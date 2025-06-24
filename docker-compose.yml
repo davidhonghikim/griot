@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  griot-node:
+    build: .
+    container_name: griot-node
+    ports:
+      - "30437:30437"
+    environment:
+      - ALLOW_INSECURE_TRANSPORT=true
+      - DATABASE_URL=postgresql://griot:griot@postgres:5432/griot
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app
+
+  postgres:
+    image: postgres:15
+    container_name: griot-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=griot
+      - POSTGRES_PASSWORD=griot
+      - POSTGRES_DB=griot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
