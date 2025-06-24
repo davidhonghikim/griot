@@ -66,3 +66,14 @@ Modern UI Redesign Complete
 - All functionality preserved while dramatically improving UX
 ```
 
+---
+
+## Archive: `archive-2025-06-24_15-17-34.tar.gz`
+
+**Created:** Tue Jun 24 15:17:36 CDT 2025
+
+### Notes:
+```
+Pre-kai-cd/OWU UI integration snapshot – baseline before frontend revamp
+```
+
