@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply antialiased;
+  }
+  
+  code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-ai-q-500 hover:bg-ai-q-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+  
+  .server-card {
+    @apply card hover:shadow-md transition-shadow duration-200 cursor-pointer;
+  }
+  
+  .status-indicator {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-healthy {
+    @apply status-indicator bg-green-100 text-green-800;
+  }
+  
+  .status-warning {
+    @apply status-indicator bg-yellow-100 text-yellow-800;
+  }
+  
+  .status-error {
+    @apply status-indicator bg-red-100 text-red-800;
+  }
+  
+  .nav-link {
+    @apply flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200;
+  }
+  
+  .nav-link-active {
+    @apply nav-link bg-ai-q-100 text-ai-q-700;
+  }
+  
+  .nav-link-inactive {
+    @apply nav-link text-gray-600 hover:text-gray-900 hover:bg-gray-50;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-ai-q-600 to-ai-q-800 bg-clip-text text-transparent;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Loading animations */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.2s ease-in-out infinite;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 468px 100%;
+}
