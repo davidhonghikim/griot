@@ -6,7 +6,12 @@ export const Navigation: React.FC = () => {
   const { logout } = useAuth();
   const location = useLocation();
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard';
+    }
+    return location.pathname === path;
+  };
 
   return (
     <nav className="glass-effect sticky top-0 z-50 border-b border-gray-200">
@@ -42,6 +47,18 @@ export const Navigation: React.FC = () => {
                 className={`nav-link ${isActive('/jobs') ? 'active' : ''}`}
               >
                 Jobs
+              </Link>
+              <Link
+                to="/installer"
+                className={`nav-link ${isActive('/installer') ? 'active' : ''}`}
+              >
+                Installer
+              </Link>
+              <Link
+                to="/settings"
+                className={`nav-link ${isActive('/settings') ? 'active' : ''}`}
+              >
+                Settings
               </Link>
             </div>
           </div>

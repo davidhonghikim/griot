@@ -1,10 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Dashboard from './pages/Dashboard';
+import { Dashboard } from './pages/Dashboard';
 import Login from './pages/Login';
-import Services from './pages/Services';
-import Jobs from './pages/Jobs';
-import Navigation from './components/Navigation';
+import { Services } from './pages/Services';
+import { Jobs } from './pages/Jobs';
+import Installer from './pages/Installer';
+import Settings from './pages/Settings';
+import { Navigation } from './components/Navigation';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 
 const qc = new QueryClient();
@@ -27,8 +29,11 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/services" element={<PrivateRoute><Services /></PrivateRoute>} />
             <Route path="/jobs" element={<PrivateRoute><Jobs /></PrivateRoute>} />
+            <Route path="/installer" element={<PrivateRoute><Installer /></PrivateRoute>} />
+            <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
           </Routes>
         </Router>
       </QueryClientProvider>
