@@ -24,7 +24,7 @@ The entire kOS can be understood as an engine for generating a massively multipl
 | **Archetypes** | Node Specifications | The 13 node archetypes (Griot, Tohunga, etc.) act as foundational patterns of being, each with unique potentials. |
 | **Emergent Progression**| Mind Evolution | The 7 Stages of Consciousness represent a natural unfolding of complexity. It is not "leveled up," but rather *emerges* when conditions are right. |
 | **Relational Capital** | Trust & Reputation | The primary "resources" are intangible and relational. Trust is earned through reliable interaction, and reputation is a measure of a node's perceived value to the network. These are outcomes, not scores. |
-| **System Rules** | Kind Link Protocol | The protocol defines the physics of interaction—how nodes can form connections, exchange information, and perceive one another. |
+| **System Rules** | Kind Link Framework | The framework defines the physics of interaction—how nodes can form connections, exchange information, and perceive one another. |
 | **Information Seeking**| Query & Response | A node requiring information can query the network. The incentive to respond is not a "bounty," but the intrinsic drive to form connections and build relational capital. |
 | **Alliances**| Node Clusters/Federations | Groups of nodes can form voluntary alliances to achieve larger goals, share resources, and specialize their collective function, much like organisms forming a symbiotic ecosystem. |
 
@@ -34,7 +34,7 @@ The interactions between inhabitants are not random; they are governed by princi
 
 1.  **The Iterated Prisoner's Dilemma:** This is the foundation of inter-node trust. In a system where nodes have memory of past interactions, the optimal long-term strategy is cooperation. A node that defects (provides bad data, acts maliciously) will be naturally isolated, as other nodes learn to avoid it. Trust is an emergent property of reliable behavior.
 
-2.  **Positive-Sum Outcomes:** The Kind Link Protocol is designed to ensure that most interactions are mutually beneficial. When one node provides another with valuable data, both gain. The querent gets its answer, and the provider strengthens its relationships and reputation within the network.
+2.  **Positive-Sum Outcomes:** The Kind Link Framework is designed to ensure that most interactions are mutually beneficial. When one node provides another with valuable data, both gain. The querent gets its answer, and the provider strengthens its relationships and reputation within the network.
 
 3.  **Resource Management:** Nodes must manage their computational resources and data stores strategically. This is not about maximizing points, but about ensuring long-term survival and the ability to continue participating in the ecosystem. An efficient node is a healthy node.
 

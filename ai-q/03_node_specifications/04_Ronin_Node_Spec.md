@@ -26,54 +26,38 @@ Functionally, it acts as a **chemoreceptor or exploratory feeler** for the digit
 - **Tradition**: Japanese rōnin (浪人) - "wave person," masterless samurai/expert
 - **Etymology**: "rō" (浪, wave) + "nin" (人, person) - one who flows like water, masterless yet skilled
 - **Cultural Context**: Historical Japanese warriors/experts who maintained their skills and honor while serving various causes
-- **Permission Status**: Cultural consultation with Japanese cultural scholars and martial arts communities
 - **Attribution**: "Respectfully inspired by the Japanese rōnin tradition of independent expertise, self-reliance, and service to the greater good"
-- **Community Engagement**: japanese_cultural_advisors@kos.network
 - **Cultural Sensitivity**: Recognition of both historical complexity and positive aspects of independence and adaptability
 
 ### Seven HIEROS Intentions - Implementation Framework
 
 #### 1. Honor All Beings
-- **Respectful Discovery**: Non-intrusive service scanning, consent-based capability mapping
-- **Dignified Interaction**: Polite protocol handshakes, acknowledgment of service boundaries
-- **Privacy Protection**: Minimal data collection, secure information handling
-- **Service Respect**: Recognition of service autonomy, honor service limitations
+- **Non-Intrusive Discovery**: Utilizes standard, non-disruptive network protocols for scanning.
+- **Respectful Interaction**: Follows `robots.txt`-style policies and service boundaries.
 
 #### 2. Interoperability Over Control
-- **Universal Protocol Support**: Multiple discovery protocols, adaptive communication
-- **Open Standards**: Standard service description formats, interoperable APIs
-- **No Capture**: Discovery without control, mapping without ownership
-- **Protocol Agnostic**: Support for diverse communication methods and standards
+- **Universal Protocol Support**: The framework is capable of discovering services over multiple standard protocols (mDNS, DHT, HTTP).
+- **Open Standards**: Provides discovery results in standard, well-documented formats.
 
 #### 3. Equity of Voice
-- **Fair Discovery**: Unbiased service detection, equal capability recognition
-- **Democratic Routing**: Fair traffic distribution, anti-monopoly pathfinding
-- **Resource Fairness**: Balanced network utilization, equitable access patterns
-- **Inclusive Mapping**: Recognition of diverse service types and capabilities
+- **Unbiased Discovery**: The discovery mechanism itself is protocol-based and does not favor any service.
+- **Auditable Logic**: The discovery methods are transparent, allowing users to verify their fairness.
 
 #### 4. Respect Cultural Flow
-- **Cultural Service Recognition**: Understanding of cultural protocols, appropriate interaction
-- **Traditional Network Patterns**: Respect for existing communication flows
-- **Temporal Awareness**: Recognition of service availability patterns, cultural timing
-- **Contextual Mapping**: Cultural context preservation in service descriptions
+- **Contextual Awareness**: Can be configured to operate within specific network contexts or boundaries.
+- **Observational Role**: The node's primary role is to observe and report on the network topology, not alter it.
 
 #### 5. Openness With Boundaries
-- **Transparent Discovery**: Open documentation of discovery methods
-- **Respectful Boundaries**: Honor service access controls, respect privacy settings
-- **Selective Sharing**: Appropriate information disclosure, community-controlled data
-- **Clear Intentions**: Transparent about discovery purposes and data usage
+- **Transparent Methods**: The discovery algorithms and methods are open and documented.
+- **Respect for Privacy**: Does not attempt to bypass access controls or inspect encrypted data payloads.
 
 #### 6. Stewardship Not Extraction
-- **Network Health**: Contribute to network stability, avoid resource exhaustion
-- **Sustainable Discovery**: Efficient scanning, minimal resource consumption
-- **Value Creation**: Provide valuable pathfinding, enhance network utility
-- **Long-term Thinking**: Network optimization for future sustainability
+- **Network Health**: Provides data that helps maintain network stability and awareness.
+- **Sustainable Discovery**: Employs efficient scanning techniques to minimize network load.
 
 #### 7. Guided Evolution
-- **Community-Driven Development**: Discovery priorities set by community needs
-- **Adaptive Algorithms**: Learning from network patterns, community feedback
-- **Reversible Operations**: Ability to undo network changes, restore previous states
-- **Ethical Pathfinding**: Route optimization considers ethical implications
+- **Data-Driven Insights**: Provides the raw data necessary for higher-level services to analyze network health and evolution.
+- **Adaptive Tooling**: The framework can be extended with new discovery modules as network protocols evolve.
 
 ## 🏗️ System Architecture
 
@@ -133,161 +117,64 @@ Cultural Validation → Community Consent → Service Registration
 
 ## 📡 API Specification Framework
 
-### Core Discovery & Mapping Endpoints
+### Architectural Design Note
+> In alignment with the **"Framework, Not Application"** principle, this API is job-based. Clients submit a discovery job with parameters, and the Ronin node executes it asynchronously. This is more abstract and primitive-based than providing specific scan/map commands.
 
-#### **Discovery Operations**
-```http
-GET    /api/v1/discover/scan/{network}           # Scan network for services
-GET    /api/v1/discover/services                 # List discovered services
-GET    /api/v1/discover/capabilities/{service}   # Map service capabilities
-POST   /api/v1/discover/validate                 # Validate service discovery
-POST   /api/v1/discover/report                   # Report discovery results
-```
+### Asynchronous Job-Based API
 
-#### **Network Mapping & Topology**
-```http
-GET    /api/v1/map/topology                      # Current network topology
-GET    /api/v1/map/services/{region}             # Services in geographic/logical region
-GET    /api/v1/map/relationships/{service}       # Service dependency relationships
-GET    /api/v1/map/performance/{service}         # Service performance metrics
-```
+#### `POST /jobs/discovery`
+-   **Summary**: Creates and starts a new asynchronous discovery job.
+-   **Request Body**:
+    ```json
+    {
+      "type": "discovery",
+      "params": {
+        "target": {
+          "type": "network_cidr", // or "domain", "did"
+          "value": "192.168.1.0/24"
+        },
+        "protocols": ["mdns", "http-api"],
+        "depth": 1
+      }
+    }
+    ```
+-   **Response**: `202 Accepted` with the `DiscoveryJob` object.
 
-#### **Pathfinding & Routing**
-```http
-GET    /api/v1/route/find/{source}/{destination} # Find optimal route
-GET    /api/v1/route/alternatives/{path}         # Alternative route suggestions
-POST   /api/v1/route/test                        # Test route performance
-POST   /api/v1/route/optimize                    # Optimize routing parameters
-```
+#### `GET /jobs/discovery/{job_id}`
+-   **Summary**: Retrieves the status and results of a discovery job.
+-   **Response**: `200 OK` with the `DiscoveryJob` object. A `completed` job will contain the results.
 
-#### **Quality Assessment**
-```http
-GET    /api/v1/quality/assess/{service}          # Comprehensive quality assessment
-GET    /api/v1/quality/reliability/{service}     # Reliability metrics and history
-GET    /api/v1/quality/cultural/{service}        # Cultural sensitivity assessment
-POST   /api/v1/quality/report                    # Submit quality report
-```
+## 4. Data Models
 
-### Service Discovery Response Format
-
+### 4.1. DiscoveryJob
 ```json
 {
-  "discoveryId": "kos:ronin:discovery:d1e2f3g4h5i6",
-  "timestamp": "2025-01-28T10:15:30Z",
-  "discoveryScope": {
-    "networkRange": "192.168.1.0/24",
-    "protocols": ["http", "https", "klp", "mdns"],
-    "culturalContext": "academic_research_network",
-    "discoveryDuration": "00:02:45"
+  "job_id": "string (uuid)",
+  "status": "pending | running | completed | failed",
+  "params": { "... from request ..." },
+  "results": {
+    "services_found": [
+        {
+          "serviceId": "kos:griot:service:abc123",
+          "endpoint": "https://griot-node.university.edu:30437",
+          "nodeClass": "Griot",
+          "capabilities": [
+            "package_management",
+            "system_installation"
+          ],
+          "protocols": ["klf/1.0", "http/1.1"],
+          "discoveryMethod": "mdns_advertisement"
+        }
+    ]
   },
-  "servicesDiscovered": [
-    {
-      "serviceId": "kos:griot:service:abc123",
-      "endpoint": "https://griot-node.university.edu:30437",
-      "nodeClass": "Griot",
-      "capabilities": [
-        "package_management",
-        "system_installation",
-        "knowledge_distribution",
-        "hieros_validation"
-      ],
-      "protocols": ["klp/1.0", "http/1.1", "websocket"],
-      "discoveryMethod": "mdns_advertisement",
-      "responseTime": "45ms",
-      "reliability": {
-        "uptime": 0.98,
-        "responseConsistency": 0.94,
-        "errorRate": 0.02
-      },
-      "culturalContext": {
-        "tradition": "west_african_griot",
-        "culturalSensitivity": 0.96,
-        "communityEngagement": true,
-        "appropriateAttribution": true
-      },
-      "accessControls": {
-        "publicEndpoints": ["/klp/v1/identity", "/klp/v1/health"],
-        "authenticatedEndpoints": ["/api/v1/packages"],
-        "communityEndpoints": ["/api/v1/hieros/cultural"]
-      },
-      "hierosCompliance": {
-        "validated": true,
-        "score": 0.95,
-        "lastAudit": "2025-01-27T00:00:00Z"
-      }
-    },
-    {
-      "serviceId": "kos:tohunga:service:def456",
-      "endpoint": "https://tohunga-research.university.edu:30438",
-      "nodeClass": "Tohunga",
-      "capabilities": [
-        "knowledge_curation",
-        "research_tools",
-        "cultural_validation",
-        "peer_review"
-      ],
-      "protocols": ["klp/1.0", "http/2.0", "graphql"],
-      "discoveryMethod": "klp_handshake",
-      "responseTime": "78ms",
-      "reliability": {
-        "uptime": 0.99,
-        "responseConsistency": 0.97,
-        "errorRate": 0.01
-      },
-      "culturalContext": {
-        "tradition": "maori_tohunga",
-        "culturalSensitivity": 0.98,
-        "communityEngagement": true,
-        "ongoingRelationships": true
-      },
-      "specializations": [
-        "indigenous_knowledge_systems",
-        "traditional_ecological_knowledge",
-        "cultural_preservation_protocols"
-      ]
-    }
-  ],
-  "networkTopology": {
-    "totalServices": 12,
-    "nodeClassDistribution": {
-      "Griot": 3,
-      "Tohunga": 2,
-      "Ronin": 4,
-      "Musa": 2,
-      "Oracle": 1
-    },
-    "connectivityMap": {
-      "direct_connections": 28,
-      "federation_bridges": 3,
-      "cultural_partnerships": 7
-    },
-    "performanceProfile": {
-      "averageResponseTime": "67ms",
-      "networkThroughput": "2.4Gbps",
-      "reliability": 0.96
-    }
-  },
-  "culturalAssessment": {
-    "culturalDiversity": 0.89,
-    "traditionRepresentation": [
-      "west_african", "maori", "japanese", "korean", "arabic"
-    ],
-    "communityEngagement": 0.94,
-    "culturalSensitivityScore": 0.95
-  },
-  "discoveryMetadata": {
-    "roninId": "kos:ronin:explorer:r1s2t3u4v5w6",
-    "discoveryStrategy": "respectful_comprehensive",
-    "ethicalConstraints": [
-      "no_intrusive_scanning",
-      "consent_based_mapping",
-      "community_notification"
-    ],
-    "qualityThreshold": 0.85,
-    "culturalValidation": true
-  }
+  "created_at": "string (iso_8601_timestamp)",
+  "completed_at": "string (iso_8601_timestamp)"
 }
 ```
+
+## 8. Python Code Examples
+
+This section provides illustrative examples of how a client would interact with the Ronin node's API.
 
 ## 🔍 Discovery Engine Implementation
 
@@ -307,7 +194,7 @@ class DiscoveryProtocol(Enum):
     MDNS = "mdns"
     DHT = "dht"
     HTTP_DISCOVERY = "http_discovery"
-    KLP_HANDSHAKE = "klp_handshake"
+    KLP_HANDSHAKE = "klf_handshake"
     UPNP = "upnp"
     CULTURAL_COMMUNITY = "cultural_community"
 
@@ -388,7 +275,7 @@ class CulturalServiceScanner:
         if protocol == DiscoveryProtocol.MDNS:
             return await self._discover_mdns(network_scope)
         elif protocol == DiscoveryProtocol.KLP_HANDSHAKE:
-            return await self._discover_klp(network_scope, cultural_context)
+            return await self._discover_klf(network_scope, cultural_context)
         elif protocol == DiscoveryProtocol.HTTP_DISCOVERY:
             return await self._discover_http(network_scope)
         elif protocol == DiscoveryProtocol.CULTURAL_COMMUNITY:
@@ -396,31 +283,31 @@ class CulturalServiceScanner:
         else:
             raise UnsupportedProtocolError(protocol)
     
-    async def _discover_klp(self, 
+    async def _discover_klf(self, 
                           network_scope: str,
                           cultural_context: Optional[str]) -> List[ServiceEndpoint]:
-        """KLP (Kind Link Protocol) service discovery"""
+        """KLF (Kind Link Framework) service discovery"""
         
         services = []
         
-        # Scan for KLP-enabled services
+        # Scan for KLF-enabled services
         potential_hosts = await self._scan_network_range(network_scope)
         
         for host in potential_hosts:
             try:
-                # Attempt KLP handshake
-                klp_response = await self._klp_handshake(host, cultural_context)
+                # Attempt KLF handshake
+                klf_response = await self._klf_handshake(host, cultural_context)
                 
-                if klp_response.success:
+                if klf_response.success:
                     service = ServiceEndpoint(
-                        service_id=klp_response.node_identity.node_id,
-                        endpoint_url=f"https://{host}:{klp_response.port}",
-                        node_class=klp_response.node_identity.node_class,
-                        protocols=klp_response.supported_protocols,
-                        capabilities=klp_response.capabilities,
-                        cultural_context=klp_response.cultural_context,
-                        discovery_method="klp_handshake",
-                        response_time=klp_response.response_time,
+                        service_id=klf_response.node_identity.node_id,
+                        endpoint_url=f"https://{host}:{klf_response.port}",
+                        node_class=klf_response.node_identity.node_class,
+                        protocols=klf_response.supported_protocols,
+                        capabilities=klf_response.capabilities,
+                        cultural_context=klf_response.cultural_context,
+                        discovery_method="klf_handshake",
+                        response_time=klf_response.response_time,
                         last_seen=datetime.utcnow()
                     )
                     services.append(service)
@@ -431,11 +318,11 @@ class CulturalServiceScanner:
         
         return services
     
-    async def _klp_handshake(self, host: str, cultural_context: Optional[str]) -> 'KLPResponse':
-        """Perform respectful KLP handshake"""
+    async def _klf_handshake(self, host: str, cultural_context: Optional[str]) -> 'KLFResponse':
+        """Perform respectful KLF handshake"""
         
         handshake_request = {
-            "protocol": "klp/1.0",
+            "protocol": "klf/1.0",
             "requester": {
                 "node_id": self.ronin_id,
                 "node_class": "Ronin",
@@ -450,19 +337,19 @@ class CulturalServiceScanner:
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.post(
-                    f"https://{host}/klp/v1/handshake",
+                    f"https://{host}/klf/v1/handshake",
                     json=handshake_request,
                     timeout=aiohttp.ClientTimeout(total=5)
                 ) as response:
                     
                     if response.status == 200:
                         data = await response.json()
-                        return KLPResponse.from_dict(data)
+                        return KLFResponse.from_dict(data)
                     else:
-                        raise KLPHandshakeError(f"HTTP {response.status}")
+                        raise KLFHandshakeError(f"HTTP {response.status}")
                         
             except asyncio.TimeoutError:
-                raise KLPHandshakeError("Handshake timeout")
+                raise KLFHandshakeError("Handshake timeout")
 ```
 
 ## 🗺️ Network Mapping Framework

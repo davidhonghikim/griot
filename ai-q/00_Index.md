@@ -131,7 +131,7 @@ Total: 28 canonical documents defining the complete kOS ecosystem
 
 ## 🌐 **Related Systems**
 
-- **Kai-CD**: Current implementation and testing ground
+- **Kai-CD**: Current implementation and testing ground - reference source only
 - **Griot-Node**: Reference implementation of the kOS vision
 - **Future Nodes**: Tohunga, Oracle, and specialized implementations
 

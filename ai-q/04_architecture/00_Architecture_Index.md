@@ -61,7 +61,7 @@ The AI-Q Architecture documentation provides comprehensive system design specifi
 
 #### **Node Communication Architecture** 📝 *To Be Created*
 - **Focus**: Inter-node communication and federation patterns
-- **Coverage**: Kind Link Protocol implementation architecture
+- **Coverage**: Kind Link Framework implementation architecture
 - **Cultural Elements**: Respectful cross-cultural communication patterns
 - **Technical Scope**: API gateways, message queues, service discovery
 - **HIEROS Integration**: Community consent and cultural validation in all communications

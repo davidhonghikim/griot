@@ -1,3 +1,15 @@
+# 🚨 THIS README IS OUTDATED - PLEASE READ THE HANDOFF DOC 🚨
+
+> **Warning:** The information in this README describes an aspirational state and **does not reflect the current reality of the project**. The application structure described below (`server/`, `web-app/`) exists only in the `archives/` directory and is not active.
+>
+> **For the true project status, architectural rules, and development priorities, you MUST read the handoff document:**
+>
+> ### 👉 [`griot-node/agents/handoff.md`](./agents/handoff.md) 👈
+>
+> Do not begin any work without first reading and understanding the handoff document.
+
+---
+
 # Griot Node - Seed Protocol Server
 
 A complete implementation of the **Griot Seed Protocol V1** with FastAPI backend, React frontend, and TypeScript SDK. This node serves as the librarian and seed distributor in the kOS ecosystem, enabling AI service orchestration and job management.

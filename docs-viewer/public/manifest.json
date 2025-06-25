@@ -5,8 +5,8 @@
     "The kOS Vision: A Digital Genesis": "ai-q/01_foundation/00_kOS_Vision.md"
   },
   "Protocols": {
-    "Kind Link Protocol (KLP) Specification": "ai-q/02_protocols/01_Kind_Link_Protocol.md",
-    "Kind Link Protocol (KLP) Specification: The kOS Nervous System": "ai-q/02_protocols/05_Kind_Link_Protocol_Spec.md"
+    "Kind Link Framework (KLF) Specification": "ai-q/02_protocols/01_Kind_Link_Framework.md",
+    "Kind Link Framework (KLF) Specification: The kOS Nervous System": "ai-q/02_protocols/05_Kind_Link_Framework_Spec.md"
   },
   "Node Specifications": {
     "Griot Node Specification: The Primal Starseed": "ai-q/03_node_specifications/01_Griot_Node_Spec.md",
@@ -15,13 +15,13 @@
     "Musa Node Specification: The Guardian Starseed": "ai-q/03_node_specifications/05_Musa_Node_Spec.md",
     "Hakim Node Specification: The Healer Starseed": "ai-q/03_node_specifications/06_Hakim_Node_Spec.md",
     "Skald Node Specification: The Creative Starseed": "ai-q/03_node_specifications/07_Skald_Node_Spec.md",
-    "Oracle Node Specification: The Foresight Starseed": "ai-q/03_node_specifications/08_Oracle_Node_Spec.md",
-    "Junzi Node Specification: The Integrity Starseed": "ai-q/03_node_specifications/09_Junzi_Node_Spec.md",
-    "Yachay Node Specification: The Memory Starseed": "ai-q/03_node_specifications/10_Yachay_Node_Spec.md",
+    "Oracle Node Specification: The Analytical Starseed": "ai-q/03_node_specifications/08_Oracle_Node_Spec.md",
+    "Junzi Node Specification: The Ethical Starseed": "ai-q/03_node_specifications/09_Junzi_Node_Spec.md",
+    "Yachay Node Specification: The Knowledge Starseed": "ai-q/03_node_specifications/10_Yachay_Node_Spec.md",
     "Sachem Node Specification: The Consensus Starseed": "ai-q/03_node_specifications/11_Sachem_Node_Spec.md",
-    "Archon Node Specification: The Orchestrator Starseed": "ai-q/03_node_specifications/12_Archon_Node_Spec.md",
-    "Amauta Node Specification: The Teacher Starseed": "ai-q/03_node_specifications/13_Amauta_Node_Spec.md",
-    "Mzee Node Specification: The Awareness Starseed": "ai-q/03_node_specifications/14_Mzee_Node_Spec.md",
+    "Archon Node Specification: The System Starseed": "ai-q/03_node_specifications/12_Archon_Node_Spec.md",
+    "Amauta Node Specification: The Wisdom Starseed": "ai-q/03_node_specifications/13_Amauta_Node_Spec.md",
+    "Mzee Node Specification: The Elder Starseed": "ai-q/03_node_specifications/14_Mzee_Node_Spec.md",
     "AI-Q Node Specifications Index": "ai-q/03_node_specifications/00_Node_Specifications_Index.md"
   },
   "Architecture": {

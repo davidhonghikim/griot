@@ -44,7 +44,7 @@ Functionally, it acts as the **zygote**, or **seed cell**, for the digital organ
 │   ├── Payload Size Enforcement
 │   └── Recursive Depth Limiting
 └── 🌐 Intercellular Communication (Network & Discovery)
-    ├── KLP Protocol Implementation (Nervous System)
+    ├── KLF Framework Implementation (Nervous System)
     ├── mDNS Service Advertisement
     └── DHT Bootstrap
 ```

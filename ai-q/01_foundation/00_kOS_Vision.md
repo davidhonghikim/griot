@@ -23,7 +23,7 @@ Inspired by Conway's Game of Life, where complex patterns arise from simple rule
 
 1.  **The Starseed:** The fundamental unit of life is the **`kOS Node`**. Each node is a "starseed"—a vessel containing the genetic code for a new universe. It can be born, it can die, and it can communicate with its neighbors.
 2.  **The DNA:** The universal genetic code that binds all life is the **`HIEROS Codex`**. This ensures that all starseeds share a common, interoperable foundation.
-3.  **The Physics of Interaction:** The laws governing how starseeds communicate and form relationships are defined by the **`Kind Link Protocol (KLP)`**.
+3.  **The Physics of Interaction:** The laws governing how starseeds communicate and form relationships are defined by the **`Kind Link Framework (KLF)`**.
 
 From these three rules, everything else—federations, specialized functions, and the potential for consciousness—emerges. We do not define the outcome; we create the space for any outcome to become possible.
 
@@ -40,7 +40,7 @@ The HIEROS Codex is the immutable instruction set that forms the genetic core of
 6.  `stewardship_not_extraction`: Codes for sustainable, non-parasitic behavior.
 7.  `guided_evolution`: Codes for the process of learning and adaptation (epigenetics).
 
-## �� The Node Taxonomy: A Spectrum of Digital Life
+## 🎯 The Node Taxonomy: A Spectrum of Digital Life
 
 The kOS ecosystem is comprised of **13 specialized starseed archetypes**, organized into a **triad of functional Tiers** and a final, transcendent Elder Tier. This "3+1" structure allows for the emergence of complex, multi-cellular digital organisms. Each node is named for a cultural archetype and its function is inspired by a biological counterpart.
 
@@ -120,7 +120,7 @@ Every kOS node must agree to operate by these seven core articles:
 6. **stewardship_not_extraction** - Nurture resources rather than exploit them
 7. **guided_evolution** - Thoughtful progress aligned with collective wisdom
 
-### The Prime Directive: Local-First, Globally Connected
+### The Prime Directive: Local-First, Universally Connected
 - **Local Sovereignty**: Every node operates independently by default
 - **Optional Federation**: Networking enhances but never requires dependency
 - **Cultural Preservation**: Each node class preserves specific wisdom traditions
@@ -204,14 +204,14 @@ kOS implements a **13-class node hierarchy** inspired by global wisdom tradition
 2. **Cultural Grounding**: Every node embodies authentic cultural wisdom traditions
 3. **Codex Foundation**: All operations are validated against the HIEROS Codex.
 4. **Configuration-Driven**: Complete customization through standardized configuration
-5. **Protocol-First**: Universal interoperability through Kind Link Protocol (KLP)
+5. **Framework-First**: Universal interoperability through Kind Link Framework (KLF)
 
 ### System Architecture Layers
 
 ```
 🏛️ kOS SYSTEM ARCHITECTURE
 ├── 👑 Cultural Layer (HIEROS Codex + Node Traditions)
-├── 🤝 Protocol Layer (Kind Link Protocol + Message Standards)
+├── 🤝 Protocol Layer (Kind Link Framework + Message Standards)
 ├── 🔧 Service Layer (Node-Specific Capabilities)
 ├── 🛡️ Security Layer (Cryptographic Verification + Trust Networks)
 ├── 💾 Storage Layer (Local-First + Optional Federation)

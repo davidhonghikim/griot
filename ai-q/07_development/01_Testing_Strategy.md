@@ -34,15 +34,15 @@ This layer comprises standard software testing practices to ensure the code is r
     - **Coverage:** Test complete user flows from the UI to the backend and back.
     - **Focus:** Simulate real user interactions. Example: A test that logs into the `griot-web` UI, initiates a package sync, and verifies that the correct API calls are made and the UI updates accordingly.
 
-## 3. Layer 2: Protocol Compliance Testing
+## 3. Layer 2: Protocol & Framework Compliance Testing
 
-This layer ensures that a node correctly implements the required kOS protocols, primarily KLP and the HIEROS validation rules.
+This layer ensures that a node correctly implements the required kOS protocols, primarily KLF and the HIEROS validation rules.
 
-- **KLP Compliance Suite:**
-    - A dedicated suite of tests that acts as a "KLP client." It will run against a node's KLP endpoints and verify:
-        - **Authentication:** Correct handling of valid and invalid `X-KOS-Signature` headers.
-        - **Core Methods:** Correct implementation and response format for `klp_ping`, `klp_getIdentity`, etc.
-        - **Error Handling:** Proper use of JSON-RPC error codes.
+- **KLF Compliance Suite:**
+    - A dedicated suite of tests that acts as a "KLF client." It will run against a node's KLF endpoints and verify:
+        - **Schema Validation:** All responses match the canonical KLF message format.
+        - **Core Methods:** Correct implementation and response format for `klf_ping`, `klf_getIdentity`, etc.
+        - **Signature Verification:** All responses are correctly signed with the node's identity key.
 
 - **HIEROS Validator Tests:**
     - Specific unit tests for the `HIEROSValidator` class.
