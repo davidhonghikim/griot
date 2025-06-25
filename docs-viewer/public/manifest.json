@@ -1,0 +1,53 @@
+{
+  "AI-Q: The Knowledge Library": "ai-q/00_Index.md",
+  "Foundation": {
+    "Cultural Node Taxonomy: The 13 Classes of kOS": "ai-q/01_foundation/02_Node_Taxonomy.md",
+    "The kOS Vision: A Digital Genesis": "ai-q/01_foundation/00_kOS_Vision.md"
+  },
+  "Protocols": {
+    "Kind Link Protocol (KLP) Specification": "ai-q/02_protocols/01_Kind_Link_Protocol.md",
+    "Kind Link Protocol (KLP) Specification: The kOS Nervous System": "ai-q/02_protocols/05_Kind_Link_Protocol_Spec.md"
+  },
+  "Node Specifications": {
+    "Griot Node Specification: The Primal Starseed": "ai-q/03_node_specifications/01_Griot_Node_Spec.md",
+    "Tohunga Node Specification: The Sensory Starseed": "ai-q/03_node_specifications/03_Tohunga_Node_Spec.md",
+    "Ronin Node Specification: The Nomadic Starseed": "ai-q/03_node_specifications/04_Ronin_Node_Spec.md",
+    "Musa Node Specification: The Guardian Starseed": "ai-q/03_node_specifications/05_Musa_Node_Spec.md",
+    "Hakim Node Specification: The Healer Starseed": "ai-q/03_node_specifications/06_Hakim_Node_Spec.md",
+    "Skald Node Specification: The Creative Starseed": "ai-q/03_node_specifications/07_Skald_Node_Spec.md",
+    "Oracle Node Specification: The Foresight Starseed": "ai-q/03_node_specifications/08_Oracle_Node_Spec.md",
+    "Junzi Node Specification: The Integrity Starseed": "ai-q/03_node_specifications/09_Junzi_Node_Spec.md",
+    "Yachay Node Specification: The Memory Starseed": "ai-q/03_node_specifications/10_Yachay_Node_Spec.md",
+    "Sachem Node Specification: The Consensus Starseed": "ai-q/03_node_specifications/11_Sachem_Node_Spec.md",
+    "Archon Node Specification: The Orchestrator Starseed": "ai-q/03_node_specifications/12_Archon_Node_Spec.md",
+    "Amauta Node Specification: The Teacher Starseed": "ai-q/03_node_specifications/13_Amauta_Node_Spec.md",
+    "Mzee Node Specification: The Awareness Starseed": "ai-q/03_node_specifications/14_Mzee_Node_Spec.md",
+    "AI-Q Node Specifications Index": "ai-q/03_node_specifications/00_Node_Specifications_Index.md"
+  },
+  "Architecture": {
+    "AI-Q Architecture Documentation Index": "ai-q/04_architecture/00_Architecture_Index.md",
+    "AI-Q Mind + MVE System Integration": "ai-q/04_architecture/04_Mind_System_Integration.md",
+    "AI-Q Mind Data Models": "ai-q/04_architecture/05_Mind_Data_Models.md",
+    "AI-Q Mind Deployment Guide": "ai-q/04_architecture/02_Mind_Deployment_Guide.md",
+    "AI-Q Mind Implementation Kit": "ai-q/04_architecture/03_Mind_Implementation_Kit.md",
+    "Complete AI-Q Implementation Roadmap": "ai-q/04_architecture/05_Complete_Implementation_Roadmap.md",
+    "Frontend Architecture Specification": "ai-q/04_architecture/02_Frontend_Architecture.md",
+    "System Dynamics & The Great Game": "ai-q/04_architecture/08_Game_Theory_And_System_Dynamics.md",
+    "The 3 Eras of Mind Evolution": "ai-q/04_architecture/01_AI_Mind_Evolution_Architecture.md",
+    "The Cognitive Biology of a kOS Node": "ai-q/04_architecture/01_AI_Mind_Architecture.md"
+  },
+  "Agent Handoff": {
+    "AI-Q Agent Handoff Package": "ai-q/05_handoff/00_Agent_Handoff_Package.md",
+    "AI-Q Honest Project Status Assessment": "ai-q/05_handoff/01_Honest_Project_Status.md",
+    "AI-Q Implementation Progress Summary": "ai-q/05_handoff/04_Progress_Summary.md",
+    "AI-Q Phase 3 & 4 Execution Plan": "ai-q/05_handoff/02_Execution_Plan.md",
+    "AI-Q Production Framework": "ai-q/05_handoff/03_Production_Framework.md"
+  },
+  "Quality Standards": {
+    "AI-Q Quality Standards Framework": "ai-q/06_quality/00_Quality_Standards.md"
+  },
+  "Development": {
+    "AI-Q Development Workflow Guide": "ai-q/07_development/00_Development_Workflow.md",
+    "kOS Testing Strategy": "ai-q/07_development/01_Testing_Strategy.md"
+  }
+}

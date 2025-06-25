@@ -1,4 +1,5 @@
 node_modules/
+archives/
 .env
 *.log
 dist/
