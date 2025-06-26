@@ -30,7 +30,7 @@ This command will display your core system prompt, the agent workflow, the proje
 The `agents/01_AGENT_CHANGELOG.md` file is the official, chronological journal of the project. You **must** document your session in this file.
 
 **A. Start of Session:**
-Before you begin work, append a new entry to the changelog using the following template.
+Before you begin work, append a new entry to the changelog using the following template. The timestamp **MUST** be in `YYYY-MM-DD` format.
 
 ```markdown
 ---
@@ -39,28 +39,64 @@ Before you begin work, append a new entry to the changelog using the following t
 **Mission**: [A brief, one-sentence summary of the goal from LATEST_HANDOFF.md]
 
 ### Log:
-- **[Timestamp UTC]**: Session started. Reviewing rules and handoff directive.
+- **[YYYY-MM-DDTHH:MM:SSZ]**: ONBOARDING - Session started. Reviewing rules and handoff directive.
 ```
 
 **B. During Session:**
-You **must** log every significant action. This creates the audit trail. Append a new, timestamped log entry for:
--   Every `run_terminal_cmd` or `edit_file` tool call. Briefly state its purpose.
--   Every critical finding from a `read_file` or `codebase_search`.
--   Every error you encounter and every correction you make.
--   Every decision point and the reason for your choice.
+You **must** log major accomplishments, not every granular action. The goal is to create a high-level, human-readable audit trail that summarizes progress.
 
-**Example Log Entry:**
+-   **Log Major Tasks:** Instead of logging every `edit_file` or `run_terminal_cmd` call, batch your work into logical units. Create a single log entry when a significant, multi-step task is complete.
+-   **Log Key Events:** Continue to log important non-action events as they occur, using the appropriate entry type:
+    -   `FINDING`: The discovery of a significant issue.
+    -   `CORRECTION`: A direct action taken to fix a `FINDING`.
+    -   `DECISION`: A choice made between multiple implementation options. State the rationale.
+
+**Example Log Entries:**
 ```markdown
-- **[Timestamp UTC]**: Discovered KLF `MessageType` mismatch between specs and `types.ts`. Correcting `EVENT_PUBLISH` to `EVENT` in Skald API spec.
-- **[Timestamp UTC]**: Executing `edit_file` on `03_Skald_KLF_API.md` to correct message types.
+- **2025-06-25T18:35:00Z**: FINDING - Discovered a `MessageType` mismatch between specifications and the core protocol.
+- **2025-06-25T19:10:00Z**: ACTION - Completed the full 5-part specification suite for the Griot Node.
 ```
 
-### 3. The Handoff Process (Your Last 5 Minutes)
+### 3. Project-Wide Style & Naming Conventions
+
+To ensure perfect interoperability and a predictable structure, all agents **MUST** adhere to the following conventions without deviation. Do not invent new patterns.
+
+**A. Directory Structure:**
+- All project documentation and specifications **MUST** reside under `ai-q/`.
+- All agent process files (workflow, prompts, changelogs, handoffs) **MUST** reside under `agents/`.
+- Node specification suites **MUST** be placed in a subdirectory named for the node under `ai-q/03_node_specifications/`, following the pattern `[##]_[NodeName]`. Example: `ai-q/03_node_specifications/01_Griot/`.
+- No other top-level directories may be created.
+
+**B. File Naming:**
+- **Node Specifications:** Must follow the format `[##]_[SpecName].md` within their node's directory. Example: `01_Architecture.md`.
+- **Handoffs:** The primary handoff file **MUST** be `agents/handoff/LATEST_HANDOFF.md`. Archived handoffs **MUST** follow the format `[YYYY-MM-DD]_[AgentName]_[Description].md`.
+
+**C. Markdown & Documentation Style:**
+- All documentation **MUST** be in Markdown (`.md`).
+- Specification files **MUST** begin with a YAML frontmatter block containing `title` and `version` fields, matching the filename.
+- Headings **MUST** be used hierarchically (e.g., `##` follows `#`, `###` follows `##`). Do not skip levels.
+- Code blocks **MUST** be properly fenced with the language identifier (e.g., ```typescript).
+
+**D. Code Style:**
+- All code (TypeScript, etc.) **MUST** adhere to the project's Prettier and ESLint configurations. Agents are responsible for running formatters and linters before finalizing work. *(Note: This is a forward-looking requirement)*.
+
+### 4. The Handoff Process (Your Last 5 Minutes)
 
 When your assigned mission is complete, you **must** execute the following handoff procedure precisely.
 
 **A. Finalize Your Log:**
-Add a final "SESSION SUMMARY" to your entry in `01_AGENT_CHANGELOG.md`. Summarize what you accomplished, the final state of your work, and any critical findings.
+Add a final "SESSION SUMMARY" to your entry in `01_AGENT_CHANGELOG.md`. This summary **MUST** use the following structure to ensure clarity for the next agent:
+
+```markdown
+### SESSION SUMMARY:
+**Accomplishments**: 
+- [List of completed primary goals from the mission.]
+- [List of any other significant achievements.]
+**Final State**: [A brief, 1-2 sentence description of the state of the codebase and documentation at the end of the session.]
+**Key Findings**: 
+- [A bulleted list of any critical discoveries (`FINDING` entries) made during the session.]
+- [If no significant findings, state "None."]
+```
 
 **B. Archive the Old Handoff:**
 The handoff you received is now history. Move it to the archive.

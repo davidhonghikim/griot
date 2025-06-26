@@ -1,17 +1,17 @@
 ---
-title: "Yachay Node Specification: The Memory Starseed"
-description: "Technical specification for the Yachay node, the 'hippocampus' of the kOS ecosystem."
-type: "implementation"
-status: "stub"
+title: "10.0: Yachay Node Overview"
+description: "High-level overview of the Yachay node, the 'hippocampus' of the kOS ecosystem, responsible for long-term memory consolidation."
+type: "specification"
+status: "draft"
 priority: "high"
 tier: "governance"
 cultural_origin: "Quechua Tradition"
-last_updated: "2025-06-25"
-version: "0.1.0"
-agent_notes: "This is a stub file. The Yachay node needs a full technical specification. It is being created to fill a gap in the existing documentation."
+last_updated: "2024-07-23"
+version: "0.2.0"
+agent_notes: "This document is the first of a 5-part specification. It is being expanded from a stub file into a full overview."
 ---
 
-# Yachay Node Specification: The Memory Starseed
+# 10.0 Yachay Node: The Memory Starseed
 
 ## 🎯 Overview: The Memory of the Universe
 
@@ -40,4 +40,4 @@ The API will need methods for:
 -   `GET /memory/concept/{id}`: To retrieve all known information about a specific entity or concept.
 
 ---
-**Implementation Status**: 📝 **STUB - REQUIRES FULL SPECIFICATION** 
+**Implementation Status**: 📝 **DRAFT - REQUIRES EXPANSION** 
