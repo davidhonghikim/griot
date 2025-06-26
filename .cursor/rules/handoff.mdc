@@ -16,7 +16,7 @@ then give final assessment and recommendations, then wait
 
 always conform to current formatting, file naming and dir structure
 do not create dirs and files without checking current status
-do not create dirs and files in root dir 
+do not create dirs and files in root dir with out explicit reason to go against the current structure
 
 
 

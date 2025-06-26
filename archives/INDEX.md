@@ -135,3 +135,22 @@ kOS Document Explorer: Complete implementation with all fixes - deployment ready
 Fixed inaccurate progress claims, removed permission placeholders, updated KLP to KLF, cleaned HIEROS sections for node cooperation only, made frameworks truly generic without censorship
 ```
 
+---
+
+## Archive: `archive-2025-06-25_19-21-34.tar.gz`
+
+**Created:** Wed Jun 25 19:21:34 CDT 2025
+
+### Notes:
+```
+feat(docs): Complete Engineering Specifications for Core Nodes
+
+This commit marks the successful completion of the blueprinting phase. All core node classes now have a complete, consistent, and buildable set of engineering specifications.
+
+- Transformed 7 high-level node concepts into 35+ granular documents.
+- Each node now has a 5-part spec: Overview, Architecture, Data Models, KLF API, and Database Schema.
+- Conducted a full review, identifying and correcting critical inconsistencies and omissions, including a missing Griot API and mismatches with KLF protocol types.
+- Updated all handoff documentation (README, FINAL_HANDOFF) to reflect the new project state and the authoritative nature of the new specifications.
+- The project is now fully prepared for the implementation phase.
+```
+
