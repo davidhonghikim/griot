@@ -154,3 +154,21 @@ This commit marks the successful completion of the blueprinting phase. All core 
 - The project is now fully prepared for the implementation phase.
 ```
 
+---
+
+## Archive: `archive-2025-06-25_19-55-50.tar.gz`
+
+**Created:** Wed Jun 25 19:55:51 CDT 2025
+
+### Notes:
+```
+feat(agents): Refactor agent workflow and system prompt
+
+This commit refactors the entire agent workflow to be more robust, streamlined, and philosophically grounded.
+
+- Cleans up legacy files in the 'agents' directory.
+- Creates a new, definitive '02_SYSTEM_PROMPT.md' with a detailed agent persona and rules.
+- Integrates the HIEROS philosophy as a concrete, actionable code of conduct for the agent.
+- Updates the '00_AGENT_WORKFLOW.md' to enforce a new, more comprehensive bootstrapping process for all agents.
+```
+

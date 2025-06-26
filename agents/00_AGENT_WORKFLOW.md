@@ -20,10 +20,10 @@ Before taking any other action, you **must** ground yourself in the current proj
 Execute the following command:
 
 ```bash
-cat agents/00_AGENT_WORKFLOW.md && echo "---" && cat agents/handoff/LATEST_HANDOFF.md
+cat agents/02_SYSTEM_PROMPT.md && echo "\n---" && cat agents/00_AGENT_WORKFLOW.md && echo "\n---" && cat ai-q/04_architecture/02_AI_Orchestration_Framework.md && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
 ```
 
-This command will display this rulebook and the specific, up-to-date directive for your current session. Do not proceed until you have done this.
+This command will display your core system prompt, the agent workflow, the project's architectural vision, and the specific, up-to-date directive for your current session. Do not proceed until you have done this.
 
 ### 2. The Agent Changelog (Your Primary Duty)
 

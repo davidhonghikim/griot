@@ -35,7 +35,7 @@ npm run build
 npx tsx src/examples/basic-system.ts
 ```
 
-## �� **Current Status (Core Specification: 100% Complete)**
+## 🎯 **Current Status (Core Specification: 100% Complete)**
 
 The foundational engineering specifications for the core kOS node classes are now **100% complete**. This project has successfully transformed the high-level `ai-q` concepts into a complete set of buildable blueprints.
 
@@ -85,22 +85,20 @@ ai-q/
     └── ... (5 more conceptual stubs)
 ```
 
-### **Agent Coordination**
-```
-agents/                 # Agent handoffs and coordination
-├── 00_PROJECT_OVERVIEW.md  # THIS FILE - Start here
-├── Execution_Plan.md       # Current agent work log
-├── Next_Agent_Brief.md     # Status summary
-└── handoff.md             # Detailed handoff documentation
-```
+### **Agent Coordination & Workflow**
+The `agents/` directory contains the mandatory workflow and historical logs for all agent activity. The process is designed to be simple, auditable, and consistent.
 
-### **Development & Deployment**
+-   `agents/00_AGENT_WORKFLOW.md`: **The Rulebook.** All agents MUST follow the process defined in this file.
+-   `agents/handoff/LATEST_HANDOFF.md`: **The Current Task.** The single source of truth for the next agent's mission.
+-   `agents/01_AGENT_CHANGELOG.md`: **The Project Journal.** A running log of all actions, findings, and decisions made by every agent.
+
 ```
-archives/               # Archived FastAPI/React implementations
-deployments/            # Deployment configurations  
-docs-viewer/            # Documentation viewer application
-web-app/               # Web interface components
-tests/                 # Testing framework
+agents/
+├── 00_AGENT_WORKFLOW.md       # MANDATORY: The rules for all agents.
+├── 01_AGENT_CHANGELOG.md      # The running history of the project.
+└── handoff/
+    ├── LATEST_HANDOFF.md      # The official task for the NEXT agent.
+    └── archive/               # Historical handoff documents.
 ```
 
 ## 🏗️ **Architecture Overview**
@@ -158,12 +156,13 @@ All work follows established patterns:
 
 ## 🔄 **Development Workflow**
 
+The development workflow is now enforced by the rules in `agents/00_AGENT_WORKFLOW.md`.
+
 ### **For Agents**
-1. Read `agents/00_PROJECT_OVERVIEW.md` (this guide)
-2. Review `agents/Next_Agent_Brief.md` for current status
-3. **Use the `ai-q` specifications as the single source of truth for implementation.**
-4. Update `agents/Execution_Plan.md` with progress
-5. Get user verification before marking complete
+1.  **Onboard**: Read `agents/00_AGENT_WORKFLOW.md` and `agents/handoff/LATEST_HANDOFF.md`.
+2.  **Execute**: Perform the task defined in the handoff, following the established quality standards.
+3.  **Log**: Document all actions, findings, and errors in `agents/01_AGENT_CHANGELOG.md`.
+4.  **Handoff**: Follow the procedure in the workflow to archive the old handoff and create a new one.
 
 ### **For Implementation**
 1. **Select a node class from `ai-q/03_node_specifications/`.**
@@ -205,18 +204,18 @@ Restore and enhance archived systems:
 ## 📚 **Key Documentation**
 
 **Essential Reading Order:**
-1. `agents/00_PROJECT_OVERVIEW.md` - Project context
-2. `agents/Next_Agent_Brief.md` - Current status  
-3. `ai-q/01_foundation/01_Architecture_Principles.md` - Core principles
-4. **Browse the `ai-q/03_node_specifications/` directories to understand the detailed architecture of each node.**
+1.  `agents/00_AGENT_WORKFLOW.md` - The mandatory process for all contributors.
+2.  `agents/handoff/LATEST_HANDOFF.md` - The current task.
+3.  `ai-q/01_foundation/01_Architecture_Principles.md` - Core design principles.
+4.  Browse the `ai-q/03_node_specifications/` directories to understand the detailed architecture of each node.
 
 ## 🤝 **Contributing**
 
-1. Follow the bootstrap process in `agents/00_PROJECT_OVERVIEW.md`
-2. Use established patterns from completed work
-3. Maintain TypeScript strictness and quality standards
-4. Update documentation with detailed progress logs
-5. Present work to user for final verification
+1.  Follow the mandatory workflow in `agents/00_AGENT_WORKFLOW.md`.
+2.  Use established patterns from completed work in `ai-q/`.
+3.  Maintain TypeScript strictness and quality standards
+4.  Update documentation with detailed progress logs
+5.  Present work to user for final verification
 
 ---
 
