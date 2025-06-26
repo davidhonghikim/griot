@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+read files for context, review, analyze. assume prev agent made errors. double check their work.
+
+/Users/danger/CascadeProjects/griot-node/agents
+
+when bootstrapping:
+double check your work. assume you made errors so review all docs and codebase for issues and inconsistencies. analyze core project and files for logic and other issues i may not have even thought of
+
+give analysis, update all docs to reflect the issues - 
+run archive script with notes, push with notes
+then give final assessment and recommendations, then wait
+
+always conform to current formatting, file naming and dir structure
+do not create dirs and files without checking current status
+do not create dirs and files in root dir 
+
+
+
+for reference only:
+previous prototype project that evolved to this current new project
+kai-cd was a browser ext app that allowed a user to manage multiple chat llm tabs, media generation, and had a service manager, prompt manager, artefacts manager, diceware passphrase generator, vaults manager, 
+/Users/danger/CascadeProjects/kai-cd
+
+
+when handing off:
+double check your work. assume you made errors so review all docs and codebase for issues and inconsistencies. analyze core project and files for logic and other issues i may not have even thought of
+give analysis, update all docs to reflect the issues - 
+run archive script with notes, push with notes
+then give final assessment and recommendations, then wait
