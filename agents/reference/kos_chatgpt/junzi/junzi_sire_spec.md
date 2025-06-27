@@ -1,0 +1,185 @@
+# JUNZI Phase 5 - Detailed Technical Specification: Stakeholder Impact Recalibration Engine (SIRE)
+
+## Module Name:
+
+Stakeholder Impact Recalibration Engine (SIRE)
+
+## Module Purpose:
+
+SIRE periodically recalculates and adjusts stakeholder group impact weightings within JUNZI’s ethical decision framework. It uses historical engagement data, trust metrics, feedback volume, risk exposure, and ethical conflict history to dynamically refine stakeholder influence on decision weighting models.
+
+---
+
+## System Architecture
+
+### Impact Recalibration Pipeline:
+
+1. **Stakeholder Data Aggregation Layer:**
+
+   - Ingests data from:
+     - SFL (feedback volume and sentiment)
+     - JEDE (decision impact logs)
+     - EAT (historical decision-audit data)
+     - RAME (risk exposure per stakeholder group)
+     - SVN (voting participation)
+
+2. **Impact Metric Calculation Engine:**
+
+   - Calculates per-stakeholder group metrics:
+     - Engagement Rate
+     - Trust Retention Rate
+     - Feedback Responsiveness
+     - Ethical Conflict Frequency
+     - Historical Risk Load
+
+3. **Recalibration Algorithm Layer:**
+
+   - Weighted impact score formula:
+
+```python
+StakeholderImpactScore = (EngagementRate * 0.3) + (TrustRetention * 0.25) + (FeedbackResponsiveness * 0.2) + (RiskExposure * 0.15) - (ConflictFrequency * 0.1)
+```
+
+- Normalizes scores across all groups.
+
+4. **Policy Weight Adjustment Module:**
+
+   - Updates JEDE and DERE with new stakeholder group weighting multipliers.
+   - Supports rollback if recalibration causes unexpected drift or stakeholder dissatisfaction spikes.
+
+5. **Impact Change Logging Layer:**
+
+   - Full audit trail for every recalibration run.
+   - Logs include metric snapshots and change justifications (stored in EAT).
+
+6. **Recalibration Frequency Controller:**
+
+   - Default recalibration cadence: Monthly
+   - Supports on-demand recalibration under governance approval.
+
+---
+
+## Data Models
+
+### Stakeholder Impact Snapshot:
+
+```json
+{
+  "snapshot_id": "uuid",
+  "stakeholder_group": "string",
+  "engagement_rate": "float",
+  "trust_retention": "float",
+  "feedback_responsiveness": "float",
+  "risk_exposure": "float",
+  "conflict_frequency": "float",
+  "calculated_impact_score": "float",
+  "applied_multiplier": "float",
+  "timestamp": "ISO8601"
+}
+```
+
+---
+
+## API Endpoints
+
+| Endpoint                                 | Method | Description                                    |
+| ---------------------------------------- | ------ | ---------------------------------------------- |
+| /sire/calculate-impact-scores            | POST   | Runs full stakeholder impact score calculation |
+| /sire/get-impact-snapshot/{snapshot\_id} | GET    | Retrieves historical recalibration snapshot    |
+| /sire/apply-impact-weights               | POST   | Pushes new weights to JEDE and DERE            |
+| /sire/rollback-impact-weights            | POST   | Restores previous weight settings              |
+| /sire/get-recalibration-history          | POST   | Returns recalibration change log over time     |
+
+---
+
+## Algorithms and Logic
+
+1. **Weighted Composite Scoring:**
+
+   - Dynamically weights each metric category per governance policy.
+
+2. **Outlier Detection:**
+
+   - Flags unusually large changes in group impact score for manual review.
+
+3. **Drift Control Check:**
+
+   - Simulates JEDE decision flow impacts before applying new weights.
+
+---
+
+## Performance Targets
+
+- **Full Impact Recalculation Time:** Under 10 minutes for global stakeholder groups
+- **Impact Weight Application Time:** Under 2 minutes
+- **Rollback Latency:** Under 1 minute
+
+---
+
+## Monitoring and Metrics
+
+- **Impact Score Change Magnitude**
+- **Recalibration Frequency**
+- **Rollback Event Rate**
+- **Post-Recalibration Decision Flow Variance**
+
+Monitoring Tools: Prometheus + Grafana; Stakeholder impact change dashboards.
+
+---
+
+## Security Considerations
+
+- RBAC for recalibration execution and approval
+- Full audit logging in EAT
+- Governance-locked approval required for recalibration threshold adjustments
+
+---
+
+## Testing Requirements
+
+- **Unit Tests:**
+
+  - Metric calculation functions
+  - Scoring formula accuracy
+
+- **Integration Tests:**
+
+  - SIRE ↔ JEDE and DERE weight update flow
+
+- **Load Tests:**
+
+  - Multi-group recalibration under high data volumes
+
+- **Drift Simulation Tests:**
+
+  - Validate JEDE decision flow stability post-recalibration
+
+---
+
+## Deployment Profile
+
+- **Language:** Python 3.11
+- **Containerization:** Docker + Kubernetes
+- **Storage:** PostgreSQL for snapshots; S3 for large audit logs
+
+---
+
+## Dependencies
+
+- SFL API
+- JEDE API
+- DERE API
+- RAME API
+- EAT API
+- SVN API
+
+---
+
+## Next Document:
+
+Automated Rule Evolution Engine (AREE) - Full Technical Specification
+
+---
+
+*End of JUNZI Stakeholder Impact Recalibration Engine (SIRE) Technical Specification Document.*
+

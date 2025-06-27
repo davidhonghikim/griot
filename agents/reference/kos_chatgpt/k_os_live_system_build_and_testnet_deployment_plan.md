@@ -1,0 +1,113 @@
+# kOS Live System Build and Testnet Deployment Plan
+
+## Overview
+The **kOS Live System Build and Testnet Deployment Plan** details the step-by-step process for assembling the first full working instance of the kOS ecosystem and deploying it in a controlled testnet environment. This phase transitions the project from documentation and design into live, operational infrastructure.
+
+The plan covers build orchestration, testnet configuration, early node participant setup, and initial validation steps.
+
+---
+
+## 1. Build Orchestration Strategy
+
+### 1.1 Build Automation Tools
+- Docker Compose for single-node build testing
+- Kubernetes Helm Charts for multi-node orchestration
+- Ansible playbooks for bare-metal deployments
+- CI/CD pipeline triggers for automated build validation
+
+### 1.2 Target Build Artifacts
+- Container images for each node class
+- Agent binary or package bundles per agent class
+- Configuration files for GEIG, TOSE, and OEC
+- Initial Knowledge Graph and Policy Snapshots
+
+---
+
+## 2. Testnet Deployment Topology
+
+### 2.1 Initial Cluster Size
+- 5-node testnet
+  - 1 Governance Node
+  - 1 Ethics Node
+  - 1 Control Node
+  - 1 Memory Node
+  - 1 Multi-purpose Node (Processing + Skald + Discovery)
+
+### 2.2 Network Configuration
+- Private VPC or VPN-backed network layer
+- Optional public API gateway for external test participants
+- Encrypted inter-node communication (TLS/mTLS)
+
+### 2.3 Federation Simulation
+- Simulated external clusters for cross-cluster task routing tests
+- Placeholder nodes for future external partners
+
+---
+
+## 3. Early Node Participant Program
+
+- Invite internal developers and designated external partners
+- Provide container images or deployment scripts
+- Issue GEIG ethical compliance agreement for all participants
+- Establish onboarding support channel for testnet nodes
+
+---
+
+## 4. Pre-Deployment Checklist
+
+- CI/CD build success confirmation
+- GEIG policy validation pass
+- Container image integrity checks
+- Test telemetry endpoints and dashboards
+- Validate rollback plan for failed deployment
+
+---
+
+## 5. Deployment Steps
+
+1. Launch infrastructure (cloud, bare-metal, or hybrid)
+2. Deploy core infrastructure services (TOSE, OEC, GEIG)
+3. Bring up each Node Class sequentially
+4. Register agents with Control Nodes
+5. Enable inter-node messaging via the Communication Bus
+6. Run health checks across nodes and agents
+7. Trigger sample workflows for system validation
+
+---
+
+## 6. Post-Deployment Validation
+
+- Run functional tests across all active node classes
+- Validate ethical gating for task executions
+- Test telemetry stream integrity
+- Verify data storage and recall from Memory Nodes
+- Confirm end-to-end Skald message lifecycle
+
+---
+
+## 7. Risk Management for Testnet
+
+- Isolation from production data and networks
+- Rate limiting for experimental agents
+- Daily snapshot backups
+- Monitoring for misbehaving nodes or agents
+- Dedicated recovery playbooks
+
+---
+
+## 8. Next Steps After Testnet Success
+
+- Expand cluster size for stress testing
+- Invite broader external contributor participation
+- Initiate performance benchmarking
+- Schedule Phase 17 – Production Readiness Hardening
+
+---
+
+## Conclusion
+The **kOS Live System Build and Testnet Deployment Plan** provides a structured, controlled, and ethically governed pathway for transitioning the kOS ecosystem into its first operational environment—laying the foundation for full production rollout.
+
+✅ This completes Phase 16 deliverables.
+
+Next: Proceeding to **Phase 17 – Production Readiness Hardening** planning documentation.
+

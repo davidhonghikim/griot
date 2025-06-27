@@ -1,0 +1,102 @@
+# Skald Module Specification: Runtime Scheduler (SRS)
+
+## Module Name
+**Skald Runtime Scheduler (SRS)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Runtime Scheduler (SRS) is the execution timing and resource allocation manager for all active Skald workflows. It determines when and where each Skald module process runs, optimizing system utilization while meeting workflow timing, priority, and concurrency requirements.
+
+## Purpose
+To efficiently schedule, sequence, and manage runtime execution slots for Skald modules and workflows, ensuring optimal throughput, fairness, and real-time responsiveness across the Skald system.
+
+## Functional Requirements
+
+### 1. Scheduling Queues
+- **Priority Queues:** High, Medium, Low priority levels.
+- **Workflow Type Queues:** Separate queues for real-time, batch, and background jobs.
+- **Resource-Aware Queues:** Consider CPU, memory, and I/O availability when scheduling.
+
+### 2. Task Dispatching
+- **Worker Thread Pool Management:** Dynamically adjust worker threads based on load.
+- **Load-Aware Dispatching:** Route execution to underutilized nodes or threads.
+- **Concurrency Control:** Limit maximum concurrent executions per module type.
+- **Dependency Resolution:** Enforce execution order based on workflow dependencies from SWO.
+
+### 3. Timing Control
+- **Execution Time Windows:** Schedule tasks within defined time ranges.
+- **Delay and Throttle Control:** Introduce artificial delays if needed for pacing.
+- **Timeout Enforcement:** Kill or escalate jobs exceeding allowed execution time.
+
+### 4. Resource Monitoring
+- **Real-Time Resource Metrics:** CPU, Memory, I/O usage monitoring.
+- **Overload Detection:** Detect node or thread saturation and trigger load-balancing.
+- **Adaptive Scheduling:** Reprioritize or requeue jobs based on system stress levels.
+
+### 5. Scheduling Policies
+- **First-In-First-Out (FIFO)**
+- **Shortest Job First (SJF)**
+- **Round-Robin (RR)**
+- **Priority Scheduling**
+- **Custom Policy Plugin Support**
+
+### 6. Failure Handling
+- **Retry Queues:** Place failed jobs in retry queue with configurable backoff.
+- **Dead Letter Queue (DLQ):** Persistently store irrecoverable failed jobs.
+- **Escalation Triggers:** Notify Error Handling Engine (EHR) for persistent failures.
+
+## Non-Functional Requirements
+- **Latency:** <50ms job placement latency.
+- **Throughput:** Thousands of job dispatches per second on standard hardware.
+- **Scalability:** Horizontal scaling across multiple nodes.
+- **Resilience:** Graceful degradation during overload conditions.
+
+## Data Flow Diagram (Textual)
+1. **Workflow Dispatch (from SWO)** → 2. **Queue Selection** → 3. **Resource Check** → 4. **Task Assignment to Worker Thread/Node** → 5. **Execution Start** → 6. **Completion/Failure Reporting**
+
+## Interfaces
+- **Input Interfaces:** Skald Workflow Orchestrator (SWO), External Triggers.
+- **Output Interfaces:** Skald Load Balancer (LND), Error Handler (EHR), Metrics Collector.
+
+## Configuration Options
+- **Max Threads per Node:** (Default: 32)
+- **Scheduling Policy:** (FIFO/SJF/RR/Priority/Custom)
+- **Timeout Threshold:** (Default: 60 seconds)
+- **Retry Policy:** (Immediate/Exponential Backoff/Manual Intervention)
+
+## Example Use Cases
+- Scheduling parallel translation jobs across multiple cores.
+- Throttling low-priority narrative generation tasks during peak hours.
+- Pre-scheduling large batch summary jobs for off-peak processing windows.
+
+## Extensibility Hooks
+- **Custom Scheduler Plugins:** For domain-specific scheduling logic.
+- **Metrics API:** For external monitoring tools.
+- **Load Prediction Models:** AI-driven predictive load balancing (future).
+
+## Testing and Validation Plan
+- Stress tests with high job submission rates.
+- Scheduling fairness tests across priority levels.
+- Resource exhaustion simulation.
+- Failure recovery path tests.
+
+## Dependencies
+- **kOS Event Bus**
+- **Skald Workflow Orchestrator (SWO)**
+- **Skald Load Balancer (LND)**
+- **Error Handling Engine (EHR)**
+
+## Future Enhancements
+- AI-based predictive scheduling.
+- Real-time queue visualization dashboard.
+- Support for cross-node distributed scheduling.
+- Self-healing node rebalancing after failure.
+
+---
+
+**Next module:** `skald_load_balancer_and_node_dispatcher.md`
+
+Let me know when you want me to continue.
+

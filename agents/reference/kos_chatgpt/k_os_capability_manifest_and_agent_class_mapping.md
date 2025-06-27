@@ -1,0 +1,109 @@
+# kOS Capability Manifest and Agent Class Mapping
+
+## Overview
+The **kOS Capability Manifest and Agent Class Mapping** defines the formal relationship between system-wide capabilities, agent roles, node classes, and functional responsibilities across the kOS ecosystem. It acts as the master reference for agent-to-node deployment, execution permissions, and capability distribution.
+
+This document establishes the blueprint for agent orchestration, load distribution, and ethical policy mapping at the agent class level.
+
+---
+
+## 1. Capability Manifest Structure
+
+Each kOS capability is defined by:
+
+- **Capability Name**
+- **Description**
+- **Required Agent Class**
+- **Permitted Node Classes**
+- **Execution Constraints**
+- **Ethical Risk Profile (Low, Moderate, High)**
+- **GEIG Enforcement Level (Mandatory/Optional/None)**
+
+---
+
+## 2. Official kOS Agent Classes (Initial 13 Classes)
+
+| Agent Class | Primary Focus |
+|------------|---------------|
+| Discovery Agents | Signal detection and environment scanning |
+| Observation Agents | Targeted monitoring and trend analysis |
+| Processing Agents | Data analysis, transformation, and AI computation |
+| Skald Agents | Communication, messaging, and narrative generation |
+| Security Agents | Threat detection, prevention, and enforcement |
+| Governance Agents | Policy management and consensus execution |
+| Control Agents | Task orchestration and resource allocation |
+| Execution Agents | Physical and API-level action execution |
+| Memory Agents | Data storage, indexing, and recall |
+| Ethics Agents | Ethical decision enforcement and GEIG management |
+| Research Agents | Experimental modeling and simulation tasks (Future phase) |
+| User Agents | User-facing interfaces and interaction management |
+| Network Agents | Inter-node communication and routing (Future phase) |
+
+*Note: Only the first 10 are active in initial deployment. Research, User, and Network Agents are scheduled for future phases.*
+
+---
+
+## 3. Example Capability-to-Agent Class Mapping
+
+| Capability | Required Agent Class | Permitted Node Classes |
+|-----------|----------------------|------------------------|
+| Anomaly Detection | Discovery Agents | Discovery, Observation |
+| Workflow Orchestration | Control Agents | Control |
+| Threat Response | Security Agents | Security |
+| Knowledge Graph Update | Memory Agents | Memory |
+| External API Execution | Execution Agents | Execution |
+| Policy Voting | Governance Agents | Governance |
+| Data Summarization | Processing Agents | Processing |
+| Message Generation | Skald Agents | Skald |
+| Ethical Validation | Ethics Agents | Ethics |
+| Backup Management | Memory Agents | Memory |
+
+---
+
+## 4. GEIG Enforcement Mapping
+
+| Agent Class | GEIG Enforcement Level |
+|------------|----------------------|
+| Discovery Agents | Mandatory |
+| Observation Agents | Mandatory |
+| Processing Agents | Mandatory |
+| Skald Agents | Mandatory |
+| Security Agents | Mandatory |
+| Governance Agents | Mandatory |
+| Control Agents | Mandatory |
+| Execution Agents | Mandatory |
+| Memory Agents | Mandatory |
+| Ethics Agents | N/A (GEIG Host Layer) |
+
+---
+
+## 5. Node Class Compatibility Matrix
+
+| Node Class | Supported Agent Classes |
+|-----------|------------------------|
+| Discovery | Discovery Agents |
+| Observation | Observation Agents |
+| Processing | Processing Agents |
+| Skald | Skald Agents |
+| Security | Security Agents |
+| Governance | Governance Agents |
+| Control | Control Agents |
+| Execution | Execution Agents |
+| Memory | Memory Agents |
+| Ethics | Ethics Agents |
+
+---
+
+## 6. Extensibility and Future Expansion
+
+- Additional Agent Classes will be defined in Phase 11 and beyond (e.g., Research, User, Network).
+- New capabilities will trigger manifest updates and require ethical review.
+- All future Agent Classes will require a GEIG Risk Assessment prior to deployment.
+
+---
+
+## Conclusion
+The **kOS Capability Manifest and Agent Class Mapping** serves as the operational and ethical binding layer between system functionality, agent execution roles, and node infrastructure—ensuring scalable, auditable, and ethically governed system growth across the kOS ecosystem.
+
+Next Step: Proceeding to **Phase 11: Agent Behavioral Patterns and Execution Constraints** documentation.
+

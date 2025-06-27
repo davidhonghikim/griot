@@ -1,0 +1,74 @@
+# JUNZI API Production Deployment Config
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** API Deployment and Infrastructure Configuration
+
+---
+
+## 🎯 Purpose:
+To provide detailed deployment configuration and infrastructure requirements for launching the JUNZI API in a production-grade environment.
+
+---
+
+## ✅ Deployment Environment:
+| Component | Configuration |
+|---|---|
+| Cloud Provider | AWS / GCP / Azure OR on-prem Kubernetes cluster |
+| Database | PostgreSQL 14.x with production tuning |
+| Load Balancer | NGINX or Traefik with SSL termination |
+| Container Orchestration | Kubernetes (K8s) OR Docker Swarm |
+| Secrets Management | HashiCorp Vault OR Kubernetes Secrets |
+| Monitoring | Prometheus + Grafana |
+| Logging | ELK Stack or Loki (Grafana Cloud) |
+
+---
+
+## ✅ API Runtime Settings:
+| Setting | Value |
+|---|---|
+| Backend Runtime | FastAPI with Gunicorn & Uvicorn Workers |
+| Worker Count | CPU cores x 2 |
+| Max Request Size | 10 MB |
+| Rate Limiting | 100 requests per minute per API key (configurable) |
+| CORS Policy | Allow from JUNZI Frontend + Whitelisted Domains only |
+| Timeout | 30 seconds max per request |
+| Keep-Alive | Enabled |
+
+---
+
+## ✅ Kubernetes Deployment YAMLs:
+| Resource | YAML File |
+|---|---|
+| Deployment | `backend-deployment.yaml` |
+| Service | `backend-service.yaml` |
+| Ingress | `backend-ingress.yaml` |
+| ConfigMap | `backend-config.yaml` |
+| Secret | `backend-secrets.yaml` |
+| Horizontal Pod Autoscaler | `backend-hpa.yaml` |
+
+---
+
+## ✅ Deployment Steps:
+1. Build latest backend Docker image
+2. Push image to container registry
+3. Apply database migrations (Alembic)
+4. Deploy Kubernetes manifests to production namespace
+5. Run health checks on all `/health` endpoints
+6. Enable Prometheus scraping for `/metrics` endpoint
+7. Enable AlertManager rules for API errors and downtime
+8. Deploy updated OpenAPI docs to public API portal
+
+---
+
+## ✅ Post-Deployment Verification:
+| Test | Tool |
+|---|---|
+| API Smoke Test | HTTPx / Postman |
+| Load Test | Locust / k6 |
+| Bias Audit Trigger | Manual or automated bias audit job |
+| Frontend API Integration Test | Cypress / Playwright |
+
+---
+
+**This document now serves as the canonical API Production Deployment Config for JUNZI backend teams within the kOS ecosystem until formally revised.**

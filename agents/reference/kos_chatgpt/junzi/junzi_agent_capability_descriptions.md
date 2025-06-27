@@ -1,0 +1,85 @@
+# JUNZI Agent Capability Descriptions
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem
+
+This document details each individual JUNZI Agent and its precise operational role inside the JunziNode deployment.
+
+---
+
+## Agent Roster:
+
+### 1. **ContradictionScannerAgent**
+- **Role:** Real-time NLP-driven detection of contradictions between public statements and observable actions by tracked entities.
+- **Key Functions:**
+  - Time-sequenced statement comparison
+  - Semantic contradiction detection
+  - Confidence scoring for contradictions
+  - Source linkback for every data point
+- **Outputs:** Structured contradiction reports → GriotNode, YachayNode, OracleNode
+
+---
+
+### 2. **RiskProfilerAgent**
+- **Role:** Calculates entity risk scores for ethical integrity violations.
+- **Key Functions:**
+  - Multivariate risk modeling
+  - Weighting by jurisdiction, historical behavior, financial patterns
+  - Bias audit log attached to every score
+- **Outputs:** Entity risk profiles → Public API, OracleNode, YachayNode
+
+---
+
+### 3. **JurisdictionContextAgent**
+- **Role:** Classifies every action, contradiction, and risk by jurisdictional scope (local, state, federal, international, etc).
+- **Key Functions:**
+  - Jurisdictional tagging
+  - Contextual boundary classification
+  - Metadata injection for downstream agents
+- **Outputs:** Jurisdictional annotations → GriotNode, OracleNode
+
+---
+
+### 4. **BiasAuditAgent**
+- **Role:** Runs counter-bias checks across all AI/ML outputs to enforce nonpartisanship and mitigate systemic bias.
+- **Key Functions:**
+  - Multi-model consensus testing
+  - Bias weight scoring
+  - Flagging and mitigation of outlier or politically skewed results
+- **Outputs:** Bias audit logs attached to risk profiles, contradiction reports, and all public-facing outputs
+
+---
+
+### 5. **PromiseTrackerAgent**
+- **Role:** Tracks public promises made by entities and measures fulfillment vs outcome.
+- **Key Functions:**
+  - NLP-based promise detection during campaign speeches, press releases, or public statements
+  - Lifecycle monitoring of promise statuses
+  - Status flagging: Fulfilled / Broken / Pending / Stale
+- **Outputs:** Promise records → Public API, GriotNode, YachayNode
+
+---
+
+### 6. **SourceAttributionAgent**
+- **Role:** Guarantees that all data inputs and outputs have full source lineage and tamper-proof audit trails.
+- **Key Functions:**
+  - Data provenance tagging
+  - Immutable hash generation for every input
+  - External source cross-validation
+- **Outputs:** Provenance metadata attached to all entity profiles, risk scores, contradiction reports
+
+---
+
+### 7. **PublicExposureAgent**
+- **Role:** Controls the final public output flow of JUNZI-generated alerts, reports, and data streams.
+- **Key Functions:**
+  - Publishing contradiction alerts
+  - Broadcasting risk threshold crossings
+  - Exposing promise fulfillment statuses
+  - Managing API rate limits and user-facing endpoints
+- **Outputs:** Live API feeds → Public dashboards, CommunicatorNode (for broadcast)
+
+---
+
+**This document now serves as the canonical capability map for all JUNZI Agents within the kOS ecosystem until formally revised.**
+

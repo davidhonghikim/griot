@@ -1,0 +1,114 @@
+# kOS Recipe Authoring and Management Tools Specification
+
+## Overview
+
+The **Recipe Authoring and Management Tools** provide developers, agents, and users with the ability to create, validate, modify, and deploy new Recipes within the kOS ecosystem. Recipes define **multi-step workflows** that chain Skills, Adapters, and Agent actions into executable task flows.
+
+These tools enable rapid expansion of kOS functionality without requiring core system code changes.
+
+---
+
+## Core Responsibilities
+
+| Responsibility | Description |
+|---|---|
+| **Recipe Authoring** | Create new multi-step task workflows that chain Skills and Adapters. |
+| **Recipe Validation** | Check recipes for schema correctness, dependency resolution, and ethical safety. |
+| **Recipe Versioning** | Track and manage version history for each recipe. |
+| **Recipe Publishing** | Make recipes available to the Orchestration Engine for runtime use. |
+| **Recipe Discovery** | Enable agents and users to search and browse available recipes. |
+| **Recipe Deprecation** | Allow graceful sunsetting of outdated or replaced recipes. |
+| **Ethics Pre-Screening** | Automatically scan recipes for potential ethical conflicts before publication. |
+
+---
+
+## Supported Recipe Formats
+
+| Format | Purpose |
+|---|---|
+| **YAML** | Human-readable authoring format. |
+| **JSON** | For programmatic storage and API access. |
+| **Natural Language Templates (optional future phase)** | Let users describe workflows conversationally for auto-conversion into Recipes. |
+
+---
+
+## Recipe Metadata Schema
+
+| Field | Description |
+|---|---|
+| `recipe_name` | Unique identifier. |
+| `version` | Semantic version number (e.g., 1.0.1). |
+| `author` | User or agent who created the recipe. |
+| `description` | Short explanation of the workflow goal. |
+| `trigger_phrases` | NLP phrases that trigger this recipe. |
+| `steps` | Ordered list of skills to execute, with input mappings. |
+| `dependencies` | List of required Skills, Adapters, Node Classes. |
+| `node_class_alignment` | Which Node Class (from official 13 cultural classes) primarily owns execution. |
+| `ethical_risk_score` | Calculated risk score from Junzi pre-check. |
+| `tags` | Searchable classification terms (e.g., summarization, notification, SEO). |
+
+---
+
+## Recipe Authoring Tools (CLI & API)
+
+| Tool | Function |
+|---|---|
+| `kos-recipe create` | Initialize a new recipe scaffold. |
+| `kos-recipe validate {filename}` | Run schema and dependency checks. |
+| `kos-recipe publish {filename}` | Register recipe into active registry. |
+| `kos-recipe list` | View all available recipes. |
+| `kos-recipe search --tag {tag}` | Search recipes by tag or function. |
+| `kos-recipe inspect {recipe_name}` | View full recipe definition. |
+| `kos-recipe deprecate {recipe_name}` | Mark recipe as deprecated. |
+| `kos-recipe test-run {recipe_name}` | Run a sandboxed test execution for debugging. |
+
+---
+
+## Recipe Validation Criteria
+
+| Check | Description |
+|---|---|
+| Syntax Compliance | Proper YAML/JSON formatting. |
+| Skill Existence | All referenced Skills must exist and be active. |
+| Adapter Availability | Required Adapters must be configured and reachable. |
+| Node Class Alignment | Each recipe must have a designated Node Class owner. |
+| Ethical Safety | Pre-checked by Junzi for known ethical risks. |
+| Execution Sandbox Test | Optional dry-run validation to catch runtime errors. |
+
+---
+
+## Recipe Authoring Flow
+
+1. **Author defines recipe in YAML or JSON.**
+2. **Run `kos-recipe validate`.**
+3. **Fix any schema or dependency errors.**
+4. **Run `kos-recipe test-run` for execution sanity check.**
+5. **Publish recipe with `kos-recipe publish`.**
+6. **Recipe now becomes available to Orchestration Engine and Agents.**
+
+---
+
+## Extensibility & Future Enhancements
+
+| Feature | Description |
+|---|---|
+| Visual Recipe Builder | Drag-and-drop web UI for recipe construction. |
+| Natural Language Recipe Authoring | Auto-generate YAML recipes from plain English task descriptions. |
+| Recipe Performance Scoring | Track usage frequency, average execution time, and user satisfaction. |
+| Federated Recipe Sharing | Optional cross-node recipe sharing in federated deployments. |
+| Multi-LLM Testing Mode | Allow recipe dry-runs across multiple LLM backends for optimization. |
+
+---
+
+## Next Steps for Development
+
+- Implement core CLI tools.
+- Build Recipe Registry API endpoints for recipe CRUD operations.
+- Integrate with Junzi for ethics checks.
+- Develop Recipe Test Sandbox.
+- Link Recipe Authoring tools to Skill Registry for dependency lookups.
+
+---
+
+**End of Document**
+

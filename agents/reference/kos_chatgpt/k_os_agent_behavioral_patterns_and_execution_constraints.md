@@ -1,0 +1,106 @@
+# kOS Agent Behavioral Patterns and Execution Constraints
+
+## Overview
+The **kOS Agent Behavioral Patterns and Execution Constraints** document defines the allowable behavior profiles, operational limits, and ethical execution boundaries for all agents across the kOS ecosystem. It establishes mandatory behavioral contracts for every agent class to ensure alignment with system reliability, ethical governance, and operational integrity.
+
+This document formalizes runtime expectations, resource limits, lifecycle states, and behavioral models for agent operations at every node.
+
+---
+
+## 1. Agent Lifecycle States
+
+- **Initialized:** Agent created but not yet active.
+- **Running:** Actively executing assigned tasks.
+- **Suspended:** Temporarily paused but state preserved.
+- **Throttled:** Temporarily rate-limited due to resource or ethical constraints.
+- **Quarantined:** Isolated for security or ethical violations.
+- **Terminated:** Agent process stopped and state deallocated.
+
+---
+
+## 2. Core Behavioral Patterns
+
+### 2.1 Reactive Agents
+- Trigger-driven
+- Operate based on external event or data arrival
+- Typical for: Discovery, Observation, Security Agents
+
+### 2.2 Scheduled Agents
+- Operate on fixed time intervals or cron-style schedules
+- Typical for: Memory Backup Agents, System Health Check Agents
+
+### 2.3 Continuous Agents
+- Long-running background processes
+- Typical for: Governance, Ethics Monitoring, Skald Pipeline Managers
+
+### 2.4 On-Demand Agents
+- Spawned ad hoc by task submission
+- Stateless or ephemeral
+- Typical for: Execution, Processing Agents
+
+### 2.5 Swarm Agents
+- Coordinated multi-agent behavior on distributed workloads
+- Supports distributed consensus, parallel task execution
+
+---
+
+## 3. Execution Constraints by Agent Class
+
+| Agent Class | CPU Usage Limit | Memory Usage Limit | Execution Timeout | Ethical Supervision |
+|------------|----------------|-----------------|-----------------|-----------------|
+| Discovery Agents | Medium | Medium | 1-5 minutes | GEIG Mandatory |
+| Observation Agents | Medium | Medium | Long-running | GEIG Mandatory |
+| Processing Agents | High | High | Configurable | GEIG Mandatory |
+| Skald Agents | Medium | Medium | Event-driven | GEIG Mandatory |
+| Security Agents | High | Medium | Continuous | GEIG Mandatory |
+| Governance Agents | Low | Medium | Continuous | GEIG Mandatory |
+| Control Agents | High | Medium | Milliseconds-Seconds | GEIG Mandatory |
+| Execution Agents | Variable | Variable | Short | GEIG Mandatory |
+| Memory Agents | Medium | High | Long-running | GEIG Mandatory |
+| Ethics Agents | High | Medium | Continuous | N/A |
+
+*All resource limits configurable by system policy within GEIG-approved boundaries.*
+
+---
+
+## 4. Ethical Execution Filters
+
+- Mandatory GEIG check before any agent task execution.
+- Real-time ethical scoring for long-running agents.
+- Automatic throttling or suspension of agents breaching ethical risk thresholds.
+- Escalation triggers for agent behavior anomalies.
+
+---
+
+## 5. Resource Management Policies
+
+- Resource quotas defined per agent class and node type.
+- Backpressure signals for over-utilizing agents.
+- Priority-based resource allocation during peak loads.
+- Fair scheduling enforcement across competing agents.
+
+---
+
+## 6. Failure and Misbehavior Handling
+
+- Automatic quarantine for agents failing GEIG compliance checks.
+- Retry limits on failed execution attempts.
+- Agent behavior audit logging.
+- Optional human intervention workflows for repeated misbehavior.
+
+---
+
+## 7. Advanced Features
+
+- AI-driven anomaly detection on agent behavioral drift.
+- Runtime adaptive throttling based on telemetry patterns.
+- Behavioral fingerprinting for baseline compliance monitoring.
+- Predictive risk scoring for future behavior forecasts.
+
+---
+
+## Conclusion
+The **kOS Agent Behavioral Patterns and Execution Constraints** provide a foundational behavioral contract layer for every agent operating within the ecosystem—ensuring predictable, auditable, and ethically constrained system behavior across all nodes and agent classes.
+
+Next Step: Proceeding to **Phase 12: System Telemetry and Performance Monitoring Framework** documentation.
+

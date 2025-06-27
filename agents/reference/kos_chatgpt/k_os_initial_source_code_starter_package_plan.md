@@ -1,0 +1,113 @@
+# kOS Initial Source Code Starter Package Plan
+
+## Overview
+The **kOS Initial Source Code Starter Package Plan** outlines the minimal set of starter source files, folder structure, and baseline implementation templates needed to bootstrap coding work for the TOSE, OEC, and GEIG modules within the kOS ecosystem.
+
+This phase focuses on delivering syntactically valid, buildable Python module skeletons with entry points, config loaders, and unit test stubs—allowing CI/CD pipelines to pass for the first time.
+
+---
+
+## 1. Directory Structure
+
+**Root Directory:** `/kOS/`
+
+| Directory | Purpose |
+|---|---|
+| `/core/` | Base system components: TOSE, OEC, GEIG Core Engine |
+| `/configs/` | YAML/JSON config templates for each module |
+| `/tests/` | Unit test stubs for each module |
+| `/scripts/` | Run, build, and deploy scripts |
+| `/api/` | Placeholder for REST and gRPC interface code |
+| `/ci/` | Initial CI job templates (GitHub Actions or GitLab CI YAML) |
+
+---
+
+## 2. Module-Specific Starter Templates
+
+### 2.1 TOSE (`/core/tose/`)
+- `scheduler.py` (class: `TaskScheduler`)
+- `queue.py` (class: `TaskQueue`)
+- `api.py` (Flask/FastAPI endpoint placeholder for task submission)
+- `__init__.py`
+
+### 2.2 OEC (`/core/oec/`)
+- `execution_manager.py` (class: `ExecutionManager`)
+- `state_tracker.py` (class: `ExecutionStateTracker`)
+- `api.py` (FastAPI placeholder for execution plan submission)
+- `__init__.py`
+
+### 2.3 GEIG (`/core/geig_core/`)
+- `policy_engine.py` (class: `EthicalPolicyEngine`)
+- `decision_evaluator.py` (class: `EthicalDecisionEvaluator`)
+- `api.py` (FastAPI placeholder for validation endpoint)
+- `__init__.py`
+
+---
+
+## 3. Configuration Files (`/configs/`)
+
+- `tose_config.yaml`
+- `oec_config.yaml`
+- `geig_config.yaml`
+- `logging_config.yaml`
+
+All configs should include:
+- Host/port bindings
+- Logging levels
+- Database or message bus connection placeholders
+
+---
+
+## 4. Unit Test Stubs (`/tests/`)
+
+| Module | Test File |
+|---|---|
+| TOSE | `test_scheduler.py`, `test_queue.py` |
+| OEC | `test_execution_manager.py`, `test_state_tracker.py` |
+| GEIG | `test_policy_engine.py`, `test_decision_evaluator.py` |
+
+All tests should include at minimum:
+- One dummy test (`assert True`)
+- Pytest-compatible structure
+
+---
+
+## 5. CI Pipeline Starter (`/ci/`)
+
+- `.github/workflows/python-ci.yml` or `.gitlab-ci.yml`
+
+Pipeline stages:
+- Linting (flake8/black)
+- Unit tests
+- Build check (Docker build or package install)
+
+---
+
+## 6. Build Scripts (`/scripts/`)
+
+- `run_tose.sh`
+- `run_oec.sh`
+- `run_geig.sh`
+- `build_all.sh`
+
+Each script should:
+- Activate virtualenv
+- Run the module with default config
+- Print basic startup success message
+
+---
+
+## 7. Next Step Instructions for Devs
+
+- Clone repo
+- Run `build_all.sh`
+- Run CI pipeline
+- Begin iterative module coding
+
+---
+
+## Conclusion
+The **kOS Initial Source Code Starter Package Plan** provides the scaffolding necessary to transition into functional module development—enabling first-pass CI/CD success and laying the foundation for real agent, node, and orchestration logic.
+
+✅ Next: Ready to help **generate the actual starter Python code files**, **build the CI YAML**, or **create the first working API endpoints**.
+

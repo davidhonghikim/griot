@@ -1,0 +1,73 @@
+# JUNZI Cross-Node Interaction Flow
+
+**Purpose:** This document defines how JUNZI (JunziNode) interacts with other kOS Node Classes during typical lifecycle operations like data ingestion, analysis, narrative reporting, risk scoring, and public alerting.
+
+---
+
+## Primary Nodes in JUNZI's Cross-Node Workflow:
+
+| Node Class     | Role in JUNZI Operations                                                                                                                                                                                               |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **GriotNode**  | Builds narrative timelines of ethical behavior, contradiction histories, and public integrity records for entities. Consumes structured outputs from JUNZI and converts them into human-readable timelines or reports. |
+| **OracleNode** | Provides predictive analysis on future ethical risk and behavioral drift patterns based on historical data and live event streams from JUNZI.                                                                          |
+| **YachayNode** | Acts as the long-term memory layer, archiving all processed contradiction reports, risk scores, and jurisdictional profiles from JUNZI.                                                                                |
+| **MusaNode**   | Executes protective responses or triggers external security systems if a high-severity ethical violation escalates to needing active intervention or containment.                                                      |
+
+---
+
+## Cross-Node Event Flow: JUNZI-Centric Lifecycle
+
+### 📥 1. **Data Ingestion Phase:**
+
+- **Source Nodes:** Observer pipelines, external API listeners, user reports.
+- **JUNZI Action:** ContradictionScannerAgent & RiskProfilerAgent parse incoming entity actions, public statements, financials, and behaviors.
+
+### 🧠 2. **Integrity Processing Phase:**
+
+- **Within JUNZI Node:**
+  - Contradiction Detection
+  - Risk Scoring
+  - Bias Auditing
+  - Jurisdictional Context Classification
+
+### 📨 3. **Downstream Node Handoff:**
+
+| Target Node    | Data Passed                                                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **GriotNode**  | Fully scored contradiction timelines, risk rating histories, and behavior-change event streams.                                   |
+| **OracleNode** | Pattern datasets on contradictions, behavioral volatility metrics, jurisdictional violation frequency for risk projection models. |
+| **YachayNode** | All finalized contradiction reports, risk score logs, and source-provenance datasets for permanent archiving.                     |
+| **MusaNode**   | High-severity ethical breach alerts with escalation level metadata for possible containment or defense triggers.                  |
+
+### 📢 4. **Public Alerting Phase:**
+
+- **From JUNZI Node:**
+  - Exposed via Public API `/junzi/api/v1/alerts/`
+  - Sourced directly from the PublicExposureAgent within JUNZI.
+  - Distributed via CommunicatorNode if global broadcast needed.
+
+### 🪢 5. **Feedback Loop Phase:**
+
+- **User feedback, media reports, and whistleblower tips** flow back into JUNZI via Public API POST `/user_reports/`
+- **JUNZI → YachayNode → OracleNode**: For updated risk modeling and historical trend alignment.
+
+---
+
+## Event Logging & Traceability:
+
+- All cross-node handoffs log event signatures in the kOS VaultNode for data integrity and compliance.
+
+---
+
+## Summary Diagram (Text Representation):
+
+```
+[External Sources] → [JUNZI Node] → [GriotNode]
+                                → [OracleNode]
+                                → [YachayNode]
+                                → [MusaNode]
+                                → [CommunicatorNode (optional)] → [Public]
+```
+
+**This document is now the canonical reference for JUNZI cross-node interactions within the kOS ecosystem until formally revised.**
+

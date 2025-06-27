@@ -1,0 +1,187 @@
+# JUNZI Phase 3 - Detailed Technical Specification: Pilot Site-Specific JEDE Calibration Profiles
+
+## Module Name:
+
+Pilot Site-Specific JEDE Calibration Profiles (JCP)
+
+## Module Purpose:
+
+JCPs enable localized calibration of the Ethical Decision Engine (JEDE) at each external pilot site, adjusting context weightings, stakeholder impact models, rule sensitivities, and ethical thresholds to reflect site-specific cultural, legal, and operational environments without violating the Core Ethical Framework.
+
+---
+
+## Calibration Profile Architecture
+
+### Profile Components:
+
+1. **Context Weight Adjustment Map:**
+   - Custom weights for each context variable (from CAM) based on site needs.
+   - Example:
+
+```json
+{
+  "context_variable": "UserLocation",
+  "weight_multiplier": 1.5
+}
+```
+
+2. **Stakeholder Impact Matrix:**
+
+   - Defines local stakeholder group priority weights.
+   - Allows differential ethical weighting across user groups per site.
+
+3. **Rule Sensitivity Overrides:**
+
+   - Fine-tunes rule trigger thresholds for locally sensitive decision paths.
+   - Example:
+
+```json
+{
+  "rule_id": "uuid",
+  "sensitivity_modifier": -0.2
+}
+```
+
+4. **Ethical Threshold Modifiers:**
+
+   - Adjusts risk and conflict tolerance thresholds (with Ethics Council approval only).
+
+5. **Localization Metadata:**
+
+   - Cultural, regulatory, and operational context tags.
+   - Supports future auto-calibration suggestions for similar regions.
+
+---
+
+## Data Models
+
+### Calibration Profile Schema:
+
+```json
+{
+  "profile_id": "uuid",
+  "site_id": "uuid",
+  "context_weight_adjustments": [
+    { "context_variable": "string", "weight_multiplier": "float" }
+  ],
+  "stakeholder_impact_matrix": [
+    { "stakeholder_group": "string", "priority_weight": "float" }
+  ],
+  "rule_sensitivity_overrides": [
+    { "rule_id": "uuid", "sensitivity_modifier": "float" }
+  ],
+  "ethical_threshold_modifiers": [
+    { "threshold_type": "string", "modifier": "float" }
+  ],
+  "localization_metadata": {
+    "region": "string",
+    "legal_framework": "string",
+    "cultural_context_notes": "string"
+  },
+  "version": "string",
+  "created_at": "ISO8601"
+}
+```
+
+---
+
+## API Endpoints
+
+| Endpoint                           | Method | Description                                  |
+| ---------------------------------- | ------ | -------------------------------------------- |
+| /jcp/create-profile                | POST   | Creates a new calibration profile for a site |
+| /jcp/get-profile/{profile\_id}     | GET    | Retrieves profile details                    |
+| /jcp/apply-profile/{site\_id}      | POST   | Applies profile to a site’s JEDE instance    |
+| /jcp/get-active-profile/{site\_id} | GET    | Retrieves currently active profile at site   |
+| /jcp/rollback-profile/{site\_id}   | POST   | Reverts to previous profile version          |
+
+---
+
+## Governance and Controls
+
+- **Approval Workflow:**
+
+  - Any threshold modifier or high-impact stakeholder weight change requires Ethics Council approval.
+
+- **Version Control:**
+
+  - Full audit history of all profile changes stored in EAT.
+
+- **Rollback Support:**
+
+  - Profiles can be rolled back to prior versions within 1 minute of request.
+
+---
+
+## Performance Targets
+
+- **Profile Application Latency:** Under 30 seconds
+- **Profile Rollback Latency:** Under 1 minute
+- **Profile Retrieval Time:** Under 200ms
+
+---
+
+## Monitoring and Metrics
+
+- **Active Profile per Site**
+- **Number of Active Overrides vs. Default Settings**
+- **Profile Update Frequency**
+- **Ethical Outcome Variance Pre- and Post-Calibration**
+
+---
+
+## Security Considerations
+
+- Role-Based Access Control (RBAC) for profile creation and deployment
+- Profile integrity checksums
+- Audit logging of all profile lifecycle events (in EAT)
+
+---
+
+## Testing Requirements
+
+- **Unit Tests:**
+
+  - Profile parsing and validation
+  - Sensitivity override calculations
+
+- **Integration Tests:**
+
+  - JCP → JEDE profile application
+  - JCP → DERE rule weighting reconciliation
+
+- **Load Tests:**
+
+  - Simultaneous multi-site profile deployment
+
+- **Failure Recovery Tests:**
+
+  - Profile rollback under error conditions
+
+---
+
+## Deployment Profile
+
+- **Language:** Python 3.11 or Node.js 18+
+- **Containerization:** Docker + Kubernetes
+- **Storage:** PostgreSQL for profile storage
+
+---
+
+## Dependencies
+
+- JEDE API (for runtime profile application)
+- DERE API (for rule mapping reference)
+- EAT API (for audit logging)
+- EDM API (to monitor drift post-profile application)
+
+---
+
+## Next Document:
+
+Pilot Feedback Analysis Report Templates - Full Technical Specification
+
+---
+
+*End of JUNZI Pilot Site-Specific JEDE Calibration Profiles (JCP) Technical Specification Document.*
+

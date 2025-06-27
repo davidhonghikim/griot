@@ -1,0 +1,76 @@
+# JUNZI API Load Test Scripts Specification
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** Performance and Load Testing Framework
+
+---
+
+## 🎯 Purpose:
+To stress test JUNZI’s public API endpoints under high traffic, simulating real-world load scenarios like media coverage spikes, coordinated public interest surges, and malicious scraping attempts.
+
+---
+
+## ✅ Recommended Load Testing Tools:
+| Tool | Purpose |
+|---|---|
+| **Locust** | Python-based load testing with user behavior scripting |
+| **k6** | High-concurrency API load testing with JavaScript scripting |
+| **JMeter (Optional)** | For legacy test compatibility |
+
+---
+
+## ✅ Target Endpoints for Load Testing:
+| Endpoint | Type |
+|---|---|
+| `/entities/{id}/profile` | High read frequency |
+| `/entities/{id}/contradictions` | Medium read volume |
+| `/risk_scores/` | High aggregation and filter load |
+| `/promises/{entity_id}` | Moderate load |
+| `/alerts/` | High burst traffic |
+| `/user_reports/` | Low but important for write operation stress tests |
+
+---
+
+## ✅ Load Test Scenarios:
+
+| Scenario | Description |
+|---|---|
+| **Scenario 1: Baseline Health Check** | 50 concurrent users making 10 API calls each over 5 minutes |
+| **Scenario 2: Burst Spike** | 1000 concurrent users hitting `/alerts/` for 2 minutes |
+| **Scenario 3: Sustained Load** | 300 concurrent users making random GET calls across all endpoints for 1 hour |
+| **Scenario 4: Mixed Read/Write** | 200 users making GETs + POSTs to `/user_reports/` simultaneously |
+| **Scenario 5: API Abuse Simulation** | Unauthenticated scraping attempts to hit rate limits |
+
+---
+
+## ✅ Success Metrics:
+| Metric | Target Threshold |
+|---|---|
+| API Response Time (P95) | < 500 ms for all read endpoints |
+| Error Rate | < 1% 5xx errors under normal load |
+| Rate Limiting Effectiveness | 100% block rate on abuse patterns |
+| Data Consistency | No missed writes or race conditions on user submissions |
+| Recovery Time | < 1 minute for API recovery post simulated crash |
+
+---
+
+## ✅ Test Execution Workflow:
+1. Deploy staging environment
+2. Seed with test data (5000+ entities minimum)
+3. Run each load scenario independently
+4. Capture metrics in Prometheus/Grafana
+5. Log all errors to ELK or Loki for review
+6. Document pass/fail for each scenario
+
+---
+
+## ✅ Reporting:
+- Generate post-test performance summary
+- Document failure points, bottlenecks, and any rate limit triggers
+- Archive load test result artifacts for future regression testing
+
+---
+
+**This document now defines the canonical API Load Test Scripts Specification for JUNZI performance engineering teams within the kOS ecosystem until formally revised.**
+

@@ -1,0 +1,105 @@
+# kOS Agent Orchestration and Scheduling Layer
+
+## Overview
+The **kOS Agent Orchestration and Scheduling Layer (AOSL)** provides system-wide coordination, task assignment, agent lifecycle management, and resource scheduling across the entire kOS ecosystem. It ensures agents operate in alignment with priority rules, load balancing constraints, ethical limits, and system health metrics.
+
+---
+
+## Core Functions
+
+| Function                  | Purpose                                              |
+|------------------------- |---------------------------------------------------- |
+| Agent Lifecycle Management | Start, pause, restart, and terminate agents        |
+| Task Queuing and Dispatch | Dynamically assign tasks to available agents        |
+| Load Balancing            | Evenly distribute computational load across nodes   |
+| Priority Scheduling       | Order agent execution based on priority, urgency, and ethics risk |
+| Resource Quota Management | Enforce CPU, memory, network, and disk usage quotas per agent |
+| Ethics-Aware Scheduling   | Prevent scheduling of agents with pending ethics flags |
+| Health Monitoring         | Continuously track agent and node operational health |
+| Failover and Redundancy   | Reallocate tasks from failed agents or nodes        |
+
+---
+
+## Scheduling Models Supported
+
+| Model               | Use Case                                          |
+|------------------ |---------------------------------------------- |
+| Round Robin        | Even task distribution for homogeneous agent pools |
+| Priority Queue      | Time-sensitive or critical task handling       |
+| Weighted Fair Scheduling | Mix of fairness and priority weighting          |
+| Deadline-Based Scheduling | Tasks with strict completion deadlines          |
+| Resource-Aware Scheduling | Match tasks to agents based on current resource load |
+
+---
+
+## Agent Lifecycle States
+
+| State              | Description                             |
+|----------------- |------------------------------------- |
+| Initializing       | Agent loading configuration and skills |
+| Running           | Active and accepting tasks          |
+| Paused            | Temporarily halted but state-preserving |
+| Quarantined       | Isolated due to ethics or failure event |
+| Terminated        | Fully stopped and de-registered      |
+
+---
+
+## Orchestration Flow Example
+
+1. **Task Generated:** Triggered by user action or system event
+2. **Queue Evaluation:** Added to appropriate scheduling queue
+3. **Resource Check:** Verify available agent capacity and system load
+4. **Ethics Check:** Ensure target agent passes JUNZI pre-screening
+5. **Task Dispatch:** Assigned to selected agent
+6. **Execution Monitoring:** Track task completion status
+7. **Result Collection:** Capture outputs or notify downstream services
+
+---
+
+## Health Monitoring Metrics
+
+| Metric                    | Description                               |
+|------------------------- |--------------------------------------- |
+| Agent Uptime             | Total run time since last restart     |
+| Task Throughput          | Tasks processed per time unit         |
+| Failure Rate             | Number of failed executions           |
+| Ethics Violation Rate    | Frequency of ethical flags per agent  |
+| Resource Utilization     | CPU, memory, disk, and network usage  |
+
+---
+
+## Failure Recovery Mechanisms
+
+| Failure Type          | System Response                          |
+|-------------------- |-------------------------------------- |
+| Agent Crash          | Auto-restart or task reallocation      |
+| Ethics Breach        | Quarantine and alert                   |
+| Node Failure         | Migrate active agents to healthy nodes |
+| Resource Starvation  | Throttle low-priority agents, redistribute load |
+
+---
+
+## Developer APIs
+
+| Function                    | Purpose                                 |
+|------------------------- |-------------------------------------- |
+| `schedule_task()`         | Submit new task to scheduler          |
+| `pause_agent()`           | Temporarily suspend agent activity    |
+| `resume_agent()`          | Reactivate paused agent              |
+| `get_agent_status()`      | Query current agent lifecycle state  |
+| `reallocate_task()`       | Manually force task reallocation     |
+| `view_queue_metrics()`    | View live scheduler queue statistics |
+
+---
+
+## Extensibility Features
+
+- Pluggable scheduler modules (supporting ML-based scheduling in future phases)
+- Multi-node orchestration (distributed coordination)
+- Ethics-aware resource shaping
+- Dynamic scaling policies (auto-scale agents based on load)
+
+---
+
+The **kOS Agent Orchestration and Scheduling Layer (AOSL)** serves as the central nervous system for operational coordination, load distribution, and ethical enforcement across all running agents within the kOS ecosystem.
+

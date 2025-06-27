@@ -1,0 +1,108 @@
+# JUNZI Test Case Templates for System Validation
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Testing Focus:** Agent functionality, API integrity, bias audits, data provenance, and cross-node communication.
+
+---
+
+## ✅ 1. Agent-Level Unit Test Cases
+
+### ContradictionScannerAgent
+| Test Case | Description |
+|---|---|
+| CS-001 | Validate detection of a clear contradiction between two known public statements |
+| CS-002 | Ensure false positives remain under defined threshold using control dataset |
+| CS-003 | Confirm all contradiction reports include timestamp, entity ID, and source references |
+
+### RiskProfilerAgent
+| Test Case | Description |
+|---|---|
+| RP-001 | Generate risk score for entity with multiple flagged contradictions |
+| RP-002 | Check score re-calculation after new data input |
+| RP-003 | Verify attached bias audit metadata exists for every score output |
+
+### JurisdictionContextAgent
+| Test Case | Description |
+|---|---|
+| JC-001 | Classify sample data by correct jurisdiction (local, state, federal) |
+| JC-002 | Confirm that multi-jurisdictional records are tagged with all relevant contexts |
+
+### BiasAuditAgent
+| Test Case | Description |
+|---|---|
+| BA-001 | Inject known biased input and confirm bias detection triggers |
+| BA-002 | Verify bias audit logs are attached to all AI-generated risk scores |
+| BA-003 | Ensure multi-model consensus check completes within timeout threshold |
+
+### PromiseTrackerAgent
+| Test Case | Description |
+|---|---|
+| PT-001 | Detect promise in a campaign speech transcript |
+| PT-002 | Update promise status when an action fulfilling it is recorded |
+| PT-003 | Validate long-term tracking across multiple data ingestion cycles |
+
+### SourceAttributionAgent
+| Test Case | Description |
+|---|---|
+| SA-001 | Confirm that all incoming data is tagged with immutable source hashes |
+| SA-002 | Validate cross-reference accuracy between source ID and stored original |
+
+### PublicExposureAgent
+| Test Case | Description |
+|---|---|
+| PE-001 | Trigger public alert for high-risk score entity |
+| PE-002 | Validate rate limiting on public API burst traffic |
+| PE-003 | Confirm all public-facing data includes required provenance metadata |
+
+---
+
+## ✅ 2. Integration Test Cases (Cross-Agent and Cross-Node)
+
+| Test Case | Description |
+|---|---|
+| INT-001 | Full data flow: Ingest → Process → Contradiction → Risk Profile → GriotNode handoff |
+| INT-002 | High-severity contradiction triggers OracleNode risk prediction sequence |
+| INT-003 | Archived contradiction reports visible in YachayNode historical query API |
+| INT-004 | Test emergency escalation: MusaNode receives critical integrity breach notification |
+
+---
+
+## ✅ 3. API Endpoint Test Cases
+
+| Endpoint | Test Cases |
+|---|---|
+| `/entities/{id}/profile` | Fetch valid profile, 404 on nonexistent entity, data field validation |
+| `/entities/{id}/contradictions` | Return correct contradiction count, verify source links, pagination |
+| `/risk_scores/` | Filter by jurisdiction, risk level, validate score sorting |
+| `/promises/{entity_id}` | Correct promise count, status flags accurate, source references correct |
+| `/alerts/` | Recent alerts only, high-confidence filtering, API response time under threshold |
+| `/sources/{source_id}` | Source exists, correct hash, integrity check passes |
+
+---
+
+## ✅ 4. Bias Audit Validation Tests
+
+| Test Case | Description |
+|---|---|
+| BA-VAL-001 | Submit known politically charged dataset → Confirm bias mitigation triggers |
+| BA-VAL-002 | Compare outputs between model A and model B for fairness spread |
+| BA-VAL-003 | Test bias audit override fails without admin authorization |
+
+---
+
+## ✅ 5. Data Provenance Verification Tests
+
+| Test Case | Description |
+|---|---|
+| DP-001 | Trace arbitrary data output back to original ingestion source |
+| DP-002 | Tamper with source tag → Verify system flags as integrity violation |
+| DP-003 | Confirm all cross-node data retains unbroken source hash lineage |
+
+---
+
+## ✅ Summary:
+This suite forms the baseline test case template for **agent unit testing**, **node integration testing**, **public API validation**, **bias auditing**, and **data provenance enforcement** for JUNZI within the kOS ecosystem.
+
+**All agent teams and QA engineers must expand these into full executable test suites per project phase.**
+

@@ -6,7 +6,7 @@ Rules:
 2. Required keys: title, type, status, author, date, commit.
 3. Date must be ISO-8601 yyyy-mm-dd.
 4. Commit must be 7-character hex.
-5. Exactly one file `agents/handoff.md` must exist and have status: current.
+5. Exactly one file `agents/LATEST_HANDOFF.md` must exist and have status: current.
 6. Any file in agents/handoffs/* must have status: archived.
 """
 from __future__ import annotations
@@ -75,9 +75,9 @@ def main() -> None:
     if not AGENTS_DIR.exists():
         error("agents/ directory not found")
 
-    handoff_live = AGENTS_DIR / "handoff.md"
+    handoff_live = AGENTS_DIR / "LATEST_HANDOFF.md"
     if not handoff_live.exists():
-        error("agents/handoff.md is missing")
+        error("agents/LATEST_HANDOFF.md is missing")
 
     # Collect markdown files in agents and subdirs.
     md_files: List[pathlib.Path] = [p for p in AGENTS_DIR.rglob("*.md") if "templates" not in p.parts]

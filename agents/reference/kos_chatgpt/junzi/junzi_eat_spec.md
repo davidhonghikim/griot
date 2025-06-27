@@ -1,0 +1,159 @@
+# JUNZI Phase 2 - Detailed Technical Specification: Ethical Audit Trail (EAT)
+
+## Module Name:
+
+Ethical Audit Trail (EAT)
+
+## Module Purpose:
+
+The EAT serves as JUNZI’s immutable, queryable, and tamper-resistant ethical decision logging system. It ensures transparent accountability by recording all decision points, ethical rule evaluations, conflicts, stakeholder inputs, and consent records for every action processed by the JUNZI system.
+
+---
+
+## System Architecture
+
+### Logging Pipeline:
+
+1. **Event Ingestion Layer:**
+
+   - Receives decision, consent, rule change, and feedback events from JEDE, CTI, DERE, and SFL.
+   - Supports both synchronous and asynchronous input modes (Kafka or RabbitMQ preferred for async mode).
+
+2. **Preprocessing Layer:**
+
+   - Normalizes incoming event data.
+   - Adds unique audit event IDs and cryptographic hashes for tamper detection.
+   - Timestamps all entries with high-precision UTC clock source.
+
+3. **Storage Layer:**
+
+   - Multi-tiered storage architecture:
+     - **Hot Storage:** Fast-access relational or NoSQL database (PostgreSQL or MongoDB)
+     - **Cold Storage:** Long-term archive (S3, Glacier, or on-prem object storage)
+     - **Immutable Ledger (Optional):** Blockchain-backed store for ultra-high-integrity deployments (Hyperledger Fabric recommended)
+
+4. **Indexing Layer:**
+
+   - Builds decision and rule-centric indexes for fast lookup.
+   - Enables full-text and key-value search on audit fields.
+
+5. **Query and Export API Layer:**
+
+   - Allows authorized users and auditors to query, filter, and export ethical decision logs.
+   - Supports audit compliance report generation (CSV, JSON, PDF outputs).
+
+---
+
+## Data Schema
+
+```json
+{
+  "audit_event_id": "uuid",
+  "event_type": "Decision | RuleUpdate | Consent | Feedback | Conflict | Escalation",
+  "timestamp": "ISO8601",
+  "source_module": "JEDE | DERE | CTI | SFL | CAM | PAS",
+  "actor_id": "uuid",
+  "target_entities": ["uuid"],
+  "context_snapshot": "JSON",
+  "applied_rules": ["rule_id"],
+  "decision_outcome": "Allow | Deny | Escalate | Flag",
+  "justification_summary": "string",
+  "consent_state": "Granted | Denied | Pending | Not Applicable",
+  "hash": "sha256 hash",
+  "previous_event_hash": "sha256 hash"
+}
+```
+
+---
+
+## API Endpoints
+
+| Endpoint                    | Method | Description                              |
+| --------------------------- | ------ | ---------------------------------------- |
+| /eat/log-event              | POST   | Ingests new audit event                  |
+| /eat/query                  | POST   | Runs search queries across audit records |
+| /eat/get/{audit\_event\_id} | GET    | Retrieves full event details             |
+| /eat/export                 | POST   | Exports filtered audit logs              |
+| /eat/verify-integrity       | GET    | Runs tamper-check integrity validation   |
+
+---
+
+## Security Features
+
+- Immutable storage with cryptographic hash chaining
+- Optional blockchain layer for high-trust deployments
+- Role-Based Access Control (RBAC) for query and export endpoints
+- Encrypted storage at rest and in transit
+- Digital signatures on export reports for authenticity verification
+
+---
+
+## Performance Targets
+
+- **Write Latency:** < 50ms per event (hot storage tier)
+- **Query Latency:** < 500ms for indexed queries on datasets under 100M records
+- **Audit Report Generation Time:** < 2 minutes for 10,000 event reports
+
+---
+
+## Monitoring and Metrics
+
+- **Event Ingestion Rate**
+- **Storage Utilization (Hot / Cold / Ledger)**
+- **Tamper Detection Failure Rate**
+- **Query Performance Metrics**
+- **Export Throughput**
+
+Monitoring Stack: ELK (Elasticsearch, Logstash, Kibana) or OpenTelemetry-compatible pipeline.
+
+---
+
+## Testing Requirements
+
+- **Unit Tests:**
+
+  - Event schema validation
+  - Hash chain integrity checks
+
+- **Integration Tests:**
+
+  - JEDE → EAT event flow
+  - CTI → EAT consent capture logs
+
+- **Load Tests:**
+
+  - Ingestion under high decision-making load
+
+- **Security Tests:**
+
+  - Tamper attempt detection
+  - Unauthorized access prevention
+
+---
+
+## Deployment Profile
+
+- **Backend:** Node.js 18+, Python 3.11, or GoLang (configurable)
+- **Containerization:** Docker with Kubernetes deployment
+- **Storage Options:** PostgreSQL + S3 (baseline), with optional Hyperledger Fabric for ledger integrity
+
+---
+
+## Dependencies
+
+- JEDE API (for decision events)
+- DERE API (for rule updates)
+- CTI API (for consent logs)
+- SFL API (for stakeholder feedback logs)
+- CAM / PAS APIs (for context or simulation event logs)
+
+---
+
+## Next Document:
+
+Stakeholder Feedback Loop (SFL) - Full Technical Specification
+
+---
+
+*End of JUNZI Ethical Audit Trail (EAT) Technical Specification Document.*
+

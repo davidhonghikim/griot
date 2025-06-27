@@ -1,0 +1,107 @@
+# kOS JUNZI Pre-Action Filter Engine
+
+## Overview
+The **kOS JUNZI Pre-Action Filter Engine (JPAFE)** is the real-time ethical decision gatekeeper embedded within the execution path of every kOS agent, skill, and system function. It enforces pre-action ethical validation using the principles and risk scoring models defined in the HIEROS Ethical Alignment Protocol.
+
+JUNZI stands for **Judgment Unit for Non-harmful, Just, and Intention-Aligned actions**.
+
+---
+
+## Core Functions
+
+| Function                     | Purpose                                      |
+|-------------------------- |------------------------------------------- |
+| Pre-Execution Risk Assessment | Evaluate ethical risk before any agent action runs |
+| Policy Enforcement          | Block, allow, or modify actions based on configured ethical policies |
+| Contextual Sensitivity Filtering | Factor in real-time user, system, and environmental context |
+| Decision Logging             | Write every ethics decision to the audit trail |
+| Exception Handling           | Define override paths for edge cases (human-approved only) |
+
+---
+
+## Ethical Evaluation Flow
+
+1. **Action Proposal:** Agent or skill requests to execute a specific action
+2. **Context Snapshot:** JUNZI captures current user state, system state, and environment
+3. **Ethical Risk Scoring:** Use HIEROS risk model to calculate threat levels across Seven Intentions dimensions
+4. **Policy Check:** Compare risk levels against configured ethical thresholds
+5. **Decision Enforcement:** Allow, block, modify, or escalate action
+6. **Logging and Notification:** Record decision details and notify any required observers or systems
+
+---
+
+## Decision Outcomes
+
+| Outcome Type         | Description                                |
+|------------------ |------------------------------------- |
+| Allow              | Action proceeds as requested          |
+| Modify             | Action parameters adjusted to reduce risk |
+| Block              | Action halted, agent notified          |
+| Escalate           | Forward decision to higher-level ethics reviewer (e.g., Junzi Node) |
+| Require Consent    | Pause action and await explicit user consent |
+
+---
+
+## Risk Scoring Inputs
+
+| Input Category        | Example Data Points                      |
+|------------------- |------------------------------------ |
+| User State           | Consent status, vulnerability flags |
+| System Load          | Current CPU/memory/network status   |
+| Recent Ethics History | Recent violations or override incidents |
+| Action Category      | Type of action (e.g., data access, external communication, skill execution) |
+| Node Class Context   | Current node's primary class and role |
+
+---
+
+## Policy Configuration
+
+| Policy Type           | Configuration Options                     |
+|------------------- |------------------------------------- |
+| Global Ethics Thresholds | System-wide risk level caps         |
+| Node Class-Specific Rules | Allow different filters per Node Class |
+| User-Customized Policies | Personalized ethics sensitivity per user |
+| Contextual Overrides | Dynamic adjustment based on environmental conditions |
+
+---
+
+## API Endpoints (Internal Use)
+
+| Method | Endpoint                | Purpose                              |
+|------ |--------------------- |--------------------------------- |
+| POST  | `/junzi/evaluate_action` | Submit action for ethical evaluation |
+| GET   | `/junzi/policy_status`  | View active policy thresholds        |
+| POST  | `/junzi/override_request` | Submit manual override for human approval |
+| GET   | `/junzi/risk_model_info` | Retrieve current ethical scoring model |
+
+---
+
+## Developer Responsibilities
+
+| Responsibility        | Required For...                     |
+|------------------ |------------------------------- |
+| Ethics Impact Annotations | All agent actions subject to ethical filtering |
+| Parameter Sensitivity Labels | All API input parameters affecting risk level |
+| Logging Integration | All decisions must trigger audit log events |
+| Fail-Safe Defaults   | All agents must assume "Block" on JUNZI failure or timeouts |
+
+---
+
+## Performance Considerations
+
+- Millisecond-scale response times for low-latency operations
+- Async batch mode for high-volume, non-critical tasks
+- Graceful fallback with default block behavior on system error
+
+---
+
+## Extensibility
+
+- Pluggable policy engine modules
+- Support for future AI-enhanced ethical reasoning models
+- Real-time user feedback loop for continuous ethics learning
+
+---
+
+The **kOS JUNZI Pre-Action Filter Engine (JPAFE)** is the last ethical checkpoint before any action is executed across the kOS ecosystem, ensuring that every agent act aligns with user consent, ethical standards, and system integrity at runtime.
+

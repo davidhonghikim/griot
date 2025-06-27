@@ -1,0 +1,59 @@
+# JUNZI Test Data Seeder Specification
+
+**Node Class:** JunziNode\
+**System:** kOS Ecosystem\
+**Document Type:** Development Utilities - Data Seeding Plan
+
+---
+
+## 🎯 Purpose:
+
+To generate meaningful, realistic, and jurisdictionally diverse test data for backend, frontend, and API testing during JUNZI MVP development.
+
+---
+
+## ✅ Seeder Tool Requirements:
+
+| Requirement            | Details                                                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Framework              | Python scripts using SQLAlchemy ORM or native PostgreSQL SQL scripts                                                    |
+| Dataset Volume         | Minimum: 1000 Entities, 5000 ActionEvents, 1500 ContradictionRecords, 500 RiskScores, 3000 PromiseRecords, 5000 Sources |
+| Jurisdiction Diversity | Must include Local, State, Federal, and International entities                                                          |
+| Bias Simulation        | Include known-biased data samples for BiasAuditAgent testing                                                            |
+| Timestamps             | Distribute timestamps across at least 2 years to test historical filtering                                              |
+| Source Diversity       | At least 100 different source origins (gov, media, social feeds, watchdog orgs)                                         |
+
+---
+
+## ✅ Seeder Script Features:
+
+| Feature                 | Description                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| Command Line Flags      | Allow running partial seeding (e.g., only entities, only contradictions)          |
+| Data Provenance Linking | Every ActionEvent, Promise, and ContradictionRecord must reference a valid Source |
+| Relationship Integrity  | All foreign key relationships respected (Entity → ActionEvent, etc.)              |
+| Randomization           | Support faker-style randomized text for descriptions and statements               |
+| Configurable Scale      | Ability to adjust dataset size via `.env` or CLI flags                            |
+
+---
+
+## ✅ Example CLI Commands:
+
+```bash
+python seed.py --all
+python seed.py --entities 1000 --contradictions 500
+python seed.py --reset
+```
+
+---
+
+## ✅ Optional Enhancements (Phase 2+):
+
+- JSON export of seeded datasets for offline testing
+- Pre-labeled training sets for ML model fine-tuning
+- Synthetic contradiction pairs for stress-testing NLP models
+
+---
+
+**This document now defines the canonical Test Data Seeder Specification for JUNZI development within the kOS ecosystem until formally revised.**
+

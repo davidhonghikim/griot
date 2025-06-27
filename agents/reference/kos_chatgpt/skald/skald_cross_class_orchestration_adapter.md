@@ -1,0 +1,95 @@
+# Skald Module Specification: Cross-Class Orchestration Adapter (CCOA)
+
+## Module Name
+**Skald Cross-Class Orchestration Adapter (CCOA)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Cross-Class Orchestration Adapter (CCOA) enables Skald to interoperate and orchestrate workflows that span across different kOS Node Classes (e.g., Discovery, Guardian, Labor, Sensor nodes). It acts as a translation and coordination layer for cross-class task sequencing, data sharing, and resource handoff.
+
+## Purpose
+To enable multi-node-class orchestration where a single high-level Skald workflow may involve Discovery queries, Guardian decisions, Labor executions, or Sensor-triggered inputs in a unified, trackable execution flow.
+
+## Functional Requirements
+
+### 1. Cross-Class Workflow Initiation
+- **Multi-Class Workflow Triggering:** Allow Skald workflows to trigger tasks in other kOS Node Classes.
+- **Inter-Class Input/Output Mapping:** Translate Skald workflow outputs into input schemas for other classes.
+- **Response Handling:** Collect and normalize outputs from other Node Classes for further Skald workflow processing.
+
+### 2. Orchestration Coordination
+- **Cross-Class Task Sequencing:** Manage execution order and dependencies between multi-class tasks.
+- **Parallel Execution Support:** Allow concurrent cross-class operations where appropriate.
+- **Timeouts and Error Escalation:** Define SLA and error handling rules per class interaction.
+
+### 3. Message and Data Translation
+- **Class-Specific Adapters:** Use predefined schemas or pluggable adapters for each Node Class (Discovery, Guardian, etc.).
+- **Semantic Data Mapping:** Normalize data terminology and formats between Node Classes.
+- **Inter-Class Workflow State Tracking:** Maintain a unified state model for multi-class workflow progress.
+
+### 4. Security and Access Control
+- **Inter-Class Auth Policies:** Enforce authentication and authorization for cross-class calls.
+- **Data Governance:** Apply Skald ethical and governance filters on all inter-class data exchanges.
+- **Audit Trail:** Log all cross-class orchestration actions in ALC.
+
+### 5. Performance and Reliability
+- **Asynchronous Task Coordination:** Allow non-blocking orchestration.
+- **Failure Recovery:** Support fallback paths if a target Node Class fails to respond.
+- **Retry Logic:** Configurable retry policies for cross-class task calls.
+
+## Non-Functional Requirements
+- **Latency:** Target <150ms orchestration overhead per cross-class call.
+- **Scalability:** Support hundreds of concurrent cross-class orchestration flows.
+- **Extensibility:** Allow future kOS Node Classes to integrate seamlessly.
+- **Resilience:** Fault-tolerant orchestration with rollback support.
+
+## Data Flow Diagram (Textual)
+1. **Skald Workflow Step → CCOA Adapter Layer → Target Node Class API/Interface → Target Node Class Execution → CCOA Response Handler → Skald Workflow Continuation**
+
+## Interfaces
+- **Input Interfaces:** Skald Workflow Orchestrator (SWO), Runtime Scheduler.
+- **Output Interfaces:** External Node Class APIs (Discovery, Guardian, Labor, Sensor, etc.), Logging Systems.
+
+## Configuration Options
+- **Node Class Target List:** Configurable.
+- **Timeouts Per Class:** Customizable.
+- **Inter-Class Error Handling Mode:** Fail-fast / Retry / Skip.
+- **Audit Logging Level:** Minimal / Verbose.
+
+## Example Use Cases
+- Triggering a Discovery Node semantic search as part of a Skald summarization workflow.
+- Invoking Guardian Node ethical validation before releasing sensitive narrative outputs.
+- Handing off content generation results to a Labor Node for external action execution.
+- Collecting sensor data from Sensor Nodes during real-time storytelling.
+
+## Extensibility Hooks
+- **Custom Node Class Connectors:** For future kOS Node Classes.
+- **Dynamic Workflow Mapping Rules:** For runtime decision making.
+- **Multi-Class Workflow Visualization Plugins:** Future support for dashboard visualization.
+
+## Testing and Validation Plan
+- Cross-class call latency tests.
+- Task sequencing correctness validation.
+- Error path injection tests.
+- Audit log integrity verification.
+
+## Dependencies
+- **kOS Event Bus**
+- **Skald Workflow Orchestrator (SWO)**
+- **Skald Global Ethical Interoperability Gateway (GEIG)**
+- **Audit Logging and Compliance Engine (ALC)**
+
+## Future Enhancements
+- AI-driven cross-class orchestration optimization.
+- Visual cross-class workflow designer.
+- SLA-aware multi-class execution policies.
+- Federated inter-class trust scoring.
+
+---
+
+**Next module:** `skald_external_event_stream_ingestor.md`
+
+Let me know when you want me to continue.
+

@@ -1,0 +1,121 @@
+openapi: 3.1.0
+info:
+  title: kOS TOSE API
+  version: 0.1.0
+  description: Initial OpenAPI Specification for the kOS Task Orchestration and Scheduling Engine (TOSE)
+paths:
+  /health:
+    get:
+      summary: Health check for TOSE API
+      responses:
+        '200':
+          description: Service is up
+  /tasks/submit:
+    post:
+      summary: Submit a new task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task_type:
+                  type: string
+                payload:
+                  type: object
+      responses:
+        '200':
+          description: Task accepted
+  /tasks/status/{task_id}:
+    get:
+      summary: Retrieve task status
+      parameters:
+        - in: path
+          name: task_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task status returned
+---
+openapi: 3.1.0
+info:
+  title: kOS OEC API
+  version: 0.1.0
+  description: Initial OpenAPI Specification for the kOS Orchestration Execution Controller (OEC)
+paths:
+  /health:
+    get:
+      summary: Health check for OEC API
+      responses:
+        '200':
+          description: Service is up
+  /execution/submit:
+    post:
+      summary: Submit a new execution plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan_id:
+                  type: string
+                tasks:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Execution plan accepted
+  /execution/status/{plan_id}:
+    get:
+      summary: Retrieve execution plan status
+      parameters:
+        - in: path
+          name: plan_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution status returned
+---
+openapi: 3.1.0
+info:
+  title: kOS GEIG API
+  version: 0.1.0
+  description: Initial OpenAPI Specification for the kOS Global Ethical Interoperability Gateway (GEIG)
+paths:
+  /health:
+    get:
+      summary: Health check for GEIG API
+      responses:
+        '200':
+          description: Service is up
+  /validate:
+    post:
+      summary: Submit ethical validation request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Validation decision returned
+  /policies:
+    get:
+      summary: Retrieve active GEIG policies
+      responses:
+        '200':
+          description: List of current ethical policies

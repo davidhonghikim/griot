@@ -1,0 +1,108 @@
+# Skald Module Specification: Admin Dashboard and Control Panel (ACP)
+
+## Module Name
+**Skald Admin Dashboard and Control Panel (ACP)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Admin Dashboard and Control Panel (ACP) provides the primary web-based graphical user interface (GUI) for system administrators to manage, configure, monitor, and control all operational aspects of Skald Nodes. It integrates with all Skald modules to surface system state, workflow statuses, metrics, logs, configuration tools, and action triggers.
+
+## Purpose
+To offer a centralized, interactive, and real-time management interface for system operators and administrators to oversee Skald performance, configuration, health, workflows, storage, and compliance status.
+
+## Functional Requirements
+
+### 1. Dashboard Home View
+- **System Health Summary:** Display real-time node status, active workflows, resource utilization, and SLA risk indicators.
+- **Alert Panel:** Show critical alerts, warnings, and system notifications.
+- **Quick Action Bar:** Provide one-click access to common admin actions (pause workflows, trigger backup, etc.).
+
+### 2. Workflow Management Interfaces
+- **Workflow Execution Viewer:** Monitor active, queued, failed, and completed workflows.
+- **Manual Workflow Controls:** Pause, resume, terminate, or manually trigger workflows.
+- **Workflow State Inspector:** View detailed state timelines for any workflow.
+
+### 3. Configuration and Policy Management
+- **Config Editor:** Create, edit, compare, and deploy configuration sets with CVSM integration.
+- **Version History Viewer:** Browse config change history and rollback points.
+- **Policy Management:** Define or edit retention, routing, and SLA policies.
+
+### 4. Metrics and Telemetry Panels
+- **Resource Utilization Charts:** Real-time CPU, memory, I/O, and network graphs.
+- **Workflow Performance Metrics:** Display workflow latency, success rate, and throughput over time.
+- **Anomaly Detection Alerts:** Flag unusual metric trends (from AWRE, WPOE, etc.).
+
+### 5. Backup and Recovery Console
+- **Backup Job Status Viewer:** Monitor ongoing and past backup jobs (from BDRO).
+- **Restore Job Wizard:** Launch guided restores.
+- **Recovery Test Triggers:** Schedule DR test runs.
+
+### 6. Audit and Compliance Panels
+- **Audit Log Browser:** Search and filter system-wide audit logs (from ALC).
+- **SLA Compliance Summary:** View SLA breach history and risk trend graphs.
+- **Retention Policy Dashboard:** Monitor current retention rule coverage.
+
+### 7. Alerting and Notification Center
+- **Configurable Alert Rules:** Define custom alert thresholds.
+- **Multi-Channel Notification Delivery:** Email, Slack, Webhooks, etc.
+- **Alert History Archive:** Browse historical alerts and admin responses.
+
+### 8. User and Access Control
+- **Role-Based Access Management:** Define admin user roles and permissions.
+- **Audit Trail for Admin Actions:** Track who did what, when, and why.
+- **Session Monitoring:** View active admin sessions and revoke access as needed.
+
+## Non-Functional Requirements
+- **UI Responsiveness:** All dashboard pages should load and respond within 300ms.
+- **Security:** Full HTTPS, role-based access control, and session timeout policies.
+- **Extensibility:** Pluggable widget and dashboard panel architecture.
+- **Multi-Tenant Support:** Support per-tenant view segmentation where needed.
+
+## Data Flow Diagram (Textual)
+1. **Admin User Action → ACP Frontend UI → ACP Backend Controller → Skald Module APIs (Config, Metrics, Workflows, etc.) → UI Response Rendering / Audit Logging**
+
+## Interfaces
+- **Input Interfaces:** Admin Web UI, REST API, CLI Extensions (optional).
+- **Output Interfaces:** All Skald Core Modules (Config, Workflow, Metrics, Storage, Logging), External Notification Systems.
+
+## Configuration Options
+- **Theme and Layout Settings:** Light/Dark mode, widget layout preferences.
+- **Alerting Channels:** Per-user notification settings.
+- **Dashboard Refresh Rate:** Configurable (e.g., every 5s, 30s, manual).
+
+## Example Use Cases
+- Monitoring system health across a Skald cluster.
+- Rolling back a misapplied configuration.
+- Triggering a manual SLA breach mitigation action.
+- Browsing workflow execution history for audit purposes.
+
+## Extensibility Hooks
+- **Custom Widget Framework:** Allow third-party plugins to add dashboard panels.
+- **External Identity Provider Integration:** Support LDAP, OAuth, or SSO logins.
+- **API for External Dashboard Tools:** Expose Skald metrics for external BI platforms.
+
+## Testing and Validation Plan
+- UI responsiveness load tests.
+- Role-based permission enforcement validation.
+- Action-trigger-to-result latency benchmarking.
+- Alert delivery reliability tests.
+
+## Dependencies
+- **kOS Event Bus**
+- **All Skald Operational Modules (SWO, WPOE, WSPE, BDRO, ALC, etc.)**
+- **Audit Logging and Compliance Engine (ALC)**
+
+## Future Enhancements
+- AI-driven anomaly summaries on dashboard.
+- Customizable user dashboard profiles.
+- Voice-command and chatbot integration for admin actions.
+- Mobile-friendly control panel variant.
+
+---
+
+**Next module:** `skald_metrics_and_telemetry_visualization_engine.md`
+
+Let me know when you want me to continue.
+

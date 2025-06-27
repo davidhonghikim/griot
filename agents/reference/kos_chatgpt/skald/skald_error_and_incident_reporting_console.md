@@ -1,0 +1,96 @@
+# Skald Module Specification: Error and Incident Reporting Console (EIRC)
+
+## Module Name
+**Skald Error and Incident Reporting Console (EIRC)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Error and Incident Reporting Console (EIRC) provides a centralized dashboard for surfacing, managing, investigating, and resolving all Skald system errors, workflow failures, and operational incidents. It consolidates error logs, incident classifications, root cause analyses, and remediation tracking in one interactive console.
+
+## Purpose
+To enable administrators, engineers, and support teams to rapidly identify, diagnose, and resolve Skald system issues while maintaining a detailed historical record for auditing, reporting, and continuous improvement.
+
+## Functional Requirements
+
+### 1. Error and Incident Aggregation
+- **Real-Time Error Feed:** Stream all system, workflow, and module-level error events as they occur.
+- **Incident Correlation Engine:** Automatically group related errors into unified incident records.
+- **Severity Classification:** Tag errors and incidents by severity level (Info, Warning, Critical, Fatal).
+
+### 2. Incident Investigation Tools
+- **Error Timeline Visualization:** Display temporal distribution of errors during incident windows.
+- **Root Cause Analysis Panel:** Provide error stack traces, related system events, and configuration change history for investigation.
+- **System Health Correlation:** Overlay resource utilization, SLA risk, and load metrics during incident timeframes.
+
+### 3. Remediation Tracking
+- **Remediation Action Logger:** Track who performed what action in response to each incident.
+- **Auto-Remediation Status:** Display whether EPLARE auto-remediation was triggered and its outcome.
+- **Post-Incident Review Templates:** Allow creation of post-mortem reports with lessons learned and action plans.
+
+### 4. Reporting and Compliance
+- **Incident Export Tools:** Export detailed incident records for external audits.
+- **MTTR and Incident Frequency Dashboards:** Track mean time to resolution (MTTR), incident frequency, and downtime impact over time.
+- **Audit-Grade Action Logs:** Provide immutable records of all incident handling steps.
+
+### 5. Alerting and Notification Integration
+- **Real-Time Incident Alerts:** Notify admins on high-severity incidents.
+- **Notification Channel Hooks:** Integrate with Slack, email, PagerDuty, and other alerting systems.
+- **Alert Escalation Rules:** Trigger escalations based on incident severity or unresolved duration.
+
+## Non-Functional Requirements
+- **UI Latency:** Sub-500ms update latency for real-time error feeds.
+- **Scalability:** Handle millions of error events across thousands of workflows.
+- **Extensibility:** Support custom error types and incident categories.
+- **Reliability:** Ensure incident records persist across system restarts.
+
+## Data Flow Diagram (Textual)
+1. **Error Events (from ALC / Runtime Modules / EPLARE) → EIRC Aggregator → Incident Classifier → Visualization Renderer / Notification Engine / Export APIs**
+
+## Interfaces
+- **Input Interfaces:** Audit Logging and Compliance Engine (ALC), Error Pattern Learning Engine (EPLARE), Workflow Orchestrator (SWO), Resource Utilization Monitor (RUM).
+- **Output Interfaces:** Admin Dashboard (DVL), External Incident Management Systems, Notification Channels.
+
+## Configuration Options
+- **Severity Thresholds:** Customizable for alerts.
+- **Incident Auto-Correlation Rules:** Admin-definable.
+- **Export Retention Period:** Configurable.
+- **Notification Preferences:** Per admin user or team.
+
+## Example Use Cases
+- Investigating a spike in fatal workflow errors over the past hour.
+- Tracking the MTTR for the last month’s incidents.
+- Exporting a compliance report of all critical incidents for the past quarter.
+- Triggering escalation for an unresolved SLA-impacting error.
+
+## Extensibility Hooks
+- **Custom Incident Classifiers:** For domain-specific error categorization.
+- **External SIEM System Integration:** Push incidents to enterprise SIEM tools.
+- **Dynamic Escalation Policy Loader:** Allow live updates to escalation rules.
+
+## Testing and Validation Plan
+- Incident detection latency tests.
+- Auto-correlation accuracy validation.
+- MTTR calculation correctness.
+- Notification and alert delivery benchmarking.
+
+## Dependencies
+- **kOS Event Bus**
+- **Audit Logging and Compliance Engine (ALC)**
+- **Error Pattern Learning and Auto-Remediation Engine (EPLARE)**
+- **Workflow Orchestrator (SWO)**
+- **Resource Utilization Monitor (RUM)**
+
+## Future Enhancements
+- AI-driven root cause suggestion engine.
+- Predictive incident risk scoring.
+- ChatOps-style incident management integrations.
+- Visual incident correlation graphing.
+
+---
+
+**Next module:** `skald_historical_analytics_and_trends_visualizer.md`
+
+Let me know when you want me to continue.
+

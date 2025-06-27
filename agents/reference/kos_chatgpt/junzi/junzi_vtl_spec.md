@@ -1,0 +1,183 @@
+# JUNZI Phase 2 - Detailed Technical Specification: Values Translation Layer (VTL)
+
+## Module Name:
+
+Values Translation Layer (VTL)
+
+## Module Purpose:
+
+The VTL transforms high-level ethical policies, stakeholder value statements, and regulatory guidelines into machine-readable, executable rule sets deployable within the Dynamic Ethical Rule Engine (DERE). It acts as the semantic and logic bridge between human ethical language and operational decision logic.
+
+---
+
+## System Architecture
+
+### Processing Pipeline:
+
+1. **Policy Ingestion Layer:**
+
+   - Accepts input in natural language, structured documents (PDF, DOCX, JSON), or direct API submissions.
+
+2. **Preprocessing Layer:**
+
+   - Runs tokenization, stopword removal, and syntactic parsing (using spaCy or NLTK libraries).
+
+3. **Semantic Understanding Engine:**
+
+   - Applies Natural Language Understanding (NLU) models fine-tuned on ethical, legal, and regulatory corpora.
+   - Identifies ethical principles, constraints, stakeholders, and action triggers.
+
+4. **Ontology Mapper:**
+
+   - Aligns extracted elements to JUNZI’s Ethical Ontology Model (from Phase 1 outputs).
+   - Handles entity resolution, term disambiguation, and context classification.
+
+5. **Rule Generator:**
+
+   - Converts mapped elements into structured, executable rules in YAML or JSON formats.
+   - Supports generation of rule metadata: priority weights, conflict tags, stakeholder relevance indexes.
+
+6. **Simulation Validator:**
+
+   - Runs generated rules through simulated scenarios using PAS (Policy and Action Simulator) to detect conflicts or inconsistencies before deployment.
+
+7. **Export Handler:**
+
+   - Pushes validated rule sets to DERE for version-controlled storage and future deployment.
+
+---
+
+## Supported Input Formats:
+
+- PDF
+- DOCX
+- Plain Text
+- JSON Policy Documents
+- Direct REST API Calls
+
+---
+
+## Data Output Model:
+
+```json
+{
+  "rule_id": "uuid",
+  "description": "string",
+  "priority_weight": "float",
+  "stakeholder_scope": ["stakeholder_group_id"],
+  "trigger_conditions": "logic expression",
+  "action_constraints": "list of allowed/denied actions",
+  "created_from_policy": "UUID or filename",
+  "validation_status": "Pending | Validated | Failed",
+  "version": "string"
+}
+```
+
+---
+
+## Core Algorithms and Models
+
+1. **Ethical Intent Recognition Model:**
+
+   - Transformer-based NLU model fine-tuned on ethics-specific corpora.
+
+2. **Context-Aware Semantic Mapping:**
+
+   - Custom mapping layer utilizing JUNZI Ethical Ontology for entity linking and context placement.
+
+3. **Rule Synthesis Engine:**
+
+   - Converts semantic frames into logical operator chains compatible with DERE rule syntax.
+
+4. **Conflict Detection Pre-check:**
+
+   - Runs generated rule candidates against known historical conflict patterns in EAT and DERE.
+
+---
+
+## API Endpoints
+
+| Endpoint            | Method | Description                                         |
+| ------------------- | ------ | --------------------------------------------------- |
+| /vtl/ingest-policy  | POST   | Uploads new ethical policy document for parsing     |
+| /vtl/generate-rule  | POST   | Triggers rule generation from stored semantic frame |
+| /vtl/validate-rule  | POST   | Runs simulation validation for a generated rule     |
+| /vtl/export-to-dere | POST   | Exports validated rules to DERE storage             |
+| /vtl/ontology-map   | GET    | Returns current ethical ontology term mappings      |
+
+---
+
+## Performance Targets
+
+- **Policy-to-Rule Conversion Time:** Under 2 minutes for standard policy documents (<10 pages).
+- **Ontology Mapping Accuracy:** >95% alignment rate with ethical ontology categories.
+- **Rule Validation False Negative Rate:** <3%
+
+---
+
+## Logging and Monitoring
+
+- **Policy Processing Logs:** Tracks ingestion time, NLP processing metrics, and semantic parsing results.
+- **Rule Generation Metrics:** Counts generated rules per document.
+- **Conflict Detection Alerts:** Triggers notifications for rule conflicts detected pre-deployment.
+- **Ontology Mapping Health:** Regular sync and validation checks against master ontology.
+
+Monitoring Tools: ElasticSearch + Kibana stack recommended for NLP and pipeline monitoring.
+
+---
+
+## Security Considerations
+
+- API Key-based access control for ingestion endpoints
+- PII Redaction Pipeline for sensitive policy documents
+- Encrypted storage for policy inputs and generated rule drafts
+
+---
+
+## Testing Requirements
+
+- **Unit Tests:**
+
+  - NLP extraction accuracy
+  - Ontology mapping consistency
+
+- **Integration Tests:**
+
+  - End-to-end policy ingestion to DERE deployment
+
+- **Ethical Validation Tests:**
+
+  - Simulated ethical scenario checks using PAS
+
+- **Performance Tests:**
+
+  - Ingestion throughput under load
+
+---
+
+## Deployment Profile
+
+- **Language:** Python 3.11
+- **ML Libraries:** Hugging Face Transformers, spaCy, Scikit-learn
+- **Containerization:** Docker + Kubernetes
+- **Storage:** MongoDB or PostgreSQL for semantic frame storage
+
+---
+
+## Dependencies
+
+- DERE API (for rule export)
+- PAS API (for rule simulation testing)
+- EAT API (for conflict pattern lookup)
+- Ethical Ontology Service (for mapping)
+
+---
+
+## Next Document:
+
+Consent and Transparency Interface (CTI) - Full Technical Specification
+
+---
+
+*End of JUNZI Values Translation Layer (VTL) Technical Specification Document.*
+

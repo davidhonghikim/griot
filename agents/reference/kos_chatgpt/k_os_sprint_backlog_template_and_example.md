@@ -1,0 +1,84 @@
+# kOS Sprint Backlog Template and Example
+
+## Overview
+The **kOS Sprint Backlog Template and Example** provides a standardized structure for defining, tracking, and managing development tasks for any module-specific sprint within the kOS ecosystem. It helps contributors and project leads ensure clarity, accountability, and ethical oversight throughout the sprint lifecycle.
+
+This template can be used for all modules, agent classes, or system components.
+
+---
+
+## 1. Sprint Metadata
+
+- **Sprint Name:** `[e.g., Skald GCTE Sprint 1]`
+- **Sprint Number:** `[e.g., Sprint 23]`
+- **Start Date:** `[YYYY-MM-DD]`
+- **End Date:** `[YYYY-MM-DD]`
+- **Module/Phase:** `[e.g., Phase 8 – Skald Class]`
+- **Sprint Goal:** `[Short summary of the main objective]`
+
+---
+
+## 2. Sprint Backlog Table
+
+| Task ID | Task Description | Assigned To | Status | Priority | Estimated Effort (hrs) | GEIG Impact | Dependencies |
+|-------|----------------|------------|------|---------|------|--------|--------|
+| SK-GCTE-001 | Implement Trigger Detection Loop | Dev1 | In Progress | High | 12 | Medium | TOSE Queue API |
+| SK-GCTE-002 | Add Context Analysis Layer | Dev2 | Pending | High | 8 | High | Data Fabric Access |
+| SK-GCTE-003 | Define API Endpoints | Dev3 | Pending | Medium | 4 | Low | None |
+| SK-GCTE-004 | Unit Test Suite for GCTE | QA1 | Pending | High | 6 | Medium | SK-GCTE-001 |
+| SK-GCTE-005 | GEIG Ethical Check Logic | Dev2 | Pending | Critical | 10 | High | GEIG Policy Engine |
+
+---
+
+## 3. Sprint Testing Targets
+
+- Unit test coverage ≥ 90%
+- Integration test for GCTE-to-SCMG handoff
+- Load test trigger processing under 10K events/sec
+- Ethical impact test for edge case triggers
+
+---
+
+## 4. Ethical Oversight Checklist
+
+- [x] GEIG pre-sprint ethical risk review completed
+- [x] All high-risk tasks flagged for extra review
+- [ ] Mid-sprint ethical audit scheduled
+- [ ] Final GEIG validation required before merge
+
+---
+
+## 5. Sprint Deliverables
+
+- Fully functional GCTE module with:
+  - Trigger detection
+  - Context analysis
+  - Ethical gating logic
+  - API endpoints
+  - Unit and integration tests
+  - Updated module documentation
+
+---
+
+## 6. Example Daily Standup Block
+
+| Date | Dev | Yesterday | Today | Blockers |
+|----|---|---|---|---|
+| 2025-07-01 | Dev1 | Finished event loop logic | Starting testing | Waiting on TOSE stub |
+| 2025-07-01 | Dev2 | Setup GEIG hook | Implementing context scoring | None |
+
+---
+
+## 7. Retrospective Notes Template
+
+- **What went well:**
+- **What didn’t go well:**
+- **What to improve next sprint:**
+
+---
+
+## Conclusion
+The **kOS Sprint Backlog Template and Example** provides a replicable, ethically integrated structure for planning and tracking every development sprint across the kOS project—supporting delivery consistency and ethical oversight at all levels.
+
+✅ Ready to assist with populating real sprint backlogs for specific kOS modules, or help start sprint execution planning.
+
