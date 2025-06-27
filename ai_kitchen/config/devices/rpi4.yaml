@@ -1,0 +1,5 @@
+# rpi4.yaml – Raspberry Pi 4 tuning
+force_backends:
+  comfyui: false
+  ollama: false
+manual_gpus: []

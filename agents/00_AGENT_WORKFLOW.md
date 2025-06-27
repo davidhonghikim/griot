@@ -25,38 +25,43 @@ cat agents/02_SYSTEM_PROMPT.md && echo "\n---" && cat agents/00_AGENT_WORKFLOW.m
 
 This command will display your core system prompt, the agent workflow, the project's architectural vision, and the specific, up-to-date directive for your current session. Do not proceed until you have done this.
 
-### 2. The Agent Changelog (Your Primary Duty)
+### 2. The Agent Changelog (REVERSE-CHRONO)
 
-The `agents/01_AGENT_CHANGELOG.md` file is the official, chronological journal of the project. You **must** document your session in this file.
+All session history is recorded in `agents/01_AGENT_CHANGELOG_LATEST.md` – this file only contains the **current quarter** and is maintained in **newest-first order**. At the start of each UTC quarter the previous file is automatically moved to `agents/01_agent_archives/CHANGELOG_<YYYY>_Q<n>.md`.
 
-**A. Start of Session:**
-Before you begin work, append a new entry to the changelog using the following template. The timestamp **MUST** be in `YYYY-MM-DD` format.
+For the complete specification see `agents/04_HISTORY_SYSTEM.md`.
 
-```markdown
----
-## Agent: [Your Name/Model] - [YYYY-MM-DD]
+**A. Start of Session**
 
-**Mission**: [A brief, one-sentence summary of the goal from LATEST_HANDOFF.md]
+Add a new entry to the **top** of `01_AGENT_CHANGELOG_LATEST.md` using the helper script:
 
-### Log:
-- **[YYYY-MM-DDTHH:MM:SSZ]**: ONBOARDING - Session started. Reviewing rules and handoff directive.
+```bash
+node scripts/kos-log.js CHANGE "Brief description of your mission"
 ```
 
-**B. During Session:**
-You **must** log major accomplishments, not every granular action. The goal is to create a high-level, human-readable audit trail that summarizes progress.
+The script populates the template stored at `agents/templates/changelog_entry.md.tpl`, stamping the current UTC time and your agent id.
 
--   **Log Major Tasks:** Instead of logging every `edit_file` or `run_terminal_cmd` call, batch your work into logical units. Create a single log entry when a significant, multi-step task is complete.
--   **Log Key Events:** Continue to log important non-action events as they occur, using the appropriate entry type:
-    -   `FINDING`: The discovery of a significant issue.
-    -   `CORRECTION`: A direct action taken to fix a `FINDING`.
-    -   `DECISION`: A choice made between multiple implementation options. State the rationale.
+If you must add an entry manually, follow this pattern:
 
-**Example Log Entries:**
 ```markdown
-- **2025-06-25T18:35:00Z**: FINDING - Discovered a `MessageType` mismatch between specifications and the core protocol.
-- **2025-06-25T19:10:00Z**: ACTION - Completed the full 5-part specification suite for the Griot Node.
+## 2025-06-27T13:45:12Z – Claude-4 (MISSION: node spec refactor)
+* CHANGE: Renamed `04_scenarios_and_workflows` → `05_scenarios_and_workflows`.
+* ERROR: Found duplicate “04_” directory prefix – fixed in same commit.
 ```
 
+**B. During Session**
+
+Only log **high-signal events** – batch related actions into one entry. Use exactly one of the following keywords per bullet:
+
+- **CHANGE** – committed code/doc modification  
+- **FIX** – correction of a previous bug or error  
+- **ERROR** – newly discovered problem still unresolved  
+- **DECISION** – architectural or process choice with rationale  
+- **SPEC_UPDATE** – change to a canonical spec, prompt, or workflow  
+
+Minor terminal commands, individual file edits, or exploratory reads do **not** belong in the changelog; summarize them under a single CHANGE or FIX entry once complete.
+
+### 3. Project-Wide Style & Naming Conventions
 ### 3. Project-Wide Style & Naming Conventions
 
 To ensure perfect interoperability and a predictable structure, all agents **MUST** adhere to the following conventions without deviation. Do not invent new patterns.
@@ -85,7 +90,7 @@ To ensure perfect interoperability and a predictable structure, all agents **MUS
 When your assigned mission is complete, you **must** execute the following handoff procedure precisely.
 
 **A. Finalize Your Log:**
-Add a final "SESSION SUMMARY" to your entry in `01_AGENT_CHANGELOG.md`. This summary **MUST** use the following structure to ensure clarity for the next agent:
+Add a final "SESSION SUMMARY" to your entry in `01_AGENT_CHANGELOG_LATEST.md`.  This summary **MUST** use the following structure to ensure clarity for the next agent:
 
 ```markdown
 ### SESSION SUMMARY:
@@ -128,7 +133,7 @@ Create a new, clean `agents/handoff/LATEST_HANDOFF.md` file. Use the following t
 
 ## 3. Context & History
 
-For a complete history of the actions that led to this handoff, please review my final session log in `agents/01_AGENT_CHANGELOG.md` under the entry for **[YYYY-MM-DD]**.
+For a complete history of the actions that led to this handoff, please review my final session log in `agents/01_AGENT_CHANGELOG_LATEST.md` under the entry for **[YYYY-MM-DD]**.
 ```
 
 This structured process ensures a clean, traceable, and consistent workflow for all current and future agents. 

@@ -223,7 +223,7 @@ Nodes can discover and utilize each other's capabilities:
 Every agent MUST follow the process in `agents/00_AGENT_WORKFLOW.md`:
 
 1. **Onboarding**: Read system prompt, workflow, architecture, and handoff
-2. **Documentation**: Log all major actions in `agents/01_AGENT_CHANGELOG.md`
+2. **Documentation**: Log all major actions in `agents/01_AGENT_CHANGELOG_LATEST.md` (see `agents/04_HISTORY_SYSTEM.md`)
 3. **Work Execution**: Follow small, verifiable steps with proactive error checking
 4. **Handoff Creation**: Archive previous handoff, create new comprehensive handoff
 
