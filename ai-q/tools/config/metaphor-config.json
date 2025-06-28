@@ -1,0 +1,154 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-01-28",
+  "active_metaphor": "spore_kitchen",
+  
+  "metaphors": {
+    "spore_kitchen": {
+      "name": "Spore + Kitchen Brigade",
+      "description": "Spore evolution with kitchen brigade UI/UX",
+      "levels": {
+        "infrastructure": "spore_mycelium",
+        "interaction": "kitchen_brigade"
+      }
+    },
+    "plant_garden": {
+      "name": "Plant + Garden",
+      "description": "Plant growth with garden ecosystem",
+      "levels": {
+        "infrastructure": "seed_forest",
+        "interaction": "garden_tending"
+      }
+    },
+    "mythological": {
+      "name": "Mythological + Cultural",
+      "description": "KLF-inspired with cultural nodes",
+      "levels": {
+        "infrastructure": "ancient_wisdom",
+        "interaction": "cultural_exchange"
+      }
+    },
+    "custom": {
+      "name": "Custom Metaphor",
+      "description": "User-defined metaphor system",
+      "levels": {
+        "infrastructure": "user_defined",
+        "interaction": "user_defined"
+      }
+    }
+  },
+  
+  "terminology": {
+    "spore_mycelium": {
+      "atomic_unit": "spore",
+      "network": "mycelium",
+      "connection": "hyphae",
+      "growth": "germination",
+      "mature": "fruiting_body",
+      "system": "tree",
+      "domain": "forest",
+      "platform": "ecosystem"
+    },
+    "kitchen_brigade": {
+      "data": "ingredient",
+      "capability": "skill",
+      "connector": "adaptor",
+      "workflow": "recipe",
+      "process": "cooking",
+      "result": "dish",
+      "quality": "taste",
+      "system": "kitchen"
+    },
+    "seed_forest": {
+      "atomic_unit": "seed",
+      "growth": "sprout",
+      "capability": "plant",
+      "connection": "vine",
+      "system": "tree",
+      "domain": "forest",
+      "platform": "garden"
+    },
+    "ancient_wisdom": {
+      "atomic_unit": "ancient_knowledge",
+      "network": "justified_ancients",
+      "connection": "timelord",
+      "growth": "illumination",
+      "system": "k_foundation",
+      "domain": "illuminati",
+      "platform": "cosmic_garden"
+    }
+  },
+  
+  "evolution_stages": {
+    "spore_mycelium": [
+      "spore",
+      "germination",
+      "mycelium",
+      "fruiting_body",
+      "tree",
+      "forest"
+    ],
+    "seed_forest": [
+      "seed",
+      "sprout",
+      "plant",
+      "flower",
+      "tree",
+      "forest"
+    ],
+    "ancient_wisdom": [
+      "ancient_knowledge",
+      "justified_ancients",
+      "timelord",
+      "jams",
+      "k_foundation",
+      "illuminati"
+    ]
+  },
+  
+  "cultural_nodes": {
+    "griot": {
+      "culture": "west_african",
+      "role": "storyteller",
+      "function": "knowledge_preservation",
+      "evolution_path": ["spore", "mycelium", "tree"]
+    },
+    "tohunga": {
+      "culture": "maori",
+      "role": "priest_scholar",
+      "function": "sacred_knowledge",
+      "evolution_path": ["spore", "mycelium", "tree"]
+    },
+    "ronin": {
+      "culture": "japanese",
+      "role": "masterless_samurai",
+      "function": "independent_action",
+      "evolution_path": ["spore", "mycelium", "tree"]
+    }
+  },
+  
+  "mcp_compatibility": {
+    "enabled": true,
+    "version": "2024-11-05",
+    "features": [
+      "resource_access",
+      "tool_integration",
+      "function_calling",
+      "streaming",
+      "parallel_execution"
+    ],
+    "custom_extensions": [
+      "mycelium_network",
+      "cultural_knowledge",
+      "evolution_tracking"
+    ]
+  },
+  
+  "development": {
+    "hot_reload": true,
+    "metaphor_switching": true,
+    "label_customization": true,
+    "structure_flexibility": true,
+    "debug_mode": true
+  }
+} 

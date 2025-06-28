@@ -1,0 +1,40 @@
+# kOS Changelog System Configuration
+
+# Base directory for changelog files (year/month structure)
+changelog_base_dir: agents/changelogs
+
+# Default changelog pattern for finding latest file
+# Format: YYYY/MM/YYYY-MM-DD_AGENTNAME_DESCRIPTION.md
+default_changelog_pattern: "**/YYYY-MM-DD_*_*.md"
+
+# Directory structure for organizing changelogs by year/month
+# Files are stored in: agents/changelogs/YYYY/MM/
+year_month_structure: true
+
+# Fallback agent identifier if $AGENT_NAME is not set
+default_agent: Unknown-Agent
+
+# Directory holding template files
+template_dir: agents/agents_docs_templates
+
+# File naming convention for changelog entries
+# Format: YYYY-MM-DD_AGENTNAME_DESCRIPTION.md
+file_naming_format: "YYYY-MM-DD_{agent}_{description}.md"
+
+# Bootstrap documentation location
+bootstrap_guide: agents/BOOTSTRAP_GUIDE.md
+
+# Integration with other systems
+performance_system_dir: agents/performance
+implementation_plans_dir: agents/implementation-plans
+
+# Cross-reference patterns
+cross_reference_patterns:
+  - "changelog: {file}"
+  - "performance: {file}"
+  - "plan: {file}"
+
+# Quality assurance settings
+require_session_summary: true
+require_cross_references: true
+validate_file_naming: true

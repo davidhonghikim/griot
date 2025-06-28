@@ -1,4 +1,0 @@
-# comfyui_servers.yaml
-- name: local_gpu
-  url: http://localhost:8188
-  enabled: true

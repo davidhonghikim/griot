@@ -1,0 +1,129 @@
+{
+  "rules": {
+    "completed_plans": {
+      "action": "immediate",
+      "retention": "permanent",
+      "compression": true,
+      "indexing": true
+    },
+    "cancelled_plans": {
+      "action": "30_days",
+      "retention": "2_years",
+      "compression": true,
+      "indexing": true
+    },
+    "paused_plans": {
+      "action": "90_days",
+      "retention": "1_year",
+      "compression": false,
+      "indexing": true
+    },
+    "active_plans": {
+      "action": "never",
+      "retention": "current",
+      "compression": false,
+      "indexing": true
+    }
+  },
+  "compression": {
+    "enabled": true,
+    "format": "gzip",
+    "level": 6,
+    "extensions": [".md", ".json", ".txt"],
+    "exclude": [".pdf", ".zip", ".tar.gz"]
+  },
+  "indexing": {
+    "enabled": true,
+    "search_fields": [
+      "title",
+      "description", 
+      "phases.title",
+      "phases.description",
+      "metadata.tags",
+      "metadata.created_by"
+    ],
+    "full_text": true,
+    "metadata": true
+  },
+  "structure": {
+    "archive_root": "archive",
+    "date_format": "YYYY-MM",
+    "naming": {
+      "plan_files": "{date}_{plan_id}_{title_slug}.md",
+      "metadata_files": "{date}_{plan_id}_metadata.json",
+      "metrics_files": "{date}_{plan_id}_metrics.json"
+    },
+    "organization": {
+      "by_date": true,
+      "by_type": false,
+      "by_priority": false,
+      "flat_structure": false
+    }
+  },
+  "metadata": {
+    "required": [
+      "id",
+      "title", 
+      "status",
+      "created",
+      "archived",
+      "archive_reason"
+    ],
+    "optional": [
+      "completion_percentage",
+      "phases_completed",
+      "total_tasks",
+      "final_metrics"
+    ],
+    "custom": {
+      "archive_agent": "string",
+      "archive_notes": "string",
+      "related_plans": "array"
+    }
+  },
+  "validation": {
+    "pre_archive": {
+      "check_completeness": true,
+      "validate_schema": true,
+      "verify_metrics": true,
+      "check_dependencies": true
+    },
+    "post_archive": {
+      "verify_integrity": true,
+      "test_restore": false,
+      "update_index": true,
+      "notify_stakeholders": true
+    }
+  },
+  "notifications": {
+    "enabled": true,
+    "triggers": [
+      "plan_archived",
+      "archive_failed", 
+      "restore_requested",
+      "index_updated"
+    ],
+    "recipients": {
+      "plan_archived": ["plan_owner", "stakeholders"],
+      "archive_failed": ["admin", "plan_owner"],
+      "restore_requested": ["admin"],
+      "index_updated": ["admin"]
+    }
+  },
+  "restore": {
+    "enabled": true,
+    "max_size": "100MB",
+    "validation": true,
+    "confirmation": true,
+    "audit_trail": true
+  },
+  "cleanup": {
+    "enabled": true,
+    "schedule": "monthly",
+    "rules": {
+      "delete_old_metadata": "5_years",
+      "compress_old_archives": "2_years",
+      "remove_orphaned_files": true
+    }
+  }
+} 

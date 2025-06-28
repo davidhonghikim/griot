@@ -77,14 +77,14 @@ The `ai-q/` directory is the **absolute source of truth**. Everything agents nee
 ## 3. THE 13 UNIVERSAL ADAPTER NODES
 
 ### **Complete Node Ecosystem**
-Each node is a comprehensive universal adapter covering a specific domain:
+Each node is a comprehensive universal adapter covering a specific domain: ai-q/03_node_specifications dir has primary set of class nodes to design around - can stack node classes as needed for special nodes
 
-1. **Griot** (Artifact Generation) - Universal adapter for intelligent content creation and replication
+1. **Griot** (Artifact Generation) - Universal adapter for intelligent node creation and replication
 2. **Tohunga** (Job Orchestration) - Universal adapter for workflow management and execution
 3. **Ronin** (Network Discovery) - Universal adapter for service discovery and routing
-4. **Musa** (Security) - Universal adapter for authentication, authorization, and protection
+4. **Musa** (Security) - Universal adapter for security, authentication, authorization, and protection
 5. **Hakim** (Health/Wisdom) - Universal adapter for diagnostics, monitoring, and repair
-6. **Skald** (Documentation/Messaging) - Universal adapter for knowledge sharing and communication
+6. **Skald** (Documentation/Messaging) - Universal adapter for content creation sharing, and communication
 7. **Oracle** (Validation/Reasoning) - Universal adapter for logic, validation, and decision-making
 8. **Junzi** (Ethics/Integrity) - Universal adapter for ethical guidance and moral reasoning
 9. **Yachay** (Knowledge Synthesis) - Universal adapter for memory management and data integration
@@ -94,7 +94,7 @@ Each node is a comprehensive universal adapter covering a specific domain:
 13. **Mzee** (Consciousness/Meta-cognition) - Universal adapter for self-awareness and wisdom
 
 ### **Node Specification Pattern**
-Each node follows a consistent 5-6 file structure:
+Each node follows a consistent 5-6 file structure: Monolithic files should be broken down into smaller modular dirs and files
 - `00_[Node]_Overview.md` - Purpose, capabilities, and use cases
 - `01_[Node]_Architecture.md` - **CORE SPEC** - Comprehensive technical architecture
 - `02_[Node]_Data_Models.md` - Data structures and schemas
@@ -152,6 +152,7 @@ interface Universal[Domain]Adapter {
 **CRITICAL**: All file naming must follow exact patterns:
 
 **Node Specifications**:
+- ai-q/03_node_specifications: Primary set of class nodes to design around
 - Format: `[##]_[NodeName]_[SpecType].md`
 - Example: `01_Griot_Architecture.md`
 - Node name MUST be included to avoid conflicts
@@ -242,7 +243,7 @@ Every agent MUST follow the process in `agents/00_AGENT_WORKFLOW.md`:
 ```
 
 ### **Quality Assurance Process**
-- **Two-Edit Rule**: Stop and review after major changes
+- **Five-Edit Rule**: Stop and review after major changes and large tasks completions
 - **Proactive Verification**: Find and fix errors before builds fail
 - **User Verification**: Nothing is "done" until user confirms success
 - **Documentation Update**: All changes must update relevant documentation

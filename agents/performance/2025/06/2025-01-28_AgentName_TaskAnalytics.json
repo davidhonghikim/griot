@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-01-30T21:15:00Z"
+  },
+  "task_categories": {
+    "code_implementation": {
+      "description": "Writing or modifying code",
+      "difficulty_levels": ["low", "medium", "high"],
+      "expected_duration": {
+        "low": "15-30 minutes",
+        "medium": "30-90 minutes",
+        "high": "90+ minutes"
+      },
+      "success_criteria": ["builds_successfully", "tests_pass", "documentation_updated"],
+      "total_sessions": 0,
+      "success_rate": 0.0,
+      "average_quality": 0.0,
+      "average_duration": 0.0,
+      "best_agent": null,
+      "most_common_errors": []
+    },
+    "architecture_design": {
+      "description": "System design and architectural decisions",
+      "difficulty_levels": ["low", "medium", "high"],
+      "expected_duration": {
+        "low": "30-60 minutes",
+        "medium": "60-120 minutes",
+        "high": "120+ minutes"
+      },
+      "success_criteria": ["design_documented", "decisions_rationalized", "implementation_plan"],
+      "total_sessions": 0,
+      "success_rate": 0.0,
+      "average_quality": 0.0,
+      "average_duration": 0.0,
+      "best_agent": null,
+      "most_common_errors": []
+    },
+    "documentation": {
+      "description": "Creating or updating documentation",
+      "difficulty_levels": ["low", "medium", "high"],
+      "expected_duration": {
+        "low": "15-45 minutes",
+        "medium": "45-90 minutes",
+        "high": "90+ minutes"
+      },
+      "success_criteria": ["comprehensive_coverage", "clear_structure", "actionable_content"],
+      "total_sessions": 0,
+      "success_rate": 0.0,
+      "average_quality": 0.0,
+      "average_duration": 0.0,
+      "best_agent": null,
+      "most_common_errors": []
+    },
+    "debugging": {
+      "description": "Identifying and fixing issues",
+      "difficulty_levels": ["low", "medium", "high"],
+      "expected_duration": {
+        "low": "15-30 minutes",
+        "medium": "30-90 minutes",
+        "high": "90+ minutes"
+      },
+      "success_criteria": ["issue_identified", "root_cause_found", "fix_implemented"],
+      "total_sessions": 0,
+      "success_rate": 0.0,
+      "average_quality": 0.0,
+      "average_duration": 0.0,
+      "best_agent": null,
+      "most_common_errors": []
+    },
+    "code_review": {
+      "description": "Reviewing and analyzing existing code",
+      "difficulty_levels": ["low", "medium", "high"],
+      "expected_duration": {
+        "low": "15-30 minutes",
+        "medium": "30-60 minutes",
+        "high": "60+ minutes"
+      },
+      "success_criteria": ["issues_identified", "improvements_suggested", "quality_assessed"],
+      "total_sessions": 0,
+      "success_rate": 0.0,
+      "average_quality": 0.0,
+      "average_duration": 0.0,
+      "best_agent": null,
+      "most_common_errors": []
+    }
+  }
+} 

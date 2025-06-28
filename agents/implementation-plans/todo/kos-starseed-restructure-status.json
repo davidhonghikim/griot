@@ -1,0 +1,198 @@
+{
+  "id": "plan_2025_01_kos_starseed_restructure",
+  "title": "kOS Starseed Node Integration & Restructuring Plan",
+  "description": "Comprehensive restructuring of agents and ai-q directories with 13 Starseed node integration, vector memory system, and AI-native database architecture",
+  "status": "active",
+  "priority": "critical",
+  "phases": [
+    {
+      "id": "phase_1_foundation",
+      "title": "Foundation Restructure & Database Setup",
+      "description": "Directory restructuring, database setup, and migration pipeline creation",
+      "status": "not_started",
+      "completion": 0,
+      "start_date": "2025-01-28",
+      "end_date": "2025-01-31",
+      "milestones": [
+        {
+          "id": "milestone_1_1",
+          "title": "Directory restructure complete with modular organization",
+          "description": "Complete restructuring of /agents and /ai-q directories",
+          "status": "not_started"
+        },
+        {
+          "id": "milestone_1_2", 
+          "title": "Database infrastructure deployed",
+          "description": "MongoDB, Weaviate, and Neo4j deployed and configured",
+          "status": "not_started"
+        },
+        {
+          "id": "milestone_1_3",
+          "title": "Content migration pipeline operational",
+          "description": "Automated pipeline for migrating existing content to new structure",
+          "status": "not_started"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task_1_1_1",
+          "title": "Restructure /agents directory with new 6-tier system",
+          "description": "Implement new 6-tier agent directory structure",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 4
+        },
+        {
+          "id": "task_1_1_2",
+          "title": "Restructure /ai-q with 8-category modular system",
+          "description": "Reorganize ai-q directory with 8 modular categories",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4", 
+          "estimated_hours": 3
+        },
+        {
+          "id": "task_1_1_3",
+          "title": "Break large files (>1000 lines) into modular components",
+          "description": "Split monolithic files into smaller, focused modules",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 6
+        },
+        {
+          "id": "task_1_1_4",
+          "title": "Implement consistent naming (lowercase, 00_ prefixes)",
+          "description": "Apply consistent naming conventions across all files",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 2
+        },
+        {
+          "id": "task_1_1_5",
+          "title": "Set up MongoDB for document storage",
+          "description": "Deploy and configure MongoDB for large document storage",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 3
+        },
+        {
+          "id": "task_1_1_6",
+          "title": "Deploy Weaviate for vector embeddings",
+          "description": "Set up Weaviate vector database for semantic search",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 3
+        },
+        {
+          "id": "task_1_1_7",
+          "title": "Configure Neo4j for knowledge relationships",
+          "description": "Set up Neo4j graph database for knowledge relationships",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 3
+        },
+        {
+          "id": "task_1_1_8",
+          "title": "Create migration scripts for existing content",
+          "description": "Build scripts to migrate current content to new structure",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 4
+        }
+      ]
+    },
+    {
+      "id": "phase_2_starseed_memory",
+      "title": "Starseed Node Memory Specialization",
+      "description": "Implementation of specialized memory patterns for all 13 Starseed archetypes",
+      "status": "not_started",
+      "completion": 0,
+      "start_date": "2025-02-01",
+      "end_date": "2025-02-04",
+      "milestones": [
+        {
+          "id": "milestone_2_1",
+          "title": "All 13 Starseed memory patterns implemented",
+          "description": "Complete implementation of memory specializations for each node type",
+          "status": "not_started"
+        },
+        {
+          "id": "milestone_2_2",
+          "title": "Yachay primary memory system operational",
+          "description": "Primary memory consolidation system fully functional",
+          "status": "not_started"
+        },
+        {
+          "id": "milestone_2_3",
+          "title": "Cross-node collaboration workflows active",
+          "description": "Inter-node collaboration patterns implemented and tested",
+          "status": "not_started"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task_2_1_1",
+          "title": "Implement Griot memory pattern (cultural preservation)",
+          "description": "West African knowledge preservation and replication patterns",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 3
+        },
+        {
+          "id": "task_2_1_2",
+          "title": "Implement Tohunga memory pattern (sensory processing)",
+          "description": "Māori sensory organ and perception processing patterns",
+          "status": "not_started",
+          "assignee": "agent:claude-sonnet-4",
+          "estimated_hours": 3
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "overall_completion": 0,
+    "phases_completed": 0,
+    "total_tasks": 54,
+    "completed_tasks": 0,
+    "blocked_tasks": 0,
+    "resource_utilization": 0.0
+  },
+  "dependencies": [
+    {
+      "type": "external",
+      "description": "Docker environment for database deployment",
+      "status": "pending"
+    },
+    {
+      "type": "external", 
+      "description": "OpenAI API access for embedding generation",
+      "status": "pending"
+    },
+    {
+      "type": "external",
+      "description": "Node.js 18+ runtime environment", 
+      "status": "pending"
+    }
+  ],
+  "risks": [
+    {
+      "id": "risk_1",
+      "description": "Large-scale migration complexity",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Implement incremental migration with rollback capabilities"
+    },
+    {
+      "id": "risk_2", 
+      "description": "Cultural sensitivity validation challenges",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Engage cultural advisors and implement validation frameworks"
+    }
+  ],
+  "metadata": {
+    "created": "2025-01-28T10:00:00Z",
+    "updated": "2025-01-28T10:00:00Z",
+    "created_by": "agent:claude-sonnet-4",
+    "version": "1.0.0"
+  }
+} 

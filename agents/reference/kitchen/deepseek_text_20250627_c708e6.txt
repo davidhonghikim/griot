@@ -1,0 +1,25 @@
+/ai_kitchen
+├── /core
+│   ├── device_manager.py       # HW detection
+│   ├── skill_loader.py         # Dynamic module loading
+│   └── api_gateway.py          # Unified API endpoints
+├── /nodes
+│   ├── kitchen/                # Griot node
+│   │   ├── rag_engine/         # Recipe/knowledge search
+│   │   └── hardware/           # GPU/CPU profilers
+│   └── skald/                  # Creator node
+│       ├── recipe_templater/
+│       └── artifact_tools/
+├── /config
+│   ├── devices/                # HW profiles
+│   │   ├── mac_arm.yaml
+│   │   └── rpi4.yaml
+│   └── services/               # API endpoints
+│       ├── comfyui_servers.yaml
+│       └── ollama_servers.yaml
+├── /recipes
+│   ├── templates/              # Recipe blueprints
+│   └── samples/
+│       ├── noir_shortfilm.yaml
+│       └── podcast_episode.yaml
+└── install.sh                  # Platform-specific setup

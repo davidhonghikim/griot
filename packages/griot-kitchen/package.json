@@ -1,0 +1,24 @@
+{
+  "name": "@griot-seed/griot-kitchen",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The core orchestration engine for the Griot Seed project.",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5",
+    "@griot-seed/storage-mongodb": "file:../storage-mongodb",
+    "@griot-seed/rag-engine": "file:../rag-engine",
+    "@griot-seed/service-connectors": "file:../service-connectors"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+} 

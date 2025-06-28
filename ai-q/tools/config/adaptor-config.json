@@ -1,0 +1,331 @@
+{
+  "version": "1.0.0",
+  "description": "AI-Q MCP-Compatible Adaptor Configuration",
+  "active_adaptors": [
+    "mycelium_network",
+    "cultural_knowledge", 
+    "evolution_tracker",
+    "kitchen_brigade"
+  ],
+  "adaptors": {
+    "mycelium_network": {
+      "name": "Mycelium Network Adaptor",
+      "description": "Handles mycelium network connections and resource sharing",
+      "type": "network",
+      "mcp_compatible": true,
+      "capabilities": [
+        "connect",
+        "share", 
+        "request",
+        "discover",
+        "route"
+      ],
+      "endpoints": {
+        "connect": "/api/mycelium/connect",
+        "share": "/api/mycelium/share", 
+        "request": "/api/mycelium/request",
+        "discover": "/api/mycelium/discover",
+        "route": "/api/mycelium/route"
+      },
+      "connection_types": [
+        "hyphae",
+        "bridge", 
+        "tunnel",
+        "portal"
+      ],
+      "sharing_modes": [
+        "public",
+        "private",
+        "restricted",
+        "cultural"
+      ],
+      "config": {
+        "max_connections": 100,
+        "connection_timeout": 30,
+        "retry_attempts": 3,
+        "heartbeat_interval": 60
+      }
+    },
+    "cultural_knowledge": {
+      "name": "Cultural Knowledge Adaptor", 
+      "description": "Integrates and preserves cultural knowledge and wisdom",
+      "type": "knowledge",
+      "mcp_compatible": true,
+      "capabilities": [
+        "integrate",
+        "query",
+        "preserve",
+        "synthesize",
+        "translate"
+      ],
+      "endpoints": {
+        "integrate": "/api/cultural/integrate",
+        "query": "/api/cultural/query",
+        "preserve": "/api/cultural/preserve",
+        "synthesize": "/api/cultural/synthesize",
+        "translate": "/api/cultural/translate"
+      },
+      "knowledge_types": [
+        "traditional",
+        "indigenous", 
+        "modern",
+        "hybrid",
+        "sacred"
+      ],
+      "preservation_modes": [
+        "exact",
+        "adapted",
+        "synthesized",
+        "contextual"
+      ],
+      "cultures": [
+        "griot",
+        "tohunga",
+        "ronin",
+        "musa",
+        "hakim",
+        "skald",
+        "oracle",
+        "junzi",
+        "yachay",
+        "sachem",
+        "archon",
+        "amauta",
+        "mzee"
+      ],
+      "config": {
+        "max_knowledge_size": "10MB",
+        "preservation_priority": "high",
+        "cultural_sensitivity": "strict",
+        "translation_support": true
+      }
+    },
+    "evolution_tracker": {
+      "name": "Evolution Tracker Adaptor",
+      "description": "Tracks and manages node evolution through growth stages",
+      "type": "tracking", 
+      "mcp_compatible": true,
+      "capabilities": [
+        "check_stage",
+        "initiate_transformation",
+        "monitor",
+        "predict",
+        "optimize"
+      ],
+      "endpoints": {
+        "check": "/api/evolution/check",
+        "transform": "/api/evolution/transform",
+        "monitor": "/api/evolution/monitor",
+        "predict": "/api/evolution/predict",
+        "optimize": "/api/evolution/optimize"
+      },
+      "evolution_stages": [
+        "spore",
+        "germination", 
+        "mycelium",
+        "fruiting_body",
+        "tree",
+        "forest"
+      ],
+      "transformation_modes": [
+        "gradual",
+        "immediate",
+        "conditional",
+        "adaptive"
+      ],
+      "metrics": [
+        "connections_count",
+        "resources_shared",
+        "knowledge_contributed",
+        "network_health",
+        "cultural_integration",
+        "evolution_progress"
+      ],
+      "config": {
+        "check_interval": 300,
+        "transformation_timeout": 3600,
+        "prediction_horizon": 86400,
+        "optimization_frequency": 3600
+      }
+    },
+    "kitchen_brigade": {
+      "name": "Kitchen Brigade Adaptor",
+      "description": "Manages workflow execution using kitchen brigade metaphor",
+      "type": "workflow",
+      "mcp_compatible": true,
+      "capabilities": [
+        "source_ingredient",
+        "execute_recipe",
+        "manage_kitchen",
+        "coordinate_brigade",
+        "quality_control"
+      ],
+      "endpoints": {
+        "source": "/api/kitchen/source",
+        "execute": "/api/kitchen/execute",
+        "manage": "/api/kitchen/manage",
+        "coordinate": "/api/kitchen/coordinate",
+        "quality": "/api/kitchen/quality"
+      },
+      "brigade_roles": [
+        "executive_chef",
+        "sous_chef",
+        "chef_de_partie",
+        "commis",
+        "apprentice"
+      ],
+      "cooking_modes": [
+        "standard",
+        "experimental",
+        "traditional",
+        "fusion",
+        "molecular"
+      ],
+      "quality_standards": [
+        "excellent",
+        "good",
+        "acceptable",
+        "poor"
+      ],
+      "config": {
+        "max_concurrent_recipes": 10,
+        "ingredient_timeout": 300,
+        "quality_threshold": 0.8,
+        "brigade_size": 5
+      }
+    }
+  },
+  "mcp_extensions": {
+    "aiq_protocol": {
+      "version": "1.0.0",
+      "description": "AI-Q specific protocol extensions",
+      "extensions": [
+        "mycelium_networking",
+        "cultural_integration",
+        "evolution_tracking",
+        "kitchen_workflows"
+      ]
+    },
+    "custom_tools": {
+      "mycelium_connect": {
+        "description": "Connect to another node in the mycelium network",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "node_id": {
+              "type": "string",
+              "description": "ID of the node to connect to"
+            },
+            "connection_type": {
+              "type": "string",
+              "enum": ["hyphae", "bridge", "tunnel"],
+              "description": "Type of connection to establish"
+            }
+          },
+          "required": ["node_id"]
+        }
+      },
+      "cultural_integrate_knowledge": {
+        "description": "Integrate cultural knowledge into the system",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "culture": {
+              "type": "string",
+              "description": "Cultural origin of the knowledge"
+            },
+            "knowledge_type": {
+              "type": "string",
+              "enum": ["traditional", "indigenous", "modern", "hybrid"],
+              "description": "Type of cultural knowledge"
+            },
+            "knowledge_data": {
+              "type": "object",
+              "description": "Knowledge data to integrate"
+            }
+          },
+          "required": ["culture", "knowledge_type", "knowledge_data"]
+        }
+      },
+      "evolution_check_stage": {
+        "description": "Check the current evolution stage of a node",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "node_id": {
+              "type": "string",
+              "description": "ID of the node to check"
+            },
+            "include_metrics": {
+              "type": "boolean",
+              "description": "Include detailed metrics"
+            }
+          },
+          "required": ["node_id"]
+        }
+      },
+      "kitchen_execute_recipe": {
+        "description": "Execute a recipe with available ingredients",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "recipe_id": {
+              "type": "string",
+              "description": "ID of the recipe to execute"
+            },
+            "ingredients": {
+              "type": "array",
+              "items": { "type": "object" },
+              "description": "Available ingredients"
+            }
+          },
+          "required": ["recipe_id"]
+        }
+      }
+    }
+  },
+  "integration": {
+    "mcp_server": {
+      "enabled": true,
+      "port": 3000,
+      "host": "localhost",
+      "protocol": "http"
+    },
+    "webhooks": {
+      "enabled": true,
+      "endpoints": [
+        "/webhook/mycelium",
+        "/webhook/cultural", 
+        "/webhook/evolution",
+        "/webhook/kitchen"
+      ]
+    },
+    "api_gateway": {
+      "enabled": true,
+      "rate_limit": 1000,
+      "timeout": 30,
+      "cors": {
+        "enabled": true,
+        "origins": ["*"]
+      }
+    }
+  },
+  "monitoring": {
+    "metrics": {
+      "enabled": true,
+      "collector": "prometheus",
+      "interval": 60
+    },
+    "logging": {
+      "enabled": true,
+      "level": "info",
+      "format": "json",
+      "output": "file"
+    },
+    "health_checks": {
+      "enabled": true,
+      "interval": 30,
+      "timeout": 10
+    }
+  }
+} 

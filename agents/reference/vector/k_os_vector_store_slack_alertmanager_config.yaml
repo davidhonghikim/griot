@@ -1,0 +1,29 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'slack-notifications'
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 1h
+
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#kos-alerts'
+        send_resolved: true
+        title: '{{ .CommonAnnotations.summary }}'
+        text: '{{ range .Alerts }}\n*Alert:* {{ .Labels.alertname }}\n*Severity:* {{ .Labels.severity }}\n*Instance:* {{ .Labels.instance }}\n*Description:* {{ .Annotations.description }}\n{{ end }}'
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname']
+
+# Note:
+# Replace 'YOUR/SLACK/WEBHOOK' with your actual Slack Incoming Webhook URL.
+# Ensure the Slack channel exists and Alertmanager has internet access if self-hosted.

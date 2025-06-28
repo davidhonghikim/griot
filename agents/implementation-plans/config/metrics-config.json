@@ -1,0 +1,109 @@
+{
+  "collection": {
+    "interval": "daily",
+    "time": "09:00",
+    "timezone": "UTC",
+    "enabled": true
+  },
+  "retention": {
+    "period": "2_years",
+    "compression": {
+      "enabled": true,
+      "format": "gzip",
+      "level": 6
+    },
+    "archival": {
+      "enabled": true,
+      "threshold": "1_year",
+      "location": "archive/metrics"
+    }
+  },
+  "alert_thresholds": {
+    "completion_delay": {
+      "warning": 3,
+      "critical": 7,
+      "unit": "days"
+    },
+    "resource_overrun": {
+      "warning": 10,
+      "critical": 20,
+      "unit": "percent"
+    },
+    "risk_probability": {
+      "warning": "medium",
+      "critical": "high"
+    },
+    "phase_delay": {
+      "warning": 5,
+      "critical": 10,
+      "unit": "days"
+    },
+    "task_blockage": {
+      "warning": 2,
+      "critical": 5,
+      "unit": "tasks"
+    }
+  },
+  "reporting": {
+    "weekly": {
+      "enabled": true,
+      "day": "monday",
+      "time": "08:00",
+      "recipients": ["team", "stakeholders"]
+    },
+    "monthly": {
+      "enabled": true,
+      "day": 1,
+      "time": "09:00",
+      "recipients": ["management", "stakeholders"]
+    },
+    "quarterly": {
+      "enabled": true,
+      "recipients": ["executives", "board"]
+    }
+  },
+  "metrics": {
+    "completion": {
+      "enabled": true,
+      "tracking": ["overall", "phase", "task", "milestone"],
+      "calculation": "weighted_average"
+    },
+    "timeline": {
+      "enabled": true,
+      "tracking": ["duration", "delays", "velocity", "burn_rate"],
+      "baseline": "estimated"
+    },
+    "resources": {
+      "enabled": true,
+      "tracking": ["utilization", "allocation", "cost", "productivity"],
+      "currency": "USD"
+    },
+    "quality": {
+      "enabled": true,
+      "tracking": ["risks", "dependencies", "issues", "satisfaction"],
+      "scoring": "weighted"
+    }
+  },
+  "export": {
+    "formats": ["json", "csv", "pdf"],
+    "compression": true,
+    "encryption": false
+  },
+  "integration": {
+    "agent_performance": {
+      "enabled": true,
+      "link_sessions": true,
+      "correlate_metrics": true
+    },
+    "aiq_knowledge": {
+      "enabled": true,
+      "track_aku_completion": true,
+      "link_milestones": true
+    },
+    "klf_protocol": {
+      "enabled": true,
+      "broadcast_status": true,
+      "coordinate_resources": true
+    }
+  }
+} 

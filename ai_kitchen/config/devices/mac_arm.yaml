@@ -1,5 +1,0 @@
-# mac_arm.yaml – default device config for Apple Silicon
-force_backends:
-  comfyui: false
-  ollama: true
-manual_gpus: []

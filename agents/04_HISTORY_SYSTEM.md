@@ -12,10 +12,10 @@ Provide a concise, high-signal, and easily navigable record of all significant a
 
 ## 2. Core Principles
 1. **Newest-First Order** – Entries are prepended so the latest information is always at the top.
-2. **Quarterly Archives** – Each UTC quarter resides in its own file inside `agents/01_agent_archives/`.
+2. **Quarterly Archives** – Each UTC quarter resides in its own file inside `agents/history/01_agent_archives/`.
 3. **Single-Line Events** – Each bullet captures exactly one _high-value_ event.
 4. **Strict Event Keywords** – One of `CHANGE`, `FIX`, `ERROR`, `DECISION`, or `SPEC_UPDATE` _must_ prefix every bullet.
-5. **Automation First** – The `scripts/kos-log.js` CLI handles timestamping and formatting via `agents/templates/changelog_entry.md.tpl`.
+5. **Automation First** – The `scripts/kos-log.js` CLI handles timestamping and formatting via `agents/agents_docs_templates/changelog_entry.md.tpl`.
 
 ---
 
@@ -82,15 +82,15 @@ Example:
 node scripts/kos-log.js FIX "Corrected KLF message type enum" "refactor KLF spec"
 ```
 The script:
-1. Reads `agents/config.yml` for default paths.
+1. Reads `agents/history/history_config.yml` for default paths.
 2. Determines the current UTC timestamp.
 3. Uses `$AGENT_NAME` (env) or `default_agent` from the config file.
-4. Prepends the formatted entry to `agents/01_AGENT_CHANGELOG_LATEST.md`.
+4. Prepends the formatted entry to `agents/history/01_AGENT_CHANGELOG_LATEST.md`.
 
 ---
 
 ## 8. Manual Logging Fallback
-When automation is unavailable, copy the template, fill out variables, and paste it at the top of `01_AGENT_CHANGELOG_LATEST.md`.
+When automation is unavailable, copy the template, fill out variables, and paste it at the top of `agents/history/01_AGENT_CHANGELOG_LATEST.md`.
 
 ---
 

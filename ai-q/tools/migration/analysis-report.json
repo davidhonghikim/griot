@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-06-28T05:44:21.892Z",
+  "summary": {
+    "totalFiles": 0,
+    "overallCompletion": null,
+    "categories": 0,
+    "duplicates": 0,
+    "gaps": 0
+  },
+  "details": {
+    "totalFiles": 0,
+    "byCategory": {},
+    "completionStatus": {},
+    "relationships": [],
+    "duplicates": [],
+    "gaps": [],
+    "recommendations": [
+      {
+        "priority": "low",
+        "type": "structure",
+        "description": "Consider expanding to the full 8-category structure.",
+        "action": "Add missing categories: implementation, deployment, quality, evolution"
+      }
+    ],
+    "overallCompletion": null
+  },
+  "recommendations": [
+    {
+      "priority": "low",
+      "type": "structure",
+      "description": "Consider expanding to the full 8-category structure.",
+      "action": "Add missing categories: implementation, deployment, quality, evolution"
+    }
+  ]
+}

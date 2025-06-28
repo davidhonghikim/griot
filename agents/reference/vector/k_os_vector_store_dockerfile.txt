@@ -1,0 +1,42 @@
+# kOS Vector Store API + Weaviate Dockerfile
+
+FROM python:3.11-slim
+
+# Environment Variables
+ENV WEAVIATE_URL=http://weaviate:8080
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y build-essential curl && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
+WORKDIR /app
+
+# Copy project files
+COPY . /app
+
+# Install Python dependencies
+RUN pip install --no-cache-dir fastapi uvicorn weaviate-client pydantic pytest
+
+# Expose FastAPI port
+EXPOSE 8000
+
+# Startup command
+CMD ["uvicorn", "vector_store_rest:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Optional: Multi-container deployment example (docker-compose.yml):
+#
+# version: '3.8'
+# services:
+#   weaviate:
+#     image: semitechnologies/weaviate:latest
+#     ports:
+#       - "8080:8080"
+#     environment:
+#       - QUERY_DEFAULTS_LIMIT=25
+#       - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+#   vector_api:
+#     build: .
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - weaviate

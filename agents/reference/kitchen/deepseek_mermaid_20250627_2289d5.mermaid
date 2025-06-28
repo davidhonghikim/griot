@@ -1,0 +1,13 @@
+graph TB
+  subgraph Kitchen["🏠 Kitchen (Griot Node)"]
+    A[AI-Q Library] --> B[RAG Knowledge Base]
+    C[Device Manager] --> D[Hardware Detector]
+    E[Skill Loader] --> F[ComfyUI/A1111/Ollama]
+  end
+
+  subgraph Skald["🎨 Skald (Creator Node)"]
+    G[Recipe Templater] --> H[Prompt Studio]
+    I[Artifact Manager] --> J[Export/Import Hub]
+  end
+
+  Kitchen <-->|gRPC| Skald

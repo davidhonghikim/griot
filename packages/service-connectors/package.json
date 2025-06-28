@@ -1,0 +1,24 @@
+{
+  "name": "@griot-seed/service-connectors",
+  "version": "1.0.0",
+  "description": "Universal service connectors for the Griot-Seed ecosystem.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "keywords": [
+    "griot-seed",
+    "kOS",
+    "connectors"
+  ],
+  "author": "kOS Agents",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  }
+} 
