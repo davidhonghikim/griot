@@ -1,120 +1,95 @@
-# kOS Agents Configuration - AI-Optimized Formats
+# Config System
 
-**Purpose**: This directory contains AI-optimized configuration files that reduce context window usage and improve parsing efficiency for AI agents.
+**Status**: OPTIMIZED FOR AI PROCESSING
 
----
+This directory contains system-level JSON/YAML configurations for the kOS agents system.
 
-## 📊 **Optimization Summary**
+## Quick Access
 
-### **Context Window Reduction**
-- **Before**: 4 separate markdown files (~800 lines total)
-- **After**: 1 README + 3 optimized config files (~200 lines total)
-- **Savings**: ~75% reduction in context window usage
+- **System**: `system_config.json` - Core system configuration and identity
+- **Workflow**: `workflow_rules.yaml` - Workflow enforcement rules
+- **Architecture**: `architecture.json` - System architecture and design
+- **Archive**: `archive-config.json` - Archive policies and configuration
+- **Metrics**: `metrics-config.json` - Metrics collection and reporting
+- **Changelog Config**: `changelog_config.yml` - Changelog system configuration
 
-### **Format Benefits**
-- **JSON/YAML**: Structured, machine-readable, efficient parsing
-- **Reduced Redundancy**: Eliminated duplicate information across files
-- **Faster Loading**: Optimized for AI agent processing
-- **Better Organization**: Logical separation of concerns
+## System Overview
 
----
+The config system provides:
+- **System Configurations**: Core system settings and policies
+- **Fast Access**: JSON/YAML format for quick parsing and querying
+- **Version Control**: Complete versioning and last-updated tracking
+- **Consistency**: Standardized format across all configurations
 
-## 📁 **Configuration Files**
+## Format Strategy
 
-### **system_config.json**
-**Purpose**: Core system identity, principles, and operational context
-**Content**:
-- Agent identity and core traits
-- HIEROS principles and sacred intentions
-- Operational context and project paths
-- File standards and directory structure
-- Critical rules and requirements
+- **JSON**: Primary format for most configurations
+- **YAML**: Used for hierarchical configurations (workflow rules, changelog config)
+- **Metadata**: All files include version and last-updated information
 
-**Usage**: Load for agent identity and system principles
+## Usage
 
-### **workflow_rules.yaml**
-**Purpose**: Workflow process, rules, and procedural requirements
-**Content**:
-- Mandatory workflow steps
-- Critical rules and violations
-- GPT agent requirements
-- Logging standards and formats
-- Handoff process and documentation checklist
-
-**Usage**: Load for workflow compliance and process guidance
-
-### **project_context.json**
-**Purpose**: Current project state, mission, and implementation details
-**Content**:
-- Current project status and infrastructure
-- Core skills and completed nodes
-- Current mission and immediate priorities
-- Success metrics and key files
-- Integration gaps and recommended approach
-
-**Usage**: Load for current mission context and project understanding
-
-### **architecture.json**
-**Purpose**: System architecture and design principles
-**Content**:
-- Core vision and Kind Link Framework
-- Storage strategy and hybrid workflow
-- AI capabilities and model training
-- Current implementation status
-- Key architectural documents
-
-**Usage**: Load for architectural decisions and system understanding
-
----
-
-## 🚀 **Loading Commands**
-
-### **Essential Context (Recommended)**
+To view all configurations:
 ```bash
-cat agents/README.md && echo "\n---" && cat agents/bootstrap/00_AGENT_WORKFLOW.md && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
+ls -la agents/config/
 ```
 
-### **Detailed Context (Optional)**
+To view specific configuration:
 ```bash
-cat agents/config/system_config.json && echo "\n---" && cat agents/config/project_context.json && echo "\n---" && cat agents/config/architecture.json
+cat agents/config/system_config.json
 ```
 
-### **Workflow Rules (As Needed)**
+To update configuration:
 ```bash
-cat agents/config/workflow_rules.yaml
+# Edit the appropriate JSON/YAML file
+# Update the last_updated field
 ```
 
+## File Descriptions
+
+### Core System Configurations
+- **system_config.json**: Core system configuration and identity
+- **workflow_rules.yaml**: Workflow enforcement rules and procedures
+- **architecture.json**: System architecture and design patterns
+
+### System Policies
+- **archive-config.json**: Archive policies and configuration
+- **metrics-config.json**: Metrics collection and reporting configuration
+- **changelog_config.yml**: Changelog system configuration
+
+## Related Configurations
+
+Other configurations are located in their respective system directories:
+- **Performance**: `agents/performance/performance_metrics.json`
+- **Implementation Plans**: `agents/implementation-plans/implementation_plans.json`
+- **Project Context**: `agents/bootstrap/project_context.json`
+- **Plan Schema**: `agents/implementation-plans/plan-schema.json`
+- **Changelog**: `agents/bootstrap/changelog.json`
+
+## Optimization Benefits
+
+### Context Window Efficiency
+- **Before**: Large markdown files with mixed content
+- **After**: Structured JSON/YAML with focused data
+- **Improvement**: ~75% reduction in token usage for AI processing
+
+### Data Access
+- **Before**: Manual parsing of markdown content
+- **After**: Direct JSON/YAML parsing
+- **Improvement**: Faster, more reliable data access
+
+### Maintenance
+- **Before**: Inconsistent formats across systems
+- **After**: Standardized JSON/YAML format
+- **Improvement**: Easier maintenance and updates
+
+## Quality Standards
+
+- **Format Compliance**: 100% JSON/YAML format adherence
+- **Metadata**: All files include version and last-updated fields
+- **Structure**: Consistent schema and naming conventions
+- **Documentation**: Clear descriptions and usage examples
+
 ---
 
-## 🔄 **Maintenance**
-
-### **Update Process**
-1. **Source Files**: Update the original markdown files in `agents/bootstrap/`
-2. **Config Files**: Manually update corresponding JSON/YAML files
-3. **Version Control**: Update version numbers in all config files
-4. **Documentation**: Update this README if file purposes change
-
-### **Backup Strategy**
-- Original files archived in `agents/bootstrap/archive/2025/06/`
-- Config files versioned with timestamps
-- Regular backups before major changes
-
----
-
-## 📈 **Performance Metrics**
-
-### **Context Efficiency**
-- **Essential Context**: ~150 lines (vs ~800 lines before)
-- **Detailed Context**: ~200 lines (vs ~1200 lines before)
-- **Loading Speed**: ~50% faster for AI agents
-- **Memory Usage**: ~75% reduction in token consumption
-
-### **Quality Metrics**
-- **Information Density**: Higher due to structured format
-- **Parse Accuracy**: Improved with JSON/YAML structure
-- **Maintenance Overhead**: Reduced with logical separation
-- **Agent Performance**: Faster context loading and processing
-
----
-
-**Note**: These configuration files are optimized for AI agent consumption. For human reading, refer to the original markdown files in `agents/bootstrap/`. 
+**Note**: These configurations are optimized for AI processing while maintaining human readability. All files follow consistent formatting and include comprehensive metadata. 

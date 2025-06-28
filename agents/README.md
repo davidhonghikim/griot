@@ -19,17 +19,19 @@ agents/
 ├── README.md                    # This file - single entry point
 ├── bootstrap/                   # Core agent workflow and identity
 │   ├── 00_AGENT_WORKFLOW.md    # Mandatory workflow process
+│   ├── changelog.json          # Complete session history (chronological)
+│   ├── project_context.json    # Project state and architecture
 │   ├── 01_AGENT_CHANGELOG.md   # Session logging (JSON reference)
 │   ├── 02_SYSTEM_PROMPT.md     # Agent identity and principles
 │   └── archive/                # Historical workflow versions
-├── config/                     # AI-optimized JSON/YAML configurations
-│   ├── changelog.json          # Complete session history (chronological)
-│   ├── performance_metrics.json # Performance system configuration
-│   ├── implementation_plans.json # Active and backlog plans
-│   ├── project_context.json    # Project state and architecture
-│   ├── system_config.json      # System configuration
+├── config/                     # System-level JSON/YAML configurations
+│   ├── system_config.json      # Core system configuration
 │   ├── workflow_rules.yaml     # Workflow enforcement rules
-│   └── [other config files]    # Additional configurations
+│   ├── architecture.json       # System architecture
+│   ├── archive-config.json     # Archive configuration
+│   ├── metrics-config.json     # Metrics configuration
+│   ├── changelog_config.yml    # Changelog configuration
+│   └── README.md               # Config documentation
 ├── handoff/                    # Agent handoff system (Markdown)
 │   ├── LATEST_HANDOFF.md       # Current handoff directive
 │   └── archive/                # Historical handoffs
@@ -38,6 +40,7 @@ agents/
 │   ├── 2025-06-29_comprehensive_project_analysis.md
 │   └── archive/                # Historical analyses
 ├── performance/                # Performance tracking system
+│   ├── performance_metrics.json # Performance system configuration
 │   ├── README.md               # Performance system overview
 │   ├── metrics/                # Performance data (JSON)
 │   ├── reports/                # Generated reports (Markdown)
@@ -45,6 +48,8 @@ agents/
 │   ├── execution_plans/        # Plan tracking
 │   └── reviews/                # Agent reviews
 ├── implementation-plans/       # Implementation planning
+│   ├── implementation_plans.json # Complete plans configuration
+│   ├── plan-schema.json        # Plan schema definitions
 │   ├── README.md               # Plans overview
 │   ├── active/                 # Currently active plans
 │   ├── backlog/                # Planned but not active
@@ -64,10 +69,11 @@ agents/
 ## Format Optimization Strategy
 
 ### JSON/YAML for Structured Data
-- **Config files**: All system configurations in JSON/YAML
-- **Performance metrics**: Structured data for AI processing
-- **Implementation plans**: Task tracking and progress
-- **Changelog**: Session history with metadata
+- **System configs**: Core system configurations in config/
+- **Performance metrics**: Performance data in performance/
+- **Implementation plans**: Plan data in implementation-plans/
+- **Project context**: Project state in bootstrap/
+- **Changelog**: Session history in bootstrap/
 
 ### Markdown for Narrative Content
 - **Handoffs**: Agent handoff directives and context
@@ -89,7 +95,7 @@ agents/
 
 ### Directory Consolidation
 - **Eliminated**: Redundant `shared/`, `changelogs/` directories
-- **Consolidated**: Config files into `config/` directory
+- **Organized**: Files in their proper system directories
 - **Centralized**: Scripts into `scripts/` directory
 - **Result**: Cleaner structure, easier navigation
 
@@ -103,7 +109,7 @@ agents/
 
 ### ✅ Optimized Systems
 - **Bootstrap**: Core workflow and identity system
-- **Config**: All configurations in JSON/YAML format
+- **Config**: System-level configurations in JSON/YAML format
 - **Performance**: Metrics and tracking system
 - **Implementation Plans**: Plan management system
 - **Analysis**: Project analysis and insights
@@ -111,7 +117,7 @@ agents/
 
 ### 📊 Performance Metrics
 - **Directory count**: 9 → 8 (eliminated redundancy)
-- **Config files**: 11 AI-optimized JSON/YAML files
+- **Config files**: 6 system-level JSON/YAML files
 - **Context efficiency**: ~75% reduction in token usage
 - **Format consistency**: 100% adherence to format strategy
 
@@ -121,13 +127,15 @@ agents/
 1. **Start with**: `agents/README.md` for overview
 2. **Load workflow**: `agents/bootstrap/00_AGENT_WORKFLOW.md`
 3. **Check handoff**: `agents/handoff/LATEST_HANDOFF.md`
-4. **Access configs**: `agents/config/` for structured data
-5. **Follow format**: JSON for data, Markdown for narrative
+4. **Access system configs**: `agents/config/` for system configurations
+5. **Check changelog**: `agents/bootstrap/changelog.json` for session history
+6. **Check project context**: `agents/bootstrap/project_context.json` for project state
+7. **Follow format**: JSON for data, Markdown for narrative
 
 ### For Human Developers
 1. **Quick start**: Read `agents/README.md`
 2. **Workflow**: Follow `agents/bootstrap/00_AGENT_WORKFLOW.md`
-3. **Configuration**: Edit files in `agents/config/`
+3. **System configs**: Edit files in `agents/config/`
 4. **Documentation**: Update markdown files as needed
 5. **Scripts**: Use automation scripts in `agents/scripts/`
 
@@ -136,6 +144,7 @@ agents/
 - **Monthly archiving**: First day of each month
 - **Per-system archives**: Each system has its own archive directory
 - **Time-based structure**: `archive/YYYY/MM/` format
+- **Timestamp naming**: Use timestamps for better organization
 - **Automation**: `scripts/archiving/archive_monthly.sh`
 
 ## Maintenance

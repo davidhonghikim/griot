@@ -6,10 +6,11 @@ This directory contains implementation plans for kOS project features, optimized
 
 ## Quick Access
 
-- **Configuration**: `agents/config/implementation_plans.json` - Complete plans configuration
-- **Active Plans**: `agents/implementation-plans/active/` - Currently active implementation plans
-- **Backlog**: `agents/implementation-plans/backlog/` - Planned but not yet active
-- **Templates**: `agents/templates/plan-template.md` - Plan creation templates
+- **Configuration**: `implementation_plans.json` - Complete plans configuration
+- **Schema**: `plan-schema.json` - Plan schema definitions
+- **Active Plans**: `active/` - Currently active implementation plans
+- **Backlog**: `backlog/` - Planned but not yet active
+- **Templates**: `../templates/plan-template.md` - Plan creation templates
 
 ## Current Active Plans
 
@@ -55,7 +56,7 @@ Each plan follows this structure:
 
 ## Format Strategy
 
-- **JSON**: Structured plan data (config/implementation_plans.json)
+- **JSON**: Structured plan data (implementation_plans.json, plan-schema.json)
 - **Markdown**: Detailed plan documentation (active/plan-name.md)
 - **Templates**: Plan creation templates (templates/plan-template.md)
 
@@ -63,7 +64,12 @@ Each plan follows this structure:
 
 To view all plans:
 ```bash
-cat agents/config/implementation_plans.json
+cat agents/implementation-plans/implementation_plans.json
+```
+
+To view plan schema:
+```bash
+cat agents/implementation-plans/plan-schema.json
 ```
 
 To view active plan details:
@@ -74,7 +80,7 @@ cat agents/implementation-plans/active/rag-storage-implementation.md
 To create a new plan:
 ```bash
 # Use template in agents/templates/plan-template.md
-# Update agents/config/implementation_plans.json
+# Update agents/implementation-plans/implementation_plans.json
 ```
 
 ## Plan Lifecycle

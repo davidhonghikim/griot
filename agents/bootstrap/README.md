@@ -8,6 +8,8 @@ updated: "2025-06-29"
 
 # **Agent Bootstrap System**
 
+**Status**: OPTIMIZED FOR AI PROCESSING
+
 This directory contains the core bootstrap files for agent initialization and workflow management. These files provide the essential context and procedures that every agent needs to operate effectively on the kOS project.
 
 ## **Directory Structure**
@@ -167,3 +169,83 @@ Implementation Plans → Metrics → Analytics → Handoff
 
 **Last Updated**: 2025-06-29
 **Next Review**: 2025-07-01 
+
+# Bootstrap System
+
+**Status**: OPTIMIZED FOR AI PROCESSING
+
+This directory contains the core agent workflow and identity system for the kOS project.
+
+## Quick Access
+
+- **Workflow**: `00_AGENT_WORKFLOW.md` - Mandatory workflow process
+- **Changelog**: `changelog.json` - Complete session history (chronological)
+- **Project Context**: `project_context.json` - Project state and architecture
+- **Identity**: `02_SYSTEM_PROMPT.md` - Agent identity and principles
+- **Archive**: `archive/` - Historical workflow versions
+
+## System Overview
+
+The bootstrap system provides:
+- **Workflow Process**: Mandatory procedures for all agents
+- **Session History**: Complete changelog with chronological ordering
+- **Project Context**: Current project state and mission context
+- **Agent Identity**: Core principles and operational context
+- **Version Control**: Historical workflow versions
+
+## Format Strategy
+
+- **JSON**: Structured data (changelog.json, project_context.json)
+- **Markdown**: Narrative content (workflow, identity, documentation)
+- **Archive**: Historical versions with proper timestamps
+
+## Usage
+
+To view session history:
+```bash
+cat agents/bootstrap/changelog.json
+```
+
+To view project context:
+```bash
+cat agents/bootstrap/project_context.json
+```
+
+To add a new session entry:
+```bash
+# Update changelog.json with new session data
+# Follow the format in agents/bootstrap/00_AGENT_WORKFLOW.md
+```
+
+To view workflow:
+```bash
+cat agents/bootstrap/00_AGENT_WORKFLOW.md
+```
+
+## Archive Policy
+
+- **Monthly archiving**: First day of each month
+- **Time-based structure**: `archive/YYYY/MM/` format
+- **Timestamp naming**: Use timestamps for better organization
+- **Automation**: `scripts/archiving/archive_monthly.sh`
+
+## Changelog Format
+
+The changelog.json contains:
+- **Sessions**: Complete session history in chronological order
+- **Metadata**: Agent info, dates, missions, log entries
+- **Statistics**: Entry types, agent usage, date ranges
+- **Summaries**: Accomplishments, final state, key findings
+
+## Project Context Format
+
+The project_context.json contains:
+- **Current Status**: Project state and infrastructure
+- **Mission**: Current mission and immediate priorities
+- **Architecture**: System architecture and design
+- **Success Metrics**: Performance and quality targets
+- **Key Files**: Important files and their purposes
+
+---
+
+**Note**: This system is mandatory for all agent sessions and provides the foundation for consistent workflow execution. 

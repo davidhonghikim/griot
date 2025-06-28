@@ -6,10 +6,10 @@ This directory contains the kOS Agent Performance & Analytics System, optimized 
 
 ## Quick Access
 
-- **Configuration**: `agents/config/performance_metrics.json` - Complete system configuration
-- **Current Metrics**: `agents/performance/metrics/current/` - Live performance data
-- **Reports**: `agents/performance/reports/` - Generated performance reports
-- **Templates**: `agents/performance/templates/` - Performance analysis templates
+- **Configuration**: `performance_metrics.json` - Complete system configuration
+- **Current Metrics**: `metrics/current/` - Live performance data
+- **Reports**: `reports/` - Generated performance reports
+- **Templates**: `templates/` - Performance analysis templates
 
 ## System Overview
 
@@ -24,27 +24,28 @@ The performance system tracks:
 
 ```
 performance/
-├── metrics/           # Performance data (JSON format)
-│   ├── current/       # Live metrics
-│   ├── archives/      # Historical data by quarter
-│   └── reports/       # Generated reports (Markdown)
-├── prompts/           # Prompt templates and analysis
-│   ├── current/       # Active prompts
-│   ├── archives/      # Historical prompts
-│   └── templates/     # Prompt templates
-├── execution_plans/   # Plan tracking and analysis
-│   ├── current/       # Active plans
-│   ├── archives/      # Completed/abandoned plans
-│   └── templates/     # Plan templates
-└── reviews/           # Agent review system
-    ├── current/       # Active reviews
-    ├── archives/      # Historical reviews
-    └── templates/     # Review templates
+├── performance_metrics.json    # System configuration (JSON)
+├── metrics/                    # Performance data (JSON format)
+│   ├── current/               # Live metrics
+│   ├── archives/              # Historical data by quarter
+│   └── reports/               # Generated reports (Markdown)
+├── prompts/                   # Prompt templates and analysis
+│   ├── current/               # Active prompts
+│   ├── archives/              # Historical prompts
+│   └── templates/             # Prompt templates
+├── execution_plans/           # Plan tracking and analysis
+│   ├── current/               # Active plans
+│   ├── archives/              # Completed/abandoned plans
+│   └── templates/             # Plan templates
+└── reviews/                   # Agent review system
+    ├── current/               # Active reviews
+    ├── archives/              # Historical reviews
+    └── templates/             # Review templates
 ```
 
 ## Format Strategy
 
-- **JSON**: Structured data (metrics, configurations, schemas)
+- **JSON**: Structured data (performance_metrics.json, metrics)
 - **Markdown**: Narrative content (reports, documentation, templates)
 - **YAML**: Configuration files (when hierarchical structure needed)
 
@@ -52,7 +53,7 @@ performance/
 
 To view system configuration:
 ```bash
-cat agents/config/performance_metrics.json
+cat agents/performance/performance_metrics.json
 ```
 
 To add performance metrics:
