@@ -8,11 +8,33 @@ import { createLogger } from '@griot/core';
 import { ServiceManager, defaultServiceManagerConfig } from './service-manager.js';
 import { DatabaseManager } from './database-manager.js';
 import dotenv from 'dotenv';
+import { resolve } from 'path';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables in priority order
+// 1. .env.local (personal overrides) - highest priority
+// 2. .env (base configuration)
+// 3. env.example (template) - lowest priority
+const envPath = resolve(process.cwd());
+dotenv.config({ path: resolve(envPath, '.env.local') }); // Personal overrides
+dotenv.config({ path: resolve(envPath, '.env') }); // Base configuration
+dotenv.config({ path: resolve(envPath, 'env.example') }); // Template fallback
 
 const logger = createLogger('starseed-server');
+
+// Log which environment files were loaded
+const loadedFiles = [];
+if (process.env.NODE_ENV !== 'production') {
+    if (require('fs').existsSync(resolve(envPath, '.env.local'))) {
+        loadedFiles.push('.env.local');
+    }
+    if (require('fs').existsSync(resolve(envPath, '.env'))) {
+        loadedFiles.push('.env');
+    }
+    if (loadedFiles.length === 0) {
+        loadedFiles.push('env.example (template)');
+    }
+    logger.info(`Environment files loaded: ${loadedFiles.join(' -> ')}`);
+}
 
 // Initialize managers with environment variables
 const serviceManager = new ServiceManager({
