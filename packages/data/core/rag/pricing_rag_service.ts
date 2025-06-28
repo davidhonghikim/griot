@@ -1,6 +1,6 @@
-import { VectorStore } from './vector_store';
-import { EmbeddingService } from './embedding_service';
-import { PricingDocument } from '../types/pricing_types';
+import { VectorStore } from './vector_store.js';
+import { EmbeddingService } from './embedding_service.js';
+import { PricingDocument } from '../types/pricing_types.js';
 
 export interface PricingQuery {
   provider?: string;
@@ -306,7 +306,7 @@ export class PricingRAGService {
     };
 
     const results = await this.searchPricing(query);
-    return results.length > 0 ? results[0] : null;
+    return results.length > 0 && results[0] !== undefined ? results[0] : null;
   }
 
   /**
@@ -340,7 +340,7 @@ export class PricingRAGService {
     };
 
     const results = await this.searchPricing(query);
-    return results.length > 0 ? results[0] : null;
+    return results.length > 0 && results[0] !== undefined ? results[0] : null;
   }
 
   /**

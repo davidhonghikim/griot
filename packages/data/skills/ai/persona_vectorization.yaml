@@ -1,0 +1,433 @@
+name: "Persona Vectorization"
+description: "Vectorize persona content for RAG operations and semantic search across persona knowledge bases"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["persona", "vectorization", "rag", "embedding", "semantic"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: ["vector_operations", "weaviate_operations", "rag_operations"]
+  version: "1.0.0"
+  created: "2025-06-29"
+  updated: "2025-06-29"
+  author: "system"
+code: |
+  import { PersonaVectorizationService, PersonaVectorizationConfig, PersonaVectorizationResult } from '../../core/rag/persona_vectorization_service';
+  import { VectorStore } from '../../core/rag/vector_store';
+  import { EmbeddingService } from '../../core/rag/embedding_service';
+  import { PersonaLoader } from '../../core/persona_loader';
+
+  export interface PersonaVectorizationSkillConfig {
+    vectorStore: VectorStore;
+    embeddingService: EmbeddingService;
+    personaLoader: PersonaLoader;
+    chunkSize?: number;
+    overlapSize?: number;
+    similarityThreshold?: number;
+  }
+
+  export interface VectorizePersonaRequest {
+    personaId: string;
+    includeContent?: boolean;
+    forceUpdate?: boolean;
+  }
+
+  export interface VectorizeAllPersonasRequest {
+    batchSize?: number;
+    delayBetweenBatches?: number;
+    includeProgress?: boolean;
+  }
+
+  export interface SearchPersonasRequest {
+    query: string;
+    limit?: number;
+    filter?: Record<string, any>;
+    includeContent?: boolean;
+    similarityThreshold?: number;
+  }
+
+  export interface PersonaVectorizationResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+    processingTime?: number;
+    metadata?: Record<string, any>;
+  }
+
+  export class PersonaVectorizationSkill {
+    private service: PersonaVectorizationService;
+    private config: PersonaVectorizationSkillConfig;
+
+    constructor(config: PersonaVectorizationSkillConfig) {
+      this.config = config;
+      this.service = new PersonaVectorizationService({
+        vectorStore: config.vectorStore,
+        embeddingService: config.embeddingService,
+        personaLoader: config.personaLoader,
+        chunkSize: config.chunkSize || 1000,
+        overlapSize: config.overlapSize || 200,
+        similarityThreshold: config.similarityThreshold || 0.7,
+      });
+    }
+
+    /**
+     * Initialize the persona vectorization skill
+     */
+    async initialize(): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        await this.service.initialize();
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: { message: 'Persona Vectorization Skill initialized successfully' },
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'initialize',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'initialize',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Vectorize a single persona
+     */
+    async vectorizePersona(request: VectorizePersonaRequest): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        let result: PersonaVectorizationResult;
+        
+        if (request.forceUpdate) {
+          result = await this.service.updatePersonaVectors(request.personaId);
+        } else {
+          result = await this.service.vectorizePersona(request.personaId);
+        }
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: result.success,
+          data: {
+            personaId: result.personaId,
+            vectorId: result.vectorId,
+            contentLength: result.contentLength,
+            embeddingDimensions: result.embeddingDimensions,
+            processingTime: result.processingTime,
+          },
+          error: result.error,
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'vectorize_persona',
+            personaId: request.personaId,
+            forceUpdate: request.forceUpdate || false,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'vectorize_persona',
+            personaId: request.personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Vectorize all personas in batch
+     */
+    async vectorizeAllPersonas(request: VectorizeAllPersonasRequest = {}): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const results = await this.service.vectorizeAllPersonas();
+        
+        const successCount = results.filter(r => r.success).length;
+        const totalCount = results.length;
+        const totalTime = results.reduce((sum, r) => sum + r.processingTime, 0);
+        const averageTime = totalCount > 0 ? totalTime / totalCount : 0;
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: successCount === totalCount,
+          data: {
+            totalPersonas: totalCount,
+            successCount,
+            failureCount: totalCount - successCount,
+            results,
+            totalProcessingTime: totalTime,
+            averageProcessingTime: averageTime,
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'vectorize_all_personas',
+            batchSize: request.batchSize,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'vectorize_all_personas',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Search for personas using semantic queries
+     */
+    async searchPersonas(request: SearchPersonasRequest): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const results = await this.service.searchPersonas(request.query, {
+          limit: request.limit || 10,
+          filter: request.filter,
+          includeContent: request.includeContent || false,
+        });
+        
+        // Filter by similarity threshold if specified
+        const filteredResults = request.similarityThreshold 
+          ? results.filter(r => r.score >= request.similarityThreshold!)
+          : results;
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: {
+            query: request.query,
+            results: filteredResults,
+            totalResults: filteredResults.length,
+            averageScore: filteredResults.length > 0 
+              ? filteredResults.reduce((sum, r) => sum + r.score, 0) / filteredResults.length 
+              : 0,
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'search_personas',
+            query: request.query,
+            limit: request.limit,
+            similarityThreshold: request.similarityThreshold,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'search_personas',
+            query: request.query,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Get vectorization statistics
+     */
+    async getStats(): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const stats = await this.service.getVectorizationStats();
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: stats,
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'get_stats',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'get_stats',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Update persona vectors when content changes
+     */
+    async updatePersonaVectors(personaId: string): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const result = await this.service.updatePersonaVectors(personaId);
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: result.success,
+          data: {
+            personaId: result.personaId,
+            vectorId: result.vectorId,
+            contentLength: result.contentLength,
+            embeddingDimensions: result.embeddingDimensions,
+            processingTime: result.processingTime,
+          },
+          error: result.error,
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'update_persona_vectors',
+            personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'update_persona_vectors',
+            personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Get persona vector for use in other operations
+     */
+    async getPersonaVector(personaId: string): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const vector = await this.service.getPersonaVector(personaId);
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: vector !== null,
+          data: {
+            personaId,
+            vector: vector,
+            vectorExists: vector !== null,
+            vectorDimensions: vector ? vector.length : 0,
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'get_persona_vector',
+            personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'get_persona_vector',
+            personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Clean up resources
+     */
+    async cleanup(): Promise<PersonaVectorizationResponse> {
+      const startTime = Date.now();
+      
+      try {
+        await this.service.cleanup();
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: { message: 'Persona Vectorization Skill cleaned up successfully' },
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'cleanup',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_vectorization',
+            action: 'cleanup',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+  } 
