@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { ISkill } from './skill.schema';
+import { ISkill } from './skill.schema.js';
 
 export interface IPersona extends Document {
   name: string;

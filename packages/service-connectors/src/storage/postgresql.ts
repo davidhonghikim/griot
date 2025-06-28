@@ -12,6 +12,7 @@ const relationalDbCapability: RelationalDBCapability = {
     endpoints: {
         query: { path: '/query', method: 'POST' },
         listTables: { path: '/tables', method: 'GET' },
+        describeTable: { path: '/tables/:table', method: 'GET' }
     },
     parameters: {
         query: [
@@ -19,8 +20,8 @@ const relationalDbCapability: RelationalDBCapability = {
                 key: 'sql',
                 label: 'SQL Query',
                 type: 'string',
-                defaultValue: 'SELECT 1',
-                description: 'The SQL query to execute.',
+                defaultValue: '',
+                description: 'SQL query to execute'
             },
             {
                 key: 'params',
@@ -35,20 +36,17 @@ const relationalDbCapability: RelationalDBCapability = {
 };
 
 export const postgresDefinition: ServiceDefinition = {
-  type: 'postgres',
+  type: 'postgresql',
   name: 'PostgreSQL',
-  description: 'A powerful, open source object-relational database system.',
   category: 'storage',
   protocol: {
-    primary: 'http',
-    fallback: 'https',
-    autoDetect: true,
+    primary: 'https',
+    fallback: 'http',
+    autoDetect: true
   },
   defaultPort: 5432,
   authentication: {
-    type: 'bearer_token',
-    keyName: 'Authorization',
-    help: 'Provide your PostgreSQL connection string or API token.'
+    type: 'basic'
   },
   capabilities: [
     healthCapability,

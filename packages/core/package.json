@@ -10,7 +10,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@griot/core": "workspace:*",
     "fastify": "^4.25.2",
     "@fastify/cors": "^9.0.1"
   },

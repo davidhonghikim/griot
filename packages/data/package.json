@@ -2,5 +2,11 @@
   "name": "@griot/data",
   "version": "1.0.0",
   "private": true,
-  "description": "Seed data, including default skills and personas, for the kOS framework."
+  "type": "module",
+  "description": "Seed data, including default skills and personas, for the kOS framework.",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'Data package - no build needed'",
+    "clean": "echo 'Data package - no clean needed'"
+  }
 } 

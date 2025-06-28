@@ -11,6 +11,11 @@
   },
   "dependencies": {
     "@griot/core": "workspace:*",
+    "@griot/schemas": "workspace:*",
+    "@griot/service-connectors": "workspace:*",
+    "@griot/data": "workspace:*",
+    "mongoose": "^8.0.0",
+    "dotenv": "^16.4.5",
     "tsx": "^4.6.2"
   },
   "devDependencies": {

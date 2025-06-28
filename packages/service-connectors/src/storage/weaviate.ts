@@ -33,21 +33,40 @@ const vectorDatabaseCapability: VectorDatabaseCapability = {
 export const weaviateDefinition: ServiceDefinition = {
   type: 'weaviate',
   name: 'Weaviate',
-  description: 'A cloud-native, real-time vector search engine.',
   category: 'storage',
   protocol: {
-    primary: 'http',
-    fallback: 'https',
-    autoDetect: true,
+    primary: 'https',
+    fallback: 'http',
+    autoDetect: true
   },
   defaultPort: 8080,
+  hasExternalUi: true,
   authentication: {
-    type: 'bearer_token',
-    keyName: 'Authorization',
-    help: 'Provide your Weaviate API token.'
+    type: 'api_key',
+    keyName: 'X-OpenAI-Api-Key'
   },
   capabilities: [
-    healthCapability,
-    vectorDatabaseCapability,
-  ],
+    {
+      capability: 'vector_database',
+      endpoints: {
+        health: { path: '/v1/.well-known/ready', method: 'GET' },
+        listCollections: { path: '/v1/schema', method: 'GET' },
+        query: { path: '/v1/graphql', method: 'POST' },
+        upsert: { path: '/v1/objects', method: 'POST' },
+        delete: { path: '/v1/objects/:id', method: 'DELETE' },
+        createCollection: { path: '/v1/schema', method: 'POST' }
+      },
+      parameters: {
+        query: [
+          {
+            key: 'query',
+            label: 'GraphQL Query',
+            type: 'string',
+            defaultValue: '',
+            description: 'GraphQL query to execute'
+          }
+        ]
+      }
+    }
+  ]
 }; 

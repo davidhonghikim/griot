@@ -35,17 +35,16 @@ const graphDbCapability: GraphDBCapability = {
 export const neo4jDefinition: ServiceDefinition = {
   type: 'neo4j',
   name: 'Neo4j',
-  description: 'A native graph database that helps developers create intelligent applications.',
   category: 'storage',
   protocol: {
-    primary: 'http',
-    fallback: 'https',
-    autoDetect: true,
+    primary: 'https',
+    fallback: 'http',
+    autoDetect: true
   },
   defaultPort: 7474,
+  hasExternalUi: true,
   authentication: {
-    type: 'basic',
-    help: 'Provide your Neo4j username and password.'
+    type: 'basic'
   },
   capabilities: [
     healthCapability,
