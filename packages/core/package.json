@@ -1,0 +1,21 @@
+{
+  "name": "@griot/core",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@griot/core": "workspace:*",
+    "fastify": "^4.25.2",
+    "@fastify/cors": "^9.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "tsc-alias": "^1.8.8"
+  }
+} 

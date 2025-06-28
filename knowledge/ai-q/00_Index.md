@@ -22,6 +22,22 @@ kOS is not a monolithic application but a **composable, AI-driven orchestration 
 
 This structure ensures that the core logic is robust, reusable, and clearly distinct from the specific nodes or agents deployed in the ecosystem.
 
+## Current Development Status
+
+### Integration Phase: Kitchen → Starseed
+
+The project is currently in an integration phase, consolidating functionality from two applications:
+
+- **Griot Kitchen** (`apps/griot-kitchen`): A functional prototype with proven service orchestration capabilities but legacy architecture
+- **Starseed Node** (`apps/starseed-node`): The primary application with clean, modern architecture using the `@griot/core` framework
+
+**Integration Goal**: Merge Kitchen's service orchestration functionality into Starseed's architecture to create a complete, production-ready application with:
+- Full KLF/kOS ecosystem compatibility
+- Proper database integration using `@griot/schemas`
+- Service orchestration using `@griot/service-connectors`
+- Modern persona, skill, and recipe systems
+- Clean, maintainable codebase
+
 ## 🌟 **The Prime Directive**
 
 > **"One Truth, Many Implementations"**

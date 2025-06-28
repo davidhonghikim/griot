@@ -1,5 +1,5 @@
 {
-  "name": "@griot-seed/griot-kitchen",
+  "name": "@griot/kitchen",
   "version": "0.1.0",
   "private": true,
   "description": "The core orchestration engine for the Griot Seed project.",

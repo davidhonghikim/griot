@@ -22,6 +22,9 @@ import { chromaDefinition } from './storage/chromadb';
 import { qdrantDefinition } from './storage/qdrant';
 import { milvusDefinition } from './storage/milvus';
 import { dropboxDefinition } from './storage/dropbox';
+import { postgresDefinition } from './storage/postgresql';
+import { weaviateDefinition } from './storage/weaviate';
+import { neo4jDefinition } from './storage/neo4j';
 
 // Automation
 import { n8nDefinition } from './automation/n8n';
@@ -53,7 +56,10 @@ export const STORAGE: ServiceDefinition[] = [
   chromaDefinition,
   qdrantDefinition,
   milvusDefinition,
-  dropboxDefinition
+  dropboxDefinition,
+  postgresDefinition,
+  weaviateDefinition,
+  neo4jDefinition,
 ];
 
 export const AUTOMATION: ServiceDefinition[] = [

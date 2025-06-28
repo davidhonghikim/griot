@@ -8,11 +8,49 @@ services:
       - "30437:30437"
     environment:
       - ALLOW_INSECURE_TRANSPORT=true
-      - DATABASE_URL=postgresql://griot:griot@postgres:5432/griot
     depends_on:
-      - postgres
+      - mongo
+      - weaviate
+      - neo4j
     volumes:
       - ./:/app
+
+  mongo:
+    image: mongo:latest
+    container_name: griot-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    container_name: griot-weaviate
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    volumes:
+      - weaviatedata:/var/lib/weaviate
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - DEFAULT_VECTORIZER_MODULE=none
+      - CLUSTER_HOSTNAME=node1
+
+  neo4j:
+    image: neo4j:latest
+    container_name: griot-neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4jdata:/data
+    environment:
+      - NEO4J_AUTH=none
 
   postgres:
     image: postgres:15
@@ -28,4 +66,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
 volumes:
+  mongodata:
+  weaviatedata:
+  neo4jdata:
   pgdata:

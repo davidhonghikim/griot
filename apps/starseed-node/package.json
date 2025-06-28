@@ -1,0 +1,19 @@
+{
+  "name": "@griot/starseed-node",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/server.ts",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@griot/core": "workspace:*",
+    "tsx": "^4.6.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+} 

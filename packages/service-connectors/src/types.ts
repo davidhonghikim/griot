@@ -141,6 +141,26 @@ export interface DocumentStorageCapability {
   };
 }
 
+export interface RelationalDBCapability {
+  capability: 'relational_db';
+  endpoints: {
+    [endpointKey: string]: Endpoint;
+  };
+  parameters: {
+    [parameterKey: string]: ParameterDefinition[];
+  };
+}
+
+export interface GraphDBCapability {
+  capability: 'graph_db';
+  endpoints: {
+    [endpointKey: string]: Endpoint;
+  };
+  parameters: {
+    [parameterKey: string]: ParameterDefinition[];
+  };
+}
+
 export interface GraphExecutionCapability {
   capability: 'graph_execution';
   baseWorkflow: ComfyWorkflow;
@@ -187,7 +207,9 @@ export type CapabilityType =
   | 'document_storage'
   | 'graph_execution'
   | 'mesh_networking'
-  | 'health';
+  | 'health'
+  | 'relational_db'
+  | 'graph_db';
 
 export type ServiceCapability =
   | LlmChatCapability
@@ -200,7 +222,9 @@ export type ServiceCapability =
   | DocumentStorageCapability
   | GraphExecutionCapability
   | MeshNetworkingCapability
-  | HealthCapability;
+  | HealthCapability
+  | RelationalDBCapability
+  | GraphDBCapability;
 
 export type AuthType = 'none' | 'api_key' | 'bearer_token' | 'basic';
 
@@ -211,13 +235,13 @@ export interface Credential {
   value: string; // This is the actual key/token, will be encrypted in the vault
 }
 
-export type AuthDefinition = {
+export interface AuthDefinition {
   type: AuthType;
   help?: string;
   keyName?: string; // For api_key type
   headers?: { [key: string]: string }; // For custom headers
   defaultValue?: string; // For default auth values
-};
+}
 
 export interface ServiceArgument {
   flag: string;
