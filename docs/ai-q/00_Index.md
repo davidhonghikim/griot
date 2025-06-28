@@ -8,11 +8,19 @@ last_updated: "2025-01-28"
 version: "1.0.0"
 ---
 
-# AI-Q: The Knowledge Library
+# kOS Knowledge Library - Index
 
-**The Definitive Source of Truth for kOS and Griot-Node Development**
+Welcome to the kOS Knowledge Library (AI-Q). This is the definitive source of truth for the project's vision, architecture, and specifications.
 
-This is the **AI-Q Library** - the comprehensive knowledge base that serves as the single source of truth for building the kOS (Kind Operating System) and all its node implementations. Every agent, human developer, and system component references this library to ensure perfect alignment and interoperability.
+## Core Philosophy
+
+kOS is not a monolithic application but a **composable, AI-driven orchestration framework**. The project is architected as a professional-grade monorepo to facilitate this vision, with a clear separation between the core framework and the applications that consume it.
+
+- **The Core Framework (`packages/`):** A collection of reusable, versionable libraries containing the essential DNA of the kOS system. This includes the Kind Link Framework (KLF) protocol, base node types, data schemas (`@griot/schemas`), and service connectors. This is the living implementation of the AI-Q system.
+- **The Applications (`apps/`):** Standalone, runnable applications that consume the core framework libraries to perform specific roles. The primary application, and the first of its kind, is the **Starseed Node**, which serves as the primary orchestrator and system builder.
+- **The Project (`griot-node`):** The name of the monorepo itself, which contains the entire ecosystem.
+
+This structure ensures that the core logic is robust, reusable, and clearly distinct from the specific nodes or agents deployed in the ecosystem.
 
 ## 🌟 **The Prime Directive**
 

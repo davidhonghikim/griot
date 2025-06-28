@@ -336,4 +336,20 @@ The system is designed around two core concepts: **Skills** and **Personas**. Th
 -   **`implementation-plans/`**: Manages the lifecycle (`backlog`, `active`, `archive`) of complex, multi-step tasks.
 -   **`shared/`**: Contains assets shared across all agent systems, such as scripts and templates.
 
-This structure allows us to easily version skills, create new personas by mixing and matching skills, and maintain a clear separation of concerns. 
+This structure allows us to easily version skills, create new personas by mixing and matching skills, and maintain a clear separation of concerns.
+
+## Agent Development Workflow
+
+This section outlines the mandatory workflow for all agents.
+
+### Core Architectural Philosophy
+
+**Crucial:** To work on this project, you MUST understand its monorepo structure. Do not place files in the wrong location.
+
+- **The Core Framework IS in `packages/`:** All reusable, foundational code belongs here. This includes the KLF protocol, base node types, data schemas (`@griot/schemas`), and service connectors. If you are building something that another part of the system could *ever* use, it belongs in a package.
+- **Runnable Applications ARE in `apps/`:** These are consumers of the core framework. The main application we are building is the `Starseed Node`.
+- **The Project Root IS `griot-node`:** This is the name of the entire monorepo. The `griot-node/src` directory is for the code that *specifically* runs the primary Starseed application, nothing more.
+
+**Failure to adhere to this separation of concerns is a critical error.** Review existing packages before creating new code.
+
+### Onboarding

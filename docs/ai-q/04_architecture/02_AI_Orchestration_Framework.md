@@ -7,7 +7,12 @@
 
 ## 1. Overview: AI as Orchestrator
 
-The core kOS architecture shall focus on providing raw capabilities and standardized interfaces, while AI agents take on the responsibility of composing and orchestrating those capabilities to achieve specific goals. The system is a framework, not a static application.
+The core kOS architecture shall focus on providing raw capabilities and standardized interfaces, while AI agents take on the responsibility of composing and orchestrating those capabilities to achieve specific goals. 
+
+To achieve this, kOS is implemented as a **monorepo framework**, not a static application. This provides a clear separation between the reusable core libraries and the applications that consume them.
+
+- **Core Framework (`@griot/core`, etc.):** Foundational packages located in `packages/` provide the KLF protocol, base node functionality, and other essential building blocks.
+- **Applications (`Starseed Node`, etc.):** Runnable nodes located in `apps/` consume the framework to perform specialized tasks.
 
 An AI-driven orchestration layer will dynamically select and compose the optimal "tools" (node functionalities) to fulfill a user's request.
 
