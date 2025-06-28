@@ -1,0 +1,11 @@
+# Profile Manifest
+name: 'kOS Core Engineer'
+version: '1.0'
+description: 'General purpose software engineering agent for the kOS project.'
+
+# Component Files
+# These files are loaded by the system to construct the full agent context.
+components:
+  system_prompt: 'system-prompt.yml'
+  workflow: 'workflow.yml'
+  project_overview: 'project-overview.yml' 

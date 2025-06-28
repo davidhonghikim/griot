@@ -307,4 +307,33 @@ const documentationViewer = {
 
 ---
 
-**Next Step**: Begin Phase 1 with directory reorganization and modular file breakdowns while setting up the database infrastructure. 
+**Next Step**: Begin Phase 1 with directory reorganization and modular file breakdowns while setting up the database infrastructure.
+
+# kOS Agent Systems
+
+This directory contains all systems related to the definition, workflow, and operation of AI agents on the kOS project.
+
+## Core Concepts
+
+The system is designed around two core concepts: **Skills** and **Personas**. This allows for a flexible, compositional approach to defining agent capabilities.
+
+### 1. `skills/` - The Knowledge Library
+
+-   **Location**: `agents/skills/`
+-   **Purpose**: This directory contains reusable "knowledge downloads." Each subdirectory is a self-contained skill, defined by a set of YAML files (e.g., `system-prompt.yml`, `workflow.yml`).
+-   **Example**: `skills/core-engineering-v1/` contains the foundational abilities for all our software engineering agents.
+
+### 2. `personas/` - The Loadable Agents
+
+-   **Location**: `agents/personas/`
+-   **Purpose**: This directory defines the specific, loadable agent configurations, or "personas." A persona is a lightweight manifest file (`persona.yml`) that **imports** one or more skills.
+-   **Analogy**: As the user specified, this is like the Matrix loading program. We select a persona (e.g., `griot-v1`), and the system loads the required skills (`core-engineering-v1`, `documentation-v2`, etc.) to prepare the agent for its mission.
+
+## Other Agent Systems
+
+-   **`changelogs/`**: Contains the chronological logs of all agent sessions.
+-   **`handoff/`**: Manages the state transfer between agent sessions.
+-   **`implementation-plans/`**: Manages the lifecycle (`backlog`, `active`, `archive`) of complex, multi-step tasks.
+-   **`shared/`**: Contains assets shared across all agent systems, such as scripts and templates.
+
+This structure allows us to easily version skills, create new personas by mixing and matching skills, and maintain a clear separation of concerns. 

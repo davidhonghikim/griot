@@ -1,0 +1,130 @@
+# kOS Project Overview - Component File
+
+version: '1.0'
+purpose: Complete project understanding for all AI agents working on kOS. All agents must understand this before proceeding.
+
+vision:
+  name: kOS (Kindai Operating System)
+  description: |
+    kOS is a **universal adapter framework** - a comprehensive knowledge library where AI agents can dynamically learn and adapt to any technology, protocol, or methodology across any domain. It's not a traditional application but an intelligent orchestration framework that enables AI agents to compose complex workflows by discovering and utilizing available capabilities.
+  analogy:
+    title: The Universal Adapter Concept
+    description: Think of kOS as a massive cookbook where...
+    components:
+      - name: Recipes
+        is: Node specifications that teach agents how to use any tool/service/protocol.
+      - name: Ingredients
+        is: Available services, databases, protocols, and external systems.
+      - name: Chefs
+        is: AI agents that read recipes and combine ingredients to solve problems.
+      - name: Kitchen
+        is: The kOS runtime environment that orchestrates everything.
+  philosophy:
+    name: HIEROS Covenant
+    description: All work is guided by the HIEROS principles (see system-prompt.yml for full details).
+
+architecture:
+  repository_structure:
+    - path: griot-node/
+      description: Primary development repository.
+      children:
+        - path: apps/
+          description: User-facing applications (e.g., web-app, docs-viewer).
+        - path: packages/
+          description: Reusable libraries and modules (e.g., sdk).
+        - path: docs/
+          description: 🎯 SOURCE OF TRUTH - All specifications & docs. Contains ai-q/.
+        - path: agents/
+          description: Agent profiles, workflows, and process management.
+        - path: src/
+          description: Core Griot Node implementation code.
+        - path: scripts/
+          description: Monorepo-level helper scripts.
+    - path: kai-cd/
+      description: Reference-only archived prototype. DO NOT COPY CODE.
+
+  knowledge_library:
+    name: docs/ai-q
+    description: The absolute source of truth. Everything agents need to know is documented here.
+    layers:
+      - name: Foundation Layer (01_foundation/)
+        contents: Core principles, architecture, and node taxonomy.
+      - name: Protocol Layer (02_protocols/)
+        contents: Kind Link Framework (KLF) specifications.
+      - name: Node Specifications (03_node_specifications/)
+        contents: 13 universal adapter nodes, each with comprehensive specs.
+      - name: Architecture Layer (04_architecture/)
+        contents: System design patterns and the core architectural vision.
+
+nodes:
+  name: The 13 Universal Adapter Nodes
+  description: Each node is a comprehensive universal adapter covering a specific domain. They are defined in `docs/ai-q/03_node_specifications/`.
+  ecosystem:
+    - Griot (Artifact Generation)
+    - Tohunga (Job Orchestration)
+    - Ronin (Network Discovery)
+    - Musa (Security)
+    - Hakim (Health/Wisdom)
+    - Skald (Documentation/Messaging)
+    - Oracle (Validation/Reasoning)
+    - Junzi (Ethics/Integrity)
+    - Yachay (Knowledge Synthesis)
+    - Sachem (Governance/Consensus)
+    - Archon (Command/Coordination)
+    - Amauta (Education/Learning)
+    - Mzee (Consciousness/Meta-cognition)
+  specification_pattern:
+    description: Each node follows a consistent 5-6 file structure. Monolithic files should be broken down into smaller modular dirs and files.
+    files:
+      - '00_[Node]_Overview.md'
+      - '01_[Node]_Architecture.md'
+      - '02_[Node]_Data_Models.md'
+      - '03_[Node]_KLF_API.md'
+      - '04_[Node]_Cultural_Considerations.md'
+      - '05_[Node]_Examples.md'
+
+framework_principles:
+  name: Universal Adapter Framework
+  requirements:
+    - Comprehensive Protocol Coverage
+    - Multi-Dimensional Framework Matrices
+    - Cultural Adaptation Mechanisms
+    - Performance Optimization Systems
+    - Security Integration
+    - Error Handling Systems
+    - Real-World Implementation
+  quality_standards:
+    - Comprehensive Coverage: 30-50+ enums per domain.
+    - Multi-Protocol Support.
+    - Cultural Sensitivity.
+    - Production Ready.
+    - Modular Design.
+
+klf:
+  name: The Kind Link Framework (KLF)
+  description: KLF is the universal protocol enabling nodes to discover and communicate with each other.
+  message_structure: |
+    interface KLFMessage {
+      messageType: MessageType;
+      sourceNode: NodeType;
+      targetNode: NodeType;
+      payload: any;
+      metadata: KLFMetadata;
+    }
+  capability_discovery_flow:
+    - Query Phase
+    - Response Phase
+    - Composition Phase
+    - Execution Phase
+
+development_workflow:
+  source_of_truth: The agent's active profile and its component files (e.g., workflow.yml) define the mandatory process.
+  key_processes:
+    - Onboarding
+    - Changelog Documentation
+    - Work Execution
+    - Handoff Creation
+  quality_assurance:
+    - Proactive Verification
+    - User Verification is final
+    - Documentation must be kept up-to-date 
