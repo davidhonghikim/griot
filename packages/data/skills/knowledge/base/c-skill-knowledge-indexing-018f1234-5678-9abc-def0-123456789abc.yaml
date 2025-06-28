@@ -1,0 +1,674 @@
+name: "Knowledge Indexing Base"
+description: "Advanced knowledge indexing and semantic search capabilities for intelligent information retrieval"
+category: "knowledge"
+tags:
+  primary: "knowledge"
+  secondary: ["indexing", "search", "semantic", "retrieval", "vectors"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface KnowledgeDocument {
+    id: string;
+    title: string;
+    content: string;
+    type: 'text' | 'code' | 'image' | 'video' | 'audio' | 'data';
+    metadata: Record<string, any>;
+    tags: string[];
+    categories: string[];
+    createdAt: Date;
+    updatedAt: Date;
+    version: string;
+  }
+  
+  export interface IndexEntry {
+    id: string;
+    documentId: string;
+    field: string;
+    value: string;
+    vector?: number[];
+    weight: number;
+    metadata: Record<string, any>;
+  }
+  
+  export interface SearchQuery {
+    text: string;
+    filters?: Record<string, any>;
+    categories?: string[];
+    tags?: string[];
+    limit?: number;
+    offset?: number;
+    sortBy?: 'relevance' | 'date' | 'title' | 'weight';
+    sortOrder?: 'asc' | 'desc';
+  }
+  
+  export interface SearchResult {
+    document: KnowledgeDocument;
+    score: number;
+    highlights: string[];
+    matchedFields: string[];
+    metadata: Record<string, any>;
+  }
+  
+  export interface IndexingConfig {
+    enableSemanticIndexing: boolean;
+    enableFullTextSearch: boolean;
+    enableVectorSearch: boolean;
+    chunkSize: number;
+    overlapSize: number;
+    minScore: number;
+    maxResults: number;
+  }
+  
+  export interface IndexingResult {
+    documentId: string;
+    entriesCreated: number;
+    entriesUpdated: number;
+    entriesDeleted: number;
+    processingTime: number;
+    errors: string[];
+    warnings: string[];
+  }
+  
+  export class KnowledgeIndexingSkill {
+    private documents: Map<string, KnowledgeDocument>;
+    private indexEntries: Map<string, IndexEntry>;
+    private config: IndexingConfig;
+    private stopWords: Set<string>;
+    private stemmer: Map<string, string>;
+    
+    constructor(config: Partial<IndexingConfig> = {}) {
+      this.documents = new Map();
+      this.indexEntries = new Map();
+      this.config = {
+        enableSemanticIndexing: true,
+        enableFullTextSearch: true,
+        enableVectorSearch: true,
+        chunkSize: 1000,
+        overlapSize: 200,
+        minScore: 0.1,
+        maxResults: 100,
+        ...config
+      };
+      this.stopWords = new Set();
+      this.stemmer = new Map();
+      this.initializeStopWords();
+      this.initializeStemmer();
+    }
+    
+    // Initialize stop words
+    private initializeStopWords(): void {
+      const stopWordsList = [
+        'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+        'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
+        'to', 'was', 'will', 'with', 'the', 'this', 'but', 'they', 'have',
+        'had', 'what', 'said', 'each', 'which', 'she', 'do', 'how', 'their',
+        'if', 'up', 'out', 'many', 'then', 'them', 'these', 'so', 'some',
+        'her', 'would', 'make', 'like', 'into', 'him', 'time', 'two',
+        'more', 'go', 'no', 'way', 'could', 'my', 'than', 'first', 'been',
+        'call', 'who', 'its', 'now', 'find', 'long', 'down', 'day', 'did',
+        'get', 'come', 'made', 'may', 'part'
+      ];
+      
+      stopWordsList.forEach(word => this.stopWords.add(word));
+    }
+    
+    // Initialize stemmer
+    private initializeStemmer(): void {
+      // Simple Porter stemmer implementation
+      const stemmerRules = [
+        { suffix: 'ing', replacement: '' },
+        { suffix: 'ed', replacement: '' },
+        { suffix: 'er', replacement: '' },
+        { suffix: 'est', replacement: '' },
+        { suffix: 'ly', replacement: '' },
+        { suffix: 'tion', replacement: 't' },
+        { suffix: 'sion', replacement: 's' },
+        { suffix: 'ness', replacement: '' },
+        { suffix: 'ment', replacement: '' },
+        { suffix: 'able', replacement: '' },
+        { suffix: 'ible', replacement: '' }
+      ];
+      
+      // Pre-compute some common stems
+      const commonWords = [
+        'running', 'ran', 'runner', 'fastest', 'quickly', 'action',
+        'decision', 'happiness', 'development', 'readable', 'visible'
+      ];
+      
+      commonWords.forEach(word => {
+        const stem = this.applyStemmerRules(word);
+        this.stemmer.set(word, stem);
+      });
+    }
+    
+    // Apply stemmer rules
+    private applyStemmerRules(word: string): string {
+      const rules = [
+        { suffix: 'ing', replacement: '' },
+        { suffix: 'ed', replacement: '' },
+        { suffix: 'er', replacement: '' },
+        { suffix: 'est', replacement: '' },
+        { suffix: 'ly', replacement: '' },
+        { suffix: 'tion', replacement: 't' },
+        { suffix: 'sion', replacement: 's' },
+        { suffix: 'ness', replacement: '' },
+        { suffix: 'ment', replacement: '' },
+        { suffix: 'able', replacement: '' },
+        { suffix: 'ible', replacement: '' }
+      ];
+      
+      let stemmed = word.toLowerCase();
+      
+      for (const rule of rules) {
+        if (stemmed.endsWith(rule.suffix)) {
+          stemmed = stemmed.slice(0, -rule.suffix.length) + rule.replacement;
+          break;
+        }
+      }
+      
+      return stemmed;
+    }
+    
+    // Index a document
+    indexDocument(document: KnowledgeDocument): IndexingResult {
+      const startTime = Date.now();
+      const errors: string[] = [];
+      const warnings: string[] = [];
+      
+      try {
+        // Store document
+        this.documents.set(document.id, document);
+        
+        // Remove existing index entries for this document
+        const existingEntries = Array.from(this.indexEntries.values())
+          .filter(entry => entry.documentId === document.id);
+        
+        existingEntries.forEach(entry => {
+          this.indexEntries.delete(entry.id);
+        });
+        
+        const entriesDeleted = existingEntries.length;
+        let entriesCreated = 0;
+        let entriesUpdated = 0;
+        
+        // Index title
+        const titleEntries = this.createIndexEntries(document.id, 'title', document.title, 2.0);
+        titleEntries.forEach(entry => {
+          this.indexEntries.set(entry.id, entry);
+          entriesCreated++;
+        });
+        
+        // Index content
+        const contentChunks = this.chunkContent(document.content);
+        contentChunks.forEach((chunk, index) => {
+          const chunkEntries = this.createIndexEntries(
+            document.id, 
+            'content', 
+            chunk, 
+            1.0, 
+            { chunkIndex: index, totalChunks: contentChunks.length }
+          );
+          
+          chunkEntries.forEach(entry => {
+            this.indexEntries.set(entry.id, entry);
+            entriesCreated++;
+          });
+        });
+        
+        // Index tags
+        document.tags.forEach(tag => {
+          const tagEntries = this.createIndexEntries(document.id, 'tags', tag, 1.5);
+          tagEntries.forEach(entry => {
+            this.indexEntries.set(entry.id, entry);
+            entriesCreated++;
+          });
+        });
+        
+        // Index categories
+        document.categories.forEach(category => {
+          const categoryEntries = this.createIndexEntries(document.id, 'categories', category, 1.5);
+          categoryEntries.forEach(entry => {
+            this.indexEntries.set(entry.id, entry);
+            entriesCreated++;
+          });
+        });
+        
+        // Index metadata
+        Object.entries(document.metadata).forEach(([key, value]) => {
+          if (typeof value === 'string') {
+            const metadataEntries = this.createIndexEntries(document.id, `metadata.${key}`, value, 0.8);
+            metadataEntries.forEach(entry => {
+              this.indexEntries.set(entry.id, entry);
+              entriesCreated++;
+            });
+          }
+        });
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          documentId: document.id,
+          entriesCreated,
+          entriesUpdated,
+          entriesDeleted,
+          processingTime,
+          errors,
+          warnings
+        };
+        
+      } catch (error) {
+        errors.push(error instanceof Error ? error.message : 'Unknown error');
+        
+        return {
+          documentId: document.id,
+          entriesCreated: 0,
+          entriesUpdated: 0,
+          entriesDeleted: 0,
+          processingTime: Date.now() - startTime,
+          errors,
+          warnings
+        };
+      }
+    }
+    
+    // Create index entries for a field
+    private createIndexEntries(
+      documentId: string,
+      field: string,
+      value: string,
+      weight: number,
+      metadata: Record<string, any> = {}
+    ): IndexEntry[] {
+      const entries: IndexEntry[] = [];
+      
+      // Tokenize the value
+      const tokens = this.tokenize(value);
+      
+      // Create entries for each token
+      tokens.forEach((token, index) => {
+        const entry: IndexEntry = {
+          id: `${documentId}_${field}_${index}`,
+          documentId,
+          field,
+          value: token,
+          weight: weight * this.calculateTokenWeight(token, index, tokens.length),
+          metadata: {
+            ...metadata,
+            tokenIndex: index,
+            totalTokens: tokens.length,
+            isStopWord: this.stopWords.has(token.toLowerCase()),
+            stem: this.getStem(token)
+          }
+        };
+        
+        entries.push(entry);
+      });
+      
+      // Create n-gram entries for better search
+      if (tokens.length > 1) {
+        const ngrams = this.generateNGrams(tokens, 2, 3);
+        ngrams.forEach((ngram, index) => {
+          const entry: IndexEntry = {
+            id: `${documentId}_${field}_ngram_${index}`,
+            documentId,
+            field,
+            value: ngram,
+            weight: weight * 0.7,
+            metadata: {
+              ...metadata,
+              type: 'ngram',
+              ngramSize: ngram.split(' ').length
+            }
+          };
+          
+          entries.push(entry);
+        });
+      }
+      
+      return entries;
+    }
+    
+    // Tokenize text
+    private tokenize(text: string): string[] {
+      return text
+        .toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(token => token.length > 0 && !this.stopWords.has(token))
+        .map(token => this.getStem(token));
+    }
+    
+    // Get stem for a word
+    private getStem(word: string): string {
+      const lowerWord = word.toLowerCase();
+      
+      if (this.stemmer.has(lowerWord)) {
+        return this.stemmer.get(lowerWord)!;
+      }
+      
+      const stem = this.applyStemmerRules(lowerWord);
+      this.stemmer.set(lowerWord, stem);
+      
+      return stem;
+    }
+    
+    // Calculate token weight
+    private calculateTokenWeight(token: string, index: number, totalTokens: number): number {
+      let weight = 1.0;
+      
+      // Boost first and last tokens
+      if (index === 0 || index === totalTokens - 1) {
+        weight *= 1.2;
+      }
+      
+      // Boost longer tokens
+      if (token.length > 5) {
+        weight *= 1.1;
+      }
+      
+      // Penalize very short tokens
+      if (token.length < 3) {
+        weight *= 0.8;
+      }
+      
+      return weight;
+    }
+    
+    // Generate n-grams
+    private generateNGrams(tokens: string[], minSize: number, maxSize: number): string[] {
+      const ngrams: string[] = [];
+      
+      for (let size = minSize; size <= maxSize && size <= tokens.length; size++) {
+        for (let i = 0; i <= tokens.length - size; i++) {
+          ngrams.push(tokens.slice(i, i + size).join(' '));
+        }
+      }
+      
+      return ngrams;
+    }
+    
+    // Chunk content for better indexing
+    private chunkContent(content: string): string[] {
+      const chunks: string[] = [];
+      const words = content.split(/\s+/);
+      
+      for (let i = 0; i < words.length; i += this.config.chunkSize - this.config.overlapSize) {
+        const chunk = words.slice(i, i + this.config.chunkSize).join(' ');
+        chunks.push(chunk);
+      }
+      
+      return chunks;
+    }
+    
+    // Search documents
+    search(query: SearchQuery): SearchResult[] {
+      const startTime = Date.now();
+      
+      try {
+        // Tokenize query
+        const queryTokens = this.tokenize(query.text);
+        
+        // Find matching entries
+        const matchingEntries = this.findMatchingEntries(queryTokens, query);
+        
+        // Group by document and calculate scores
+        const documentScores = this.calculateDocumentScores(matchingEntries, queryTokens);
+        
+        // Apply filters
+        const filteredScores = this.applyFilters(documentScores, query);
+        
+        // Sort results
+        const sortedResults = this.sortResults(filteredScores, query);
+        
+        // Create search results
+        const results = sortedResults.slice(0, query.limit || this.config.maxResults)
+          .map(({ documentId, score, matchedFields }) => {
+            const document = this.documents.get(documentId)!;
+            const highlights = this.generateHighlights(document, queryTokens);
+            
+            return {
+              document,
+              score,
+              highlights,
+              matchedFields,
+              metadata: {
+                searchTime: Date.now() - startTime,
+                totalResults: sortedResults.length
+              }
+            };
+          });
+        
+        return results;
+        
+      } catch (error) {
+        console.error('Search failed:', error);
+        return [];
+      }
+    }
+    
+    // Find matching entries
+    private findMatchingEntries(queryTokens: string[], query: SearchQuery): IndexEntry[] {
+      const matchingEntries: IndexEntry[] = [];
+      
+      for (const entry of this.indexEntries.values()) {
+        let matches = false;
+        
+        // Check if any query token matches this entry
+        for (const token of queryTokens) {
+          if (entry.value.includes(token) || token.includes(entry.value)) {
+            matches = true;
+            break;
+          }
+        }
+        
+        if (matches) {
+          matchingEntries.push(entry);
+        }
+      }
+      
+      return matchingEntries;
+    }
+    
+    // Calculate document scores
+    private calculateDocumentScores(entries: IndexEntry[], queryTokens: string[]): Map<string, { score: number; matchedFields: Set<string> }> {
+      const documentScores = new Map<string, { score: number; matchedFields: Set<string> }>();
+      
+      for (const entry of entries) {
+        const current = documentScores.get(entry.documentId) || {
+          score: 0,
+          matchedFields: new Set<string>()
+        };
+        
+        // Calculate token match score
+        let tokenScore = 0;
+        for (const token of queryTokens) {
+          if (entry.value.includes(token)) {
+            tokenScore += entry.weight * (token.length / Math.max(token.length, entry.value.length));
+          }
+        }
+        
+        current.score += tokenScore;
+        current.matchedFields.add(entry.field);
+        
+        documentScores.set(entry.documentId, current);
+      }
+      
+      return documentScores;
+    }
+    
+    // Apply filters
+    private applyFilters(
+      documentScores: Map<string, { score: number; matchedFields: Set<string> }>,
+      query: SearchQuery
+    ): Array<{ documentId: string; score: number; matchedFields: Set<string> }> {
+      const filtered = Array.from(documentScores.entries())
+        .map(([documentId, data]) => ({ documentId, ...data }))
+        .filter(item => {
+          const document = this.documents.get(item.documentId)!;
+          
+          // Apply category filter
+          if (query.categories && query.categories.length > 0) {
+            const hasMatchingCategory = query.categories.some(cat => 
+              document.categories.includes(cat)
+            );
+            if (!hasMatchingCategory) return false;
+          }
+          
+          // Apply tag filter
+          if (query.tags && query.tags.length > 0) {
+            const hasMatchingTag = query.tags.some(tag => 
+              document.tags.includes(tag)
+            );
+            if (!hasMatchingTag) return false;
+          }
+          
+          // Apply metadata filters
+          if (query.filters) {
+            for (const [key, value] of Object.entries(query.filters)) {
+              if (document.metadata[key] !== value) {
+                return false;
+              }
+            }
+          }
+          
+          return true;
+        });
+      
+      return filtered;
+    }
+    
+    // Sort results
+    private sortResults(
+      results: Array<{ documentId: string; score: number; matchedFields: Set<string> }>,
+      query: SearchQuery
+    ): Array<{ documentId: string; score: number; matchedFields: Set<string> }> {
+      const sortBy = query.sortBy || 'relevance';
+      const sortOrder = query.sortOrder || 'desc';
+      
+      return results.sort((a, b) => {
+        let comparison = 0;
+        
+        switch (sortBy) {
+          case 'relevance':
+            comparison = a.score - b.score;
+            break;
+          case 'date':
+            const docA = this.documents.get(a.documentId)!;
+            const docB = this.documents.get(b.documentId)!;
+            comparison = docA.updatedAt.getTime() - docB.updatedAt.getTime();
+            break;
+          case 'title':
+            const titleA = this.documents.get(a.documentId)!.title;
+            const titleB = this.documents.get(b.documentId)!.title;
+            comparison = titleA.localeCompare(titleB);
+            break;
+          case 'weight':
+            comparison = a.score - b.score;
+            break;
+        }
+        
+        return sortOrder === 'asc' ? comparison : -comparison;
+      });
+    }
+    
+    // Generate highlights
+    private generateHighlights(document: KnowledgeDocument, queryTokens: string[]): string[] {
+      const highlights: string[] = [];
+      
+      // Highlight in title
+      const titleHighlight = this.highlightText(document.title, queryTokens);
+      if (titleHighlight !== document.title) {
+        highlights.push(`Title: ${titleHighlight}`);
+      }
+      
+      // Highlight in content
+      const contentHighlight = this.highlightText(document.content.substring(0, 200), queryTokens);
+      if (contentHighlight !== document.content.substring(0, 200)) {
+        highlights.push(`Content: ${contentHighlight}...`);
+      }
+      
+      return highlights;
+    }
+    
+    // Highlight text with query tokens
+    private highlightText(text: string, queryTokens: string[]): string {
+      let highlighted = text;
+      
+      for (const token of queryTokens) {
+        const regex = new RegExp(`(${token})`, 'gi');
+        highlighted = highlighted.replace(regex, '**$1**');
+      }
+      
+      return highlighted;
+    }
+    
+    // Remove document from index
+    removeDocument(documentId: string): boolean {
+      const document = this.documents.get(documentId);
+      if (!document) return false;
+      
+      // Remove document
+      this.documents.delete(documentId);
+      
+      // Remove index entries
+      const entriesToRemove = Array.from(this.indexEntries.values())
+        .filter(entry => entry.documentId === documentId);
+      
+      entriesToRemove.forEach(entry => {
+        this.indexEntries.delete(entry.id);
+      });
+      
+      return true;
+    }
+    
+    // Get document by ID
+    getDocument(documentId: string): KnowledgeDocument | undefined {
+      return this.documents.get(documentId);
+    }
+    
+    // Get all documents
+    getAllDocuments(): KnowledgeDocument[] {
+      return Array.from(this.documents.values());
+    }
+    
+    // Get index statistics
+    getIndexStats(): {
+      totalDocuments: number;
+      totalEntries: number;
+      averageEntriesPerDocument: number;
+      indexSize: number;
+    } {
+      const totalDocuments = this.documents.size;
+      const totalEntries = this.indexEntries.size;
+      const averageEntriesPerDocument = totalDocuments > 0 ? totalEntries / totalDocuments : 0;
+      
+      // Estimate index size (rough calculation)
+      let indexSize = 0;
+      for (const entry of this.indexEntries.values()) {
+        indexSize += JSON.stringify(entry).length;
+      }
+      
+      return {
+        totalDocuments,
+        totalEntries,
+        averageEntriesPerDocument,
+        indexSize
+      };
+    }
+    
+    // Update configuration
+    updateConfig(newConfig: Partial<IndexingConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    // Get current configuration
+    getConfig(): IndexingConfig {
+      return { ...this.config };
+    }
+  } 

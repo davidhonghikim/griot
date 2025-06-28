@@ -1,0 +1,692 @@
+name: "Decision Framework Base"
+description: "Advanced decision-making framework with ethical reasoning and wisdom-based analysis"
+category: "wisdom"
+tags:
+  primary: "wisdom"
+  secondary: ["decisions", "ethics", "reasoning", "analysis", "judgment"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface DecisionContext {
+    id: string;
+    title: string;
+    description: string;
+    stakeholders: string[];
+    options: DecisionOption[];
+    constraints: DecisionConstraint[];
+    criteria: DecisionCriterion[];
+    ethicalPrinciples: EthicalPrinciple[];
+    timestamp: Date;
+    urgency: 'low' | 'medium' | 'high' | 'critical';
+  }
+  
+  export interface DecisionOption {
+    id: string;
+    name: string;
+    description: string;
+    pros: string[];
+    cons: string[];
+    risks: RiskAssessment[];
+    impacts: ImpactAssessment[];
+    feasibility: number; // 0-1
+    cost: number;
+    timeline: string;
+  }
+  
+  export interface DecisionConstraint {
+    id: string;
+    type: 'resource' | 'time' | 'legal' | 'ethical' | 'technical' | 'social';
+    description: string;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    impact: string;
+  }
+  
+  export interface DecisionCriterion {
+    id: string;
+    name: string;
+    description: string;
+    weight: number; // 0-1
+    type: 'benefit' | 'cost' | 'risk' | 'ethical' | 'feasibility';
+    measurement: 'qualitative' | 'quantitative' | 'binary';
+  }
+  
+  export interface EthicalPrinciple {
+    id: string;
+    name: string;
+    description: string;
+    weight: number; // 0-1
+    category: 'autonomy' | 'beneficence' | 'nonmaleficence' | 'justice' | 'fidelity';
+  }
+  
+  export interface RiskAssessment {
+    id: string;
+    risk: string;
+    probability: number; // 0-1
+    impact: 'low' | 'medium' | 'high' | 'critical';
+    mitigation: string;
+  }
+  
+  export interface ImpactAssessment {
+    id: string;
+    stakeholder: string;
+    impact: 'positive' | 'negative' | 'neutral' | 'mixed';
+    magnitude: number; // 0-1
+    description: string;
+  }
+  
+  export interface DecisionResult {
+    contextId: string;
+    selectedOption: string;
+    reasoning: string;
+    confidence: number; // 0-1
+    ethicalScore: number; // 0-1
+    riskScore: number; // 0-1
+    feasibilityScore: number; // 0-1
+    overallScore: number; // 0-1
+    alternatives: string[];
+    recommendations: string[];
+    timeline: string;
+    nextSteps: string[];
+  }
+  
+  export interface WisdomRule {
+    id: string;
+    name: string;
+    description: string;
+    condition: string;
+    action: string;
+    priority: number;
+    enabled: boolean;
+  }
+  
+  export class DecisionFrameworkSkill {
+    private contexts: Map<string, DecisionContext>;
+    private results: Map<string, DecisionResult>;
+    private wisdomRules: Map<string, WisdomRule>;
+    private ethicalPrinciples: Map<string, EthicalPrinciple>;
+    
+    constructor() {
+      this.contexts = new Map();
+      this.results = new Map();
+      this.wisdomRules = new Map();
+      this.ethicalPrinciples = new Map();
+      this.initializeEthicalPrinciples();
+      this.initializeWisdomRules();
+    }
+    
+    // Initialize ethical principles
+    private initializeEthicalPrinciples(): void {
+      this.ethicalPrinciples.set('autonomy', {
+        id: 'autonomy',
+        name: 'Respect for Autonomy',
+        description: 'Respect the right of individuals to make their own decisions',
+        weight: 0.25,
+        category: 'autonomy'
+      });
+      
+      this.ethicalPrinciples.set('beneficence', {
+        id: 'beneficence',
+        name: 'Beneficence',
+        description: 'Act in ways that promote the well-being of others',
+        weight: 0.25,
+        category: 'beneficence'
+      });
+      
+      this.ethicalPrinciples.set('nonmaleficence', {
+        id: 'nonmaleficence',
+        name: 'Non-maleficence',
+        description: 'Do no harm to others',
+        weight: 0.25,
+        category: 'nonmaleficence'
+      });
+      
+      this.ethicalPrinciples.set('justice', {
+        id: 'justice',
+        name: 'Justice',
+        description: 'Treat people fairly and equitably',
+        weight: 0.15,
+        category: 'justice'
+      });
+      
+      this.ethicalPrinciples.set('fidelity', {
+        id: 'fidelity',
+        name: 'Fidelity',
+        description: 'Keep promises and maintain trust',
+        weight: 0.10,
+        category: 'fidelity'
+      });
+    }
+    
+    // Initialize wisdom rules
+    private initializeWisdomRules(): void {
+      // Consider long-term consequences
+      this.wisdomRules.set('long_term_thinking', {
+        id: 'long_term_thinking',
+        name: 'Long-term Thinking',
+        description: 'Consider the long-term consequences of decisions',
+        condition: 'decision_has_long_term_implications',
+        action: 'evaluate_long_term_impacts',
+        priority: 1,
+        enabled: true
+      });
+      
+      // Consider multiple perspectives
+      this.wisdomRules.set('multiple_perspectives', {
+        id: 'multiple_perspectives',
+        name: 'Multiple Perspectives',
+        description: 'Consider the perspectives of all stakeholders',
+        condition: 'multiple_stakeholders_involved',
+        action: 'analyze_stakeholder_perspectives',
+        priority: 2,
+        enabled: true
+      });
+      
+      // Precautionary principle
+      this.wisdomRules.set('precautionary_principle', {
+        id: 'precautionary_principle',
+        name: 'Precautionary Principle',
+        description: 'When in doubt, choose the safer option',
+        condition: 'high_uncertainty_or_risk',
+        action: 'favor_conservative_approach',
+        priority: 3,
+        enabled: true
+      });
+      
+      // Transparency
+      this.wisdomRules.set('transparency', {
+        id: 'transparency',
+        name: 'Transparency',
+        description: 'Be transparent about decision-making process',
+        condition: 'stakeholders_need_clarity',
+        action: 'document_decision_process',
+        priority: 4,
+        enabled: true
+      });
+      
+      // Learning from experience
+      this.wisdomRules.set('learning_from_experience', {
+        id: 'learning_from_experience',
+        name: 'Learning from Experience',
+        description: 'Apply lessons from similar past decisions',
+        condition: 'similar_past_decisions_exist',
+        action: 'review_past_experiences',
+        priority: 5,
+        enabled: true
+      });
+    }
+    
+    // Make a decision
+    makeDecision(context: DecisionContext): DecisionResult {
+      const startTime = Date.now();
+      
+      try {
+        // Store context
+        this.contexts.set(context.id, context);
+        
+        // Apply wisdom rules
+        const applicableRules = this.getApplicableRules(context);
+        
+        // Evaluate options
+        const optionEvaluations = this.evaluateOptions(context, applicableRules);
+        
+        // Select best option
+        const selectedOption = this.selectBestOption(optionEvaluations);
+        
+        // Generate reasoning
+        const reasoning = this.generateReasoning(context, selectedOption, applicableRules);
+        
+        // Calculate scores
+        const scores = this.calculateScores(selectedOption, context);
+        
+        // Generate recommendations
+        const recommendations = this.generateRecommendations(context, selectedOption);
+        
+        // Create result
+        const result: DecisionResult = {
+          contextId: context.id,
+          selectedOption: selectedOption.id,
+          reasoning,
+          confidence: scores.confidence,
+          ethicalScore: scores.ethicalScore,
+          riskScore: scores.riskScore,
+          feasibilityScore: scores.feasibilityScore,
+          overallScore: scores.overallScore,
+          alternatives: this.getTopAlternatives(optionEvaluations, 3),
+          recommendations,
+          timeline: selectedOption.timeline,
+          nextSteps: this.generateNextSteps(context, selectedOption)
+        };
+        
+        // Store result
+        this.results.set(context.id, result);
+        
+        return result;
+        
+      } catch (error) {
+        throw new Error(`Decision making failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+    
+    // Get applicable wisdom rules
+    private getApplicableRules(context: DecisionContext): WisdomRule[] {
+      const applicableRules: WisdomRule[] = [];
+      
+      for (const rule of this.wisdomRules.values()) {
+        if (!rule.enabled) continue;
+        
+        if (this.evaluateRuleCondition(rule.condition, context)) {
+          applicableRules.push(rule);
+        }
+      }
+      
+      // Sort by priority
+      return applicableRules.sort((a, b) => a.priority - b.priority);
+    }
+    
+    // Evaluate rule condition
+    private evaluateRuleCondition(condition: string, context: DecisionContext): boolean {
+      switch (condition) {
+        case 'decision_has_long_term_implications':
+          return context.urgency === 'low' || context.urgency === 'medium';
+        case 'multiple_stakeholders_involved':
+          return context.stakeholders.length > 1;
+        case 'high_uncertainty_or_risk':
+          return context.options.some(option => 
+            option.risks.some(risk => risk.impact === 'high' || risk.impact === 'critical')
+          );
+        case 'stakeholders_need_clarity':
+          return context.stakeholders.length > 2;
+        case 'similar_past_decisions_exist':
+          return this.hasSimilarPastDecisions(context);
+        default:
+          return false;
+      }
+    }
+    
+    // Check for similar past decisions
+    private hasSimilarPastDecisions(context: DecisionContext): boolean {
+      // Simple similarity check based on title and description
+      const contextText = `${context.title} ${context.description}`.toLowerCase();
+      
+      for (const pastContext of this.contexts.values()) {
+        const pastText = `${pastContext.title} ${pastContext.description}`.toLowerCase();
+        
+        // Check for common keywords
+        const commonWords = contextText.split(' ').filter(word => 
+          word.length > 3 && pastText.includes(word)
+        );
+        
+        if (commonWords.length >= 3) {
+          return true;
+        }
+      }
+      
+      return false;
+    }
+    
+    // Evaluate all options
+    private evaluateOptions(context: DecisionContext, rules: WisdomRule[]): Map<string, {
+      option: DecisionOption;
+      scores: {
+        ethical: number;
+        risk: number;
+        feasibility: number;
+        overall: number;
+      };
+      reasoning: string[];
+    }> {
+      const evaluations = new Map();
+      
+      for (const option of context.options) {
+        const scores = this.calculateOptionScores(option, context);
+        const reasoning = this.generateOptionReasoning(option, context, rules);
+        
+        evaluations.set(option.id, {
+          option,
+          scores,
+          reasoning
+        });
+      }
+      
+      return evaluations;
+    }
+    
+    // Calculate scores for an option
+    private calculateOptionScores(option: DecisionOption, context: DecisionContext): {
+      ethical: number;
+      risk: number;
+      feasibility: number;
+      overall: number;
+    } {
+      // Calculate ethical score
+      const ethicalScore = this.calculateEthicalScore(option, context);
+      
+      // Calculate risk score
+      const riskScore = this.calculateRiskScore(option);
+      
+      // Calculate feasibility score
+      const feasibilityScore = option.feasibility;
+      
+      // Calculate overall score
+      const overallScore = (ethicalScore * 0.4) + ((1 - riskScore) * 0.3) + (feasibilityScore * 0.3);
+      
+      return {
+        ethical: ethicalScore,
+        risk: riskScore,
+        feasibility: feasibilityScore,
+        overall: overallScore
+      };
+    }
+    
+    // Calculate ethical score
+    private calculateEthicalScore(option: DecisionOption, context: DecisionContext): number {
+      let totalScore = 0;
+      let totalWeight = 0;
+      
+      for (const principle of context.ethicalPrinciples) {
+        const principleScore = this.evaluateEthicalPrinciple(principle, option, context);
+        totalScore += principleScore * principle.weight;
+        totalWeight += principle.weight;
+      }
+      
+      return totalWeight > 0 ? totalScore / totalWeight : 0;
+    }
+    
+    // Evaluate ethical principle
+    private evaluateEthicalPrinciple(principle: EthicalPrinciple, option: DecisionOption, context: DecisionContext): number {
+      switch (principle.category) {
+        case 'autonomy':
+          return this.evaluateAutonomy(option, context);
+        case 'beneficence':
+          return this.evaluateBeneficence(option, context);
+        case 'nonmaleficence':
+          return this.evaluateNonmaleficence(option, context);
+        case 'justice':
+          return this.evaluateJustice(option, context);
+        case 'fidelity':
+          return this.evaluateFidelity(option, context);
+        default:
+          return 0.5;
+      }
+    }
+    
+    // Evaluate autonomy
+    private evaluateAutonomy(option: DecisionOption, context: DecisionContext): number {
+      // Check if option respects stakeholder autonomy
+      const positiveImpacts = option.impacts.filter(impact => impact.impact === 'positive');
+      const negativeImpacts = option.impacts.filter(impact => impact.impact === 'negative');
+      
+      if (positiveImpacts.length > negativeImpacts.length) {
+        return 0.8;
+      } else if (positiveImpacts.length === negativeImpacts.length) {
+        return 0.5;
+      } else {
+        return 0.2;
+      }
+    }
+    
+    // Evaluate beneficence
+    private evaluateBeneficence(option: DecisionOption, context: DecisionContext): number {
+      const positiveImpacts = option.impacts.filter(impact => impact.impact === 'positive');
+      const totalMagnitude = positiveImpacts.reduce((sum, impact) => sum + impact.magnitude, 0);
+      
+      return Math.min(totalMagnitude / context.stakeholders.length, 1);
+    }
+    
+    // Evaluate nonmaleficence
+    private evaluateNonmaleficence(option: DecisionOption, context: DecisionContext): number {
+      const negativeImpacts = option.impacts.filter(impact => impact.impact === 'negative');
+      const totalMagnitude = negativeImpacts.reduce((sum, impact) => sum + impact.magnitude, 0);
+      
+      return Math.max(1 - totalMagnitude / context.stakeholders.length, 0);
+    }
+    
+    // Evaluate justice
+    private evaluateJustice(option: DecisionOption, context: DecisionContext): number {
+      const impacts = option.impacts;
+      const magnitudes = impacts.map(impact => impact.magnitude);
+      const variance = this.calculateVariance(magnitudes);
+      
+      // Lower variance means more equitable distribution
+      return Math.max(1 - variance, 0);
+    }
+    
+    // Evaluate fidelity
+    private evaluateFidelity(option: DecisionOption, context: DecisionContext): number {
+      // Check if option aligns with stated goals and commitments
+      const pros = option.pros.length;
+      const cons = option.cons.length;
+      
+      return pros > cons ? 0.8 : pros === cons ? 0.5 : 0.2;
+    }
+    
+    // Calculate risk score
+    private calculateRiskScore(option: DecisionOption): number {
+      if (option.risks.length === 0) return 0;
+      
+      const riskScores = option.risks.map(risk => {
+        const impactScore = { low: 0.25, medium: 0.5, high: 0.75, critical: 1.0 }[risk.impact];
+        return risk.probability * impactScore;
+      });
+      
+      return Math.max(...riskScores);
+    }
+    
+    // Calculate variance
+    private calculateVariance(values: number[]): number {
+      if (values.length === 0) return 0;
+      
+      const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+      const squaredDiffs = values.map(val => Math.pow(val - mean, 2));
+      const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / values.length;
+      
+      return variance;
+    }
+    
+    // Generate option reasoning
+    private generateOptionReasoning(option: DecisionOption, context: DecisionContext, rules: WisdomRule[]): string[] {
+      const reasoning: string[] = [];
+      
+      // Add pros and cons
+      if (option.pros.length > 0) {
+        reasoning.push(`Pros: ${option.pros.join(', ')}`);
+      }
+      
+      if (option.cons.length > 0) {
+        reasoning.push(`Cons: ${option.cons.join(', ')}`);
+      }
+      
+      // Add risk considerations
+      const highRisks = option.risks.filter(risk => risk.impact === 'high' || risk.impact === 'critical');
+      if (highRisks.length > 0) {
+        reasoning.push(`High risks: ${highRisks.map(risk => risk.risk).join(', ')}`);
+      }
+      
+      // Add stakeholder impacts
+      const positiveImpacts = option.impacts.filter(impact => impact.impact === 'positive');
+      const negativeImpacts = option.impacts.filter(impact => impact.impact === 'negative');
+      
+      if (positiveImpacts.length > 0) {
+        reasoning.push(`Positive impacts: ${positiveImpacts.length} stakeholders`);
+      }
+      
+      if (negativeImpacts.length > 0) {
+        reasoning.push(`Negative impacts: ${negativeImpacts.length} stakeholders`);
+      }
+      
+      return reasoning;
+    }
+    
+    // Select best option
+    private selectBestOption(evaluations: Map<string, any>): DecisionOption {
+      let bestOption: DecisionOption | null = null;
+      let bestScore = -1;
+      
+      for (const [optionId, evaluation] of evaluations) {
+        if (evaluation.scores.overall > bestScore) {
+          bestScore = evaluation.scores.overall;
+          bestOption = evaluation.option;
+        }
+      }
+      
+      if (!bestOption) {
+        throw new Error('No valid options found');
+      }
+      
+      return bestOption;
+    }
+    
+    // Generate reasoning
+    private generateReasoning(context: DecisionContext, selectedOption: DecisionOption, rules: WisdomRule[]): string {
+      const reasoning: string[] = [];
+      
+      reasoning.push(`Selected option: ${selectedOption.name}`);
+      reasoning.push(`Reasoning: This option was chosen based on comprehensive evaluation of ethical principles, risk assessment, and feasibility analysis.`);
+      
+      if (rules.length > 0) {
+        reasoning.push(`Applied wisdom rules: ${rules.map(rule => rule.name).join(', ')}`);
+      }
+      
+      reasoning.push(`Key considerations: ${selectedOption.pros.slice(0, 3).join(', ')}`);
+      
+      return reasoning.join(' ');
+    }
+    
+    // Calculate final scores
+    private calculateScores(selectedOption: DecisionOption, context: DecisionContext): {
+      confidence: number;
+      ethicalScore: number;
+      riskScore: number;
+      feasibilityScore: number;
+      overallScore: number;
+    } {
+      const ethicalScore = this.calculateEthicalScore(selectedOption, context);
+      const riskScore = this.calculateRiskScore(selectedOption);
+      const feasibilityScore = selectedOption.feasibility;
+      
+      const overallScore = (ethicalScore * 0.4) + ((1 - riskScore) * 0.3) + (feasibilityScore * 0.3);
+      const confidence = Math.min(overallScore * 1.2, 1); // Boost confidence slightly
+      
+      return {
+        confidence,
+        ethicalScore,
+        riskScore,
+        feasibilityScore,
+        overallScore
+      };
+    }
+    
+    // Generate recommendations
+    private generateRecommendations(context: DecisionContext, selectedOption: DecisionOption): string[] {
+      const recommendations: string[] = [];
+      
+      // Risk mitigation recommendations
+      const highRisks = selectedOption.risks.filter(risk => risk.impact === 'high' || risk.impact === 'critical');
+      highRisks.forEach(risk => {
+        recommendations.push(`Implement risk mitigation: ${risk.mitigation}`);
+      });
+      
+      // Stakeholder communication
+      if (context.stakeholders.length > 1) {
+        recommendations.push('Communicate decision to all stakeholders');
+      }
+      
+      // Monitoring and evaluation
+      recommendations.push('Establish monitoring and evaluation framework');
+      
+      // Contingency planning
+      if (selectedOption.risks.length > 0) {
+        recommendations.push('Develop contingency plans for identified risks');
+      }
+      
+      return recommendations;
+    }
+    
+    // Get top alternatives
+    private getTopAlternatives(evaluations: Map<string, any>, count: number): string[] {
+      const sortedOptions = Array.from(evaluations.entries())
+        .sort(([, a], [, b]) => b.scores.overall - a.scores.overall)
+        .slice(1, count + 1) // Skip the best option
+        .map(([optionId]) => optionId);
+      
+      return sortedOptions;
+    }
+    
+    // Generate next steps
+    private generateNextSteps(context: DecisionContext, selectedOption: DecisionOption): string[] {
+      const nextSteps: string[] = [];
+      
+      nextSteps.push('Implement the selected option');
+      nextSteps.push('Monitor progress and outcomes');
+      nextSteps.push('Evaluate results against expected outcomes');
+      
+      if (selectedOption.timeline) {
+        nextSteps.push(`Follow timeline: ${selectedOption.timeline}`);
+      }
+      
+      return nextSteps;
+    }
+    
+    // Add wisdom rule
+    addWisdomRule(rule: WisdomRule): void {
+      this.wisdomRules.set(rule.id, rule);
+    }
+    
+    // Remove wisdom rule
+    removeWisdomRule(ruleId: string): boolean {
+      return this.wisdomRules.delete(ruleId);
+    }
+    
+    // Get all wisdom rules
+    getWisdomRules(): WisdomRule[] {
+      return Array.from(this.wisdomRules.values());
+    }
+    
+    // Get decision result
+    getDecisionResult(contextId: string): DecisionResult | undefined {
+      return this.results.get(contextId);
+    }
+    
+    // Get all decision results
+    getAllResults(): DecisionResult[] {
+      return Array.from(this.results.values());
+    }
+    
+    // Get ethical principles
+    getEthicalPrinciples(): EthicalPrinciple[] {
+      return Array.from(this.ethicalPrinciples.values());
+    }
+    
+    // Create decision context
+    createContext(
+      title: string,
+      description: string,
+      stakeholders: string[],
+      options: DecisionOption[],
+      urgency: DecisionContext['urgency'] = 'medium'
+    ): DecisionContext {
+      return {
+        id: this.generateContextId(),
+        title,
+        description,
+        stakeholders,
+        options,
+        constraints: [],
+        criteria: [],
+        ethicalPrinciples: Array.from(this.ethicalPrinciples.values()),
+        timestamp: new Date(),
+        urgency
+      };
+    }
+    
+    // Generate context ID
+    private generateContextId(): string {
+      return `context_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+  } 

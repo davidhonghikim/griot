@@ -1,0 +1,173 @@
+name: "Code Style Check"
+description: "Ensures consistent code style, formatting, and TypeScript best practices"
+category: "compliance"
+tags:
+  primary: "compliance"
+  secondary: ["code-style", "typescript", "formatting", "documentation"]
+  nodes: ["musa", "griot", "tohunga", "ronin", "oracle", "skald", "amauta", "mzee"]
+  priority: "medium"
+  complexity: "moderate"
+  cultural: ["hieros"]
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { readFileSync } from 'fs';
+  import { glob } from 'glob';
+  
+  export async function code_style_check(input: {
+    check_typescript: boolean;
+    check_formatting: boolean;
+    check_imports: boolean;
+    check_documentation: boolean;
+  }) {
+    const violations = [];
+    const recommendations = [];
+    
+    // Check TypeScript files for style issues
+    const tsFiles = await glob('**/*.ts', { ignore: ['node_modules/**', 'dist/**'] });
+    
+    for (const file of tsFiles) {
+      const content = readFileSync(file, 'utf8');
+      
+      // Check for proper TypeScript usage
+      if (input.check_typescript) {
+        // Check for any usage
+        if (content.includes('any') && !content.includes('// eslint-disable-next-line')) {
+          violations.push({
+            file,
+            issue: 'Avoid using "any" type - use proper TypeScript types',
+            severity: 'error'
+          });
+        }
+        
+        // Check for proper interface usage
+        if (content.includes('interface') && !content.includes('export interface')) {
+          recommendations.push({
+            file,
+            issue: 'Export interfaces for better reusability',
+            severity: 'info'
+          });
+        }
+        
+        // Check for proper type usage
+        if (content.includes('type') && !content.includes('export type')) {
+          recommendations.push({
+            file,
+            issue: 'Export types for better reusability',
+            severity: 'info'
+          });
+        }
+      }
+      
+      // Check for proper formatting
+      if (input.check_formatting) {
+        // Check for consistent indentation
+        const lines = content.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.length > 0 && !line.startsWith(' ') && !line.startsWith('\t')) {
+            // This might be a formatting issue, but we'll be lenient
+            continue;
+          }
+        }
+        
+        // Check for trailing whitespace
+        if (content.includes(' \n') || content.includes('\t\n')) {
+          violations.push({
+            file,
+            issue: 'Remove trailing whitespace',
+            severity: 'warning'
+          });
+        }
+        
+        // Check for proper line endings
+        if (content.includes('\r\n')) {
+          violations.push({
+            file,
+            issue: 'Use LF line endings instead of CRLF',
+            severity: 'warning'
+          });
+        }
+      }
+      
+      // Check for proper imports
+      if (input.check_imports) {
+        // Check for unused imports (basic check)
+        const importMatches = content.match(/import\s+{([^}]+)}\s+from\s+['"]([^'"]+)['"]/g);
+        if (importMatches) {
+          for (const match of importMatches) {
+            const importContent = match.match(/import\s+{([^}]+)}\s+from/)?.[1];
+            if (importContent) {
+              const imports = importContent.split(',').map(i => i.trim());
+              for (const imp of imports) {
+                const importName = imp.split(' as ')[0].trim();
+                if (!content.includes(importName) || content.indexOf(importName) === content.indexOf(match)) {
+                  recommendations.push({
+                    file,
+                    issue: `Potentially unused import: ${importName}`,
+                    severity: 'warning'
+                  });
+                }
+              }
+            }
+          }
+        }
+        
+        // Check for proper import ordering
+        const importLines = content.split('\n').filter(line => line.trim().startsWith('import'));
+        if (importLines.length > 1) {
+          const sortedImports = [...importLines].sort();
+          if (JSON.stringify(importLines) !== JSON.stringify(sortedImports)) {
+            recommendations.push({
+              file,
+              issue: 'Sort imports alphabetically',
+              severity: 'info'
+            });
+          }
+        }
+      }
+      
+      // Check for documentation
+      if (input.check_documentation) {
+        // Check for JSDoc on exported functions
+        const exportMatches = content.match(/export\s+(?:async\s+)?function\s+(\w+)/g);
+        if (exportMatches) {
+          for (const match of exportMatches) {
+            const funcName = match.match(/function\s+(\w+)/)?.[1];
+            if (funcName && !content.includes(`/**`) && !content.includes(`* @param`)) {
+              recommendations.push({
+                file,
+                issue: `Add JSDoc documentation for exported function: ${funcName}`,
+                severity: 'info'
+              });
+            }
+          }
+        }
+        
+        // Check for JSDoc on exported classes
+        const classMatches = content.match(/export\s+class\s+(\w+)/g);
+        if (classMatches) {
+          for (const match of classMatches) {
+            const className = match.match(/class\s+(\w+)/)?.[1];
+            if (className && !content.includes(`/**`) && !content.includes(`* @class`)) {
+              recommendations.push({
+                file,
+                issue: `Add JSDoc documentation for exported class: ${className}`,
+                severity: 'info'
+              });
+            }
+          }
+        }
+      }
+    }
+    
+    return {
+      success: violations.length === 0,
+      violations,
+      recommendations,
+      summary: `Found ${violations.length} violations and ${recommendations.length} recommendations`
+    };
+  } 

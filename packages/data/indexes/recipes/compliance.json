@@ -1,0 +1,275 @@
+{
+  "category": "compliance",
+  "asset_type": "recipes",
+  "total_files": 7,
+  "last_updated": "2025-06-28T07:58:39.540536",
+  "files": [
+    {
+      "name": "Security Compliance Check",
+      "path": "recipes/security/security_compliance_check.yaml",
+      "type": "recipes",
+      "category": "compliance",
+      "size": 13,
+      "lastModified": "2025-06-28T06:11:47.826546",
+      "hash": "9f6ff794c03148113b9a84fd7933777cf4719fa325aff69199267042ddee8486",
+      "description": "Ensures proper input validation, sanitization, and security best practices - assumes all input is malicious until proven safe",
+      "tags": {
+        "primary": "security",
+        "secondary": [
+          "compliance",
+          "input-validation",
+          "injection-prevention",
+          "authentication",
+          "authorization",
+          "secrets",
+          "encryption",
+          "threat-detection"
+        ],
+        "nodes": [
+          "musa"
+        ],
+        "priority": "critical",
+        "complexity": "complex",
+        "cultural": [
+          "hieros"
+        ],
+        "dependencies": [
+          "environment_check",
+          "package_priority_check"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Compliance Runner",
+      "path": "recipes/compliance/compliance_runner.yaml",
+      "type": "recipes",
+      "category": "compliance",
+      "size": 11,
+      "lastModified": "2025-06-28T06:11:43.893255",
+      "hash": "5b8c8e70e46052fb945fca60aa0269e96738ec2d89f3b7727c0634f8cf259a52",
+      "description": "Orchestrates all compliance checks and generates comprehensive security and code quality reports",
+      "tags": {
+        "primary": "compliance",
+        "secondary": [
+          "security",
+          "orchestration",
+          "reporting",
+          "automation"
+        ],
+        "nodes": [
+          "musa"
+        ],
+        "priority": "critical",
+        "complexity": "complex",
+        "cultural": [
+          "hieros"
+        ],
+        "dependencies": [
+          "security_compliance_check",
+          "environment_check",
+          "package_priority_check",
+          "klf_compatibility_check",
+          "code_style_check",
+          "testing_requirements_check"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Environment Check",
+      "path": "recipes/compliance/environment_check.yaml",
+      "type": "recipes",
+      "category": "compliance",
+      "size": 2,
+      "lastModified": "2025-06-28T06:10:58.760189",
+      "hash": "907410a3a31eeef68b56cc0fe25cf1705c374e4a9b79543c0fc9f5c2bea31274",
+      "description": "Validates environment configuration and centralized config usage",
+      "tags": {
+        "primary": "compliance",
+        "secondary": [
+          "environment",
+          "configuration",
+          "deployment"
+        ],
+        "nodes": [
+          "musa",
+          "griot"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "cultural": [
+          "hieros"
+        ],
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Package Priority Check",
+      "path": "recipes/compliance/package_priority_check.yaml",
+      "type": "recipes",
+      "category": "compliance",
+      "size": 2,
+      "lastModified": "2025-06-28T06:11:11.623335",
+      "hash": "94be3beed546ead415b23c2e86b96cdee7ff51b31797f5e3a9e73f22c3f4ea1a",
+      "description": "Ensures agents use existing packages first and avoid code duplication",
+      "tags": {
+        "primary": "compliance",
+        "secondary": [
+          "packages",
+          "dependencies",
+          "architecture"
+        ],
+        "nodes": [
+          "musa",
+          "griot"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "cultural": [
+          "hieros"
+        ],
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Code Style Check",
+      "path": "recipes/compliance/code_style_check.yaml",
+      "type": "recipes",
+      "category": "compliance",
+      "size": 6,
+      "lastModified": "2025-06-28T06:11:27.426806",
+      "hash": "fe443bf0c4ae9e2a18ed911fb12c774867743c4edd6b6e4f83d21515f1a70518",
+      "description": "Ensures consistent code style, formatting, and TypeScript best practices",
+      "tags": {
+        "primary": "compliance",
+        "secondary": [
+          "code-style",
+          "typescript",
+          "formatting",
+          "documentation"
+        ],
+        "nodes": [
+          "musa",
+          "griot",
+          "tohunga",
+          "ronin",
+          "oracle",
+          "skald",
+          "amauta",
+          "mzee"
+        ],
+        "priority": "medium",
+        "complexity": "moderate",
+        "cultural": [
+          "hieros"
+        ],
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Klf Compatibility Check",
+      "path": "recipes/compliance/klf_compatibility_check.yaml",
+      "type": "recipes",
+      "category": "compliance",
+      "size": 4,
+      "lastModified": "2025-06-28T06:11:47.788896",
+      "hash": "8240e748c38141f00b4c9695455e9a3189aaf3e28f857ad7defa2e54ceeed38d",
+      "description": "Ensures code follows Kind Link Framework patterns and conventions",
+      "tags": {
+        "primary": "compliance",
+        "secondary": [
+          "klf",
+          "protocol",
+          "naming",
+          "architecture"
+        ],
+        "nodes": [
+          "musa",
+          "griot",
+          "tohunga",
+          "ronin",
+          "oracle",
+          "skald",
+          "amauta",
+          "mzee"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "cultural": [
+          "hieros"
+        ],
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Testing Requirements Check",
+      "path": "recipes/testing/testing_requirements_check.yaml",
+      "type": "recipes",
+      "category": "compliance",
+      "size": 6,
+      "lastModified": "2025-06-28T06:11:45.340541",
+      "hash": "111f3282459e8bcda4152be2ab448ea5068e81f24aee772cf90784ab7720cb06",
+      "description": "Ensures proper test coverage and testing best practices",
+      "tags": {
+        "primary": "testing",
+        "secondary": [
+          "compliance",
+          "coverage",
+          "unit",
+          "integration",
+          "e2e"
+        ],
+        "nodes": [
+          "musa",
+          "griot",
+          "tohunga",
+          "ronin",
+          "oracle",
+          "skald",
+          "amauta",
+          "mzee"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "cultural": [
+          "hieros"
+        ],
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

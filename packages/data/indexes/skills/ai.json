@@ -1,0 +1,338 @@
+{
+  "category": "ai",
+  "asset_type": "skills",
+  "total_files": 13,
+  "last_updated": "2025-06-28T07:58:39.339951",
+  "files": [
+    {
+      "name": "Token Optimization",
+      "path": "skills/ai/token_optimization.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 10,
+      "lastModified": "2025-06-28T06:46:05.517729",
+      "hash": "2c8e732e218742e66c184945b9a46692bb73abacc34f37b01d2a935e851dbcb4",
+      "description": "Optimize prompts and responses for minimal token usage while maintaining accuracy",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "token",
+          "optimization",
+          "efficiency",
+          "cost"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Llm Integration",
+      "path": "skills/ai/llm_integration.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 11,
+      "lastModified": "2025-06-28T06:33:51.765281",
+      "hash": "1cac1ba58a470d8955778a78723ff766df87caedfb563e3ce09023a99d802f1e",
+      "description": "Integration with OpenAI, Anthropic, and local language models for text generation and analysis",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "llm",
+          "openai",
+          "anthropic",
+          "text-generation",
+          "completion"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Vector Operations",
+      "path": "skills/ai/vector_operations.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 8,
+      "lastModified": "2025-06-28T06:25:54.491543",
+      "hash": "97415a796993f6ef9be56d0a16c76ee5a034dc665558871cf577f2c6dba70877",
+      "description": "Vector embedding, similarity search, and semantic operations for AI/ML workflows",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "vector",
+          "embedding",
+          "similarity",
+          "semantic",
+          "ml",
+          "weaviate"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Prompt Analysis",
+      "path": "skills/ai/prompt_analysis.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 10,
+      "lastModified": "2025-06-28T06:39:12.457266",
+      "hash": "d78042d4c188a03bf1680474a2a11762bc2695c0aa0a1b27714d84495a509144",
+      "description": "Analyze prompts for clarity, effectiveness, and potential issues",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "prompt",
+          "analysis",
+          "evaluation",
+          "quality"
+        ],
+        "priority": "medium",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Template Rendering",
+      "path": "skills/ai/template_rendering.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 1,
+      "lastModified": "2025-06-28T06:37:49.525311",
+      "hash": "36a9e7f1c95b82ffb99743e0c5c4ce95d83c9a430aac59f84ef3cbfab6145068"
+    },
+    {
+      "name": "Prompt Engineering",
+      "path": "skills/ai/prompt_engineering.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 11,
+      "lastModified": "2025-06-28T06:32:37.256163",
+      "hash": "5683fbbfc95d2dc0cabbaa6285398392975c293ab0ebf6228c33ae924f6eb692"
+    },
+    {
+      "name": "Token Calculator",
+      "path": "skills/ai/token_calculator.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 10,
+      "lastModified": "2025-06-28T07:02:19.290520",
+      "hash": "133ef45a2eb4936671352b5876e0efc7196540b4d78850d4f1f07e179db2d141",
+      "description": "Generic token calculation and cost estimation with external configuration",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "token",
+          "calculator",
+          "pricing",
+          "cost"
+        ],
+        "priority": "high",
+        "complexity": "low",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Prompt Optimization",
+      "path": "skills/ai/prompt_optimization.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 6,
+      "lastModified": "2025-06-28T06:38:36.708153",
+      "hash": "a982de6d933411b49c94ad69806359d133be5299327df5d5d81d2991c6d53503",
+      "description": "Optimize prompts for better LLM performance and accuracy",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "prompt",
+          "optimization",
+          "llm",
+          "performance"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Token Calculator Rag",
+      "path": "skills/ai/token_calculator_rag.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 12,
+      "lastModified": "2025-06-28T07:30:09.639958",
+      "hash": "ff8035a9710445752af9dcb68041f802a5f917f13b2442b0ce14c77abf629733",
+      "description": "Semantic token calculation and cost estimation using RAG-based pricing system",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "token",
+          "calculator",
+          "pricing",
+          "cost",
+          "rag",
+          "semantic"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [
+          "pricing_rag_service"
+        ],
+        "version": "2.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Rag Operations",
+      "path": "skills/ai/rag_operations.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 12,
+      "lastModified": "2025-06-28T06:33:23.077788",
+      "hash": "d4174c45877c746e5e12df03041da904548db6ec0566ef9ee41cffe6f61ca2e3",
+      "description": "Retrieval-augmented generation operations including document retrieval, context building, and enhanced generation",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "rag",
+          "retrieval",
+          "augmentation",
+          "generation",
+          "context"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Text Processing",
+      "path": "skills/ai/text_processing.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 12,
+      "lastModified": "2025-06-28T06:36:20.486183",
+      "hash": "1785d0814c03fce062a275b0a718dd7687599737b095b512d86e455229483789",
+      "description": "Text processing operations including tokenization, summarization, extraction, and text analysis",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "text",
+          "tokenization",
+          "summarization",
+          "extraction",
+          "analysis"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Budget Manager",
+      "path": "skills/ai/budget_manager.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 13,
+      "lastModified": "2025-06-28T06:58:01.981582",
+      "hash": "5fcffb4e8a97f6fd3215be3478a565e828f884915c4787fa946f7f167fcb128f",
+      "description": "Track spending, enforce budget limits, and provide budget analytics",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "budget",
+          "tracking",
+          "analytics",
+          "spending",
+          "limits"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [
+          "token_price_estimator"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Token Price Estimator",
+      "path": "skills/ai/token_price_estimator.yaml",
+      "type": "skills",
+      "category": "ai",
+      "size": 16,
+      "lastModified": "2025-06-28T06:58:43.317614",
+      "hash": "6de1e8400e6b337d4be3ec0426996ef48c6ab2a89d05c713cd8c876b87fefedd",
+      "description": "Estimate token usage and costs for different media types and provide budget planning",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "token",
+          "estimator",
+          "budget",
+          "media",
+          "pricing"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [
+          "token_calculator"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

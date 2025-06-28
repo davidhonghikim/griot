@@ -1,0 +1,18 @@
+{
+  "category": "generic_price_aggregator.py",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.546300",
+  "files": [
+    {
+      "name": "Generic Price Aggregator",
+      "path": "scripts/generic_price_aggregator.py",
+      "type": "scripts",
+      "category": "generic_price_aggregator.py",
+      "size": 15,
+      "lastModified": "2025-06-28T07:07:20.100641",
+      "hash": "406a9010b12babed96eb2816c85b591ce78f7b8a98f4fe16906616674479c88e",
+      "description": "!/usr/bin/env python3  "
+    }
+  ]
+}

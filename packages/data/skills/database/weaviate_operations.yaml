@@ -1,0 +1,445 @@
+name: "Weaviate Operations"
+description: "Weaviate vector database operations including schema management, vector storage, and similarity search"
+category: "database"
+tags:
+  primary: "database"
+  secondary: ["weaviate", "vector", "similarity", "schema"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface WeaviateConfig {
+    url: string;
+    apiKey?: string;
+    headers?: Record<string, string>;
+    timeout?: number;
+  }
+  
+  export interface WeaviateObject {
+    id?: string;
+    class: string;
+    properties: Record<string, any>;
+    vector?: number[];
+    metadata?: Record<string, any>;
+  }
+  
+  export interface WeaviateSchema {
+    class: string;
+    description?: string;
+    properties: Array<{
+      name: string;
+      dataType: string[];
+      description?: string;
+      indexInverted?: boolean;
+      tokenization?: string;
+    }>;
+    vectorizer?: string;
+    vectorIndexConfig?: Record<string, any>;
+  }
+  
+  export interface SearchOptions {
+    limit?: number;
+    offset?: number;
+    additional?: string[];
+    distance?: number;
+  }
+  
+  export class WeaviateOperations {
+    private config: WeaviateConfig;
+    private httpClient: any; // HTTPClientOperations instance
+    
+    constructor(config: WeaviateConfig, httpClient: any) {
+      this.config = {
+        timeout: 30000,
+        ...config,
+      };
+      this.httpClient = httpClient;
+    }
+    
+    // Schema management
+    async createSchema(schema: WeaviateSchema): Promise<void> {
+      const url = `${this.config.url}/v1/schema`;
+      const response = await this.httpClient.post(url, schema, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to create schema: ${response.error}`);
+      }
+    }
+    
+    async getSchema(): Promise<WeaviateSchema[]> {
+      const url = `${this.config.url}/v1/schema`;
+      const response = await this.httpClient.get(url, {
+        headers: {
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to get schema: ${response.error}`);
+      }
+      
+      return response.data.classes || [];
+    }
+    
+    async deleteSchema(className: string): Promise<void> {
+      const url = `${this.config.url}/v1/schema/${className}`;
+      const response = await this.httpClient.delete(url, {
+        headers: {
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to delete schema: ${response.error}`);
+      }
+    }
+    
+    // Object operations
+    async createObject(object: WeaviateObject): Promise<{id: string}> {
+      const url = `${this.config.url}/v1/objects`;
+      const payload = {
+        class: object.class,
+        properties: object.properties,
+        ...(object.vector && { vector: object.vector }),
+      };
+      
+      const response = await this.httpClient.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to create object: ${response.error}`);
+      }
+      
+      return { id: response.data.id };
+    }
+    
+    async getObject(id: string, className: string): Promise<WeaviateObject> {
+      const url = `${this.config.url}/v1/objects/${className}/${id}`;
+      const response = await this.httpClient.get(url, {
+        headers: {
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to get object: ${response.error}`);
+      }
+      
+      return response.data;
+    }
+    
+    async updateObject(id: string, object: Partial<WeaviateObject>): Promise<void> {
+      const url = `${this.config.url}/v1/objects/${object.class}/${id}`;
+      const payload = {
+        ...(object.properties && { properties: object.properties }),
+        ...(object.vector && { vector: object.vector }),
+      };
+      
+      const response = await this.httpClient.patch(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to update object: ${response.error}`);
+      }
+    }
+    
+    async deleteObject(id: string, className: string): Promise<void> {
+      const url = `${this.config.url}/v1/objects/${className}/${id}`;
+      const response = await this.httpClient.delete(url, {
+        headers: {
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to delete object: ${response.error}`);
+      }
+    }
+    
+    // Vector similarity search
+    async vectorSearch(
+      className: string,
+      vector: number[],
+      options: SearchOptions = {}
+    ): Promise<Array<{id: string, score: number, properties: Record<string, any>}>> {
+      const url = `${this.config.url}/v1/graphql`;
+      const query = `
+        {
+          Get {
+            ${className}(
+              nearVector: {
+                vector: [${vector.join(',')}]
+              }
+              limit: ${options.limit || 10}
+              ${options.offset ? `offset: ${options.offset}` : ''}
+              ${options.additional ? `additional: [${options.additional.join(',')}]` : ''}
+            ) {
+              _additional {
+                id
+                distance
+                ${options.additional ? options.additional.join('\n') : ''}
+              }
+              ${Object.keys(options.properties || {}).join('\n')}
+            }
+          }
+        }
+      `;
+      
+      const response = await this.httpClient.post(url, { query }, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to perform vector search: ${response.error}`);
+      }
+      
+      return response.data.data.Get[className].map((item: any) => ({
+        id: item._additional.id,
+        score: 1 - item._additional.distance, // Convert distance to similarity score
+        properties: item,
+      }));
+    }
+    
+    // Text similarity search
+    async textSearch(
+      className: string,
+      text: string,
+      options: SearchOptions = {}
+    ): Promise<Array<{id: string, score: number, properties: Record<string, any>}>> {
+      const url = `${this.config.url}/v1/graphql`;
+      const query = `
+        {
+          Get {
+            ${className}(
+              nearText: {
+                concepts: ["${text}"]
+              }
+              limit: ${options.limit || 10}
+              ${options.offset ? `offset: ${options.offset}` : ''}
+              ${options.additional ? `additional: [${options.additional.join(',')}]` : ''}
+            ) {
+              _additional {
+                id
+                distance
+                ${options.additional ? options.additional.join('\n') : ''}
+              }
+              ${Object.keys(options.properties || {}).join('\n')}
+            }
+          }
+        }
+      `;
+      
+      const response = await this.httpClient.post(url, { query }, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to perform text search: ${response.error}`);
+      }
+      
+      return response.data.data.Get[className].map((item: any) => ({
+        id: item._additional.id,
+        score: 1 - item._additional.distance,
+        properties: item,
+      }));
+    }
+    
+    // Hybrid search (combine vector and text)
+    async hybridSearch(
+      className: string,
+      vector: number[],
+      text: string,
+      alpha: number = 0.5,
+      options: SearchOptions = {}
+    ): Promise<Array<{id: string, score: number, properties: Record<string, any>}>> {
+      const url = `${this.config.url}/v1/graphql`;
+      const query = `
+        {
+          Get {
+            ${className}(
+              nearVector: {
+                vector: [${vector.join(',')}]
+              }
+              nearText: {
+                concepts: ["${text}"]
+              }
+              alpha: ${alpha}
+              limit: ${options.limit || 10}
+              ${options.offset ? `offset: ${options.offset}` : ''}
+              ${options.additional ? `additional: [${options.additional.join(',')}]` : ''}
+            ) {
+              _additional {
+                id
+                distance
+                ${options.additional ? options.additional.join('\n') : ''}
+              }
+              ${Object.keys(options.properties || {}).join('\n')}
+            }
+          }
+        }
+      `;
+      
+      const response = await this.httpClient.post(url, { query }, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to perform hybrid search: ${response.error}`);
+      }
+      
+      return response.data.data.Get[className].map((item: any) => ({
+        id: item._additional.id,
+        score: 1 - item._additional.distance,
+        properties: item,
+      }));
+    }
+    
+    // Batch operations
+    async batchCreateObjects(objects: WeaviateObject[]): Promise<Array<{id: string}>> {
+      const url = `${this.config.url}/v1/batch/objects`;
+      const payload = objects.map(obj => ({
+        class: obj.class,
+        properties: obj.properties,
+        ...(obj.vector && { vector: obj.vector }),
+      }));
+      
+      const response = await this.httpClient.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to batch create objects: ${response.error}`);
+      }
+      
+      return response.data.map((item: any) => ({ id: item.id }));
+    }
+    
+    async batchDeleteObjects(ids: string[], className: string): Promise<void> {
+      const url = `${this.config.url}/v1/batch/objects`;
+      const payload = {
+        match: {
+          class: className,
+          id: ids,
+        },
+      };
+      
+      const response = await this.httpClient.delete(url, {
+        data: payload,
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to batch delete objects: ${response.error}`);
+      }
+    }
+    
+    // Aggregation queries
+    async aggregate(
+      className: string,
+      fields: string[],
+      groupBy?: string[]
+    ): Promise<any> {
+      const url = `${this.config.url}/v1/graphql`;
+      const groupByClause = groupBy ? `group: [${groupBy.join(',')}]` : '';
+      const query = `
+        {
+          Aggregate {
+            ${className} {
+              ${fields.map(field => `${field} { count }`).join('\n')}
+              ${groupByClause}
+            }
+          }
+        }
+      `;
+      
+      const response = await this.httpClient.post(url, { query }, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers,
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Failed to perform aggregation: ${response.error}`);
+      }
+      
+      return response.data.data.Aggregate[className];
+    }
+    
+    // Utility operations
+    async getObjectCount(className: string): Promise<number> {
+      const result = await this.aggregate(className, ['meta']);
+      return result.meta.count;
+    }
+    
+    async getClassInfo(className: string): Promise<any> {
+      const schemas = await this.getSchema();
+      return schemas.find(schema => schema.class === className);
+    }
+    
+    // Health check
+    async healthCheck(): Promise<{healthy: boolean, version: string}> {
+      const url = `${this.config.url}/v1/.well-known/ready`;
+      const response = await this.httpClient.get(url);
+      
+      if (response.success) {
+        return { healthy: true, version: response.headers['x-weaviate-version'] || 'unknown' };
+      } else {
+        return { healthy: false, version: 'unknown' };
+      }
+    }
+    
+    // Configuration management
+    updateConfig(newConfig: Partial<WeaviateConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    getConfig(): WeaviateConfig {
+      return { ...this.config };
+    }
+  } 

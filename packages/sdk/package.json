@@ -1,13 +1,27 @@
 {
-  "name": "griot-sdk",
+  "name": "@griot/sdk",
   "version": "1.0.0",
   "private": true,
-  "description": "TypeScript client for Griot Seed Protocol",
+  "description": "TypeScript client for Starseed Node API",
   "type": "module",
-  "main": "GriotSeedClient.ts",
-  "types": "GriotSeedClient.ts",
+  "main": "dist/StarseedClient.js",
+  "types": "dist/StarseedClient.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/StarseedClient.js",
+      "types": "./dist/StarseedClient.d.ts"
+    }
+  },
   "scripts": {
-    "build": "echo 'SDK package - no build needed'",
-    "clean": "echo 'SDK package - no clean needed'"
-  }
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "test": "node ../../tests/scripts/sdk-test.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "files": [
+    "dist"
+  ]
 } 

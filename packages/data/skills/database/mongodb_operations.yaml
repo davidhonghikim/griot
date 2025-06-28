@@ -1,0 +1,142 @@
+name: "MongoDB Operations"
+description: "Core MongoDB database operations including connection, CRUD operations, aggregation, and indexing"
+category: "database"
+tags:
+  primary: "database"
+  secondary: ["mongodb", "nosql", "crud", "aggregation", "indexing"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { MongoClient, Db, Collection, ObjectId } from 'mongodb';
+  
+  export interface MongoDBConfig {
+    uri: string;
+    database: string;
+    options?: {
+      maxPoolSize?: number;
+      serverSelectionTimeoutMS?: number;
+      socketTimeoutMS?: number;
+    };
+  }
+  
+  export interface QueryOptions {
+    limit?: number;
+    skip?: number;
+    sort?: Record<string, 1 | -1>;
+    projection?: Record<string, 0 | 1>;
+  }
+  
+  export class MongoDBOperations {
+    private client: MongoClient;
+    private db: Db;
+    
+    constructor(config: MongoDBConfig) {
+      this.client = new MongoClient(config.uri, config.options);
+      this.db = this.client.db(config.database);
+    }
+    
+    async connect(): Promise<void> {
+      await this.client.connect();
+    }
+    
+    async disconnect(): Promise<void> {
+      await this.client.close();
+    }
+    
+    // Collection operations
+    getCollection<T>(name: string): Collection<T> {
+      return this.db.collection<T>(name);
+    }
+    
+    // CRUD Operations
+    async create<T>(collection: string, document: T): Promise<ObjectId> {
+      const result = await this.db.collection(collection).insertOne(document);
+      return result.insertedId;
+    }
+    
+    async createMany<T>(collection: string, documents: T[]): Promise<ObjectId[]> {
+      const result = await this.db.collection(collection).insertMany(documents);
+      return Object.values(result.insertedIds);
+    }
+    
+    async read<T>(collection: string, filter: any, options?: QueryOptions): Promise<T[]> {
+      let query = this.db.collection(collection).find(filter);
+      
+      if (options?.sort) query = query.sort(options.sort);
+      if (options?.skip) query = query.skip(options.skip);
+      if (options?.limit) query = query.limit(options.limit);
+      if (options?.projection) query = query.project(options.projection);
+      
+      return await query.toArray();
+    }
+    
+    async readOne<T>(collection: string, filter: any, options?: QueryOptions): Promise<T | null> {
+      let query = this.db.collection(collection).findOne(filter);
+      
+      if (options?.projection) query = query.project(options.projection);
+      
+      return await query;
+    }
+    
+    async update(collection: string, filter: any, update: any, upsert = false): Promise<number> {
+      const result = await this.db.collection(collection).updateOne(filter, update, { upsert });
+      return result.modifiedCount;
+    }
+    
+    async updateMany(collection: string, filter: any, update: any, upsert = false): Promise<number> {
+      const result = await this.db.collection(collection).updateMany(filter, update, { upsert });
+      return result.modifiedCount;
+    }
+    
+    async delete(collection: string, filter: any): Promise<number> {
+      const result = await this.db.collection(collection).deleteOne(filter);
+      return result.deletedCount;
+    }
+    
+    async deleteMany(collection: string, filter: any): Promise<number> {
+      const result = await this.db.collection(collection).deleteMany(filter);
+      return result.deletedCount;
+    }
+    
+    // Aggregation operations
+    async aggregate<T>(collection: string, pipeline: any[]): Promise<T[]> {
+      return await this.db.collection(collection).aggregate(pipeline).toArray();
+    }
+    
+    // Indexing operations
+    async createIndex(collection: string, indexSpec: any, options?: any): Promise<string> {
+      return await this.db.collection(collection).createIndex(indexSpec, options);
+    }
+    
+    async listIndexes(collection: string): Promise<any[]> {
+      return await this.db.collection(collection).listIndexes().toArray();
+    }
+    
+    async dropIndex(collection: string, indexName: string): Promise<void> {
+      await this.db.collection(collection).dropIndex(indexName);
+    }
+    
+    // Utility operations
+    async count(collection: string, filter?: any): Promise<number> {
+      return await this.db.collection(collection).countDocuments(filter || {});
+    }
+    
+    async distinct(collection: string, field: string, filter?: any): Promise<any[]> {
+      return await this.db.collection(collection).distinct(field, filter);
+    }
+    
+    // Transaction support
+    async withTransaction<T>(callback: (session: any) => Promise<T>): Promise<T> {
+      const session = this.client.startSession();
+      try {
+        return await session.withTransaction(callback);
+      } finally {
+        await session.endSession();
+      }
+    }
+  } 

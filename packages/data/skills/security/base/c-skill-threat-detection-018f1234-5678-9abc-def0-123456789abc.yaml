@@ -1,0 +1,591 @@
+name: "Threat Detection Base"
+description: "Advanced threat detection and security monitoring capabilities for system protection"
+category: "security"
+tags:
+  primary: "security"
+  secondary: ["threats", "detection", "monitoring", "analysis", "protection"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface SecurityEvent {
+    id: string;
+    timestamp: Date;
+    type: 'authentication' | 'authorization' | 'data_access' | 'network' | 'system' | 'application';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    source: string;
+    target: string;
+    action: string;
+    details: Record<string, any>;
+    metadata: Record<string, any>;
+  }
+  
+  export interface ThreatPattern {
+    id: string;
+    name: string;
+    description: string;
+    type: 'signature' | 'behavioral' | 'anomaly' | 'heuristic';
+    conditions: ThreatCondition[];
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    enabled: boolean;
+    confidence: number; // 0-1
+  }
+  
+  export interface ThreatCondition {
+    field: string;
+    operator: 'equals' | 'contains' | 'regex' | 'range' | 'exists' | 'not_exists';
+    value: any;
+    logicalOperator?: 'and' | 'or';
+  }
+  
+  export interface ThreatAlert {
+    id: string;
+    timestamp: Date;
+    patternId: string;
+    eventId: string;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    description: string;
+    evidence: string[];
+    confidence: number;
+    status: 'new' | 'investigating' | 'resolved' | 'false_positive';
+    actions: string[];
+  }
+  
+  export interface SecurityMetrics {
+    totalEvents: number;
+    totalAlerts: number;
+    eventsByType: Record<string, number>;
+    alertsBySeverity: Record<string, number>;
+    averageResponseTime: number;
+    falsePositiveRate: number;
+  }
+  
+  export class ThreatDetectionSkill {
+    private events: Map<string, SecurityEvent>;
+    private patterns: Map<string, ThreatPattern>;
+    private alerts: Map<string, ThreatAlert>;
+    private metrics: SecurityMetrics;
+    private baselineData: Map<string, any[]>;
+    
+    constructor() {
+      this.events = new Map();
+      this.patterns = new Map();
+      this.alerts = new Map();
+      this.baselineData = new Map();
+      this.metrics = {
+        totalEvents: 0,
+        totalAlerts: 0,
+        eventsByType: {},
+        alertsBySeverity: {},
+        averageResponseTime: 0,
+        falsePositiveRate: 0
+      };
+      this.initializeDefaultPatterns();
+    }
+    
+    // Initialize default threat patterns
+    private initializeDefaultPatterns(): void {
+      // Brute force attack pattern
+      this.patterns.set('brute_force', {
+        id: 'brute_force',
+        name: 'Brute Force Attack',
+        description: 'Detect multiple failed authentication attempts from the same source',
+        type: 'behavioral',
+        conditions: [
+          {
+            field: 'type',
+            operator: 'equals',
+            value: 'authentication'
+          },
+          {
+            field: 'action',
+            operator: 'equals',
+            value: 'failed_login'
+          }
+        ],
+        severity: 'high',
+        enabled: true,
+        confidence: 0.8
+      });
+      
+      // Unauthorized access pattern
+      this.patterns.set('unauthorized_access', {
+        id: 'unauthorized_access',
+        name: 'Unauthorized Access Attempt',
+        description: 'Detect access attempts to restricted resources',
+        type: 'signature',
+        conditions: [
+          {
+            field: 'type',
+            operator: 'equals',
+            value: 'authorization'
+          },
+          {
+            field: 'action',
+            operator: 'equals',
+            value: 'access_denied'
+          }
+        ],
+        severity: 'medium',
+        enabled: true,
+        confidence: 0.9
+      });
+      
+      // Data exfiltration pattern
+      this.patterns.set('data_exfiltration', {
+        id: 'data_exfiltration',
+        name: 'Data Exfiltration',
+        description: 'Detect unusual data access patterns',
+        type: 'anomaly',
+        conditions: [
+          {
+            field: 'type',
+            operator: 'equals',
+            value: 'data_access'
+          },
+          {
+            field: 'details.volume',
+            operator: 'range',
+            value: [1000, Infinity]
+          }
+        ],
+        severity: 'critical',
+        enabled: true,
+        confidence: 0.7
+      });
+      
+      // Network scanning pattern
+      this.patterns.set('network_scanning', {
+        id: 'network_scanning',
+        name: 'Network Scanning',
+        description: 'Detect port scanning or network reconnaissance',
+        type: 'behavioral',
+        conditions: [
+          {
+            field: 'type',
+            operator: 'equals',
+            value: 'network'
+          },
+          {
+            field: 'action',
+            operator: 'contains',
+            value: 'scan'
+          }
+        ],
+        severity: 'medium',
+        enabled: true,
+        confidence: 0.6
+      });
+      
+      // System compromise pattern
+      this.patterns.set('system_compromise', {
+        id: 'system_compromise',
+        name: 'System Compromise',
+        description: 'Detect signs of system compromise or malware',
+        type: 'heuristic',
+        conditions: [
+          {
+            field: 'type',
+            operator: 'equals',
+            value: 'system'
+          },
+          {
+            field: 'severity',
+            operator: 'equals',
+            value: 'critical'
+          }
+        ],
+        severity: 'critical',
+        enabled: true,
+        confidence: 0.8
+      });
+    }
+    
+    // Process a security event
+    processEvent(event: SecurityEvent): ThreatAlert[] {
+      const startTime = Date.now();
+      this.metrics.totalEvents++;
+      
+      // Store event
+      this.events.set(event.id, event);
+      
+      // Update metrics
+      this.updateEventMetrics(event);
+      
+      // Check for threats
+      const alerts = this.detectThreats(event);
+      
+      // Update baseline data
+      this.updateBaseline(event);
+      
+      // Update response time
+      const responseTime = Date.now() - startTime;
+      this.updateResponseTime(responseTime);
+      
+      return alerts;
+    }
+    
+    // Detect threats based on an event
+    private detectThreats(event: SecurityEvent): ThreatAlert[] {
+      const alerts: ThreatAlert[] = [];
+      
+      for (const pattern of this.patterns.values()) {
+        if (!pattern.enabled) continue;
+        
+        if (this.patternMatchesEvent(pattern, event)) {
+          const alert = this.createAlert(pattern, event);
+          alerts.push(alert);
+          
+          // Store alert
+          this.alerts.set(alert.id, alert);
+          this.metrics.totalAlerts++;
+          this.updateAlertMetrics(alert);
+        }
+      }
+      
+      return alerts;
+    }
+    
+    // Check if a pattern matches an event
+    private patternMatchesEvent(pattern: ThreatPattern, event: SecurityEvent): boolean {
+      for (const condition of pattern.conditions) {
+        if (!this.evaluateCondition(condition, event)) {
+          return false;
+        }
+      }
+      
+      return true;
+    }
+    
+    // Evaluate a single condition
+    private evaluateCondition(condition: ThreatCondition, event: SecurityEvent): boolean {
+      const fieldValue = this.getNestedValue(event, condition.field);
+      
+      switch (condition.operator) {
+        case 'equals':
+          return fieldValue === condition.value;
+        case 'contains':
+          return typeof fieldValue === 'string' && fieldValue.includes(condition.value);
+        case 'regex':
+          if (typeof fieldValue === 'string' && typeof condition.value === 'string') {
+            try {
+              const regex = new RegExp(condition.value);
+              return regex.test(fieldValue);
+            } catch {
+              return false;
+            }
+          }
+          return false;
+        case 'range':
+          if (typeof fieldValue === 'number' && Array.isArray(condition.value)) {
+            const [min, max] = condition.value;
+            return fieldValue >= min && fieldValue <= max;
+          }
+          return false;
+        case 'exists':
+          return fieldValue !== undefined && fieldValue !== null;
+        case 'not_exists':
+          return fieldValue === undefined || fieldValue === null;
+        default:
+          return false;
+      }
+    }
+    
+    // Create an alert from a pattern match
+    private createAlert(pattern: ThreatPattern, event: SecurityEvent): ThreatAlert {
+      const alert: ThreatAlert = {
+        id: this.generateAlertId(),
+        timestamp: new Date(),
+        patternId: pattern.id,
+        eventId: event.id,
+        severity: pattern.severity,
+        description: `${pattern.name} detected: ${pattern.description}`,
+        evidence: this.gatherEvidence(pattern, event),
+        confidence: pattern.confidence,
+        status: 'new',
+        actions: this.suggestActions(pattern, event)
+      };
+      
+      return alert;
+    }
+    
+    // Gather evidence for an alert
+    private gatherEvidence(pattern: ThreatPattern, event: SecurityEvent): string[] {
+      const evidence: string[] = [];
+      
+      evidence.push(`Event type: ${event.type}`);
+      evidence.push(`Event source: ${event.source}`);
+      evidence.push(`Event action: ${event.action}`);
+      evidence.push(`Event severity: ${event.severity}`);
+      
+      // Add pattern-specific evidence
+      for (const condition of pattern.conditions) {
+        const fieldValue = this.getNestedValue(event, condition.field);
+        evidence.push(`${condition.field} ${condition.operator} ${condition.value} (actual: ${fieldValue})`);
+      }
+      
+      return evidence;
+    }
+    
+    // Suggest actions for an alert
+    private suggestActions(pattern: ThreatPattern, event: SecurityEvent): string[] {
+      const actions: string[] = [];
+      
+      switch (pattern.id) {
+        case 'brute_force':
+          actions.push('Block source IP address');
+          actions.push('Enable additional authentication factors');
+          actions.push('Review authentication logs');
+          break;
+        case 'unauthorized_access':
+          actions.push('Review access permissions');
+          actions.push('Investigate source of access attempt');
+          actions.push('Update access control policies');
+          break;
+        case 'data_exfiltration':
+          actions.push('Immediately block data access');
+          actions.push('Investigate data access patterns');
+          actions.push('Review data access logs');
+          break;
+        case 'network_scanning':
+          actions.push('Block scanning IP addresses');
+          actions.push('Review network security policies');
+          actions.push('Enable intrusion detection');
+          break;
+        case 'system_compromise':
+          actions.push('Isolate affected systems');
+          actions.push('Initiate incident response');
+          actions.push('Review system integrity');
+          break;
+        default:
+          actions.push('Investigate the incident');
+          actions.push('Review security logs');
+          actions.push('Update security policies');
+      }
+      
+      return actions;
+    }
+    
+    // Update event metrics
+    private updateEventMetrics(event: SecurityEvent): void {
+      // Update events by type
+      this.metrics.eventsByType[event.type] = (this.metrics.eventsByType[event.type] || 0) + 1;
+    }
+    
+    // Update alert metrics
+    private updateAlertMetrics(alert: ThreatAlert): void {
+      // Update alerts by severity
+      this.metrics.alertsBySeverity[alert.severity] = (this.metrics.alertsBySeverity[alert.severity] || 0) + 1;
+    }
+    
+    // Update response time
+    private updateResponseTime(responseTime: number): void {
+      const totalTime = this.metrics.averageResponseTime * (this.metrics.totalEvents - 1) + responseTime;
+      this.metrics.averageResponseTime = totalTime / this.metrics.totalEvents;
+    }
+    
+    // Update baseline data
+    private updateBaseline(event: SecurityEvent): void {
+      const key = `${event.type}_${event.source}`;
+      
+      if (!this.baselineData.has(key)) {
+        this.baselineData.set(key, []);
+      }
+      
+      const baseline = this.baselineData.get(key)!;
+      baseline.push({
+        timestamp: event.timestamp,
+        severity: event.severity,
+        action: event.action
+      });
+      
+      // Keep only recent data (last 1000 events)
+      if (baseline.length > 1000) {
+        baseline.splice(0, baseline.length - 1000);
+      }
+    }
+    
+    // Get nested value from object
+    private getNestedValue(obj: any, path: string): any {
+      return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+      }, obj);
+    }
+    
+    // Generate unique alert ID
+    private generateAlertId(): string {
+      return `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Add a new threat pattern
+    addPattern(pattern: ThreatPattern): void {
+      this.patterns.set(pattern.id, pattern);
+    }
+    
+    // Remove a threat pattern
+    removePattern(patternId: string): boolean {
+      return this.patterns.delete(patternId);
+    }
+    
+    // Update a threat pattern
+    updatePattern(patternId: string, updates: Partial<ThreatPattern>): boolean {
+      const pattern = this.patterns.get(patternId);
+      if (!pattern) return false;
+      
+      this.patterns.set(patternId, { ...pattern, ...updates });
+      return true;
+    }
+    
+    // Get all patterns
+    getPatterns(): ThreatPattern[] {
+      return Array.from(this.patterns.values());
+    }
+    
+    // Get all alerts
+    getAlerts(): ThreatAlert[] {
+      return Array.from(this.alerts.values());
+    }
+    
+    // Get alerts by status
+    getAlertsByStatus(status: ThreatAlert['status']): ThreatAlert[] {
+      return Array.from(this.alerts.values()).filter(alert => alert.status === status);
+    }
+    
+    // Get alerts by severity
+    getAlertsBySeverity(severity: ThreatAlert['severity']): ThreatAlert[] {
+      return Array.from(this.alerts.values()).filter(alert => alert.severity === severity);
+    }
+    
+    // Update alert status
+    updateAlertStatus(alertId: string, status: ThreatAlert['status']): boolean {
+      const alert = this.alerts.get(alertId);
+      if (!alert) return false;
+      
+      alert.status = status;
+      this.alerts.set(alertId, alert);
+      
+      return true;
+    }
+    
+    // Get security metrics
+    getMetrics(): SecurityMetrics {
+      return { ...this.metrics };
+    }
+    
+    // Get baseline data
+    getBaselineData(type?: string, source?: string): any[] {
+      if (type && source) {
+        const key = `${type}_${source}`;
+        return this.baselineData.get(key) || [];
+      }
+      
+      return Array.from(this.baselineData.values()).flat();
+    }
+    
+    // Analyze baseline for anomalies
+    analyzeBaseline(type: string, source: string): {
+      averageSeverity: number;
+      commonActions: string[];
+      anomalyScore: number;
+    } {
+      const baseline = this.getBaselineData(type, source);
+      
+      if (baseline.length === 0) {
+        return {
+          averageSeverity: 0,
+          commonActions: [],
+          anomalyScore: 0
+        };
+      }
+      
+      // Calculate average severity
+      const severityMap = { low: 1, medium: 2, high: 3, critical: 4 };
+      const severitySum = baseline.reduce((sum, event) => {
+        return sum + (severityMap[event.severity as keyof typeof severityMap] || 0);
+      }, 0);
+      const averageSeverity = severitySum / baseline.length;
+      
+      // Find common actions
+      const actionCounts: Record<string, number> = {};
+      baseline.forEach(event => {
+        actionCounts[event.action] = (actionCounts[event.action] || 0) + 1;
+      });
+      
+      const commonActions = Object.entries(actionCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5)
+        .map(([action]) => action);
+      
+      // Calculate anomaly score (simplified)
+      const recentEvents = baseline.slice(-10);
+      const recentSeverity = recentEvents.reduce((sum, event) => {
+        return sum + (severityMap[event.severity as keyof typeof severityMap] || 0);
+      }, 0) / recentEvents.length;
+      
+      const anomalyScore = Math.abs(recentSeverity - averageSeverity) / 4;
+      
+      return {
+        averageSeverity,
+        commonActions,
+        anomalyScore: Math.min(anomalyScore, 1)
+      };
+    }
+    
+    // Create a security event
+    createEvent(
+      type: SecurityEvent['type'],
+      severity: SecurityEvent['severity'],
+      source: string,
+      target: string,
+      action: string,
+      details: Record<string, any> = {},
+      metadata: Record<string, any> = {}
+    ): SecurityEvent {
+      return {
+        id: this.generateEventId(),
+        timestamp: new Date(),
+        type,
+        severity,
+        source,
+        target,
+        action,
+        details,
+        metadata
+      };
+    }
+    
+    // Generate unique event ID
+    private generateEventId(): string {
+      return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Clear old events and alerts
+    clearOldData(maxAge: number): { eventsCleared: number; alertsCleared: number } {
+      const cutoffTime = new Date(Date.now() - maxAge);
+      
+      // Clear old events
+      let eventsCleared = 0;
+      for (const [id, event] of this.events) {
+        if (event.timestamp < cutoffTime) {
+          this.events.delete(id);
+          eventsCleared++;
+        }
+      }
+      
+      // Clear old alerts
+      let alertsCleared = 0;
+      for (const [id, alert] of this.alerts) {
+        if (alert.timestamp < cutoffTime) {
+          this.alerts.delete(id);
+          alertsCleared++;
+        }
+      }
+      
+      return { eventsCleared, alertsCleared };
+    }
+  } 

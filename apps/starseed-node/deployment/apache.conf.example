@@ -1,0 +1,53 @@
+# =============================================================================
+# Apache Configuration for Starseed Node
+# =============================================================================
+# Copy this to /etc/apache2/sites-available/starseed-node.conf
+# Then enable with: a2ensite starseed-node
+# =============================================================================
+
+<VirtualHost *:80>
+    ServerName your-domain.com
+    ServerAdmin webmaster@your-domain.com
+    
+    # Redirect HTTP to HTTPS
+    Redirect permanent / https://your-domain.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName your-domain.com
+    ServerAdmin webmaster@your-domain.com
+    
+    # SSL Configuration
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/your-domain.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/your-domain.com/privkey.pem
+    
+    # SSL Security Settings
+    SSLProtocol all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+    SSLCipherSuite ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384
+    SSLHonorCipherOrder on
+    SSLCompression off
+    
+    # Security Headers
+    Header always set X-Frame-Options DENY
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    
+    # Proxy to Starseed Node
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:30437/
+    ProxyPassReverse / http://127.0.0.1:30437/
+    
+    # Health check endpoint
+    ProxyPass /health http://127.0.0.1:30437/health
+    ProxyPassReverse /health http://127.0.0.1:30437/health
+    
+    # API endpoints
+    ProxyPass /api/ http://127.0.0.1:30437/api/
+    ProxyPassReverse /api/ http://127.0.0.1:30437/api/
+    
+    # Logs
+    ErrorLog ${APACHE_LOG_DIR}/starseed-node_error.log
+    CustomLog ${APACHE_LOG_DIR}/starseed-node_access.log combined
+</VirtualHost> 

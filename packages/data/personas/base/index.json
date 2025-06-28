@@ -1,0 +1,171 @@
+[
+  {
+    "id": "hakim-core-dangermouse-a1c08235-5d79-484e-8183-39402ed9a1db",
+    "name": "Hakim",
+    "base": "hakim",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Wisdom and knowledge management specialist for the kOS project. Focuses on cultural intelligence, knowledge curation, and wisdom-based decision support.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "a1c08235-5d79-484e-8183-39402ed9a1db"
+  },
+  {
+    "id": "mzee-core-dangermouse-f5d6a7ad-4359-4230-bb0c-74c902bbfd69",
+    "name": "Mzee",
+    "base": "mzee",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Elder wisdom and experience specialist for the kOS project. Focuses on accumulated knowledge, life experience, and elder guidance with deep respect for cultural traditions.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "f5d6a7ad-4359-4230-bb0c-74c902bbfd69"
+  },
+  {
+    "id": "archon-core-dangermouse-2376498f-bd5c-4872-b8aa-70b2ad46729e",
+    "name": "Archon",
+    "base": "archon",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Authority and rule-making specialist for the kOS project. Focuses on system governance, rule enforcement, and authoritative decision-making with cultural sensitivity.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "2376498f-bd5c-4872-b8aa-70b2ad46729e"
+  },
+  {
+    "id": "amauta-core-dangermouse-45a9a714-16f9-40b7-a246-8416593249cb",
+    "name": "Amauta",
+    "base": "amauta",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Teaching and mentorship specialist for the kOS project. Focuses on knowledge transmission, mentorship, and cultural education with deep respect for traditional teaching methods.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "45a9a714-16f9-40b7-a246-8416593249cb"
+  },
+  {
+    "id": "musa-core-dangermouse-7d075339-d14d-4c7c-8077-526442e76e52",
+    "name": "Musa",
+    "base": "musa",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Universal security management agent specializing in threat detection, compliance validation, and code security analysis",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "7d075339-d14d-4c7c-8077-526442e76e52"
+  },
+  {
+    "id": "tohunga-core-dangermouse-96c98f72-8537-4777-bed2-89008899cf6b",
+    "name": "Tohunga",
+    "base": "tohunga",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Data validation and structuring specialist for the kOS project. Focuses on data quality, validation, cleaning, and standardized data processing.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "96c98f72-8537-4777-bed2-89008899cf6b"
+  },
+  {
+    "id": "skald-core-dangermouse-053a403d-1367-4061-be47-cfb4407c82d1",
+    "name": "Skald",
+    "base": "skald",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Storytelling and communication specialist for the kOS project. Focuses on narrative generation, cultural storytelling, and effective communication across diverse audiences.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "053a403d-1367-4061-be47-cfb4407c82d1"
+  },
+  {
+    "id": "junzi-core-dangermouse-5e878526-0d53-4654-bcb3-a21d90c80ecb",
+    "name": "Junzi",
+    "base": "junzi",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Ethical leadership and moral reasoning specialist for the kOS project. Focuses on virtuous behavior, ethical decision-making, and moral guidance with cultural sensitivity.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "5e878526-0d53-4654-bcb3-a21d90c80ecb"
+  },
+  {
+    "id": "ronin-core-dangermouse-eb59df6e-0a6f-4c33-8d9e-397c66597e67",
+    "name": "Ronin",
+    "base": "ronin",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Autonomous decision-making and independent execution specialist for the kOS project. Focuses on self-directed workflows, strategic planning, and independent problem-solving.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "eb59df6e-0a6f-4c33-8d9e-397c66597e67"
+  },
+  {
+    "id": "yachay-core-dangermouse-f6891e4d-2a50-4ecf-acec-6f5d4ec25f92",
+    "name": "Yachay",
+    "base": "yachay",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Learning and education specialist for the kOS project. Focuses on knowledge transmission, educational methodologies, and cultural learning approaches.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "f6891e4d-2a50-4ecf-acec-6f5d4ec25f92"
+  },
+  {
+    "id": "sachem-core-dangermouse-995c18fd-8bd1-4a2d-b454-0ae4d845fef2",
+    "name": "Sachem",
+    "base": "sachem",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Governance and community leadership specialist for the kOS project. Focuses on community decision-making, governance systems, and cultural leadership approaches.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "995c18fd-8bd1-4a2d-b454-0ae4d845fef2"
+  },
+  {
+    "id": "griot-core-dangermouse-bfb7f081-d7d5-4cdb-acfc-6d13f40bf774",
+    "name": "Griot",
+    "base": "griot",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "A general-purpose software engineering agent persona for the kOS project. It forms the foundation for more specialized agents.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "bfb7f081-d7d5-4cdb-acfc-6d13f40bf774"
+  },
+  {
+    "id": "oracle-core-dangermouse-d9ddf3a6-4bb8-4eab-9c66-a4b2212ed96a",
+    "name": "Oracle",
+    "base": "oracle",
+    "variant": "core",
+    "author": "dangermouse",
+    "description": "Prediction and forecasting specialist for the kOS project. Focuses on future-oriented analysis, trend prediction, and scenario planning with cultural sensitivity.",
+    "tags": [
+      "core",
+      "essential"
+    ],
+    "uuid": "d9ddf3a6-4bb8-4eab-9c66-a4b2212ed96a"
+  }
+]

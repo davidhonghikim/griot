@@ -1,0 +1,232 @@
+name: "PostgreSQL Operations"
+description: "PostgreSQL database operations including connection, SQL queries, transactions, and schema management"
+category: "database"
+tags:
+  primary: "database"
+  secondary: ["postgresql", "sql", "transactions", "schema"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { Pool, PoolClient, QueryResult } from 'pg';
+  
+  export interface PostgreSQLConfig {
+    host: string;
+    port: number;
+    database: string;
+    user: string;
+    password: string;
+    ssl?: boolean;
+    maxConnections?: number;
+    idleTimeoutMillis?: number;
+  }
+  
+  export interface QueryOptions {
+    timeout?: number;
+    rowMode?: 'array' | 'object';
+    types?: any;
+  }
+  
+  export interface TransactionOptions {
+    isolationLevel?: 'READ UNCOMMITTED' | 'READ COMMITTED' | 'REPEATABLE READ' | 'SERIALIZABLE';
+    timeout?: number;
+  }
+  
+  export class PostgreSQLOperations {
+    private pool: Pool;
+    
+    constructor(config: PostgreSQLConfig) {
+      this.pool = new Pool({
+        host: config.host,
+        port: config.port,
+        database: config.database,
+        user: config.user,
+        password: config.password,
+        ssl: config.ssl,
+        max: config.maxConnections || 20,
+        idleTimeoutMillis: config.idleTimeoutMillis || 30000,
+      });
+    }
+    
+    // Connection management
+    async connect(): Promise<PoolClient> {
+      return await this.pool.connect();
+    }
+    
+    async end(): Promise<void> {
+      await this.pool.end();
+    }
+    
+    // Basic query execution
+    async query(text: string, params?: any[], options?: QueryOptions): Promise<QueryResult> {
+      const client = await this.connect();
+      try {
+        return await client.query(text, params);
+      } finally {
+        client.release();
+      }
+    }
+    
+    // Transaction support
+    async transaction<T>(callback: (client: PoolClient) => Promise<T>, options?: TransactionOptions): Promise<T> {
+      const client = await this.connect();
+      try {
+        await client.query('BEGIN');
+        
+        if (options?.isolationLevel) {
+          await client.query(`SET TRANSACTION ISOLATION LEVEL ${options.isolationLevel}`);
+        }
+        
+        const result = await callback(client);
+        await client.query('COMMIT');
+        return result;
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
+    }
+    
+    // CRUD operations
+    async insert(table: string, data: Record<string, any>): Promise<QueryResult> {
+      const columns = Object.keys(data);
+      const values = Object.values(data);
+      const placeholders = columns.map((_, index) => `$${index + 1}`).join(', ');
+      
+      const query = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders}) RETURNING *`;
+      return await this.query(query, values);
+    }
+    
+    async select(table: string, where?: Record<string, any>, columns?: string[]): Promise<QueryResult> {
+      const selectColumns = columns ? columns.join(', ') : '*';
+      let query = `SELECT ${selectColumns} FROM ${table}`;
+      const values: any[] = [];
+      
+      if (where && Object.keys(where).length > 0) {
+        const conditions = Object.keys(where).map((key, index) => {
+          values.push(where[key]);
+          return `${key} = $${index + 1}`;
+        });
+        query += ` WHERE ${conditions.join(' AND ')}`;
+      }
+      
+      return await this.query(query, values);
+    }
+    
+    async update(table: string, data: Record<string, any>, where: Record<string, any>): Promise<QueryResult> {
+      const setColumns = Object.keys(data);
+      const whereColumns = Object.keys(where);
+      const values = [...Object.values(data), ...Object.values(where)];
+      
+      const setClause = setColumns.map((col, index) => `${col} = $${index + 1}`).join(', ');
+      const whereClause = whereColumns.map((col, index) => `${col} = $${setColumns.length + index + 1}`).join(' AND ');
+      
+      const query = `UPDATE ${table} SET ${setClause} WHERE ${whereClause} RETURNING *`;
+      return await this.query(query, values);
+    }
+    
+    async delete(table: string, where: Record<string, any>): Promise<QueryResult> {
+      const whereColumns = Object.keys(where);
+      const values = Object.values(where);
+      
+      const whereClause = whereColumns.map((col, index) => `${col} = $${index + 1}`).join(' AND ');
+      const query = `DELETE FROM ${table} WHERE ${whereClause} RETURNING *`;
+      
+      return await this.query(query, values);
+    }
+    
+    // Schema operations
+    async createTable(table: string, columns: Array<{name: string, type: string, constraints?: string}>): Promise<void> {
+      const columnDefs = columns.map(col => {
+        let def = `${col.name} ${col.type}`;
+        if (col.constraints) {
+          def += ` ${col.constraints}`;
+        }
+        return def;
+      }).join(', ');
+      
+      const query = `CREATE TABLE IF NOT EXISTS ${table} (${columnDefs})`;
+      await this.query(query);
+    }
+    
+    async dropTable(table: string): Promise<void> {
+      await this.query(`DROP TABLE IF EXISTS ${table}`);
+    }
+    
+    async addColumn(table: string, column: {name: string, type: string, constraints?: string}): Promise<void> {
+      let def = `${column.name} ${column.type}`;
+      if (column.constraints) {
+        def += ` ${column.constraints}`;
+      }
+      
+      await this.query(`ALTER TABLE ${table} ADD COLUMN ${def}`);
+    }
+    
+    async dropColumn(table: string, column: string): Promise<void> {
+      await this.query(`ALTER TABLE ${table} DROP COLUMN ${column}`);
+    }
+    
+    // Index operations
+    async createIndex(table: string, columns: string[], indexName?: string, unique: boolean = false): Promise<void> {
+      const indexNameFinal = indexName || `${table}_${columns.join('_')}_idx`;
+      const uniqueClause = unique ? 'UNIQUE' : '';
+      const query = `CREATE ${uniqueClause} INDEX ${indexNameFinal} ON ${table} (${columns.join(', ')})`;
+      await this.query(query);
+    }
+    
+    async dropIndex(indexName: string): Promise<void> {
+      await this.query(`DROP INDEX IF EXISTS ${indexName}`);
+    }
+    
+    // Utility operations
+    async tableExists(table: string): Promise<boolean> {
+      const result = await this.query(
+        "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = $1)",
+        [table]
+      );
+      return result.rows[0].exists;
+    }
+    
+    async getTableInfo(table: string): Promise<any[]> {
+      const query = `
+        SELECT column_name, data_type, is_nullable, column_default
+        FROM information_schema.columns
+        WHERE table_name = $1
+        ORDER BY ordinal_position
+      `;
+      const result = await this.query(query, [table]);
+      return result.rows;
+    }
+    
+    async getTableSize(table: string): Promise<number> {
+      const query = `
+        SELECT pg_total_relation_size($1) as size
+      `;
+      const result = await this.query(query, [table]);
+      return parseInt(result.rows[0].size);
+    }
+    
+    // Backup and restore (simplified)
+    async backupTable(table: string, backupTable: string): Promise<void> {
+      await this.query(`CREATE TABLE ${backupTable} AS SELECT * FROM ${table}`);
+    }
+    
+    async restoreTable(table: string, backupTable: string): Promise<void> {
+      await this.query(`DROP TABLE IF EXISTS ${table}`);
+      await this.query(`ALTER TABLE ${backupTable} RENAME TO ${table}`);
+    }
+    
+    // Connection pool management
+    getPoolStats(): {totalCount: number, idleCount: number, waitingCount: number} {
+      return {
+        totalCount: this.pool.totalCount,
+        idleCount: this.pool.idleCount,
+        waitingCount: this.pool.waitingCount,
+      };
+    }
+  } 

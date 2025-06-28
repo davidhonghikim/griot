@@ -1,0 +1,18 @@
+{
+  "category": "setup_pricing_rag.py",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.545761",
+  "files": [
+    {
+      "name": "Setup Pricing Rag",
+      "path": "scripts/setup_pricing_rag.py",
+      "type": "scripts",
+      "category": "setup_pricing_rag.py",
+      "size": 18,
+      "lastModified": "2025-06-28T07:33:16.497394",
+      "hash": "f2a6d23de76366e75c142f2300ac7dd6aa8c4bc5fd17eab45935acc6b1831d23",
+      "description": "!/usr/bin/env python3  "
+    }
+  ]
+}

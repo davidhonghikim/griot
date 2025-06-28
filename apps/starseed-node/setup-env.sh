@@ -27,13 +27,13 @@ echo "🔧 Creating environment configuration..."
 # Create .env file from template
 cp env.example .env
 
-# Replace BASE_IP in the .env file
+# Replace all IP addresses in the .env file
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
-    sed -i '' "s/BASE_IP=192.168.1.180/BASE_IP=$BASE_IP/g" .env
+    sed -i '' "s/192.168.1.180/$BASE_IP/g" .env
 else
     # Linux
-    sed -i "s/BASE_IP=192.168.1.180/BASE_IP=$BASE_IP/g" .env
+    sed -i "s/192.168.1.180/$BASE_IP/g" .env
 fi
 
 echo "✅ Base configuration created: .env"
@@ -43,19 +43,26 @@ echo ""
 read -p "🔧 Create personal override file (.env.local) for customizations? [y/N]: " CREATE_OVERRIDE
 
 if [[ $CREATE_OVERRIDE =~ ^[Yy]$ ]]; then
-    cp env.local.example .env.local
-    
-    # Replace BASE_IP in the override file too
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        sed -i '' "s/BASE_IP=192.168.1.100/BASE_IP=$BASE_IP/g" .env.local
+    if [ -f "env.local.example" ]; then
+        cp env.local.example .env.local
+        
+        # Replace IP addresses in the override file too
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            sed -i '' "s/192.168.1.100/$BASE_IP/g" .env.local
+        else
+            # Linux
+            sed -i "s/192.168.1.100/$BASE_IP/g" .env.local
+        fi
+        
+        echo "✅ Personal override file created: .env.local"
+        echo "   📝 Edit this file for your personal customizations"
     else
-        # Linux
-        sed -i "s/BASE_IP=192.168.1.100/BASE_IP=$BASE_IP/g" .env.local
+        echo "⚠️  env.local.example not found, creating basic .env.local"
+        echo "# Personal overrides for Starseed Node" > .env.local
+        echo "BASE_IP=$BASE_IP" >> .env.local
+        echo "✅ Basic personal override file created: .env.local"
     fi
-    
-    echo "✅ Personal override file created: .env.local"
-    echo "   📝 Edit this file for your personal customizations"
 fi
 
 echo ""

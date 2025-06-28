@@ -1,0 +1,17 @@
+{
+  "category": "update_pricing.sh",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.547322",
+  "files": [
+    {
+      "name": "Update Pricing",
+      "path": "scripts/update_pricing.sh",
+      "type": "scripts",
+      "category": "update_pricing.sh",
+      "size": 8,
+      "lastModified": "2025-06-28T07:03:50.688953",
+      "hash": "6f85b5a2706ac51c74644559bf0e20ebb590f65f3669e774c0597ec9d3f79ff6"
+    }
+  ]
+}

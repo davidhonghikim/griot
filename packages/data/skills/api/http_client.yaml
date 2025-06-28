@@ -1,0 +1,232 @@
+name: "HTTP Client Operations"
+description: "Comprehensive HTTP client operations including GET, POST, PUT, DELETE requests with authentication, headers, and error handling"
+category: "api"
+tags:
+  primary: "api"
+  secondary: ["http", "rest", "authentication", "headers", "error-handling"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+  
+  export interface HTTPClientConfig {
+    baseURL?: string;
+    timeout?: number;
+    headers?: Record<string, string>;
+    auth?: {
+      username: string;
+      password: string;
+    };
+    token?: string;
+  }
+  
+  export interface RequestOptions {
+    headers?: Record<string, string>;
+    params?: Record<string, any>;
+    timeout?: number;
+    retries?: number;
+    retryDelay?: number;
+  }
+  
+  export interface APIResponse<T = any> {
+    data: T;
+    status: number;
+    statusText: string;
+    headers: Record<string, string>;
+    success: boolean;
+    error?: string;
+  }
+  
+  export class HTTPClientOperations {
+    private client: AxiosInstance;
+    private defaultRetries: number;
+    private defaultRetryDelay: number;
+    
+    constructor(config: HTTPClientConfig) {
+      this.client = axios.create({
+        baseURL: config.baseURL,
+        timeout: config.timeout || 30000,
+        headers: {
+          'Content-Type': 'application/json',
+          ...config.headers,
+        },
+      });
+      
+      // Add authentication
+      if (config.auth) {
+        this.client.defaults.auth = config.auth;
+      }
+      
+      if (config.token) {
+        this.client.defaults.headers.common['Authorization'] = `Bearer ${config.token}`;
+      }
+      
+      this.defaultRetries = 3;
+      this.defaultRetryDelay = 1000;
+      
+      // Add response interceptor for error handling
+      this.client.interceptors.response.use(
+        (response) => response,
+        (error) => {
+          console.error('HTTP Request Error:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            message: error.message,
+          });
+          return Promise.reject(error);
+        }
+      );
+    }
+    
+    // Basic HTTP methods
+    async get<T>(url: string, options?: RequestOptions): Promise<APIResponse<T>> {
+      return this.makeRequest<T>('GET', url, undefined, options);
+    }
+    
+    async post<T>(url: string, data?: any, options?: RequestOptions): Promise<APIResponse<T>> {
+      return this.makeRequest<T>('POST', url, data, options);
+    }
+    
+    async put<T>(url: string, data?: any, options?: RequestOptions): Promise<APIResponse<T>> {
+      return this.makeRequest<T>('PUT', url, data, options);
+    }
+    
+    async patch<T>(url: string, data?: any, options?: RequestOptions): Promise<APIResponse<T>> {
+      return this.makeRequest<T>('PATCH', url, data, options);
+    }
+    
+    async delete<T>(url: string, options?: RequestOptions): Promise<APIResponse<T>> {
+      return this.makeRequest<T>('DELETE', url, undefined, options);
+    }
+    
+    // Advanced methods
+    async upload<T>(url: string, file: File | Buffer, options?: RequestOptions): Promise<APIResponse<T>> {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const config: AxiosRequestConfig = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          ...options?.headers,
+        },
+        params: options?.params,
+        timeout: options?.timeout,
+      };
+      
+      try {
+        const response = await this.client.post<T>(url, formData, config);
+        return this.formatResponse(response);
+      } catch (error) {
+        return this.formatError(error);
+      }
+    }
+    
+    async download(url: string, options?: RequestOptions): Promise<Buffer> {
+      const config: AxiosRequestConfig = {
+        responseType: 'arraybuffer',
+        headers: options?.headers,
+        params: options?.params,
+        timeout: options?.timeout,
+      };
+      
+      const response = await this.client.get(url, config);
+      return Buffer.from(response.data);
+    }
+    
+    // Utility methods
+    setAuthToken(token: string): void {
+      this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    
+    setBaseURL(baseURL: string): void {
+      this.client.defaults.baseURL = baseURL;
+    }
+    
+    setDefaultHeaders(headers: Record<string, string>): void {
+      this.client.defaults.headers.common = {
+        ...this.client.defaults.headers.common,
+        ...headers,
+      };
+    }
+    
+    // Private methods
+    private async makeRequest<T>(
+      method: string,
+      url: string,
+      data?: any,
+      options?: RequestOptions
+    ): Promise<APIResponse<T>> {
+      const config: AxiosRequestConfig = {
+        method,
+        url,
+        data,
+        headers: options?.headers,
+        params: options?.params,
+        timeout: options?.timeout,
+      };
+      
+      const retries = options?.retries ?? this.defaultRetries;
+      const retryDelay = options?.retryDelay ?? this.defaultRetryDelay;
+      
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+          const response = await this.client.request<T>(config);
+          return this.formatResponse(response);
+        } catch (error: any) {
+          if (attempt === retries) {
+            return this.formatError(error);
+          }
+          
+          // Retry on network errors or 5xx status codes
+          if (this.shouldRetry(error)) {
+            await this.delay(retryDelay * Math.pow(2, attempt)); // Exponential backoff
+            continue;
+          }
+          
+          return this.formatError(error);
+        }
+      }
+      
+      throw new Error('Max retries exceeded');
+    }
+    
+    private formatResponse<T>(response: AxiosResponse<T>): APIResponse<T> {
+      return {
+        data: response.data,
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers as Record<string, string>,
+        success: response.status >= 200 && response.status < 300,
+      };
+    }
+    
+    private formatError(error: any): APIResponse {
+      return {
+        data: null,
+        status: error.response?.status || 0,
+        statusText: error.response?.statusText || 'Unknown Error',
+        headers: error.response?.headers || {},
+        success: false,
+        error: error.message || 'Request failed',
+      };
+    }
+    
+    private shouldRetry(error: any): boolean {
+      // Retry on network errors
+      if (!error.response) return true;
+      
+      // Retry on 5xx server errors
+      const status = error.response.status;
+      return status >= 500 && status < 600;
+    }
+    
+    private delay(ms: number): Promise<void> {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  } 

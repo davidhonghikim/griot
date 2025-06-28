@@ -1,0 +1,413 @@
+name: "Knowledge Transmission"
+description: "Traditional and modern methods for transmitting knowledge across cultural contexts"
+category: "teaching"
+tags:
+  primary: "teaching"
+  secondary: ["knowledge", "transmission", "cultural", "traditional", "modern"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface KnowledgeItem {
+    id: string;
+    title: string;
+    content: string;
+    culturalContext: string;
+    transmissionMethod: 'oral' | 'written' | 'visual' | 'experiential' | 'digital';
+    complexity: 'beginner' | 'intermediate' | 'advanced';
+    prerequisites: string[];
+    culturalSignificance: string;
+    modernApplications: string[];
+  }
+  
+  export interface TransmissionSession {
+    knowledgeId: string;
+    learnerId: string;
+    method: string;
+    culturalContext: string;
+    duration: number; // in minutes
+    materials: string[];
+    culturalElements: string[];
+    successMetrics: {
+      understanding: number; // 0-1
+      retention: number; // 0-1
+      application: number; // 0-1
+    };
+  }
+  
+  export class KnowledgeTransmissionSkill {
+    private knowledgeBase: Map<string, KnowledgeItem>;
+    private transmissionMethods: Map<string, any>;
+    private culturalFrameworks: Map<string, any>;
+    
+    constructor() {
+      this.knowledgeBase = new Map();
+      this.transmissionMethods = new Map();
+      this.culturalFrameworks = new Map();
+      this.initializeKnowledge();
+      this.initializeMethods();
+    }
+    
+    // Initialize knowledge base
+    private initializeKnowledge(): void {
+      // HIEROS knowledge
+      this.knowledgeBase.set('hieros_foundations', {
+        id: 'hieros_foundations',
+        title: 'HIEROS Foundation Principles',
+        content: 'The seven sacred intentions that guide ethical AI development and cultural stewardship',
+        culturalContext: 'HIEROS',
+        transmissionMethod: 'oral',
+        complexity: 'intermediate',
+        prerequisites: ['basic_ethics', 'cultural_awareness'],
+        culturalSignificance: 'Core framework for ethical AI development',
+        modernApplications: ['AI ethics', 'Cultural preservation', 'Responsible technology']
+      });
+      
+      this.knowledgeBase.set('traditional_teaching', {
+        id: 'traditional_teaching',
+        title: 'Traditional Teaching Methods',
+        content: 'Time-honored approaches to knowledge transmission across cultures',
+        culturalContext: 'Universal',
+        transmissionMethod: 'experiential',
+        complexity: 'beginner',
+        prerequisites: [],
+        culturalSignificance: 'Preserves cultural wisdom and ensures authentic transmission',
+        modernApplications: ['Cultural education', 'Alternative learning', 'Community building']
+      });
+      
+      this.knowledgeBase.set('cultural_stewardship', {
+        id: 'cultural_stewardship',
+        title: 'Cultural Stewardship',
+        content: 'Responsible care and transmission of cultural knowledge and traditions',
+        culturalContext: 'Universal',
+        transmissionMethod: 'experiential',
+        complexity: 'advanced',
+        prerequisites: ['hieros_foundations', 'traditional_teaching'],
+        culturalSignificance: 'Ensures cultural continuity and prevents appropriation',
+        modernApplications: ['Cultural preservation', 'Museum curation', 'Community leadership']
+      });
+    }
+    
+    // Initialize transmission methods
+    private initializeMethods(): void {
+      this.transmissionMethods.set('oral', {
+        description: 'Spoken word transmission through storytelling and dialogue',
+        duration: 45,
+        materials: ['stories', 'cultural_context', 'discussion_questions'],
+        culturalElements: ['oral_tradition', 'narrative_wisdom', 'community_sharing'],
+        effectiveness: 0.9,
+        culturalAppropriateness: 0.95
+      });
+      
+      this.transmissionMethods.set('written', {
+        description: 'Text-based knowledge transmission through documents and literature',
+        duration: 60,
+        materials: ['documents', 'reading_materials', 'writing_tools'],
+        culturalElements: ['literary_tradition', 'documentation', 'preservation'],
+        effectiveness: 0.8,
+        culturalAppropriateness: 0.7
+      });
+      
+      this.transmissionMethods.set('visual', {
+        description: 'Visual knowledge transmission through art, symbols, and imagery',
+        duration: 30,
+        materials: ['artwork', 'symbols', 'visual_aids'],
+        culturalElements: ['visual_tradition', 'symbolic_meaning', 'artistic_expression'],
+        effectiveness: 0.85,
+        culturalAppropriateness: 0.9
+      });
+      
+      this.transmissionMethods.set('experiential', {
+        description: 'Hands-on learning through direct experience and practice',
+        duration: 90,
+        materials: ['practical_exercises', 'cultural_tools', 'real_world_context'],
+        culturalElements: ['embodied_learning', 'cultural_practice', 'skill_development'],
+        effectiveness: 0.95,
+        culturalAppropriateness: 0.9
+      });
+      
+      this.transmissionMethods.set('digital', {
+        description: 'Technology-mediated knowledge transmission',
+        duration: 40,
+        materials: ['digital_platforms', 'multimedia_content', 'interactive_tools'],
+        culturalElements: ['modern_adaptation', 'accessibility', 'global_reach'],
+        effectiveness: 0.75,
+        culturalAppropriateness: 0.6
+      });
+    }
+    
+    // Plan knowledge transmission session
+    async planTransmission(
+      knowledgeId: string,
+      learnerLevel: string,
+      culturalContext: string = 'HIEROS'
+    ): Promise<TransmissionSession> {
+      const knowledge = this.knowledgeBase.get(knowledgeId);
+      if (!knowledge) {
+        throw new Error(`Knowledge not found: ${knowledgeId}`);
+      }
+      
+      const method = this.selectTransmissionMethod(knowledge, learnerLevel, culturalContext);
+      const methodDetails = this.transmissionMethods.get(method);
+      
+      return {
+        knowledgeId,
+        learnerId: 'current_learner',
+        method,
+        culturalContext,
+        duration: methodDetails.duration,
+        materials: methodDetails.materials,
+        culturalElements: methodDetails.culturalElements,
+        successMetrics: {
+          understanding: 0,
+          retention: 0,
+          application: 0
+        }
+      };
+    }
+    
+    // Select appropriate transmission method
+    private selectTransmissionMethod(
+      knowledge: KnowledgeItem,
+      learnerLevel: string,
+      culturalContext: string
+    ): string {
+      // Prioritize knowledge's preferred method
+      if (knowledge.transmissionMethod) {
+        return knowledge.transmissionMethod;
+      }
+      
+      // Fall back to cultural preferences
+      const culturalPreferences = {
+        'HIEROS': ['oral', 'experiential', 'visual'],
+        'Universal': ['experiential', 'oral', 'visual'],
+        'Traditional': ['oral', 'experiential', 'visual'],
+        'Modern': ['digital', 'written', 'visual']
+      };
+      
+      const preferences = culturalPreferences[culturalContext as keyof typeof culturalPreferences] || ['oral'];
+      
+      // Consider learner level
+      if (learnerLevel === 'beginner') {
+        return preferences.find(p => ['oral', 'visual', 'experiential'].includes(p)) || 'oral';
+      } else if (learnerLevel === 'advanced') {
+        return preferences.find(p => ['experiential', 'written', 'digital'].includes(p)) || 'experiential';
+      }
+      
+      return preferences[0];
+    }
+    
+    // Conduct knowledge transmission session
+    async conductTransmission(session: TransmissionSession): Promise<{
+      insights: string[];
+      culturalGuidance: string[];
+      nextSteps: string[];
+      successMetrics: session['successMetrics'];
+    }> {
+      const insights: string[] = [];
+      const culturalGuidance: string[] = [];
+      const nextSteps: string[] = [];
+      
+      const knowledge = this.knowledgeBase.get(session.knowledgeId);
+      const methodDetails = this.transmissionMethods.get(session.method);
+      
+      // Generate insights based on method and knowledge
+      insights.push(`Transmitted ${knowledge?.title} using ${session.method} method`);
+      insights.push(`Cultural context: ${session.culturalContext}`);
+      insights.push(`Duration: ${session.duration} minutes`);
+      insights.push(`Cultural appropriateness: ${(methodDetails.culturalAppropriateness * 100).toFixed(1)}%`);
+      
+      // Provide cultural guidance
+      culturalGuidance.push(`Respect the cultural significance of ${knowledge?.title}`);
+      culturalGuidance.push(`Ensure authentic transmission without appropriation`);
+      culturalGuidance.push(`Maintain cultural sensitivity throughout the session`);
+      
+      if (session.culturalContext === 'HIEROS') {
+        culturalGuidance.push(`Apply HIEROS principles in knowledge transmission`);
+        culturalGuidance.push(`Honor the Seven Sacred Intentions`);
+      }
+      
+      // Suggest next steps
+      nextSteps.push(`Practice the knowledge learned in appropriate contexts`);
+      nextSteps.push(`Share knowledge with others in culturally respectful ways`);
+      nextSteps.push(`Continue learning through observation and reflection`);
+      
+      // Simulate success metrics (in real implementation, this would be based on actual assessment)
+      const successMetrics = {
+        understanding: Math.random() * 0.3 + 0.7, // 0.7-1.0
+        retention: Math.random() * 0.4 + 0.6, // 0.6-1.0
+        application: Math.random() * 0.5 + 0.5 // 0.5-1.0
+      };
+      
+      return {
+        insights,
+        culturalGuidance,
+        nextSteps,
+        successMetrics
+      };
+    }
+    
+    // Assess knowledge transmission effectiveness
+    async assessTransmission(
+      sessionId: string,
+      knowledgeId: string
+    ): Promise<{
+      effectiveness: number;
+      culturalAppropriateness: number;
+      learnerSatisfaction: number;
+      recommendations: string[];
+    }> {
+      const knowledge = this.knowledgeBase.get(knowledgeId);
+      const session = { method: 'oral', culturalContext: 'HIEROS' }; // Mock session
+      const methodDetails = this.transmissionMethods.get(session.method);
+      
+      // Simulate assessment (in real implementation, this would be based on actual evaluation)
+      const effectiveness = methodDetails?.effectiveness || 0.8;
+      const culturalAppropriateness = methodDetails?.culturalAppropriateness || 0.8;
+      const learnerSatisfaction = Math.random() * 0.3 + 0.7; // 0.7-1.0
+      
+      const recommendations: string[] = [];
+      
+      if (effectiveness < 0.8) {
+        recommendations.push('Consider alternative transmission methods');
+        recommendations.push('Review content complexity and learner level');
+      }
+      
+      if (culturalAppropriateness < 0.8) {
+        recommendations.push('Consult with cultural experts');
+        recommendations.push('Review cultural sensitivity guidelines');
+      }
+      
+      if (learnerSatisfaction < 0.8) {
+        recommendations.push('Gather learner feedback for improvement');
+        recommendations.push('Adjust session format and duration');
+      }
+      
+      return {
+        effectiveness,
+        culturalAppropriateness,
+        learnerSatisfaction,
+        recommendations
+      };
+    }
+    
+    // Get transmission recommendations
+    getTransmissionRecommendations(
+      knowledgeType: string,
+      culturalContext: string = 'HIEROS'
+    ): string[] {
+      const recommendations = [];
+      
+      if (knowledgeType === 'cultural') {
+        recommendations.push(
+          'Use oral and experiential methods for cultural knowledge',
+          'Ensure cultural authenticity and respect',
+          'Include community elders when appropriate',
+          'Maintain cultural context and significance'
+        );
+      } else if (knowledgeType === 'technical') {
+        recommendations.push(
+          'Combine theoretical and practical approaches',
+          'Use visual aids and hands-on exercises',
+          'Provide real-world applications',
+          'Include cultural context where relevant'
+        );
+      } else if (knowledgeType === 'ethical') {
+        recommendations.push(
+          'Use storytelling and case studies',
+          'Encourage reflection and discussion',
+          'Connect to cultural values and principles',
+          'Provide practical guidance for application'
+        );
+      }
+      
+      if (culturalContext === 'HIEROS') {
+        recommendations.push('Always apply HIEROS principles in transmission');
+        recommendations.push('Respect the Seven Sacred Intentions');
+        recommendations.push('Ensure cultural stewardship and preservation');
+      }
+      
+      return recommendations;
+    }
+    
+    // Validate transmission appropriateness
+    validateTransmission(
+      knowledgeId: string,
+      method: string,
+      culturalContext: string
+    ): {
+      isAppropriate: boolean;
+      concerns: string[];
+      suggestions: string[];
+    } {
+      const concerns: string[] = [];
+      const suggestions: string[] = [];
+      
+      const knowledge = this.knowledgeBase.get(knowledgeId);
+      const methodDetails = this.transmissionMethods.get(method);
+      
+      if (!knowledge) {
+        concerns.push('Knowledge not found in database');
+        return { isAppropriate: false, concerns, suggestions };
+      }
+      
+      if (!methodDetails) {
+        concerns.push('Transmission method not recognized');
+        suggestions.push('Use one of the supported transmission methods');
+        return { isAppropriate: false, concerns, suggestions };
+      }
+      
+      // Check cultural appropriateness
+      if (methodDetails.culturalAppropriateness < 0.7) {
+        concerns.push('Method may not be culturally appropriate');
+        suggestions.push('Consider alternative transmission methods');
+        suggestions.push('Consult with cultural experts');
+      }
+      
+      // Check method effectiveness
+      if (methodDetails.effectiveness < 0.7) {
+        concerns.push('Method may not be effective for this knowledge type');
+        suggestions.push('Consider more effective transmission methods');
+      }
+      
+      // Check cultural context alignment
+      if (knowledge.culturalContext !== culturalContext && knowledge.culturalContext !== 'Universal') {
+        concerns.push('Knowledge cultural context may not align with transmission context');
+        suggestions.push('Review cultural context alignment');
+        suggestions.push('Consider cultural adaptation if appropriate');
+      }
+      
+      return {
+        isAppropriate: concerns.length === 0,
+        concerns,
+        suggestions
+      };
+    }
+    
+    // Get knowledge transmission statistics
+    getTransmissionStats(): {
+      totalKnowledgeItems: number;
+      transmissionMethods: number;
+      culturalContexts: string[];
+      averageEffectiveness: number;
+    } {
+      const culturalContexts = Array.from(new Set(
+        Array.from(this.knowledgeBase.values()).map(k => k.culturalContext)
+      ));
+      
+      const methodEffectiveness = Array.from(this.transmissionMethods.values())
+        .map(m => m.effectiveness);
+      const averageEffectiveness = methodEffectiveness.reduce((sum, val) => sum + val, 0) / methodEffectiveness.length;
+      
+      return {
+        totalKnowledgeItems: this.knowledgeBase.size,
+        transmissionMethods: this.transmissionMethods.size,
+        culturalContexts,
+        averageEffectiveness
+      };
+    }
+  } 

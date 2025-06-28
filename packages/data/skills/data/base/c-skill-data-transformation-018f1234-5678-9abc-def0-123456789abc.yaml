@@ -1,0 +1,671 @@
+name: "Data Transformation Base"
+description: "Advanced data transformation and reshaping capabilities for complex data operations"
+category: "data"
+tags:
+  primary: "data"
+  secondary: ["transformation", "reshaping", "aggregation", "pivoting", "mapping"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface TransformationRule {
+    id: string;
+    name: string;
+    description: string;
+    ruleType: 'map' | 'filter' | 'aggregate' | 'pivot' | 'join' | 'split' | 'merge';
+    sourceField: string;
+    targetField: string;
+    parameters: Record<string, any>;
+    conditions?: Record<string, any>;
+  }
+  
+  export interface TransformationResult {
+    ruleId: string;
+    sourceField: string;
+    targetField: string;
+    originalValue: any;
+    transformedValue: any;
+    success: boolean;
+    error?: string;
+    metadata: Record<string, any>;
+  }
+  
+  export interface DataTransformationConfig {
+    rules: TransformationRule[];
+    preserveOriginal: boolean;
+    batchSize: number;
+    errorHandling: 'skip' | 'fail' | 'default';
+    defaultValue?: any;
+  }
+  
+  export class DataTransformationSkill {
+    private transformationRules: Map<string, TransformationRule>;
+    private customTransformers: Map<string, Function>;
+    private builtInTransformers: Map<string, Function>;
+    
+    constructor() {
+      this.transformationRules = new Map();
+      this.customTransformers = new Map();
+      this.builtInTransformers = new Map();
+      this.initializeBuiltInTransformers();
+    }
+    
+    // Initialize built-in transformers
+    private initializeBuiltInTransformers(): void {
+      // String transformers
+      this.builtInTransformers.set('capitalize', (value: string) => {
+        return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+      });
+      
+      this.builtInTransformers.set('camelCase', (value: string) => {
+        return value.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+          return index === 0 ? word.toLowerCase() : word.toUpperCase();
+        }).replace(/\s+/g, '');
+      });
+      
+      this.builtInTransformers.set('snakeCase', (value: string) => {
+        return value.replace(/\s+/g, '_').toLowerCase();
+      });
+      
+      this.builtInTransformers.set('kebabCase', (value: string) => {
+        return value.replace(/\s+/g, '-').toLowerCase();
+      });
+      
+      this.builtInTransformers.set('extractNumber', (value: string) => {
+        const match = value.match(/\d+/);
+        return match ? parseInt(match[0], 10) : null;
+      });
+      
+      this.builtInTransformers.set('extractEmail', (value: string) => {
+        const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+        const match = value.match(emailRegex);
+        return match ? match[0] : null;
+      });
+      
+      // Number transformers
+      this.builtInTransformers.set('toPercentage', (value: number, decimals: number = 2) => {
+        return (value * 100).toFixed(decimals) + '%';
+      });
+      
+      this.builtInTransformers.set('toCurrency', (value: number, currency: string = 'USD') => {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: currency
+        }).format(value);
+      });
+      
+      this.builtInTransformers.set('roundToNearest', (value: number, nearest: number = 1) => {
+        return Math.round(value / nearest) * nearest;
+      });
+      
+      this.builtInTransformers.set('normalize', (value: number, min: number, max: number) => {
+        return (value - min) / (max - min);
+      });
+      
+      // Date transformers
+      this.builtInTransformers.set('extractYear', (value: Date) => {
+        return value.getFullYear();
+      });
+      
+      this.builtInTransformers.set('extractMonth', (value: Date) => {
+        return value.getMonth() + 1;
+      });
+      
+      this.builtInTransformers.set('extractDay', (value: Date) => {
+        return value.getDate();
+      });
+      
+      this.builtInTransformers.set('getDayOfWeek', (value: Date) => {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        return days[value.getDay()];
+      });
+      
+      this.builtInTransformers.set('getQuarter', (value: Date) => {
+        return Math.ceil((value.getMonth() + 1) / 3);
+      });
+      
+      // Array transformers
+      this.builtInTransformers.set('flatten', (value: any[]) => {
+        return value.flat(Infinity);
+      });
+      
+      this.builtInTransformers.set('unique', (value: any[]) => {
+        return [...new Set(value)];
+      });
+      
+      this.builtInTransformers.set('sort', (value: any[], direction: 'asc' | 'desc' = 'asc') => {
+        const sorted = [...value].sort();
+        return direction === 'desc' ? sorted.reverse() : sorted;
+      });
+      
+      this.builtInTransformers.set('take', (value: any[], count: number) => {
+        return value.slice(0, count);
+      });
+      
+      this.builtInTransformers.set('skip', (value: any[], count: number) => {
+        return value.slice(count);
+      });
+      
+      // Object transformers
+      this.builtInTransformers.set('pick', (value: Record<string, any>, keys: string[]) => {
+        const result: Record<string, any> = {};
+        keys.forEach(key => {
+          if (value.hasOwnProperty(key)) {
+            result[key] = value[key];
+          }
+        });
+        return result;
+      });
+      
+      this.builtInTransformers.set('omit', (value: Record<string, any>, keys: string[]) => {
+        const result = { ...value };
+        keys.forEach(key => {
+          delete result[key];
+        });
+        return result;
+      });
+      
+      this.builtInTransformers.set('rename', (value: Record<string, any>, mapping: Record<string, string>) => {
+        const result: Record<string, any> = {};
+        Object.keys(value).forEach(key => {
+          const newKey = mapping[key] || key;
+          result[newKey] = value[key];
+        });
+        return result;
+      });
+    }
+    
+    // Add transformation rule
+    addTransformationRule(rule: TransformationRule): void {
+      this.transformationRules.set(rule.id, rule);
+    }
+    
+    // Add custom transformer
+    addCustomTransformer(name: string, transformer: Function): void {
+      this.customTransformers.set(name, transformer);
+    }
+    
+    // Transform single field
+    transformField(
+      field: string,
+      value: any,
+      rules: TransformationRule[]
+    ): TransformationResult[] {
+      const results: TransformationResult[] = [];
+      
+      for (const rule of rules) {
+        if (rule.sourceField === field) {
+          try {
+            const transformedValue = this.applyTransformationRule(rule, value);
+            const metadata = this.extractMetadata(rule, value, transformedValue);
+            
+            results.push({
+              ruleId: rule.id,
+              sourceField: rule.sourceField,
+              targetField: rule.targetField,
+              originalValue: value,
+              transformedValue,
+              success: true,
+              metadata
+            });
+          } catch (error) {
+            results.push({
+              ruleId: rule.id,
+              sourceField: rule.sourceField,
+              targetField: rule.targetField,
+              originalValue: value,
+              transformedValue: null,
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error',
+              metadata: {}
+            });
+          }
+        }
+      }
+      
+      return results;
+    }
+    
+    // Transform entire object
+    transformObject(
+      data: Record<string, any>,
+      config: DataTransformationConfig
+    ): {
+      transformedData: Record<string, any>;
+      results: TransformationResult[];
+      summary: {
+        total: number;
+        successful: number;
+        failed: number;
+        errors: string[];
+      };
+    } {
+      const transformedData = config.preserveOriginal ? { ...data } : data;
+      const results: TransformationResult[] = [];
+      const errors: string[] = [];
+      
+      // Apply all rules to the data
+      for (const rule of config.rules) {
+        try {
+          const value = this.getNestedValue(transformedData, rule.sourceField);
+          const transformedValue = this.applyTransformationRule(rule, value);
+          const metadata = this.extractMetadata(rule, value, transformedValue);
+          
+          // Set the transformed value
+          this.setNestedValue(transformedData, rule.targetField, transformedValue);
+          
+          results.push({
+            ruleId: rule.id,
+            sourceField: rule.sourceField,
+            targetField: rule.targetField,
+            originalValue: value,
+            transformedValue,
+            success: true,
+            metadata
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          errors.push(`Rule ${rule.id}: ${errorMessage}`);
+          
+          if (config.errorHandling === 'fail') {
+            throw new Error(`Transformation failed: ${errorMessage}`);
+          } else if (config.errorHandling === 'default' && config.defaultValue !== undefined) {
+            this.setNestedValue(transformedData, rule.targetField, config.defaultValue);
+          }
+          
+          results.push({
+            ruleId: rule.id,
+            sourceField: rule.sourceField,
+            targetField: rule.targetField,
+            originalValue: this.getNestedValue(transformedData, rule.sourceField),
+            transformedValue: null,
+            success: false,
+            error: errorMessage,
+            metadata: {}
+          });
+        }
+      }
+      
+      // Calculate summary
+      const summary = {
+        total: results.length,
+        successful: results.filter(r => r.success).length,
+        failed: results.filter(r => !r.success).length,
+        errors
+      };
+      
+      return {
+        transformedData,
+        results,
+        summary
+      };
+    }
+    
+    // Transform array of objects
+    transformArray(
+      dataArray: Record<string, any>[],
+      config: DataTransformationConfig
+    ): {
+      transformedArray: Record<string, any>[];
+      results: TransformationResult[];
+      summary: {
+        total: number;
+        successful: number;
+        failed: number;
+        errors: string[];
+      };
+    } {
+      const transformedArray: Record<string, any>[] = [];
+      const allResults: TransformationResult[] = [];
+      const allErrors: string[] = [];
+      
+      for (let i = 0; i < dataArray.length; i += config.batchSize) {
+        const batch = dataArray.slice(i, i + config.batchSize);
+        
+        for (const item of batch) {
+          try {
+            const { transformedData, results, summary } = this.transformObject(item, config);
+            transformedArray.push(transformedData);
+            allResults.push(...results);
+            allErrors.push(...summary.errors);
+          } catch (error) {
+            if (config.errorHandling === 'fail') {
+              throw error;
+            }
+            // Skip this item if error handling is 'skip'
+            allErrors.push(`Item ${i}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        }
+      }
+      
+      const summary = {
+        total: allResults.length,
+        successful: allResults.filter(r => r.success).length,
+        failed: allResults.filter(r => !r.success).length,
+        errors: allErrors
+      };
+      
+      return {
+        transformedArray,
+        results: allResults,
+        summary
+      };
+    }
+    
+    // Apply a single transformation rule
+    private applyTransformationRule(rule: TransformationRule, value: any): any {
+      // Check conditions first
+      if (rule.conditions && !this.evaluateConditions(rule.conditions, value)) {
+        return value; // Return original value if conditions not met
+      }
+      
+      switch (rule.ruleType) {
+        case 'map':
+          return this.applyMapRule(rule, value);
+        case 'filter':
+          return this.applyFilterRule(rule, value);
+        case 'aggregate':
+          return this.applyAggregateRule(rule, value);
+        case 'pivot':
+          return this.applyPivotRule(rule, value);
+        case 'join':
+          return this.applyJoinRule(rule, value);
+        case 'split':
+          return this.applySplitRule(rule, value);
+        case 'merge':
+          return this.applyMergeRule(rule, value);
+        default:
+          return value;
+      }
+    }
+    
+    // Apply map rule
+    private applyMapRule(rule: TransformationRule, value: any): any {
+      const { operation, ...params } = rule.parameters;
+      const transformer = this.builtInTransformers.get(operation) || this.customTransformers.get(operation);
+      
+      if (transformer) {
+        return transformer(value, params);
+      }
+      
+      return value;
+    }
+    
+    // Apply filter rule
+    private applyFilterRule(rule: TransformationRule, value: any): any {
+      const { condition, ...params } = rule.parameters;
+      
+      if (Array.isArray(value)) {
+        return value.filter(item => this.evaluateCondition(condition, item, params));
+      }
+      
+      return this.evaluateCondition(condition, value, params) ? value : null;
+    }
+    
+    // Apply aggregate rule
+    private applyAggregateRule(rule: TransformationRule, value: any): any {
+      const { operation, field } = rule.parameters;
+      
+      if (!Array.isArray(value)) {
+        return value;
+      }
+      
+      switch (operation) {
+        case 'sum':
+          return value.reduce((sum, item) => sum + (this.getNestedValue(item, field) || 0), 0);
+        case 'average':
+          const sum = value.reduce((acc, item) => acc + (this.getNestedValue(item, field) || 0), 0);
+          return value.length > 0 ? sum / value.length : 0;
+        case 'count':
+          return value.length;
+        case 'min':
+          return Math.min(...value.map(item => this.getNestedValue(item, field)).filter(v => v !== null && v !== undefined));
+        case 'max':
+          return Math.max(...value.map(item => this.getNestedValue(item, field)).filter(v => v !== null && v !== undefined));
+        default:
+          return value;
+      }
+    }
+    
+    // Apply pivot rule
+    private applyPivotRule(rule: TransformationRule, value: any): any {
+      const { index, columns, values, aggfunc = 'first' } = rule.parameters;
+      
+      if (!Array.isArray(value)) {
+        return value;
+      }
+      
+      const pivotTable: Record<string, any> = {};
+      
+      for (const item of value) {
+        const indexValue = this.getNestedValue(item, index);
+        const columnValue = this.getNestedValue(item, columns);
+        const valueToAggregate = this.getNestedValue(item, values);
+        
+        if (!pivotTable[indexValue]) {
+          pivotTable[indexValue] = {};
+        }
+        
+        if (aggfunc === 'first' || !pivotTable[indexValue][columnValue]) {
+          pivotTable[indexValue][columnValue] = valueToAggregate;
+        } else if (aggfunc === 'sum') {
+          pivotTable[indexValue][columnValue] = (pivotTable[indexValue][columnValue] || 0) + valueToAggregate;
+        }
+      }
+      
+      return pivotTable;
+    }
+    
+    // Apply join rule
+    private applyJoinRule(rule: TransformationRule, value: any): any {
+      const { separator = ' ', fields } = rule.parameters;
+      
+      if (Array.isArray(fields)) {
+        return fields.map(field => this.getNestedValue(value, field)).join(separator);
+      }
+      
+      return value;
+    }
+    
+    // Apply split rule
+    private applySplitRule(rule: TransformationRule, value: any): any {
+      const { separator = ' ', limit } = rule.parameters;
+      
+      if (typeof value === 'string') {
+        return limit ? value.split(separator, limit) : value.split(separator);
+      }
+      
+      return value;
+    }
+    
+    // Apply merge rule
+    private applyMergeRule(rule: TransformationRule, value: any): any {
+      const { fields, strategy = 'overwrite' } = rule.parameters;
+      
+      if (!Array.isArray(fields)) {
+        return value;
+      }
+      
+      const merged: Record<string, any> = {};
+      
+      for (const field of fields) {
+        const fieldValue = this.getNestedValue(value, field);
+        if (fieldValue !== undefined) {
+          if (strategy === 'overwrite' || !merged.hasOwnProperty(field)) {
+            merged[field] = fieldValue;
+          }
+        }
+      }
+      
+      return merged;
+    }
+    
+    // Evaluate conditions
+    private evaluateConditions(conditions: Record<string, any>, value: any): boolean {
+      for (const [condition, params] of Object.entries(conditions)) {
+        if (!this.evaluateCondition(condition, value, params)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    
+    // Evaluate single condition
+    private evaluateCondition(condition: string, value: any, params: any): boolean {
+      switch (condition) {
+        case 'equals':
+          return value === params.value;
+        case 'notEquals':
+          return value !== params.value;
+        case 'greaterThan':
+          return typeof value === 'number' && value > params.value;
+        case 'lessThan':
+          return typeof value === 'number' && value < params.value;
+        case 'contains':
+          return typeof value === 'string' && value.includes(params.value);
+        case 'startsWith':
+          return typeof value === 'string' && value.startsWith(params.value);
+        case 'endsWith':
+          return typeof value === 'string' && value.endsWith(params.value);
+        case 'isNull':
+          return value === null || value === undefined;
+        case 'isNotNull':
+          return value !== null && value !== undefined;
+        case 'isEmpty':
+          return value === '' || (Array.isArray(value) && value.length === 0);
+        case 'isNotEmpty':
+          return value !== '' && (!Array.isArray(value) || value.length > 0);
+        default:
+          return true;
+      }
+    }
+    
+    // Extract metadata from transformation
+    private extractMetadata(rule: TransformationRule, originalValue: any, transformedValue: any): Record<string, any> {
+      const metadata: Record<string, any> = {
+        ruleType: rule.ruleType,
+        timestamp: new Date().toISOString()
+      };
+      
+      if (typeof originalValue === 'string' && typeof transformedValue === 'string') {
+        metadata.lengthChange = transformedValue.length - originalValue.length;
+      }
+      
+      if (typeof originalValue === 'number' && typeof transformedValue === 'number') {
+        metadata.valueChange = transformedValue - originalValue;
+        metadata.percentageChange = originalValue !== 0 ? ((transformedValue - originalValue) / originalValue) * 100 : 0;
+      }
+      
+      return metadata;
+    }
+    
+    // Get nested value from object
+    private getNestedValue(obj: any, path: string): any {
+      return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+      }, obj);
+    }
+    
+    // Set nested value in object
+    private setNestedValue(obj: any, path: string, value: any): void {
+      const keys = path.split('.');
+      const lastKey = keys.pop()!;
+      const target = keys.reduce((current, key) => {
+        if (!current[key]) {
+          current[key] = {};
+        }
+        return current[key];
+      }, obj);
+      
+      target[lastKey] = value;
+    }
+    
+    // Create common transformation rules
+    createCommonRules(): TransformationRule[] {
+      return [
+        {
+          id: 'normalize_names',
+          name: 'Normalize Names',
+          description: 'Capitalize and clean name fields',
+          ruleType: 'map',
+          sourceField: 'name',
+          targetField: 'normalizedName',
+          parameters: { operation: 'capitalize' }
+        },
+        {
+          id: 'extract_year',
+          name: 'Extract Year',
+          description: 'Extract year from date fields',
+          ruleType: 'map',
+          sourceField: 'date',
+          targetField: 'year',
+          parameters: { operation: 'extractYear' }
+        },
+        {
+          id: 'format_currency',
+          name: 'Format Currency',
+          description: 'Format numbers as currency',
+          ruleType: 'map',
+          sourceField: 'amount',
+          targetField: 'formattedAmount',
+          parameters: { operation: 'toCurrency', currency: 'USD' }
+        },
+        {
+          id: 'filter_valid_emails',
+          name: 'Filter Valid Emails',
+          description: 'Filter out invalid email addresses',
+          ruleType: 'filter',
+          sourceField: 'email',
+          targetField: 'email',
+          parameters: { condition: 'contains', value: '@' }
+        }
+      ];
+    }
+    
+    // Validate transformation results
+    validateTransformation(
+      originalData: Record<string, any>,
+      transformedData: Record<string, any>
+    ): {
+      isValid: boolean;
+      issues: string[];
+      improvements: string[];
+    } {
+      const issues: string[] = [];
+      const improvements: string[] = [];
+      
+      // Check for data integrity
+      const originalKeys = Object.keys(originalData);
+      const transformedKeys = Object.keys(transformedData);
+      
+      const newKeys = transformedKeys.filter(key => !originalKeys.includes(key));
+      if (newKeys.length > 0) {
+        improvements.push(`Added ${newKeys.length} new fields: ${newKeys.join(', ')}`);
+      }
+      
+      // Check for data quality improvements
+      for (const key of originalKeys) {
+        const original = originalData[key];
+        const transformed = transformedData[key];
+        
+        if (original !== transformed) {
+          if (typeof original === 'string' && typeof transformed === 'string') {
+            if (transformed.length > original.length) {
+              improvements.push(`Enhanced ${key} with additional data`);
+            }
+          }
+        }
+      }
+      
+      return {
+        isValid: issues.length === 0,
+        issues,
+        improvements
+      };
+    }
+  } 

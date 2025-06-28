@@ -1,0 +1,18 @@
+{
+  "category": "self_hosting_calculator.py",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.546023",
+  "files": [
+    {
+      "name": "Self Hosting Calculator",
+      "path": "scripts/self_hosting_calculator.py",
+      "type": "scripts",
+      "category": "self_hosting_calculator.py",
+      "size": 14,
+      "lastModified": "2025-06-28T07:03:16.757562",
+      "hash": "bbd9a6d06d7b16ea268aab421f60b0d0e3a6fa687d420f7ea82975cd8c5dc534",
+      "description": "!/usr/bin/env python3  "
+    }
+  ]
+}

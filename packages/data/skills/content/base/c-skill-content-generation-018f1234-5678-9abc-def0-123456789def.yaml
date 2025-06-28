@@ -1,0 +1,638 @@
+name: "Content Generation Base"
+description: "Advanced content generation and storytelling capabilities for narrative creation"
+category: "content"
+tags:
+  primary: "content"
+  secondary: ["generation", "storytelling", "narrative", "creative", "writing"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface ContentTemplate {
+    id: string;
+    name: string;
+    description: string;
+    templateType: 'story' | 'poem' | 'article' | 'script' | 'summary' | 'description';
+    structure: string;
+    variables: string[];
+    style: Record<string, any>;
+  }
+  
+  export interface ContentGenerationConfig {
+    template: ContentTemplate;
+    variables: Record<string, any>;
+    style: Record<string, any>;
+    length: 'short' | 'medium' | 'long';
+    tone: 'formal' | 'casual' | 'poetic' | 'technical' | 'conversational';
+    audience: 'general' | 'expert' | 'child' | 'academic';
+  }
+  
+  export interface ContentGenerationResult {
+    content: string;
+    metadata: {
+      templateId: string;
+      variables: Record<string, any>;
+      style: Record<string, any>;
+      length: number;
+      generationTime: number;
+      quality: number; // 0-1
+    };
+    alternatives: string[];
+    suggestions: string[];
+  }
+  
+  export class ContentGenerationSkill {
+    private templates: Map<string, ContentTemplate>;
+    private stylePresets: Map<string, Record<string, any>>;
+    private tonePresets: Map<string, Record<string, any>>;
+    
+    constructor() {
+      this.templates = new Map();
+      this.stylePresets = new Map();
+      this.tonePresets = new Map();
+      this.initializePresets();
+      this.initializeTemplates();
+    }
+    
+    // Initialize style presets
+    private initializePresets(): void {
+      // Style presets
+      this.stylePresets.set('formal', {
+        vocabulary: 'complex',
+        sentenceStructure: 'compound',
+        formality: 'high',
+        punctuation: 'strict'
+      });
+      
+      this.stylePresets.set('casual', {
+        vocabulary: 'simple',
+        sentenceStructure: 'simple',
+        formality: 'low',
+        punctuation: 'relaxed'
+      });
+      
+      this.stylePresets.set('poetic', {
+        vocabulary: 'metaphorical',
+        sentenceStructure: 'rhythmic',
+        formality: 'medium',
+        punctuation: 'artistic'
+      });
+      
+      this.stylePresets.set('technical', {
+        vocabulary: 'precise',
+        sentenceStructure: 'clear',
+        formality: 'high',
+        punctuation: 'standard'
+      });
+      
+      this.stylePresets.set('conversational', {
+        vocabulary: 'natural',
+        sentenceStructure: 'varied',
+        formality: 'medium',
+        punctuation: 'natural'
+      });
+      
+      // Tone presets
+      this.tonePresets.set('general', {
+        accessibility: 'high',
+        complexity: 'medium',
+        engagement: 'balanced'
+      });
+      
+      this.tonePresets.set('expert', {
+        accessibility: 'low',
+        complexity: 'high',
+        engagement: 'intellectual'
+      });
+      
+      this.tonePresets.set('child', {
+        accessibility: 'very_high',
+        complexity: 'low',
+        engagement: 'playful'
+      });
+      
+      this.tonePresets.set('academic', {
+        accessibility: 'medium',
+        complexity: 'high',
+        engagement: 'scholarly'
+      });
+    }
+    
+    // Initialize content templates
+    private initializeTemplates(): void {
+      // Story template
+      this.templates.set('hero_journey', {
+        id: 'hero_journey',
+        name: 'Hero Journey Story',
+        description: 'Classic hero journey narrative structure',
+        templateType: 'story',
+        structure: `
+          Once upon a time, there was {{protagonist}} who lived in {{setting}}.
+          
+          {{inciting_incident}}
+          
+          {{protagonist}} decided to {{call_to_action}} and embarked on a journey.
+          
+          Along the way, {{protagonist}} faced {{challenges}} and learned {{lessons}}.
+          
+          Finally, {{protagonist}} reached {{climax}} and achieved {{resolution}}.
+          
+          The story teaches us that {{moral}}.
+        `,
+        variables: ['protagonist', 'setting', 'inciting_incident', 'call_to_action', 'challenges', 'lessons', 'climax', 'resolution', 'moral'],
+        style: { narrative: 'third_person', pacing: 'moderate' }
+      });
+      
+      // Poem template
+      this.templates.set('haiku', {
+        id: 'haiku',
+        name: 'Haiku Poem',
+        description: 'Traditional 5-7-5 syllable structure',
+        templateType: 'poem',
+        structure: `{{line1}} (5 syllables)
+{{line2}} (7 syllables)
+{{line3}} (5 syllables)`,
+        variables: ['line1', 'line2', 'line3'],
+        style: { form: 'haiku', imagery: 'nature' }
+      });
+      
+      // Article template
+      this.templates.set('how_to', {
+        id: 'how_to',
+        name: 'How-To Article',
+        description: 'Step-by-step instructional content',
+        templateType: 'article',
+        structure: `# How to {{topic}}
+
+{{introduction}}
+
+## What You'll Need
+{{materials}}
+
+## Steps
+{{steps}}
+
+## Tips
+{{tips}}
+
+## Conclusion
+{{conclusion}}`,
+        variables: ['topic', 'introduction', 'materials', 'steps', 'tips', 'conclusion'],
+        style: { format: 'instructional', clarity: 'high' }
+      });
+      
+      // Script template
+      this.templates.set('dialogue', {
+        id: 'dialogue',
+        name: 'Dialogue Script',
+        description: 'Conversation between characters',
+        templateType: 'script',
+        structure: `{{character1}}: {{line1}}
+
+{{character2}}: {{line2}}
+
+{{character1}}: {{line3}}
+
+{{character2}}: {{line4}}`,
+        variables: ['character1', 'character2', 'line1', 'line2', 'line3', 'line4'],
+        style: { format: 'dialogue', natural: 'high' }
+      });
+      
+      // Summary template
+      this.templates.set('executive_summary', {
+        id: 'executive_summary',
+        name: 'Executive Summary',
+        description: 'Concise overview of key points',
+        templateType: 'summary',
+        structure: `## Executive Summary
+
+**Key Points:**
+{{key_points}}
+
+**Main Findings:**
+{{findings}}
+
+**Recommendations:**
+{{recommendations}}
+
+**Next Steps:**
+{{next_steps}}`,
+        variables: ['key_points', 'findings', 'recommendations', 'next_steps'],
+        style: { format: 'business', conciseness: 'high' }
+      });
+    }
+    
+    // Generate content using template
+    generateContent(config: ContentGenerationConfig): ContentGenerationResult {
+      const startTime = Date.now();
+      
+      // Get template
+      const template = this.templates.get(config.template.id);
+      if (!template) {
+        throw new Error(`Template not found: ${config.template.id}`);
+      }
+      
+      // Apply style and tone presets
+      const style = this.mergeStyles(template.style, config.style, config.tone);
+      
+      // Generate content
+      let content = this.applyTemplate(template, config.variables);
+      content = this.applyStyling(content, style);
+      
+      // Generate alternatives
+      const alternatives = this.generateAlternatives(template, config.variables, style);
+      
+      // Generate suggestions
+      const suggestions = this.generateSuggestions(content, style);
+      
+      // Calculate quality score
+      const quality = this.calculateQuality(content, style);
+      
+      const generationTime = Date.now() - startTime;
+      
+      return {
+        content,
+        metadata: {
+          templateId: template.id,
+          variables: config.variables,
+          style,
+          length: content.length,
+          generationTime,
+          quality
+        },
+        alternatives,
+        suggestions
+      };
+    }
+    
+    // Generate story
+    generateStory(
+      protagonist: string,
+      setting: string,
+      theme: string,
+      style: Record<string, any> = {}
+    ): ContentGenerationResult {
+      const config: ContentGenerationConfig = {
+        template: this.templates.get('hero_journey')!,
+        variables: {
+          protagonist,
+          setting,
+          inciting_incident: `One day, something unexpected happened that changed everything.`,
+          call_to_action: `face the challenge and grow stronger`,
+          challenges: `many obstacles and difficulties`,
+          lessons: `important life lessons about courage and perseverance`,
+          climax: `the final test of their abilities`,
+          resolution: `success and personal growth`,
+          moral: `with determination and courage, we can overcome any obstacle`
+        },
+        style,
+        length: 'medium',
+        tone: 'conversational',
+        audience: 'general'
+      };
+      
+      return this.generateContent(config);
+    }
+    
+    // Generate poem
+    generatePoem(
+      subject: string,
+      emotion: string,
+      style: Record<string, any> = {}
+    ): ContentGenerationResult {
+      const config: ContentGenerationConfig = {
+        template: this.templates.get('haiku')!,
+        variables: {
+          line1: this.generateHaikuLine(subject, 5),
+          line2: this.generateHaikuLine(emotion, 7),
+          line3: this.generateHaikuLine('reflection', 5)
+        },
+        style: { ...style, form: 'haiku' },
+        length: 'short',
+        tone: 'poetic',
+        audience: 'general'
+      };
+      
+      return this.generateContent(config);
+    }
+    
+    // Generate article
+    generateArticle(
+      topic: string,
+      keyPoints: string[],
+      style: Record<string, any> = {}
+    ): ContentGenerationResult {
+      const config: ContentGenerationConfig = {
+        template: this.templates.get('how_to')!,
+        variables: {
+          topic,
+          introduction: `This guide will help you understand and master ${topic}.`,
+          materials: `The basic requirements for ${topic}.`,
+          steps: keyPoints.map((point, index) => `${index + 1}. ${point}`).join('\n'),
+          tips: `Remember to take your time and practice regularly.`,
+          conclusion: `With practice and dedication, you can excel at ${topic}.`
+        },
+        style,
+        length: 'medium',
+        tone: 'technical',
+        audience: 'general'
+      };
+      
+      return this.generateContent(config);
+    }
+    
+    // Generate summary
+    generateSummary(
+      content: string,
+      keyPoints: string[],
+      style: Record<string, any> = {}
+    ): ContentGenerationResult {
+      const config: ContentGenerationConfig = {
+        template: this.templates.get('executive_summary')!,
+        variables: {
+          key_points: keyPoints.join('\n- '),
+          findings: `Analysis of the main content reveals important insights.`,
+          recommendations: `Based on the findings, here are the key recommendations.`,
+          next_steps: `Immediate actions to take based on this summary.`
+        },
+        style,
+        length: 'short',
+        tone: 'formal',
+        audience: 'expert'
+      };
+      
+      return this.generateContent(config);
+    }
+    
+    // Apply template with variables
+    private applyTemplate(template: ContentTemplate, variables: Record<string, any>): string {
+      let content = template.structure;
+      
+      for (const [key, value] of Object.entries(variables)) {
+        const placeholder = `{{${key}}}`;
+        content = content.replace(new RegExp(placeholder, 'g'), value || '');
+      }
+      
+      return content.trim();
+    }
+    
+    // Apply styling to content
+    private applyStyling(content: string, style: Record<string, any>): string {
+      let styledContent = content;
+      
+      // Apply vocabulary complexity
+      if (style.vocabulary === 'complex') {
+        styledContent = this.enhanceVocabulary(styledContent);
+      } else if (style.vocabulary === 'simple') {
+        styledContent = this.simplifyVocabulary(styledContent);
+      }
+      
+      // Apply sentence structure
+      if (style.sentenceStructure === 'compound') {
+        styledContent = this.createCompoundSentences(styledContent);
+      } else if (style.sentenceStructure === 'simple') {
+        styledContent = this.createSimpleSentences(styledContent);
+      }
+      
+      // Apply formality
+      if (style.formality === 'high') {
+        styledContent = this.makeFormal(styledContent);
+      } else if (style.formality === 'low') {
+        styledContent = this.makeCasual(styledContent);
+      }
+      
+      return styledContent;
+    }
+    
+    // Merge styles from template, config, and tone
+    private mergeStyles(
+      templateStyle: Record<string, any>,
+      configStyle: Record<string, any>,
+      tone: string
+    ): Record<string, any> {
+      const toneStyle = this.tonePresets.get(tone) || {};
+      
+      return {
+        ...templateStyle,
+        ...toneStyle,
+        ...configStyle
+      };
+    }
+    
+    // Generate alternatives
+    private generateAlternatives(
+      template: ContentTemplate,
+      variables: Record<string, any>,
+      style: Record<string, any>
+    ): string[] {
+      const alternatives: string[] = [];
+      
+      // Generate variations with different styles
+      const alternativeStyles = [
+        { ...style, tone: 'casual' },
+        { ...style, tone: 'formal' },
+        { ...style, tone: 'poetic' }
+      ];
+      
+      for (const altStyle of alternativeStyles) {
+        try {
+          const altContent = this.applyTemplate(template, variables);
+          alternatives.push(this.applyStyling(altContent, altStyle));
+        } catch (error) {
+          // Skip failed alternatives
+        }
+      }
+      
+      return alternatives.slice(0, 3); // Return max 3 alternatives
+    }
+    
+    // Generate suggestions
+    private generateSuggestions(content: string, style: Record<string, any>): string[] {
+      const suggestions: string[] = [];
+      
+      // Analyze content and provide suggestions
+      if (content.length < 100) {
+        suggestions.push('Consider adding more detail to make the content more engaging');
+      }
+      
+      if (content.length > 1000) {
+        suggestions.push('Consider breaking this into shorter sections for better readability');
+      }
+      
+      if (style.tone === 'formal' && content.includes('!')) {
+        suggestions.push('Consider using more formal punctuation for a professional tone');
+      }
+      
+      if (style.audience === 'child' && content.length > 500) {
+        suggestions.push('Consider shortening the content for younger audiences');
+      }
+      
+      return suggestions;
+    }
+    
+    // Calculate quality score
+    private calculateQuality(content: string, style: Record<string, any>): number {
+      let quality = 0.5; // Base quality
+      
+      // Length appropriateness
+      if (content.length >= 50 && content.length <= 2000) {
+        quality += 0.2;
+      }
+      
+      // Style consistency
+      if (style.tone && style.formality) {
+        quality += 0.1;
+      }
+      
+      // Content structure
+      if (content.includes('\n\n') || content.includes('##')) {
+        quality += 0.1;
+      }
+      
+      // Vocabulary appropriateness
+      if (style.vocabulary === 'complex' && content.length > 200) {
+        quality += 0.1;
+      }
+      
+      return Math.min(quality, 1.0);
+    }
+    
+    // Helper methods for styling
+    private enhanceVocabulary(content: string): string {
+      // Simple vocabulary enhancement
+      const enhancements: Record<string, string> = {
+        'good': 'excellent',
+        'bad': 'unfavorable',
+        'big': 'substantial',
+        'small': 'minimal',
+        'fast': 'rapid',
+        'slow': 'gradual'
+      };
+      
+      let enhanced = content;
+      for (const [simple, enhanced_word] of Object.entries(enhancements)) {
+        enhanced = enhanced.replace(new RegExp(`\\b${simple}\\b`, 'gi'), enhanced_word);
+      }
+      
+      return enhanced;
+    }
+    
+    private simplifyVocabulary(content: string): string {
+      // Simple vocabulary simplification
+      const simplifications: Record<string, string> = {
+        'excellent': 'good',
+        'unfavorable': 'bad',
+        'substantial': 'big',
+        'minimal': 'small',
+        'rapid': 'fast',
+        'gradual': 'slow'
+      };
+      
+      let simplified = content;
+      for (const [complex, simple_word] of Object.entries(simplifications)) {
+        simplified = simplified.replace(new RegExp(`\\b${complex}\\b`, 'gi'), simple_word);
+      }
+      
+      return simplified;
+    }
+    
+    private createCompoundSentences(content: string): string {
+      // Simple compound sentence creation
+      const sentences = content.split('. ');
+      const compoundSentences = sentences.map(sentence => {
+        if (sentence.length < 50) {
+          return sentence + ', and this adds complexity to the narrative.';
+        }
+        return sentence;
+      });
+      
+      return compoundSentences.join('. ');
+    }
+    
+    private createSimpleSentences(content: string): string {
+      // Simple sentence simplification
+      return content.replace(/[,;]/g, '. ').replace(/\.\s*\./g, '.');
+    }
+    
+    private makeFormal(content: string): string {
+      // Make content more formal
+      const formalReplacements: Record<string, string> = {
+        "don't": 'do not',
+        "can't": 'cannot',
+        "won't": 'will not',
+        "it's": 'it is',
+        "that's": 'that is'
+      };
+      
+      let formal = content;
+      for (const [informal, formal_word] of Object.entries(formalReplacements)) {
+        formal = formal.replace(new RegExp(`\\b${informal}\\b`, 'gi'), formal_word);
+      }
+      
+      return formal;
+    }
+    
+    private makeCasual(content: string): string {
+      // Make content more casual
+      const casualReplacements: Record<string, string> = {
+        'do not': "don't",
+        'cannot': "can't",
+        'will not': "won't",
+        'it is': "it's",
+        'that is': "that's"
+      };
+      
+      let casual = content;
+      for (const [formal, casual_word] of Object.entries(casualReplacements)) {
+        casual = casual.replace(new RegExp(`\\b${formal}\\b`, 'gi'), casual_word);
+      }
+      
+      return casual;
+    }
+    
+    // Generate haiku line with specified syllable count
+    private generateHaikuLine(theme: string, syllables: number): string {
+      const themeWords: Record<string, string[]> = {
+        'nature': ['forest', 'mountain', 'river', 'ocean', 'sky', 'wind', 'rain', 'sun'],
+        'emotion': ['joy', 'sorrow', 'peace', 'anger', 'love', 'hope', 'fear', 'calm'],
+        'reflection': ['wisdom', 'truth', 'beauty', 'harmony', 'balance', 'growth', 'change', 'life']
+      };
+      
+      const words = themeWords[theme] || themeWords['nature'];
+      const word = words[Math.floor(Math.random() * words.length)];
+      
+      // Simple syllable approximation
+      if (syllables === 5) {
+        return `The ${word} flows`;
+      } else if (syllables === 7) {
+        return `Through the ancient ${word} path`;
+      }
+      
+      return word;
+    }
+    
+    // Add custom template
+    addTemplate(template: ContentTemplate): void {
+      this.templates.set(template.id, template);
+    }
+    
+    // Add custom style preset
+    addStylePreset(name: string, style: Record<string, any>): void {
+      this.stylePresets.set(name, style);
+    }
+    
+    // Get available templates
+    getAvailableTemplates(): ContentTemplate[] {
+      return Array.from(this.templates.values());
+    }
+    
+    // Get template by type
+    getTemplatesByType(type: string): ContentTemplate[] {
+      return Array.from(this.templates.values()).filter(t => t.templateType === type);
+    }
+  } 

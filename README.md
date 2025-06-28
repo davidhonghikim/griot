@@ -217,6 +217,32 @@ Restore and enhance archived systems:
 4.  Update documentation with detailed progress logs
 5.  Present work to user for final verification
 
+## Environment Configuration
+
+All environment variables are loaded and managed centrally via `@griot/core`.
+
+- Use `getEnvironmentConfig()` from `@griot/core` in all packages and apps.
+- Do **not** use `dotenv` or `process.env` directly in your code.
+- See `packages/core/src/config/environment.ts` for the full list of supported variables and types.
+
+## Test Structure
+
+- All integration and system test scripts are in the `tests/` directory.
+- To run all tests:
+  ```bash
+  npm run test
+  ```
+- To add a new test, place it in the appropriate subfolder of `tests/`.
+
+## Build and Run
+
+- Build all packages before running any app:
+  ```bash
+  npm install
+  npm run build
+  ```
+- Each app may have a `prestart` script to check that all packages are built.
+
 ---
 
 **Core Specifications**: 100% Complete | **Next Phase**: Implementation

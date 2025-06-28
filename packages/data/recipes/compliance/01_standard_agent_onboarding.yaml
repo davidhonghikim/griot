@@ -1,0 +1,44 @@
+name: "Standard Agent Onboarding"
+description: "Mandatory recipe for all agents to ensure consistent workflow and compliance"
+version: "1.0.0"
+trigger_phrases: ["onboard", "start session", "begin work"]
+
+steps:
+  - skill: "environment_check"
+    input:
+      check_centralized_config: true
+      verify_package_dependencies: true
+      validate_klf_compatibility: true
+    conditions:
+      required: true
+      order: 1
+
+  - skill: "code_style_validation"
+    input:
+      check_imports: true
+      verify_env_usage: true
+      validate_package_usage: true
+    conditions:
+      required: true
+      order: 2
+
+  - skill: "documentation_update"
+    input:
+      update_changelog: true
+      verify_readme: true
+      check_api_docs: true
+    conditions:
+      required: true
+      order: 3
+
+  - skill: "test_verification"
+    input:
+      run_existing_tests: true
+      add_new_tests: true
+      verify_coverage: true
+    conditions:
+      required: true
+      order: 4
+
+dependencies: ["core_packages", "klf_framework"]
+tags: ["mandatory", "onboarding", "compliance"] 

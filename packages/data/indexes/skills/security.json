@@ -1,0 +1,38 @@
+{
+  "category": "security",
+  "asset_type": "skills",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.339468",
+  "files": [
+    {
+      "name": "Encryption",
+      "path": "skills/security/encryption.yaml",
+      "type": "skills",
+      "category": "security",
+      "size": 7,
+      "lastModified": "2025-06-28T06:25:54.476798",
+      "hash": "1efb473d4c99ff5593164687ca3e77d69f3a70661ad7c344d130090932a0de95",
+      "description": "Comprehensive encryption and decryption operations including symmetric, asymmetric, and hashing functions",
+      "tags": {
+        "primary": "security",
+        "secondary": [
+          "encryption",
+          "decryption",
+          "hashing",
+          "crypto",
+          "aes",
+          "rsa",
+          "sha"
+        ],
+        "priority": "high",
+        "complexity": "high",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

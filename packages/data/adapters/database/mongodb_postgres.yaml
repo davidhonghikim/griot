@@ -1,0 +1,215 @@
+name: "MongoDB to PostgreSQL Adapter"
+description: "Universal translator for converting data between MongoDB and PostgreSQL formats"
+category: "adapter"
+tags:
+  primary: "adapter"
+  secondary: ["database", "mongodb", "postgresql", "conversion", "migration"]
+  nodes: ["musa", "griot", "tohunga", "ronin", "oracle", "skald", "hakim", "junzi", "yachay", "sachem", "archon", "amauta", "mzee"]
+  priority: "high"
+  complexity: "moderate"
+  cultural: ["hieros"]
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface MongoDBDocument {
+    _id?: string;
+    [key: string]: any;
+  }
+  
+  export interface PostgreSQLRow {
+    id?: string;
+    [key: string]: any;
+  }
+  
+  export interface SchemaMapping {
+    collection: string;
+    table: string;
+    fieldMappings: Record<string, string>;
+    typeConversions?: Record<string, string>;
+  }
+  
+  export class MongoDBPostgreSQLAdapter {
+    private schemaMappings: Map<string, SchemaMapping>;
+    
+    constructor() {
+      this.schemaMappings = new Map();
+    }
+    
+    // Register schema mappings
+    registerMapping(mapping: SchemaMapping): void {
+      this.schemaMappings.set(mapping.collection, mapping);
+    }
+    
+    // Convert MongoDB document to PostgreSQL row
+    convertToPostgreSQL(collection: string, mongoDoc: MongoDBDocument): PostgreSQLRow {
+      const mapping = this.schemaMappings.get(collection);
+      if (!mapping) {
+        throw new Error(`No mapping found for collection: ${collection}`);
+      }
+      
+      const postgresRow: PostgreSQLRow = {};
+      
+      // Handle ID conversion
+      if (mongoDoc._id) {
+        postgresRow.id = mongoDoc._id.toString();
+      }
+      
+      // Apply field mappings
+      for (const [mongoField, postgresField] of Object.entries(mapping.fieldMappings)) {
+        if (mongoDoc[mongoField] !== undefined) {
+          const value = this.convertValue(mongoDoc[mongoField], mapping.typeConversions?.[mongoField]);
+          postgresRow[postgresField] = value;
+        }
+      }
+      
+      return postgresRow;
+    }
+    
+    // Convert PostgreSQL row to MongoDB document
+    convertToMongoDB(collection: string, postgresRow: PostgreSQLRow): MongoDBDocument {
+      const mapping = this.schemaMappings.get(collection);
+      if (!mapping) {
+        throw new Error(`No mapping found for table: ${collection}`);
+      }
+      
+      const mongoDoc: MongoDBDocument = {};
+      
+      // Handle ID conversion
+      if (postgresRow.id) {
+        mongoDoc._id = postgresRow.id;
+      }
+      
+      // Apply reverse field mappings
+      for (const [mongoField, postgresField] of Object.entries(mapping.fieldMappings)) {
+        if (postgresRow[postgresField] !== undefined) {
+          const value = this.convertValue(postgresRow[postgresField], mapping.typeConversions?.[mongoField]);
+          mongoDoc[mongoField] = value;
+        }
+      }
+      
+      return mongoDoc;
+    }
+    
+    // Convert arrays of documents
+    convertArrayToPostgreSQL(collection: string, mongoDocs: MongoDBDocument[]): PostgreSQLRow[] {
+      return mongoDocs.map(doc => this.convertToPostgreSQL(collection, doc));
+    }
+    
+    convertArrayToMongoDB(collection: string, postgresRows: PostgreSQLRow[]): MongoDBDocument[] {
+      return postgresRows.map(row => this.convertToMongoDB(collection, row));
+    }
+    
+    // Value type conversion
+    private convertValue(value: any, targetType?: string): any {
+      if (value === null || value === undefined) {
+        return null;
+      }
+      
+      switch (targetType) {
+        case 'string':
+          return String(value);
+        case 'number':
+          return Number(value);
+        case 'boolean':
+          return Boolean(value);
+        case 'date':
+          return value instanceof Date ? value : new Date(value);
+        case 'json':
+          return typeof value === 'string' ? JSON.parse(value) : value;
+        case 'array':
+          return Array.isArray(value) ? value : [value];
+        default:
+          return value;
+      }
+    }
+    
+    // Generate SQL schema from MongoDB collection
+    generatePostgreSQLSchema(collection: string, sampleDocs: MongoDBDocument[]): string {
+      if (sampleDocs.length === 0) {
+        throw new Error('Sample documents required for schema generation');
+      }
+      
+      const fields = this.inferFields(sampleDocs);
+      const tableName = collection.replace(/[^a-zA-Z0-9_]/g, '_');
+      
+      let sql = `CREATE TABLE ${tableName} (\n`;
+      sql += `  id VARCHAR(255) PRIMARY KEY,\n`;
+      
+      for (const [fieldName, fieldType] of Object.entries(fields)) {
+        const postgresType = this.mapToPostgreSQLType(fieldType);
+        const safeFieldName = fieldName.replace(/[^a-zA-Z0-9_]/g, '_');
+        sql += `  ${safeFieldName} ${postgresType},\n`;
+      }
+      
+      sql = sql.slice(0, -2) + '\n);';
+      return sql;
+    }
+    
+    // Infer field types from sample documents
+    private inferFields(docs: MongoDBDocument[]): Record<string, string> {
+      const fieldTypes: Record<string, Set<string>> = {};
+      
+      for (const doc of docs) {
+        for (const [field, value] of Object.entries(doc)) {
+          if (field === '_id') continue;
+          
+          if (!fieldTypes[field]) {
+            fieldTypes[field] = new Set();
+          }
+          
+          fieldTypes[field].add(this.getTypeName(value));
+        }
+      }
+      
+      const result: Record<string, string> = {};
+      for (const [field, types] of Object.entries(fieldTypes)) {
+        result[field] = this.resolveType(Array.from(types));
+      }
+      
+      return result;
+    }
+    
+    private getTypeName(value: any): string {
+      if (value === null) return 'null';
+      if (Array.isArray(value)) return 'array';
+      if (value instanceof Date) return 'date';
+      if (typeof value === 'object') return 'object';
+      return typeof value;
+    }
+    
+    private resolveType(types: string[]): string {
+      if (types.includes('object') || types.includes('array')) return 'jsonb';
+      if (types.includes('date')) return 'timestamp';
+      if (types.includes('number')) return 'numeric';
+      if (types.includes('boolean')) return 'boolean';
+      return 'text';
+    }
+    
+    private mapToPostgreSQLType(mongoType: string): string {
+      switch (mongoType) {
+        case 'string': return 'TEXT';
+        case 'number': return 'NUMERIC';
+        case 'boolean': return 'BOOLEAN';
+        case 'date': return 'TIMESTAMP';
+        case 'object': return 'JSONB';
+        case 'array': return 'JSONB';
+        default: return 'TEXT';
+      }
+    }
+    
+    // Utility methods
+    getMapping(collection: string): SchemaMapping | undefined {
+      return this.schemaMappings.get(collection);
+    }
+    
+    listMappings(): string[] {
+      return Array.from(this.schemaMappings.keys());
+    }
+    
+    removeMapping(collection: string): boolean {
+      return this.schemaMappings.delete(collection);
+    }
+  } 

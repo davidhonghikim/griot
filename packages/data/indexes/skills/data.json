@@ -1,0 +1,34 @@
+{
+  "category": "data",
+  "asset_type": "skills",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.340869",
+  "files": [
+    {
+      "name": "Tag Manager",
+      "path": "skills/data/tag_manager.yaml",
+      "type": "skills",
+      "category": "data",
+      "size": 12,
+      "lastModified": "2025-06-28T06:26:52.149790",
+      "hash": "85441254c5ee430c72dec3e2bba15ddab63eab5d4b339d78a2ef60600598fcb4",
+      "description": "Comprehensive tag management system for discovering, validating, and organizing recipes, skills, and personas",
+      "tags": {
+        "primary": "data",
+        "secondary": [
+          "organization",
+          "metadata",
+          "discovery",
+          "validation"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

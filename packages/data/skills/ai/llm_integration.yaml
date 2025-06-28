@@ -1,0 +1,360 @@
+name: "LLM Integration"
+description: "Integration with OpenAI, Anthropic, and local language models for text generation and analysis"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["llm", "openai", "anthropic", "text-generation", "completion"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface LLMConfig {
+    provider: 'openai' | 'anthropic' | 'local';
+    apiKey?: string;
+    baseURL?: string;
+    model: string;
+    maxTokens?: number;
+    temperature?: number;
+    topP?: number;
+    frequencyPenalty?: number;
+    presencePenalty?: number;
+  }
+  
+  export interface LLMRequest {
+    prompt: string;
+    systemPrompt?: string;
+    maxTokens?: number;
+    temperature?: number;
+    topP?: number;
+    frequencyPenalty?: number;
+    presencePenalty?: number;
+    stop?: string[];
+  }
+  
+  export interface LLMResponse {
+    text: string;
+    usage?: {
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    };
+    model: string;
+    finishReason?: string;
+    metadata?: Record<string, any>;
+  }
+  
+  export interface ChatMessage {
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+    name?: string;
+  }
+  
+  export interface ChatRequest {
+    messages: ChatMessage[];
+    maxTokens?: number;
+    temperature?: number;
+    topP?: number;
+    frequencyPenalty?: number;
+    presencePenalty?: number;
+    stop?: string[];
+  }
+  
+  export class LLMIntegration {
+    private config: LLMConfig;
+    private httpClient: any; // HTTPClientOperations instance
+    
+    constructor(config: LLMConfig, httpClient: any) {
+      this.config = {
+        maxTokens: 1000,
+        temperature: 0.7,
+        topP: 1.0,
+        frequencyPenalty: 0.0,
+        presencePenalty: 0.0,
+        ...config,
+      };
+      this.httpClient = httpClient;
+    }
+    
+    // OpenAI Integration
+    async openaiCompletion(request: LLMRequest): Promise<LLMResponse> {
+      const url = `${this.config.baseURL || 'https://api.openai.com/v1'}/completions`;
+      
+      const payload = {
+        model: this.config.model,
+        prompt: request.prompt,
+        max_tokens: request.maxTokens || this.config.maxTokens,
+        temperature: request.temperature || this.config.temperature,
+        top_p: request.topP || this.config.topP,
+        frequency_penalty: request.frequencyPenalty || this.config.frequencyPenalty,
+        presence_penalty: request.presencePenalty || this.config.presencePenalty,
+        stop: request.stop,
+      };
+      
+      const response = await this.httpClient.post(url, payload, {
+        headers: {
+          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`OpenAI API error: ${response.error}`);
+      }
+      
+      const data = response.data;
+      return {
+        text: data.choices[0].text,
+        usage: data.usage,
+        model: data.model,
+        finishReason: data.choices[0].finish_reason,
+      };
+    }
+    
+    async openaiChat(request: ChatRequest): Promise<LLMResponse> {
+      const url = `${this.config.baseURL || 'https://api.openai.com/v1'}/chat/completions`;
+      
+      const payload = {
+        model: this.config.model,
+        messages: request.messages,
+        max_tokens: request.maxTokens || this.config.maxTokens,
+        temperature: request.temperature || this.config.temperature,
+        top_p: request.topP || this.config.topP,
+        frequency_penalty: request.frequencyPenalty || this.config.frequencyPenalty,
+        presence_penalty: request.presencePenalty || this.config.presencePenalty,
+        stop: request.stop,
+      };
+      
+      const response = await this.httpClient.post(url, payload, {
+        headers: {
+          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`OpenAI API error: ${response.error}`);
+      }
+      
+      const data = response.data;
+      return {
+        text: data.choices[0].message.content,
+        usage: data.usage,
+        model: data.model,
+        finishReason: data.choices[0].finish_reason,
+      };
+    }
+    
+    // Anthropic Integration
+    async anthropicCompletion(request: LLMRequest): Promise<LLMResponse> {
+      const url = `${this.config.baseURL || 'https://api.anthropic.com/v1'}/complete`;
+      
+      const payload = {
+        model: this.config.model,
+        prompt: `\n\nHuman: ${request.prompt}\n\nAssistant:`,
+        max_tokens_to_sample: request.maxTokens || this.config.maxTokens,
+        temperature: request.temperature || this.config.temperature,
+        top_p: request.topP || this.config.topP,
+        stop_sequences: request.stop,
+      };
+      
+      const response = await this.httpClient.post(url, payload, {
+        headers: {
+          'x-api-key': this.config.apiKey,
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01',
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Anthropic API error: ${response.error}`);
+      }
+      
+      const data = response.data;
+      return {
+        text: data.completion,
+        usage: {
+          promptTokens: data.stop_reason === 'max_tokens' ? data.max_tokens_to_sample : undefined,
+          completionTokens: data.completion.length,
+          totalTokens: data.stop_reason === 'max_tokens' ? data.max_tokens_to_sample : data.completion.length,
+        },
+        model: data.model,
+        finishReason: data.stop_reason,
+      };
+    }
+    
+    async anthropicChat(request: ChatRequest): Promise<LLMResponse> {
+      // Convert chat messages to Anthropic format
+      const prompt = this.convertChatToPrompt(request.messages);
+      
+      return this.anthropicCompletion({
+        prompt,
+        maxTokens: request.maxTokens,
+        temperature: request.temperature,
+        topP: request.topP,
+        frequencyPenalty: request.frequencyPenalty,
+        presencePenalty: request.presencePenalty,
+        stop: request.stop,
+      });
+    }
+    
+    // Local Model Integration (via Ollama or similar)
+    async localCompletion(request: LLMRequest): Promise<LLMResponse> {
+      const url = `${this.config.baseURL || 'http://localhost:11434'}/api/generate`;
+      
+      const payload = {
+        model: this.config.model,
+        prompt: request.prompt,
+        options: {
+          num_predict: request.maxTokens || this.config.maxTokens,
+          temperature: request.temperature || this.config.temperature,
+          top_p: request.topP || this.config.topP,
+          stop: request.stop,
+        },
+      };
+      
+      const response = await this.httpClient.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.success) {
+        throw new Error(`Local model API error: ${response.error}`);
+      }
+      
+      const data = response.data;
+      return {
+        text: data.response,
+        usage: {
+          promptTokens: data.prompt_eval_count,
+          completionTokens: data.eval_count,
+          totalTokens: data.prompt_eval_count + data.eval_count,
+        },
+        model: data.model,
+        finishReason: data.done ? 'stop' : 'length',
+      };
+    }
+    
+    // Unified interface
+    async generate(request: LLMRequest): Promise<LLMResponse> {
+      switch (this.config.provider) {
+        case 'openai':
+          return this.openaiCompletion(request);
+        case 'anthropic':
+          return this.anthropicCompletion(request);
+        case 'local':
+          return this.localCompletion(request);
+        default:
+          throw new Error(`Unsupported provider: ${this.config.provider}`);
+      }
+    }
+    
+    async chat(request: ChatRequest): Promise<LLMResponse> {
+      switch (this.config.provider) {
+        case 'openai':
+          return this.openaiChat(request);
+        case 'anthropic':
+          return this.anthropicChat(request);
+        case 'local':
+          // Convert chat to completion for local models
+          const prompt = this.convertChatToPrompt(request.messages);
+          return this.localCompletion({
+            prompt,
+            maxTokens: request.maxTokens,
+            temperature: request.temperature,
+            topP: request.topP,
+            frequencyPenalty: request.frequencyPenalty,
+            presencePenalty: request.presencePenalty,
+            stop: request.stop,
+          });
+        default:
+          throw new Error(`Unsupported provider: ${this.config.provider}`);
+      }
+    }
+    
+    // Utility methods
+    private convertChatToPrompt(messages: ChatMessage[]): string {
+      return messages
+        .map(msg => {
+          switch (msg.role) {
+            case 'system':
+              return `System: ${msg.content}`;
+            case 'user':
+              return `Human: ${msg.content}`;
+            case 'assistant':
+              return `Assistant: ${msg.content}`;
+            default:
+              return msg.content;
+          }
+        })
+        .join('\n\n');
+    }
+    
+    // Batch processing
+    async batchGenerate(requests: LLMRequest[]): Promise<LLMResponse[]> {
+      const results: LLMResponse[] = [];
+      
+      for (const request of requests) {
+        try {
+          const result = await this.generate(request);
+          results.push(result);
+        } catch (error) {
+          results.push({
+            text: '',
+            model: this.config.model,
+            finishReason: 'error',
+            metadata: { error: error instanceof Error ? error.message : 'Unknown error' },
+          });
+        }
+      }
+      
+      return results;
+    }
+    
+    // Streaming support (simplified)
+    async *streamGenerate(request: LLMRequest): AsyncGenerator<string> {
+      // This is a simplified implementation
+      // In production, you'd implement proper streaming
+      const response = await this.generate(request);
+      yield response.text;
+    }
+    
+    // Model management
+    async listModels(): Promise<string[]> {
+      switch (this.config.provider) {
+        case 'openai':
+          const response = await this.httpClient.get(
+            `${this.config.baseURL || 'https://api.openai.com/v1'}/models`,
+            {
+              headers: {
+                'Authorization': `Bearer ${this.config.apiKey}`,
+              },
+            }
+          );
+          return response.data.data.map((model: any) => model.id);
+        case 'anthropic':
+          // Anthropic doesn't have a models endpoint, return common models
+          return ['claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'];
+        case 'local':
+          const localResponse = await this.httpClient.get(
+            `${this.config.baseURL || 'http://localhost:11434'}/api/tags`
+          );
+          return localResponse.data.models.map((model: any) => model.name);
+        default:
+          return [];
+      }
+    }
+    
+    // Configuration management
+    updateConfig(newConfig: Partial<LLMConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    getConfig(): LLMConfig {
+      return { ...this.config };
+    }
+  } 

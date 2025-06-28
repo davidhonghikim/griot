@@ -1,0 +1,447 @@
+name: "Token Price Estimator"
+description: "Estimate token usage and costs for different media types and provide budget planning"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["token", "estimator", "budget", "media", "pricing"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: ["token_calculator"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { TokenCalculator } from './token_calculator';
+  
+  export interface MediaConfig {
+    type: 'text' | 'image' | 'video' | 'audio';
+    size?: number; // bytes for files, tokens for text
+    duration?: number; // seconds for audio/video
+    resolution?: string; // e.g., "1920x1080" for images/video
+    quality?: 'low' | 'medium' | 'high';
+  }
+  
+  export interface BudgetConfig {
+    totalBudget: number;
+    currency: string;
+    timeFrame: 'hour' | 'day' | 'week' | 'month';
+    priority: 'cost' | 'quality' | 'speed';
+  }
+  
+  export interface EstimationResult {
+    mediaType: string;
+    estimatedTokens: number;
+    estimatedCost: number;
+    confidence: number;
+    breakdown: {
+      inputTokens: number;
+      outputTokens: number;
+      processingTokens: number;
+    };
+    recommendations: string[];
+  }
+  
+  export interface BudgetPlan {
+    totalBudget: number;
+    allocatedBudget: number;
+    remainingBudget: number;
+    operations: Array<{
+      operation: string;
+      mediaType: string;
+      estimatedCost: number;
+      priority: number;
+    }>;
+    recommendations: string[];
+  }
+  
+  export class TokenPriceEstimator {
+    private tokenCalculator: TokenCalculator;
+    private mediaPricing: Record<string, any>;
+    
+    constructor(tokenCalculator: TokenCalculator) {
+      this.tokenCalculator = tokenCalculator;
+      this.initializeMediaPricing();
+    }
+    
+    // Initialize media-specific pricing
+    private initializeMediaPricing(): void {
+      this.mediaPricing = {
+        text: {
+          // Text is priced by tokens
+          pricing: 'per_token',
+          baseTokensPerChar: 0.25, // ~4 chars per token
+        },
+        image: {
+          // Images are priced by resolution and quality
+          pricing: 'per_image',
+          baseCost: 0.02, // Base cost per image
+          resolutionMultipliers: {
+            '512x512': 1.0,
+            '1024x1024': 1.5,
+            '1792x1024': 2.0,
+            '1024x1792': 2.0,
+          },
+          qualityMultipliers: {
+            'low': 0.8,
+            'medium': 1.0,
+            'high': 1.3,
+          },
+        },
+        video: {
+          // Videos are priced by duration and quality
+          pricing: 'per_minute',
+          baseCostPerMinute: 0.10,
+          qualityMultipliers: {
+            'low': 0.7,
+            'medium': 1.0,
+            'high': 1.5,
+          },
+          resolutionMultipliers: {
+            '480p': 0.8,
+            '720p': 1.0,
+            '1080p': 1.3,
+            '4k': 2.0,
+          },
+        },
+        audio: {
+          // Audio is priced by duration
+          pricing: 'per_minute',
+          baseCostPerMinute: 0.006,
+          qualityMultipliers: {
+            'low': 0.8,
+            'medium': 1.0,
+            'high': 1.2,
+          },
+        },
+      };
+    }
+    
+    // Estimate tokens and cost for text
+    estimateText(text: string, model?: string): EstimationResult {
+      const tokens = this.tokenCalculator.calculateTokens(text);
+      const cost = this.tokenCalculator.calculateCost(tokens, 0, model);
+      
+      return {
+        mediaType: 'text',
+        estimatedTokens: tokens,
+        estimatedCost: cost.totalCost,
+        confidence: 0.95, // High confidence for text
+        breakdown: {
+          inputTokens: tokens,
+          outputTokens: 0,
+          processingTokens: 0,
+        },
+        recommendations: this.generateTextRecommendations(text, tokens),
+      };
+    }
+    
+    // Estimate tokens and cost for image
+    estimateImage(config: MediaConfig, model?: string): EstimationResult {
+      const { resolution = '1024x1024', quality = 'medium' } = config;
+      
+      // Estimate tokens based on image description
+      const estimatedDescriptionLength = this.estimateImageDescriptionLength(resolution, quality);
+      const descriptionTokens = this.tokenCalculator.calculateTokens('a'.repeat(estimatedDescriptionLength));
+      
+      // Calculate image-specific cost
+      const baseCost = this.mediaPricing.image.baseCost;
+      const resolutionMultiplier = this.mediaPricing.image.resolutionMultipliers[resolution] || 1.0;
+      const qualityMultiplier = this.mediaPricing.image.qualityMultipliers[quality] || 1.0;
+      const imageCost = baseCost * resolutionMultiplier * qualityMultiplier;
+      
+      // Estimate output tokens (image description, analysis, etc.)
+      const outputTokens = this.estimateImageOutputTokens(resolution, quality);
+      const outputCost = this.tokenCalculator.calculateCost(0, outputTokens, model).outputCost;
+      
+      const totalCost = imageCost + outputCost;
+      const totalTokens = descriptionTokens + outputTokens;
+      
+      return {
+        mediaType: 'image',
+        estimatedTokens: totalTokens,
+        estimatedCost: totalCost,
+        confidence: 0.85,
+        breakdown: {
+          inputTokens: descriptionTokens,
+          outputTokens: outputTokens,
+          processingTokens: 0,
+        },
+        recommendations: this.generateImageRecommendations(resolution, quality, totalCost),
+      };
+    }
+    
+    // Estimate tokens and cost for video
+    estimateVideo(config: MediaConfig, model?: string): EstimationResult {
+      const { duration = 60, quality = 'medium', resolution = '1080p' } = config;
+      
+      // Estimate tokens for video description
+      const estimatedDescriptionLength = this.estimateVideoDescriptionLength(duration, quality);
+      const descriptionTokens = this.tokenCalculator.calculateTokens('a'.repeat(estimatedDescriptionLength));
+      
+      // Calculate video-specific cost
+      const baseCostPerMinute = this.mediaPricing.video.baseCostPerMinute;
+      const qualityMultiplier = this.mediaPricing.video.qualityMultipliers[quality] || 1.0;
+      const resolutionMultiplier = this.mediaPricing.video.resolutionMultipliers[resolution] || 1.0;
+      const videoCost = (duration / 60) * baseCostPerMinute * qualityMultiplier * resolutionMultiplier;
+      
+      // Estimate output tokens (video analysis, transcription, etc.)
+      const outputTokens = this.estimateVideoOutputTokens(duration, quality);
+      const outputCost = this.tokenCalculator.calculateCost(0, outputTokens, model).outputCost;
+      
+      const totalCost = videoCost + outputCost;
+      const totalTokens = descriptionTokens + outputTokens;
+      
+      return {
+        mediaType: 'video',
+        estimatedTokens: totalTokens,
+        estimatedCost: totalCost,
+        confidence: 0.80,
+        breakdown: {
+          inputTokens: descriptionTokens,
+          outputTokens: outputTokens,
+          processingTokens: 0,
+        },
+        recommendations: this.generateVideoRecommendations(duration, quality, totalCost),
+      };
+    }
+    
+    // Estimate tokens and cost for audio
+    estimateAudio(config: MediaConfig, model?: string): EstimationResult {
+      const { duration = 60, quality = 'medium' } = config;
+      
+      // Estimate tokens for audio description
+      const estimatedDescriptionLength = this.estimateAudioDescriptionLength(duration, quality);
+      const descriptionTokens = this.tokenCalculator.calculateTokens('a'.repeat(estimatedDescriptionLength));
+      
+      // Calculate audio-specific cost
+      const baseCostPerMinute = this.mediaPricing.audio.baseCostPerMinute;
+      const qualityMultiplier = this.mediaPricing.audio.qualityMultipliers[quality] || 1.0;
+      const audioCost = (duration / 60) * baseCostPerMinute * qualityMultiplier;
+      
+      // Estimate output tokens (transcription, analysis, etc.)
+      const outputTokens = this.estimateAudioOutputTokens(duration, quality);
+      const outputCost = this.tokenCalculator.calculateCost(0, outputTokens, model).outputCost;
+      
+      const totalCost = audioCost + outputCost;
+      const totalTokens = descriptionTokens + outputTokens;
+      
+      return {
+        mediaType: 'audio',
+        estimatedTokens: totalTokens,
+        estimatedCost: totalCost,
+        confidence: 0.85,
+        breakdown: {
+          inputTokens: descriptionTokens,
+          outputTokens: outputTokens,
+          processingTokens: 0,
+        },
+        recommendations: this.generateAudioRecommendations(duration, quality, totalCost),
+      };
+    }
+    
+    // Estimate mixed media (text + images + video + audio)
+    estimateMixedMedia(mediaConfigs: MediaConfig[], model?: string): EstimationResult {
+      let totalTokens = 0;
+      let totalCost = 0;
+      const breakdowns = [];
+      const recommendations = [];
+      
+      for (const config of mediaConfigs) {
+        let estimation: EstimationResult;
+        
+        switch (config.type) {
+          case 'text':
+            estimation = this.estimateText('placeholder', model);
+            break;
+          case 'image':
+            estimation = this.estimateImage(config, model);
+            break;
+          case 'video':
+            estimation = this.estimateVideo(config, model);
+            break;
+          case 'audio':
+            estimation = this.estimateAudio(config, model);
+            break;
+          default:
+            continue;
+        }
+        
+        totalTokens += estimation.estimatedTokens;
+        totalCost += estimation.estimatedCost;
+        breakdowns.push(estimation.breakdown);
+        recommendations.push(...estimation.recommendations);
+      }
+      
+      // Add mixed media discount
+      const discount = mediaConfigs.length > 1 ? 0.1 : 0; // 10% discount for mixed media
+      const finalCost = totalCost * (1 - discount);
+      
+      return {
+        mediaType: 'mixed',
+        estimatedTokens: totalTokens,
+        estimatedCost: finalCost,
+        confidence: 0.75, // Lower confidence for mixed media
+        breakdown: {
+          inputTokens: breakdowns.reduce((sum, b) => sum + b.inputTokens, 0),
+          outputTokens: breakdowns.reduce((sum, b) => sum + b.outputTokens, 0),
+          processingTokens: breakdowns.reduce((sum, b) => sum + b.processingTokens, 0),
+        },
+        recommendations: [...new Set(recommendations)], // Remove duplicates
+      };
+    }
+    
+    // Create budget plan
+    createBudgetPlan(
+      operations: Array<{ operation: string; mediaConfig: MediaConfig; priority: number }>,
+      budgetConfig: BudgetConfig
+    ): BudgetPlan {
+      const estimations = operations.map(op => ({
+        ...op,
+        estimation: this.estimateMixedMedia([op.mediaConfig]),
+      }));
+      
+      // Sort by priority and cost
+      const sortedOperations = estimations.sort((a, b) => {
+        if (a.priority !== b.priority) return b.priority - a.priority;
+        return a.estimation.estimatedCost - b.estimation.estimatedCost;
+      });
+      
+      let allocatedBudget = 0;
+      const plannedOperations = [];
+      const recommendations = [];
+      
+      for (const op of sortedOperations) {
+        if (allocatedBudget + op.estimation.estimatedCost <= budgetConfig.totalBudget) {
+          plannedOperations.push({
+            operation: op.operation,
+            mediaType: op.mediaConfig.type,
+            estimatedCost: op.estimation.estimatedCost,
+            priority: op.priority,
+          });
+          allocatedBudget += op.estimation.estimatedCost;
+        } else {
+          recommendations.push(`Skip ${op.operation} (cost: $${op.estimation.estimatedCost.toFixed(4)})`);
+        }
+      }
+      
+      const remainingBudget = budgetConfig.totalBudget - allocatedBudget;
+      
+      // Add optimization recommendations
+      if (remainingBudget < budgetConfig.totalBudget * 0.1) {
+        recommendations.push('Consider using cheaper models for non-critical operations');
+        recommendations.push('Batch similar operations to reduce overhead');
+      }
+      
+      return {
+        totalBudget: budgetConfig.totalBudget,
+        allocatedBudget,
+        remainingBudget,
+        operations: plannedOperations,
+        recommendations,
+      };
+    }
+    
+    // Helper methods for estimation
+    private estimateImageDescriptionLength(resolution: string, quality: string): number {
+      const baseLength = 100;
+      const resolutionMultiplier = resolution.includes('4k') ? 1.5 : 1.0;
+      const qualityMultiplier = quality === 'high' ? 1.3 : 1.0;
+      return Math.floor(baseLength * resolutionMultiplier * qualityMultiplier);
+    }
+    
+    private estimateImageOutputTokens(resolution: string, quality: string): number {
+      const baseTokens = 200;
+      const resolutionMultiplier = resolution.includes('4k') ? 1.5 : 1.0;
+      const qualityMultiplier = quality === 'high' ? 1.3 : 1.0;
+      return Math.floor(baseTokens * resolutionMultiplier * qualityMultiplier);
+    }
+    
+    private estimateVideoDescriptionLength(duration: number, quality: string): number {
+      const baseLength = 50;
+      const durationMultiplier = Math.min(duration / 60, 3); // Cap at 3x for long videos
+      const qualityMultiplier = quality === 'high' ? 1.3 : 1.0;
+      return Math.floor(baseLength * durationMultiplier * qualityMultiplier);
+    }
+    
+    private estimateVideoOutputTokens(duration: number, quality: string): number {
+      const baseTokens = 100;
+      const durationMultiplier = Math.min(duration / 60, 3);
+      const qualityMultiplier = quality === 'high' ? 1.3 : 1.0;
+      return Math.floor(baseTokens * durationMultiplier * qualityMultiplier);
+    }
+    
+    private estimateAudioDescriptionLength(duration: number, quality: string): number {
+      const baseLength = 30;
+      const durationMultiplier = Math.min(duration / 60, 2);
+      const qualityMultiplier = quality === 'high' ? 1.2 : 1.0;
+      return Math.floor(baseLength * durationMultiplier * qualityMultiplier);
+    }
+    
+    private estimateAudioOutputTokens(duration: number, quality: string): number {
+      const baseTokens = 80;
+      const durationMultiplier = Math.min(duration / 60, 2);
+      const qualityMultiplier = quality === 'high' ? 1.2 : 1.0;
+      return Math.floor(baseTokens * durationMultiplier * qualityMultiplier);
+    }
+    
+    // Generate recommendations
+    private generateTextRecommendations(text: string, tokens: number): string[] {
+      const recommendations = [];
+      
+      if (tokens > 4000) {
+        recommendations.push('Consider chunking long text into smaller segments');
+        recommendations.push('Use summarization to reduce input length');
+      }
+      
+      if (text.length > 2000) {
+        recommendations.push('Consider using cheaper models for initial processing');
+      }
+      
+      return recommendations;
+    }
+    
+    private generateImageRecommendations(resolution: string, quality: string, cost: number): string[] {
+      const recommendations = [];
+      
+      if (resolution.includes('4k')) {
+        recommendations.push('Consider using 1080p for faster processing and lower cost');
+      }
+      
+      if (quality === 'high' && cost > 0.05) {
+        recommendations.push('Medium quality may be sufficient for most use cases');
+      }
+      
+      return recommendations;
+    }
+    
+    private generateVideoRecommendations(duration: number, quality: string, cost: number): string[] {
+      const recommendations = [];
+      
+      if (duration > 300) { // 5 minutes
+        recommendations.push('Consider processing video in segments');
+        recommendations.push('Use lower quality for initial analysis');
+      }
+      
+      if (quality === 'high' && cost > 0.20) {
+        recommendations.push('Medium quality provides good results at lower cost');
+      }
+      
+      return recommendations;
+    }
+    
+    private generateAudioRecommendations(duration: number, quality: string, cost: number): string[] {
+      const recommendations = [];
+      
+      if (duration > 600) { // 10 minutes
+        recommendations.push('Consider processing audio in chunks');
+        recommendations.push('Use lower quality for initial transcription');
+      }
+      
+      if (quality === 'high' && cost > 0.05) {
+        recommendations.push('Medium quality is sufficient for most audio processing');
+      }
+      
+      return recommendations;
+    }
+  } 

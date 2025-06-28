@@ -1,0 +1,40 @@
+{
+  "category": "",
+  "asset_type": "recipes",
+  "total_files": 2,
+  "last_updated": "2025-06-28T07:58:39.541342",
+  "files": [
+    {
+      "name": "01 Standard Agent Onboarding",
+      "path": "recipes/compliance/01_standard_agent_onboarding.yaml",
+      "type": "recipes",
+      "category": "",
+      "size": 1,
+      "lastModified": "2025-06-28T05:59:29.186686",
+      "hash": "2521e32b500c13e9cc0d24320ae140646daf2f9c861d8a3d0d5f487d1751a035",
+      "description": "Mandatory recipe for all agents to ensure consistent workflow and compliance",
+      "tags": [
+        "mandatory",
+        "onboarding",
+        "compliance"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "name": "02 Code Development Standards",
+      "path": "recipes/compliance/02_code_development_standards.yaml",
+      "type": "recipes",
+      "category": "",
+      "size": 1,
+      "lastModified": "2025-06-28T05:59:31.248045",
+      "hash": "eef40b25494734228bd95506b599cee178d5e6fb43cd4538b45218fdc54da711",
+      "description": "Enforces consistent coding patterns, package usage, and KLF compatibility",
+      "tags": [
+        "development",
+        "standards",
+        "compliance"
+      ],
+      "version": "1.0.0"
+    }
+  ]
+}

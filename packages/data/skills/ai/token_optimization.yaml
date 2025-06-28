@@ -1,0 +1,298 @@
+name: "Token Optimization"
+description: "Optimize prompts and responses for minimal token usage while maintaining accuracy"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["token", "optimization", "efficiency", "cost"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface TokenConfig {
+    targetTokens?: number;
+    maxTokens?: number;
+    preserveAccuracy?: boolean;
+    compressionLevel?: 'minimal' | 'moderate' | 'aggressive';
+  }
+  
+  export interface OptimizationResult {
+    originalText: string;
+    optimizedText: string;
+    tokenReduction: number;
+    compressionRatio: number;
+    qualityScore: number;
+    changes: string[];
+  }
+  
+  export class TokenOptimization {
+    private config: TokenConfig;
+    
+    constructor(config: TokenConfig = {}) {
+      this.config = {
+        targetTokens: 1000,
+        maxTokens: 2000,
+        preserveAccuracy: true,
+        compressionLevel: 'moderate',
+        ...config,
+      };
+    }
+    
+    // Optimize prompt for minimal tokens
+    optimizePrompt(prompt: string, context?: any): OptimizationResult {
+      let optimized = prompt;
+      const changes: string[] = [];
+      
+      // Remove unnecessary whitespace
+      optimized = this.removeExcessWhitespace(optimized);
+      changes.push('Removed excess whitespace');
+      
+      // Compress repetitive patterns
+      optimized = this.compressRepetitivePatterns(optimized);
+      changes.push('Compressed repetitive patterns');
+      
+      // Optimize based on compression level
+      switch (this.config.compressionLevel) {
+        case 'aggressive':
+          optimized = this.aggressiveCompression(optimized);
+          changes.push('Applied aggressive compression');
+          break;
+        case 'moderate':
+          optimized = this.moderateCompression(optimized);
+          changes.push('Applied moderate compression');
+          break;
+        case 'minimal':
+          optimized = this.minimalCompression(optimized);
+          changes.push('Applied minimal compression');
+          break;
+      }
+      
+      // Context-aware optimization
+      if (context) {
+        optimized = this.contextAwareOptimization(optimized, context);
+        changes.push('Applied context-aware optimization');
+      }
+      
+      const tokenReduction = this.estimateTokenReduction(prompt, optimized);
+      const compressionRatio = optimized.length / prompt.length;
+      const qualityScore = this.assessQuality(optimized);
+      
+      return {
+        originalText: prompt,
+        optimizedText: optimized,
+        tokenReduction,
+        compressionRatio,
+        qualityScore,
+        changes,
+      };
+    }
+    
+    // Remove unnecessary whitespace
+    private removeExcessWhitespace(text: string): string {
+      return text
+        .replace(/\s+/g, ' ')           // Multiple spaces to single
+        .replace(/\n\s*\n/g, '\n')      // Multiple newlines to single
+        .replace(/^\s+|\s+$/g, '')      // Trim start/end
+        .replace(/\s+([.,!?])/g, '$1'); // Remove space before punctuation
+    }
+    
+    // Compress repetitive patterns
+    private compressRepetitivePatterns(text: string): string {
+      // Replace common verbose patterns with concise versions
+      const patterns = [
+        { from: /please provide a detailed explanation of/gi, to: 'explain' },
+        { from: /in a comprehensive manner/gi, to: 'comprehensively' },
+        { from: /with great attention to detail/gi, to: 'carefully' },
+        { from: /as thoroughly as possible/gi, to: 'thoroughly' },
+        { from: /in the most effective way/gi, to: 'effectively' },
+        { from: /to the best of your ability/gi, to: 'best' },
+        { from: /utilizing all available information/gi, to: 'using all info' },
+        { from: /taking into consideration/gi, to: 'considering' },
+        { from: /it is important to note that/gi, to: 'note:' },
+        { from: /I would like you to/gi, to: 'Please' },
+      ];
+      
+      let compressed = text;
+      patterns.forEach(pattern => {
+        compressed = compressed.replace(pattern.from, pattern.to);
+      });
+      
+      return compressed;
+    }
+    
+    // Minimal compression - safe optimizations
+    private minimalCompression(text: string): string {
+      // Only remove obvious redundancies
+      const safePatterns = [
+        { from: /\bvery very\b/gi, to: 'very' },
+        { from: /\bcompletely completely\b/gi, to: 'completely' },
+        { from: /\babsolutely absolutely\b/gi, to: 'absolutely' },
+        { from: /\bplease please\b/gi, to: 'please' },
+      ];
+      
+      let compressed = text;
+      safePatterns.forEach(pattern => {
+        compressed = compressed.replace(pattern.from, pattern.to);
+      });
+      
+      return compressed;
+    }
+    
+    // Moderate compression - balance of size and quality
+    private moderateCompression(text: string): string {
+      let compressed = this.minimalCompression(text);
+      
+      // Additional moderate optimizations
+      const moderatePatterns = [
+        { from: /\bwith respect to\b/gi, to: 'regarding' },
+        { from: /\bin order to\b/gi, to: 'to' },
+        { from: /\bfor the purpose of\b/gi, to: 'for' },
+        { from: /\bon the basis of\b/gi, to: 'based on' },
+        { from: /\bwith regard to\b/gi, to: 'regarding' },
+        { from: /\bin the context of\b/gi, to: 'in' },
+        { from: /\bwith the exception of\b/gi, to: 'except' },
+        { from: /\bat the present time\b/gi, to: 'now' },
+      ];
+      
+      moderatePatterns.forEach(pattern => {
+        compressed = compressed.replace(pattern.from, pattern.to);
+      });
+      
+      return compressed;
+    }
+    
+    // Aggressive compression - maximum token reduction
+    private aggressiveCompression(text: string): string {
+      let compressed = this.moderateCompression(text);
+      
+      // More aggressive optimizations
+      const aggressivePatterns = [
+        { from: /\bhowever\b/gi, to: 'but' },
+        { from: /\bfurthermore\b/gi, to: 'also' },
+        { from: /\bmoreover\b/gi, to: 'also' },
+        { from: /\badditionally\b/gi, to: 'also' },
+        { from: /\bconsequently\b/gi, to: 'so' },
+        { from: /\btherefore\b/gi, to: 'so' },
+        { from: /\bnevertheless\b/gi, to: 'but' },
+        { from: /\bnonetheless\b/gi, to: 'but' },
+        { from: /\bwith the intention of\b/gi, to: 'to' },
+        { from: /\bfor the reason that\b/gi, to: 'because' },
+      ];
+      
+      aggressivePatterns.forEach(pattern => {
+        compressed = compressed.replace(pattern.from, pattern.to);
+      });
+      
+      return compressed;
+    }
+    
+    // Context-aware optimization
+    private contextAwareOptimization(text: string, context: any): string {
+      let optimized = text;
+      
+      // Remove redundant context information
+      if (context.topic) {
+        const topicPattern = new RegExp(`\\b${context.topic}\\b`, 'gi');
+        // Only remove if it appears multiple times
+        const matches = optimized.match(topicPattern);
+        if (matches && matches.length > 2) {
+          optimized = optimized.replace(topicPattern, (match, index) => {
+            return index === 0 ? match : 'it';
+          });
+        }
+      }
+      
+      // Use pronouns for repeated entities
+      if (context.entities) {
+        context.entities.forEach((entity: string, index: number) => {
+          if (index > 0) {
+            const entityPattern = new RegExp(`\\b${entity}\\b`, 'gi');
+            optimized = optimized.replace(entityPattern, 'it');
+          }
+        });
+      }
+      
+      return optimized;
+    }
+    
+    // Estimate token reduction (rough approximation)
+    private estimateTokenReduction(original: string, optimized: string): number {
+      // Rough token estimation: 1 token ≈ 4 characters
+      const originalTokens = Math.ceil(original.length / 4);
+      const optimizedTokens = Math.ceil(optimized.length / 4);
+      return originalTokens - optimizedTokens;
+    }
+    
+    // Assess quality of optimization
+    private assessQuality(text: string): number {
+      let score = 1.0;
+      
+      // Penalize if too short (might lose meaning)
+      if (text.length < 50) score -= 0.2;
+      
+      // Penalize if too compressed (might be unclear)
+      const wordCount = text.split(/\s+/).length;
+      if (wordCount < 10) score -= 0.3;
+      
+      // Check for readability
+      const sentences = text.split(/[.!?]+/).length;
+      const avgWordsPerSentence = wordCount / sentences;
+      if (avgWordsPerSentence > 25) score -= 0.2;
+      
+      // Check for essential elements
+      const hasAction = /\b(do|create|write|analyze|explain|summarize)\b/gi.test(text);
+      const hasSubject = /\b(it|this|that|the|a|an)\b/gi.test(text);
+      
+      if (!hasAction) score -= 0.3;
+      if (!hasSubject) score -= 0.2;
+      
+      return Math.max(0, Math.min(1, score));
+    }
+    
+    // Batch optimization
+    optimizePrompts(prompts: string[], context?: any): OptimizationResult[] {
+      return prompts.map(prompt => this.optimizePrompt(prompt, context));
+    }
+    
+    // Optimize for specific token target
+    optimizeToTarget(prompt: string, targetTokens: number): OptimizationResult {
+      const original = this.optimizePrompt(prompt);
+      
+      if (original.tokenReduction >= targetTokens) {
+        return original;
+      }
+      
+      // Apply more aggressive compression
+      this.config.compressionLevel = 'aggressive';
+      const aggressive = this.optimizePrompt(prompt);
+      
+      if (aggressive.tokenReduction >= targetTokens) {
+        return aggressive;
+      }
+      
+      // Truncate if necessary (last resort)
+      const maxChars = targetTokens * 4; // Rough estimation
+      const truncated = prompt.substring(0, maxChars);
+      
+      return {
+        originalText: prompt,
+        optimizedText: truncated,
+        tokenReduction: this.estimateTokenReduction(prompt, truncated),
+        compressionRatio: truncated.length / prompt.length,
+        qualityScore: 0.5, // Lower score for truncation
+        changes: ['Applied aggressive compression', 'Truncated to target length'],
+      };
+    }
+    
+    // Configuration management
+    updateConfig(newConfig: Partial<TokenConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    getConfig(): TokenConfig {
+      return { ...this.config };
+    }
+  } 

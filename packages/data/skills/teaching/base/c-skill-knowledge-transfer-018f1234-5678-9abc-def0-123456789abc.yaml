@@ -1,0 +1,654 @@
+name: "Knowledge Transfer Base"
+description: "Advanced knowledge transfer and educational content delivery capabilities for effective learning"
+category: "teaching"
+tags:
+  primary: "teaching"
+  secondary: ["education", "learning", "content", "delivery", "pedagogy"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface LearningContent {
+    id: string;
+    title: string;
+    description: string;
+    type: 'concept' | 'procedure' | 'fact' | 'skill' | 'principle';
+    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    format: 'text' | 'video' | 'audio' | 'interactive' | 'multimedia';
+    content: string;
+    prerequisites: string[];
+    objectives: string[];
+    metadata: Record<string, any>;
+  }
+  
+  export interface LearningPath {
+    id: string;
+    name: string;
+    description: string;
+    content: LearningContent[];
+    sequence: string[]; // Content IDs in order
+    estimatedDuration: number; // in minutes
+    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    prerequisites: string[];
+    outcomes: string[];
+  }
+  
+  export interface Learner {
+    id: string;
+    name: string;
+    level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    preferences: {
+      learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+      pace: 'slow' | 'normal' | 'fast';
+      format: 'text' | 'video' | 'audio' | 'interactive';
+    };
+    progress: Map<string, number>; // Content ID -> Progress (0-1)
+    completed: Set<string>; // Completed content IDs
+    assessments: AssessmentResult[];
+  }
+  
+  export interface AssessmentResult {
+    id: string;
+    contentId: string;
+    score: number; // 0-1
+    timestamp: Date;
+    answers: Record<string, any>;
+    feedback: string;
+  }
+  
+  export interface TeachingStrategy {
+    id: string;
+    name: string;
+    description: string;
+    type: 'explanation' | 'demonstration' | 'practice' | 'feedback' | 'review';
+    content: string;
+    conditions: string[];
+    effectiveness: number; // 0-1
+  }
+  
+  export interface LearningSession {
+    id: string;
+    learnerId: string;
+    contentId: string;
+    startTime: Date;
+    endTime?: Date;
+    duration: number; // in minutes
+    engagement: number; // 0-1
+    comprehension: number; // 0-1
+    notes: string[];
+  }
+  
+  export class KnowledgeTransferSkill {
+    private content: Map<string, LearningContent>;
+    private paths: Map<string, LearningPath>;
+    private learners: Map<string, Learner>;
+    private strategies: Map<string, TeachingStrategy>;
+    private sessions: Map<string, LearningSession>;
+    
+    constructor() {
+      this.content = new Map();
+      this.paths = new Map();
+      this.learners = new Map();
+      this.strategies = new Map();
+      this.sessions = new Map();
+      this.initializeDefaultContent();
+      this.initializeTeachingStrategies();
+    }
+    
+    // Initialize default learning content
+    private initializeDefaultContent(): void {
+      // Basic concept content
+      this.content.set('basic_concept', {
+        id: 'basic_concept',
+        title: 'Understanding Basic Concepts',
+        description: 'Learn how to identify and understand fundamental concepts',
+        type: 'concept',
+        difficulty: 'beginner',
+        format: 'text',
+        content: 'A concept is a mental representation of a category of things, events, or ideas. Understanding concepts involves recognizing patterns, similarities, and differences.',
+        prerequisites: [],
+        objectives: [
+          'Define what a concept is',
+          'Identify different types of concepts',
+          'Understand how concepts are formed'
+        ],
+        metadata: {
+          tags: ['concept', 'fundamental', 'theory'],
+          estimatedTime: 15
+        }
+      });
+      
+      // Problem-solving procedure
+      this.content.set('problem_solving', {
+        id: 'problem_solving',
+        title: 'Problem-Solving Procedure',
+        description: 'Learn a systematic approach to solving problems',
+        type: 'procedure',
+        difficulty: 'intermediate',
+        format: 'interactive',
+        content: '1. Define the problem clearly\n2. Gather relevant information\n3. Generate possible solutions\n4. Evaluate alternatives\n5. Choose the best solution\n6. Implement the solution\n7. Monitor and evaluate results',
+        prerequisites: ['basic_concept'],
+        objectives: [
+          'Apply systematic problem-solving steps',
+          'Evaluate different solution approaches',
+          'Monitor solution effectiveness'
+        ],
+        metadata: {
+          tags: ['problem-solving', 'procedure', 'systematic'],
+          estimatedTime: 30
+        }
+      });
+      
+      // Critical thinking skill
+      this.content.set('critical_thinking', {
+        id: 'critical_thinking',
+        title: 'Critical Thinking Skills',
+        description: 'Develop critical thinking and analytical reasoning abilities',
+        type: 'skill',
+        difficulty: 'advanced',
+        format: 'multimedia',
+        content: 'Critical thinking involves analyzing information, evaluating arguments, and making reasoned judgments. It requires questioning assumptions, considering multiple perspectives, and drawing logical conclusions.',
+        prerequisites: ['problem_solving'],
+        objectives: [
+          'Analyze arguments and evidence',
+          'Evaluate credibility of sources',
+          'Draw logical conclusions',
+          'Recognize cognitive biases'
+        ],
+        metadata: {
+          tags: ['critical-thinking', 'analysis', 'reasoning'],
+          estimatedTime: 45
+        }
+      });
+    }
+    
+    // Initialize teaching strategies
+    private initializeTeachingStrategies(): void {
+      // Explanation strategy
+      this.strategies.set('explanation', {
+        id: 'explanation',
+        name: 'Clear Explanation',
+        description: 'Provide clear, structured explanations of concepts',
+        type: 'explanation',
+        content: 'Break down complex concepts into simpler parts. Use analogies and examples to illustrate key points. Provide step-by-step explanations for procedures.',
+        conditions: ['learner_needs_clarity', 'concept_is_complex'],
+        effectiveness: 0.8
+      });
+      
+      // Demonstration strategy
+      this.strategies.set('demonstration', {
+        id: 'demonstration',
+        name: 'Live Demonstration',
+        description: 'Show how to perform tasks or procedures',
+        type: 'demonstration',
+        content: 'Demonstrate the process step-by-step while explaining each action. Allow learners to observe and ask questions. Provide opportunities for practice.',
+        conditions: ['skill_based_content', 'visual_learner'],
+        effectiveness: 0.9
+      });
+      
+      // Practice strategy
+      this.strategies.set('practice', {
+        id: 'practice',
+        name: 'Guided Practice',
+        description: 'Provide opportunities for hands-on practice',
+        type: 'practice',
+        content: 'Create exercises and activities that allow learners to apply what they have learned. Provide feedback and guidance during practice sessions.',
+        conditions: ['skill_development_needed', 'learner_ready_for_practice'],
+        effectiveness: 0.85
+      });
+      
+      // Feedback strategy
+      this.strategies.set('feedback', {
+        id: 'feedback',
+        name: 'Constructive Feedback',
+        description: 'Provide specific, actionable feedback',
+        type: 'feedback',
+        content: 'Give specific feedback on performance, highlighting strengths and areas for improvement. Provide suggestions for how to improve.',
+        conditions: ['learner_has_practiced', 'improvement_needed'],
+        effectiveness: 0.75
+      });
+      
+      // Review strategy
+      this.strategies.set('review', {
+        id: 'review',
+        name: 'Periodic Review',
+        description: 'Regular review of previously learned content',
+        type: 'review',
+        content: 'Schedule regular reviews of key concepts and skills. Use different formats and approaches to reinforce learning.',
+        conditions: ['content_needs_reinforcement', 'time_since_last_learning'],
+        effectiveness: 0.7
+      });
+    }
+    
+    // Create learning path
+    createLearningPath(
+      name: string,
+      description: string,
+      contentIds: string[],
+      difficulty: LearningPath['difficulty'] = 'beginner'
+    ): LearningPath {
+      const content = contentIds.map(id => this.content.get(id)).filter(Boolean) as LearningContent[];
+      
+      const path: LearningPath = {
+        id: this.generatePathId(),
+        name,
+        description,
+        content,
+        sequence: contentIds,
+        estimatedDuration: content.reduce((sum, c) => sum + (c.metadata.estimatedTime || 15), 0),
+        difficulty,
+        prerequisites: [],
+        outcomes: content.flatMap(c => c.objectives)
+      };
+      
+      this.paths.set(path.id, path);
+      return path;
+    }
+    
+    // Register learner
+    registerLearner(
+      name: string,
+      level: Learner['level'] = 'beginner',
+      preferences: Partial<Learner['preferences']> = {}
+    ): Learner {
+      const learner: Learner = {
+        id: this.generateLearnerId(),
+        name,
+        level,
+        preferences: {
+          learningStyle: 'visual',
+          pace: 'normal',
+          format: 'text',
+          ...preferences
+        },
+        progress: new Map(),
+        completed: new Set(),
+        assessments: []
+      };
+      
+      this.learners.set(learner.id, learner);
+      return learner;
+    }
+    
+    // Start learning session
+    startSession(learnerId: string, contentId: string): LearningSession {
+      const learner = this.learners.get(learnerId);
+      const content = this.content.get(contentId);
+      
+      if (!learner || !content) {
+        throw new Error('Learner or content not found');
+      }
+      
+      const session: LearningSession = {
+        id: this.generateSessionId(),
+        learnerId,
+        contentId,
+        startTime: new Date(),
+        duration: 0,
+        engagement: 0,
+        comprehension: 0,
+        notes: []
+      };
+      
+      this.sessions.set(session.id, session);
+      return session;
+    }
+    
+    // End learning session
+    endSession(sessionId: string, engagement: number, comprehension: number, notes: string[] = []): void {
+      const session = this.sessions.get(sessionId);
+      if (!session) return;
+      
+      session.endTime = new Date();
+      session.duration = (session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60);
+      session.engagement = Math.max(0, Math.min(1, engagement));
+      session.comprehension = Math.max(0, Math.min(1, comprehension));
+      session.notes = notes;
+      
+      // Update learner progress
+      const learner = this.learners.get(session.learnerId);
+      if (learner) {
+        learner.progress.set(session.contentId, comprehension);
+        
+        if (comprehension >= 0.8) {
+          learner.completed.add(session.contentId);
+        }
+      }
+    }
+    
+    // Get personalized learning path
+    getPersonalizedPath(learnerId: string, topic?: string): LearningPath | null {
+      const learner = this.learners.get(learnerId);
+      if (!learner) return null;
+      
+      // Find appropriate content based on learner level and preferences
+      const suitableContent = Array.from(this.content.values())
+        .filter(content => {
+          // Check difficulty level
+          const levelMatch = this.isLevelSuitable(content.difficulty, learner.level);
+          
+          // Check format preference
+          const formatMatch = content.format === learner.preferences.format;
+          
+          // Check if prerequisites are met
+          const prerequisitesMet = content.prerequisites.every(prereq => 
+            learner.completed.has(prereq)
+          );
+          
+          return levelMatch && (formatMatch || content.format === 'multimedia') && prerequisitesMet;
+        })
+        .sort((a, b) => {
+          // Prioritize by difficulty match and format preference
+          const aScore = this.calculateContentScore(a, learner);
+          const bScore = this.calculateContentScore(b, learner);
+          return bScore - aScore;
+        });
+      
+      if (suitableContent.length === 0) return null;
+      
+      // Create personalized path
+      const contentIds = suitableContent.slice(0, 5).map(c => c.id);
+      return this.createLearningPath(
+        `Personalized Path for ${learner.name}`,
+        `Customized learning path based on ${learner.name}'s preferences and progress`,
+        contentIds,
+        learner.level
+      );
+    }
+    
+    // Calculate content suitability score
+    private calculateContentScore(content: LearningContent, learner: Learner): number {
+      let score = 0;
+      
+      // Level suitability
+      if (content.difficulty === learner.level) score += 0.4;
+      else if (this.isLevelSuitable(content.difficulty, learner.level)) score += 0.2;
+      
+      // Format preference
+      if (content.format === learner.preferences.format) score += 0.3;
+      else if (content.format === 'multimedia') score += 0.2;
+      
+      // Learning style compatibility
+      if (learner.preferences.learningStyle === 'visual' && content.format === 'video') score += 0.2;
+      else if (learner.preferences.learningStyle === 'auditory' && content.format === 'audio') score += 0.2;
+      else if (learner.preferences.learningStyle === 'reading' && content.format === 'text') score += 0.2;
+      
+      return score;
+    }
+    
+    // Check if level is suitable
+    private isLevelSuitable(contentLevel: string, learnerLevel: string): boolean {
+      const levels = ['beginner', 'intermediate', 'advanced', 'expert'];
+      const contentIndex = levels.indexOf(contentLevel);
+      const learnerIndex = levels.indexOf(learnerLevel);
+      
+      return contentIndex <= learnerIndex + 1; // Allow one level above
+    }
+    
+    // Get teaching recommendations
+    getTeachingRecommendations(learnerId: string, contentId: string): TeachingStrategy[] {
+      const learner = this.learners.get(learnerId);
+      const content = this.content.get(contentId);
+      
+      if (!learner || !content) return [];
+      
+      const recommendations: TeachingStrategy[] = [];
+      
+      for (const strategy of this.strategies.values()) {
+        if (this.shouldUseStrategy(strategy, learner, content)) {
+          recommendations.push(strategy);
+        }
+      }
+      
+      // Sort by effectiveness
+      return recommendations.sort((a, b) => b.effectiveness - a.effectiveness);
+    }
+    
+    // Determine if strategy should be used
+    private shouldUseStrategy(strategy: TeachingStrategy, learner: Learner, content: LearningContent): boolean {
+      for (const condition of strategy.conditions) {
+        switch (condition) {
+          case 'learner_needs_clarity':
+            if (learner.level === 'beginner' && content.difficulty === 'intermediate') return true;
+            break;
+          case 'concept_is_complex':
+            if (content.type === 'concept' && content.difficulty === 'advanced') return true;
+            break;
+          case 'skill_based_content':
+            if (content.type === 'skill' || content.type === 'procedure') return true;
+            break;
+          case 'visual_learner':
+            if (learner.preferences.learningStyle === 'visual') return true;
+            break;
+          case 'skill_development_needed':
+            if (content.type === 'skill') return true;
+            break;
+          case 'learner_ready_for_practice':
+            const progress = learner.progress.get(content.id) || 0;
+            if (progress >= 0.6) return true;
+            break;
+          case 'learner_has_practiced':
+            if (learner.completed.has(content.id)) return true;
+            break;
+          case 'improvement_needed':
+            const recentAssessments = learner.assessments
+              .filter(a => a.contentId === content.id)
+              .slice(-3);
+            if (recentAssessments.length > 0) {
+              const avgScore = recentAssessments.reduce((sum, a) => sum + a.score, 0) / recentAssessments.length;
+              if (avgScore < 0.8) return true;
+            }
+            break;
+          case 'content_needs_reinforcement':
+            const lastSession = Array.from(this.sessions.values())
+              .filter(s => s.learnerId === learner.id && s.contentId === content.id)
+              .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
+            
+            if (lastSession) {
+              const daysSince = (Date.now() - lastSession.startTime.getTime()) / (1000 * 60 * 60 * 24);
+              if (daysSince > 7) return true;
+            }
+            break;
+          case 'time_since_last_learning':
+            const lastLearning = Array.from(this.sessions.values())
+              .filter(s => s.learnerId === learner.id)
+              .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
+            
+            if (lastLearning) {
+              const daysSince = (Date.now() - lastLearning.startTime.getTime()) / (1000 * 60 * 60 * 24);
+              if (daysSince > 14) return true;
+            }
+            break;
+        }
+      }
+      
+      return false;
+    }
+    
+    // Record assessment result
+    recordAssessment(
+      learnerId: string,
+      contentId: string,
+      score: number,
+      answers: Record<string, any>,
+      feedback: string
+    ): AssessmentResult {
+      const learner = this.learners.get(learnerId);
+      if (!learner) {
+        throw new Error('Learner not found');
+      }
+      
+      const assessment: AssessmentResult = {
+        id: this.generateAssessmentId(),
+        contentId,
+        score: Math.max(0, Math.min(1, score)),
+        timestamp: new Date(),
+        answers,
+        feedback
+      };
+      
+      learner.assessments.push(assessment);
+      
+      // Update progress
+      learner.progress.set(contentId, score);
+      
+      if (score >= 0.8) {
+        learner.completed.add(contentId);
+      }
+      
+      return assessment;
+    }
+    
+    // Get learner progress
+    getLearnerProgress(learnerId: string): {
+      overall: number;
+      byContent: Record<string, number>;
+      completed: string[];
+      recommendations: string[];
+    } {
+      const learner = this.learners.get(learnerId);
+      if (!learner) {
+        throw new Error('Learner not found');
+      }
+      
+      const progressEntries = Array.from(learner.progress.entries());
+      const overall = progressEntries.length > 0 ?
+        progressEntries.reduce((sum, [, progress]) => sum + progress, 0) / progressEntries.length : 0;
+      
+      const byContent: Record<string, number> = {};
+      learner.progress.forEach((progress, contentId) => {
+        byContent[contentId] = progress;
+      });
+      
+      const completed = Array.from(learner.completed);
+      
+      const recommendations = this.generateRecommendations(learner);
+      
+      return {
+        overall,
+        byContent,
+        completed,
+        recommendations
+      };
+    }
+    
+    // Generate recommendations
+    private generateRecommendations(learner: Learner): string[] {
+      const recommendations: string[] = [];
+      
+      // Check for low progress areas
+      const lowProgress = Array.from(learner.progress.entries())
+        .filter(([, progress]) => progress < 0.6)
+        .map(([contentId]) => contentId);
+      
+      if (lowProgress.length > 0) {
+        recommendations.push(`Review content: ${lowProgress.join(', ')}`);
+      }
+      
+      // Check for completed content that needs reinforcement
+      const recentAssessments = learner.assessments
+        .filter(a => a.timestamp > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+      
+      const lowScores = recentAssessments.filter(a => a.score < 0.7);
+      if (lowScores.length > 0) {
+        recommendations.push('Practice recently learned content to reinforce understanding');
+      }
+      
+      // Suggest next steps
+      const availableContent = Array.from(this.content.values())
+        .filter(content => !learner.completed.has(content.id) && 
+          content.prerequisites.every(prereq => learner.completed.has(prereq)));
+      
+      if (availableContent.length > 0) {
+        const nextContent = availableContent[0];
+        recommendations.push(`Next recommended: ${nextContent.title}`);
+      }
+      
+      return recommendations;
+    }
+    
+    // Add learning content
+    addContent(content: LearningContent): void {
+      this.content.set(content.id, content);
+    }
+    
+    // Add teaching strategy
+    addStrategy(strategy: TeachingStrategy): void {
+      this.strategies.set(strategy.id, strategy);
+    }
+    
+    // Get all content
+    getAllContent(): LearningContent[] {
+      return Array.from(this.content.values());
+    }
+    
+    // Get content by type
+    getContentByType(type: LearningContent['type']): LearningContent[] {
+      return Array.from(this.content.values())
+        .filter(content => content.type === type);
+    }
+    
+    // Get all learners
+    getAllLearners(): Learner[] {
+      return Array.from(this.learners.values());
+    }
+    
+    // Get all paths
+    getAllPaths(): LearningPath[] {
+      return Array.from(this.paths.values());
+    }
+    
+    // Get learner sessions
+    getLearnerSessions(learnerId: string): LearningSession[] {
+      return Array.from(this.sessions.values())
+        .filter(session => session.learnerId === learnerId)
+        .sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
+    }
+    
+    // Generate IDs
+    private generatePathId(): string {
+      return `path_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    private generateLearnerId(): string {
+      return `learner_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    private generateSessionId(): string {
+      return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    private generateAssessmentId(): string {
+      return `assessment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Get statistics
+    getStatistics(): {
+      totalContent: number;
+      totalLearners: number;
+      totalPaths: number;
+      totalSessions: number;
+      averageEngagement: number;
+      averageComprehension: number;
+    } {
+      const sessions = Array.from(this.sessions.values());
+      const averageEngagement = sessions.length > 0 ?
+        sessions.reduce((sum, s) => sum + s.engagement, 0) / sessions.length : 0;
+      const averageComprehension = sessions.length > 0 ?
+        sessions.reduce((sum, s) => sum + s.comprehension, 0) / sessions.length : 0;
+      
+      return {
+        totalContent: this.content.size,
+        totalLearners: this.learners.size,
+        totalPaths: this.paths.size,
+        totalSessions: this.sessions.size,
+        averageEngagement,
+        averageComprehension
+      };
+    }
+  } 

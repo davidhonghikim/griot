@@ -1,0 +1,44 @@
+{
+  "category": "general",
+  "asset_type": "configs",
+  "total_files": 3,
+  "last_updated": "2025-06-28T07:58:39.550276",
+  "files": [
+    {
+      "name": "Model Pricing",
+      "path": "config/model_pricing.json",
+      "type": "unknown",
+      "category": "general",
+      "size": 2,
+      "lastModified": "2025-06-28T07:00:12.576232",
+      "hash": "71fd46c3864dfdf6fc48be26e4265af3a1d7d4936af89591245473f4ea9b6b97",
+      "description": "AI model pricing per 1M tokens (USD)",
+      "tags": [],
+      "version": "1.0.0"
+    },
+    {
+      "name": "Default Pricing",
+      "path": "config/default_pricing.json",
+      "type": "unknown",
+      "category": "general",
+      "size": 7,
+      "lastModified": "2025-06-28T07:28:17.355798",
+      "hash": "0004a10b6962b01af672323a06191d4cc86f5e13685cd0788edca9073dd975dd",
+      "description": "Default pricing data for common AI providers - used as fallback and initial seed",
+      "tags": [],
+      "version": "1.0.0"
+    },
+    {
+      "name": "Provider Config",
+      "path": "config/provider_config.json",
+      "type": "unknown",
+      "category": "general",
+      "size": 4,
+      "lastModified": "2025-06-28T07:05:58.824775",
+      "hash": "a6caef8433a4d4cac6f5095c74038d05fbe54fc27a17b68077cdde5de2fdfd41",
+      "description": "Generic AI provider configuration for extensible pricing system",
+      "tags": [],
+      "version": "1.0.0"
+    }
+  ]
+}

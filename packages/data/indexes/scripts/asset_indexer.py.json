@@ -1,0 +1,18 @@
+{
+  "category": "asset_indexer.py",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.546803",
+  "files": [
+    {
+      "name": "Asset Indexer",
+      "path": "scripts/asset_indexer.py",
+      "type": "scripts",
+      "category": "asset_indexer.py",
+      "size": 16,
+      "lastModified": "2025-06-28T07:58:34.872054",
+      "hash": "71b86d8291bfb141cac973aa5e67c5bcdeb0af764656425b664fcb3e6b35cd44",
+      "description": "Asset type configurations"
+    }
+  ]
+}

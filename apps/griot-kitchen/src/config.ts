@@ -1,24 +1,13 @@
-import dotenv from 'dotenv';
+import { getEnvironmentConfig } from '@griot/core';
 
-// It is recommended to create a `.env` file in the root of the `griot-kitchen` package.
-// Load environment variables from that file.
-dotenv.config();
+const env = getEnvironmentConfig();
 
-interface AppConfig {
-  host: string;
-  port: number;
-  mongoUri: string;
-  mongoDbName: string;
-  logLevel: string;
-}
-
-// Perform basic validation and export the configuration.
-const config: AppConfig = {
-  host: process.env.HOST || '0.0.0.0',
-  port: parseInt(process.env.PORT || '8080', 10),
-  mongoUri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
-  mongoDbName: process.env.MONGODB_DB_NAME || 'griot_seed',
-  logLevel: process.env.LOG_LEVEL || 'info',
+export const config = {
+  host: env.HOST,
+  port: env.PORT || 8080,
+  mongoUri: env.MONGODB_URI || 'mongodb://localhost:27017',
+  mongoDbName: env.MONGODB_DB_NAME || 'griot_seed',
+  logLevel: process.env.LOG_LEVEL || 'info', // If LOG_LEVEL is not in central config, keep this fallback
 };
 
 // Validate that essential variables are present

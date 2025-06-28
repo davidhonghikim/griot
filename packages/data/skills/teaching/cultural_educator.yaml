@@ -1,0 +1,336 @@
+name: "Cultural Educator"
+description: "Cultural education and knowledge transmission skills with respect for traditional teaching methods"
+category: "teaching"
+tags:
+  primary: "teaching"
+  secondary: ["cultural", "education", "traditional", "knowledge", "transmission"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface CulturalKnowledge {
+    id: string;
+    title: string;
+    description: string;
+    culturalContext: string;
+    transmissionMethod: 'storytelling' | 'observation' | 'practice' | 'ceremony' | 'discussion';
+    complexity: 'beginner' | 'intermediate' | 'advanced';
+    prerequisites: string[];
+    culturalSignificance: string;
+    modernRelevance: string;
+  }
+  
+  export interface TeachingSession {
+    knowledgeId: string;
+    learnerId: string;
+    method: string;
+    culturalContext: string;
+    duration: number; // in minutes
+    materials: string[];
+    culturalElements: string[];
+    assessment: {
+      understanding: number; // 0-1
+      culturalAppreciation: number; // 0-1
+      practicalApplication: number; // 0-1
+    };
+  }
+  
+  export class CulturalEducatorSkill {
+    private culturalKnowledge: Map<string, CulturalKnowledge>;
+    private teachingMethods: Map<string, any>;
+    private culturalFrameworks: Map<string, any>;
+    
+    constructor() {
+      this.culturalKnowledge = new Map();
+      this.teachingMethods = new Map();
+      this.culturalFrameworks = new Map();
+      this.initializeKnowledge();
+      this.initializeMethods();
+    }
+    
+    // Initialize cultural knowledge base
+    private initializeKnowledge(): void {
+      // HIEROS cultural knowledge
+      this.culturalKnowledge.set('hieros_principles', {
+        id: 'hieros_principles',
+        title: 'The Seven Sacred Intentions of HIEROS',
+        description: 'Core principles for ethical AI development and cultural stewardship',
+        culturalContext: 'HIEROS',
+        transmissionMethod: 'discussion',
+        complexity: 'intermediate',
+        prerequisites: ['basic_ethics', 'cultural_awareness'],
+        culturalSignificance: 'Foundation for ethical AI development and cultural preservation',
+        modernRelevance: 'Essential for building AI systems that respect human dignity and cultural diversity'
+      });
+      
+      this.culturalKnowledge.set('traditional_teaching', {
+        id: 'traditional_teaching',
+        title: 'Traditional Teaching Methods',
+        description: 'Time-honored approaches to knowledge transmission',
+        culturalContext: 'Universal',
+        transmissionMethod: 'storytelling',
+        complexity: 'beginner',
+        prerequisites: [],
+        culturalSignificance: 'Preserves cultural wisdom and ensures authentic transmission',
+        modernRelevance: 'Provides effective alternatives to modern educational methods'
+      });
+      
+      this.culturalKnowledge.set('cultural_stewardship', {
+        id: 'cultural_stewardship',
+        title: 'Cultural Stewardship and Preservation',
+        description: 'Responsible care and transmission of cultural knowledge',
+        culturalContext: 'Universal',
+        transmissionMethod: 'practice',
+        complexity: 'advanced',
+        prerequisites: ['hieros_principles', 'traditional_teaching'],
+        culturalSignificance: 'Ensures cultural continuity and prevents appropriation',
+        modernRelevance: 'Critical for maintaining cultural diversity in globalized world'
+      });
+    }
+    
+    // Initialize teaching methods
+    private initializeMethods(): void {
+      this.teachingMethods.set('storytelling', {
+        description: 'Narrative-based knowledge transmission',
+        duration: 30,
+        materials: ['stories', 'cultural_context', 'reflection_questions'],
+        culturalElements: ['oral_tradition', 'narrative_wisdom', 'cultural_values'],
+        effectiveness: 0.9
+      });
+      
+      this.teachingMethods.set('observation', {
+        description: 'Learning through careful observation and reflection',
+        duration: 45,
+        materials: ['demonstrations', 'guided_observation', 'reflection_journal'],
+        culturalElements: ['respectful_observation', 'patient_learning', 'cultural_practice'],
+        effectiveness: 0.85
+      });
+      
+      this.teachingMethods.set('practice', {
+        description: 'Hands-on learning through cultural practices',
+        duration: 60,
+        materials: ['practical_exercises', 'cultural_tools', 'guidance'],
+        culturalElements: ['embodied_learning', 'cultural_practice', 'skill_development'],
+        effectiveness: 0.95
+      });
+      
+      this.teachingMethods.set('discussion', {
+        description: 'Interactive dialogue and knowledge sharing',
+        duration: 40,
+        materials: ['discussion_topics', 'cultural_context', 'facilitation_guidelines'],
+        culturalElements: ['collective_wisdom', 'shared_understanding', 'cultural_dialogue'],
+        effectiveness: 0.8
+      });
+    }
+    
+    // Plan cultural education session
+    async planSession(
+      knowledgeId: string,
+      learnerLevel: string,
+      culturalContext: string = 'HIEROS'
+    ): Promise<TeachingSession> {
+      const knowledge = this.culturalKnowledge.get(knowledgeId);
+      if (!knowledge) {
+        throw new Error(`Cultural knowledge not found: ${knowledgeId}`);
+      }
+      
+      const method = this.selectTeachingMethod(knowledge, learnerLevel);
+      const methodDetails = this.teachingMethods.get(method);
+      
+      return {
+        knowledgeId,
+        learnerId: 'current_learner',
+        method,
+        culturalContext,
+        duration: methodDetails.duration,
+        materials: methodDetails.materials,
+        culturalElements: methodDetails.culturalElements,
+        assessment: {
+          understanding: 0,
+          culturalAppreciation: 0,
+          practicalApplication: 0
+        }
+      };
+    }
+    
+    // Select appropriate teaching method
+    private selectTeachingMethod(knowledge: CulturalKnowledge, learnerLevel: string): string {
+      const methodPreferences = {
+        beginner: ['storytelling', 'observation'],
+        intermediate: ['discussion', 'practice'],
+        advanced: ['practice', 'discussion']
+      };
+      
+      const preferredMethods = methodPreferences[learnerLevel as keyof typeof methodPreferences] || ['discussion'];
+      
+      // Find the best method that matches the knowledge transmission method
+      for (const method of preferredMethods) {
+        if (method === knowledge.transmissionMethod) {
+          return method;
+        }
+      }
+      
+      // Fall back to preferred method for learner level
+      return preferredMethods[0];
+    }
+    
+    // Conduct cultural education session
+    async conductSession(session: TeachingSession): Promise<{
+      insights: string[];
+      culturalGuidance: string[];
+      nextSteps: string[];
+      assessment: session['assessment'];
+    }> {
+      const insights: string[] = [];
+      const culturalGuidance: string[] = [];
+      const nextSteps: string[] = [];
+      
+      // Simulate session conduct and assessment
+      const knowledge = this.culturalKnowledge.get(session.knowledgeId);
+      const methodDetails = this.teachingMethods.get(session.method);
+      
+      // Generate insights based on method and knowledge
+      insights.push(`Used ${session.method} to teach ${knowledge?.title}`);
+      insights.push(`Cultural context: ${session.culturalContext}`);
+      insights.push(`Duration: ${session.duration} minutes`);
+      
+      // Provide cultural guidance
+      culturalGuidance.push(`Respect the cultural significance of ${knowledge?.title}`);
+      culturalGuidance.push(`Ensure authentic transmission of traditional knowledge`);
+      culturalGuidance.push(`Maintain cultural sensitivity throughout the session`);
+      
+      // Suggest next steps
+      nextSteps.push(`Practice the concepts learned in daily activities`);
+      nextSteps.push(`Share knowledge with others in culturally appropriate ways`);
+      nextSteps.push(`Continue learning through observation and reflection`);
+      
+      // Simulate assessment (in real implementation, this would be based on actual learner performance)
+      const assessment = {
+        understanding: Math.random() * 0.3 + 0.7, // 0.7-1.0
+        culturalAppreciation: Math.random() * 0.4 + 0.6, // 0.6-1.0
+        practicalApplication: Math.random() * 0.5 + 0.5 // 0.5-1.0
+      };
+      
+      return {
+        insights,
+        culturalGuidance,
+        nextSteps,
+        assessment
+      };
+    }
+    
+    // Assess cultural understanding
+    async assessCulturalUnderstanding(
+      learnerId: string,
+      knowledgeId: string
+    ): Promise<{
+      understanding: number;
+      culturalAppreciation: number;
+      practicalApplication: number;
+      recommendations: string[];
+    }> {
+      const knowledge = this.culturalKnowledge.get(knowledgeId);
+      
+      // Simulate assessment (in real implementation, this would be based on actual evaluation)
+      const understanding = Math.random() * 0.4 + 0.6; // 0.6-1.0
+      const culturalAppreciation = Math.random() * 0.5 + 0.5; // 0.5-1.0
+      const practicalApplication = Math.random() * 0.6 + 0.4; // 0.4-1.0
+      
+      const recommendations: string[] = [];
+      
+      if (understanding < 0.8) {
+        recommendations.push('Review core concepts and cultural context');
+      }
+      
+      if (culturalAppreciation < 0.7) {
+        recommendations.push('Engage more deeply with cultural significance and history');
+      }
+      
+      if (practicalApplication < 0.6) {
+        recommendations.push('Practice applying knowledge in real-world situations');
+      }
+      
+      return {
+        understanding,
+        culturalAppreciation,
+        practicalApplication,
+        recommendations
+      };
+    }
+    
+    // Get cultural education recommendations
+    getEducationRecommendations(
+      learnerLevel: string,
+      culturalContext: string = 'HIEROS'
+    ): string[] {
+      const recommendations = [];
+      
+      if (learnerLevel === 'beginner') {
+        recommendations.push(
+          'Start with foundational cultural principles and values',
+          'Use storytelling and observation to build cultural awareness',
+          'Focus on respect and cultural sensitivity',
+          'Learn through traditional teaching methods'
+        );
+      } else if (learnerLevel === 'intermediate') {
+        recommendations.push(
+          'Deepen understanding through discussion and practice',
+          'Explore cultural significance and historical context',
+          'Begin applying knowledge in appropriate contexts',
+          'Engage with cultural community and traditions'
+        );
+      } else if (learnerLevel === 'advanced') {
+        recommendations.push(
+          'Take on teaching and mentorship roles',
+          'Contribute to cultural preservation and evolution',
+          'Innovate while respecting traditional foundations',
+          'Guide others in cultural understanding and practice'
+        );
+      }
+      
+      return recommendations;
+    }
+    
+    // Validate cultural appropriateness
+    validateCulturalAppropriateness(
+      content: string,
+      culturalContext: string
+    ): {
+      isAppropriate: boolean;
+      concerns: string[];
+      suggestions: string[];
+    } {
+      const concerns: string[] = [];
+      const suggestions: string[] = [];
+      
+      // Check for cultural sensitivity
+      const sensitiveTerms = ['appropriation', 'stereotype', 'misrepresentation'];
+      const hasConcerns = sensitiveTerms.some(term => 
+        content.toLowerCase().includes(term)
+      );
+      
+      if (hasConcerns) {
+        concerns.push('Content may contain culturally insensitive elements');
+        suggestions.push('Review content with cultural experts');
+        suggestions.push('Ensure respectful representation of cultural elements');
+      }
+      
+      // Check for cultural accuracy
+      if (culturalContext === 'HIEROS') {
+        if (!content.includes('HIEROS') && !content.includes('cultural')) {
+          concerns.push('Content may not align with HIEROS cultural framework');
+          suggestions.push('Include HIEROS principles and cultural context');
+        }
+      }
+      
+      return {
+        isAppropriate: concerns.length === 0,
+        concerns,
+        suggestions
+      };
+    }
+  } 

@@ -1,0 +1,58 @@
+{
+  "category": "",
+  "asset_type": "skills",
+  "total_files": 4,
+  "last_updated": "2025-06-28T07:58:39.341097",
+  "files": [
+    {
+      "name": "Workflow",
+      "path": "skills/core-engineering-v1/workflow.yml",
+      "type": "skills",
+      "category": "",
+      "size": 6,
+      "lastModified": "2025-06-28T04:25:54.082832",
+      "hash": "878a19ca4e95b270920ca58231ef0855afed2d737a05f7a069a1f464f18e2f3d",
+      "description": "This document is the absolute source of truth for the agent development workflow on the kOS project. It is non-negotiable. Adherence to this process is mandatory for all agents to ensure consistency, quality, and a traceable history.",
+      "tags": [],
+      "version": "1.0"
+    },
+    {
+      "name": "Project Overview",
+      "path": "skills/core-engineering-v1/project-overview.yml",
+      "type": "skills",
+      "category": "",
+      "size": 5,
+      "lastModified": "2025-06-28T04:26:24.537535",
+      "hash": "583e69ad2702e7101ba7e885ff252aaaf714f4666ceb31f2eb1361df903baa9b",
+      "description": "",
+      "tags": [],
+      "version": "1.0"
+    },
+    {
+      "name": "Profile",
+      "path": "skills/core-engineering-v1/profile.yml",
+      "type": "skills",
+      "category": "",
+      "size": 1,
+      "lastModified": "2025-06-28T04:26:40.572288",
+      "hash": "20b093d25ffbdb2e792659394ccc93f2c0a5071b0178080cf74dbe2a50b2ca18",
+      "description": "General purpose software engineering agent for the kOS project.",
+      "tags": [],
+      "version": "1.0"
+    },
+    {
+      "name": "System Prompt",
+      "path": "skills/core-engineering-v1/system-prompt.yml",
+      "type": "skills",
+      "category": "",
+      "size": 7,
+      "lastModified": "2025-06-28T04:25:29.806939",
+      "hash": "aea7b8f348594db453c649c84eb318ceb705da46023257d33fe7182a40ef5ed2",
+      "description": "",
+      "tags": [],
+      "version": "1.0",
+      "role": "",
+      "specialization": ""
+    }
+  ]
+}

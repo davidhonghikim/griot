@@ -1,0 +1,164 @@
+name: "Efficient Prompt Engineering"
+description: "Optimize prompts for minimal token usage and maximum effectiveness in single requests"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["efficiency", "token", "optimization", "cost"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: ["token_optimization", "prompt_analysis", "template_rendering"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+workflow:
+  steps:
+    - step: 1
+      name: "Initial Token Analysis"
+      description: "Analyze current token usage and identify optimization opportunities"
+      skills:
+        - skill: "token_optimization"
+          action: "optimizePrompt"
+          input:
+            prompt: "{{original_prompt}}"
+            context: "{{context}}"
+          output: "token_analysis"
+    
+    - step: 2
+      name: "Prompt Consolidation"
+      description: "Combine multiple requests into single, comprehensive prompt"
+      condition: "{{consolidate_requests}}"
+      skills:
+        - skill: "prompt_analysis"
+          action: "analyzePrompt"
+          input:
+            prompt: "{{consolidated_prompt}}"
+          output: "consolidation_analysis"
+    
+    - step: 3
+      name: "Template Optimization"
+      description: "Optimize templates for minimal token usage"
+      condition: "template_variables.length > 0"
+      skills:
+        - skill: "template_rendering"
+          action: "extractVariables"
+          input:
+            template: "{{optimized_prompt}}"
+          output: "template_variables"
+        - skill: "token_optimization"
+          action: "optimizeToTarget"
+          input:
+            prompt: "{{optimized_prompt}}"
+            targetTokens: "{{target_tokens}}"
+          output: "final_optimized_prompt"
+    
+    - step: 4
+      name: "Quality Validation"
+      description: "Ensure optimization doesn't compromise quality"
+      skills:
+        - skill: "prompt_analysis"
+          action: "analyzePrompt"
+          input:
+            prompt: "{{final_optimized_prompt}}"
+          output: "final_analysis"
+        - skill: "prompt_analysis"
+          action: "comparePrompts"
+          input:
+            prompt1: "{{original_prompt}}"
+            prompt2: "{{final_optimized_prompt}}"
+          output: "quality_comparison"
+    
+    - step: 5
+      name: "Efficiency Report"
+      description: "Generate efficiency metrics and recommendations"
+      skills:
+        - skill: "token_optimization"
+          action: "optimizePrompt"
+          input:
+            prompt: "{{final_optimized_prompt}}"
+          output: "final_token_analysis"
+
+inputs:
+  original_prompt:
+    type: "string"
+    required: true
+    description: "The original prompt to optimize"
+  
+  target_tokens:
+    type: "number"
+    default: 1000
+    description: "Target token count for optimization"
+  
+  context:
+    type: "object"
+    required: false
+    description: "Context information for optimization"
+  
+  consolidate_requests:
+    type: "boolean"
+    default: true
+    description: "Whether to consolidate multiple requests"
+  
+  preserve_quality:
+    type: "boolean"
+    default: true
+    description: "Whether to prioritize quality over token reduction"
+
+outputs:
+  optimized_prompt:
+    type: "string"
+    description: "The token-optimized prompt"
+  
+  token_savings:
+    type: "object"
+    description: "Token reduction metrics"
+  
+  quality_score:
+    type: "number"
+    description: "Quality assessment score"
+  
+  efficiency_metrics:
+    type: "object"
+    description: "Overall efficiency metrics"
+
+configuration:
+  max_quality_threshold: 0.8
+  min_token_reduction: 0.2
+  enable_aggressive_optimization: false
+  preserve_critical_elements: true
+
+error_handling:
+  - condition: "final_analysis.score < 0.6"
+    action: "fallback_to_original"
+    message: "Quality too low, using original prompt"
+    recovery: "use_original_prompt"
+  
+  - condition: "token_analysis.tokenReduction < 0.1"
+    action: "log_warning"
+    message: "Minimal token reduction achieved"
+    recovery: "continue_with_optimized"
+
+examples:
+  basic_optimization:
+    inputs:
+      original_prompt: "Please provide a detailed explanation of the concept of artificial intelligence, including its history, current applications, and future implications, with great attention to detail and comprehensive coverage of all relevant aspects."
+      target_tokens: 500
+    expected_outputs:
+      optimized_prompt: "Explain AI: history, current uses, future implications."
+      token_savings:
+        reduction: 75
+        percentage: 0.6
+      quality_score: 0.85
+  
+  template_optimization:
+    inputs:
+      original_prompt: "Analyze the sentiment of {{text}} and provide {{output_format}} with detailed explanations and comprehensive coverage."
+      target_tokens: 300
+      context:
+        topic: "sentiment analysis"
+    expected_outputs:
+      optimized_prompt: "Analyze sentiment of {{text}}, provide {{output_format}}."
+      token_savings:
+        reduction: 60
+        percentage: 0.5
+      quality_score: 0.9 

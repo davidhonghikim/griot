@@ -1,0 +1,398 @@
+name: "Budget Manager"
+description: "Track spending, enforce budget limits, and provide budget analytics"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["budget", "tracking", "analytics", "spending", "limits"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: ["token_price_estimator"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { TokenPriceEstimator } from './token_price_estimator';
+  
+  export interface BudgetLimit {
+    id: string;
+    name: string;
+    amount: number;
+    currency: string;
+    timeFrame: 'hour' | 'day' | 'week' | 'month';
+    startDate: string;
+    endDate?: string;
+    isActive: boolean;
+  }
+  
+  export interface SpendingRecord {
+    id: string;
+    timestamp: string;
+    operation: string;
+    mediaType: string;
+    model: string;
+    tokens: number;
+    cost: number;
+    currency: string;
+    budgetId: string;
+  }
+  
+  export interface BudgetStatus {
+    budgetId: string;
+    budgetName: string;
+    limit: number;
+    spent: number;
+    remaining: number;
+    percentageUsed: number;
+    isOverBudget: boolean;
+    timeFrame: string;
+    startDate: string;
+    endDate?: string;
+  }
+  
+  export interface BudgetAnalytics {
+    totalSpent: number;
+    averageCostPerOperation: number;
+    mostExpensiveOperation: string;
+    costliestModel: string;
+    spendingTrend: 'increasing' | 'decreasing' | 'stable';
+    recommendations: string[];
+    breakdown: {
+      byMediaType: Record<string, number>;
+      byModel: Record<string, number>;
+      byOperation: Record<string, number>;
+    };
+  }
+  
+  export class BudgetManager {
+    private tokenEstimator: TokenPriceEstimator;
+    private budgets: Map<string, BudgetLimit>;
+    private spendingRecords: SpendingRecord[];
+    
+    constructor(tokenEstimator: TokenPriceEstimator) {
+      this.tokenEstimator = tokenEstimator;
+      this.budgets = new Map();
+      this.spendingRecords = [];
+    }
+    
+    // Create a new budget
+    createBudget(budget: Omit<BudgetLimit, 'id'>): string {
+      const id = `budget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const newBudget: BudgetLimit = {
+        ...budget,
+        id,
+        startDate: budget.startDate || new Date().toISOString(),
+        isActive: true,
+      };
+      
+      this.budgets.set(id, newBudget);
+      return id;
+    }
+    
+    // Update an existing budget
+    updateBudget(budgetId: string, updates: Partial<BudgetLimit>): boolean {
+      const budget = this.budgets.get(budgetId);
+      if (!budget) return false;
+      
+      this.budgets.set(budgetId, { ...budget, ...updates });
+      return true;
+    }
+    
+    // Deactivate a budget
+    deactivateBudget(budgetId: string): boolean {
+      return this.updateBudget(budgetId, { isActive: false });
+    }
+    
+    // Record spending
+    recordSpending(spending: Omit<SpendingRecord, 'id' | 'timestamp'>): string {
+      const id = `spending_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const record: SpendingRecord = {
+        ...spending,
+        id,
+        timestamp: new Date().toISOString(),
+      };
+      
+      this.spendingRecords.push(record);
+      return id;
+    }
+    
+    // Get budget status
+    getBudgetStatus(budgetId: string): BudgetStatus | null {
+      const budget = this.budgets.get(budgetId);
+      if (!budget || !budget.isActive) return null;
+      
+      const spent = this.calculateSpentAmount(budgetId);
+      const remaining = budget.amount - spent;
+      const percentageUsed = (spent / budget.amount) * 100;
+      
+      return {
+        budgetId,
+        budgetName: budget.name,
+        limit: budget.amount,
+        spent,
+        remaining,
+        percentageUsed,
+        isOverBudget: spent > budget.amount,
+        timeFrame: budget.timeFrame,
+        startDate: budget.startDate,
+        endDate: budget.endDate,
+      };
+    }
+    
+    // Get all active budget statuses
+    getAllBudgetStatuses(): BudgetStatus[] {
+      const statuses: BudgetStatus[] = [];
+      
+      for (const [budgetId, budget] of this.budgets) {
+        if (budget.isActive) {
+          const status = this.getBudgetStatus(budgetId);
+          if (status) statuses.push(status);
+        }
+      }
+      
+      return statuses;
+    }
+    
+    // Check if operation is within budget
+    canAffordOperation(
+      budgetId: string,
+      estimatedCost: number
+    ): { canAfford: boolean; remainingBudget: number; warning?: string } {
+      const status = this.getBudgetStatus(budgetId);
+      if (!status) {
+        return { canAfford: false, remainingBudget: 0, warning: 'Budget not found or inactive' };
+      }
+      
+      const canAfford = status.remaining >= estimatedCost;
+      let warning: string | undefined;
+      
+      if (status.percentageUsed > 90) {
+        warning = 'Budget nearly exhausted';
+      } else if (status.percentageUsed > 75) {
+        warning = 'Budget usage is high';
+      }
+      
+      return { canAfford, remainingBudget: status.remaining, warning };
+    }
+    
+    // Get spending analytics
+    getBudgetAnalytics(budgetId: string, timeRange?: { start: string; end: string }): BudgetAnalytics | null {
+      const budget = this.budgets.get(budgetId);
+      if (!budget) return null;
+      
+      const records = this.getSpendingRecordsInRange(budgetId, timeRange);
+      if (records.length === 0) return null;
+      
+      const totalSpent = records.reduce((sum, record) => sum + record.cost, 0);
+      const averageCostPerOperation = totalSpent / records.length;
+      
+      // Find most expensive operation
+      const operationCosts = records.reduce((acc, record) => {
+        acc[record.operation] = (acc[record.operation] || 0) + record.cost;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const mostExpensiveOperation = Object.entries(operationCosts).reduce((max, [op, cost]) => 
+        cost > max.cost ? { operation: op, cost } : max
+      , { operation: '', cost: 0 });
+      
+      // Find costliest model
+      const modelCosts = records.reduce((acc, record) => {
+        acc[record.model] = (acc[record.model] || 0) + record.cost;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const costliestModel = Object.entries(modelCosts).reduce((max, [model, cost]) => 
+        cost > max.cost ? { model, cost } : max
+      , { model: '', cost: 0 });
+      
+      // Calculate spending trend
+      const spendingTrend = this.calculateSpendingTrend(records);
+      
+      // Generate recommendations
+      const recommendations = this.generateBudgetRecommendations(records, budget);
+      
+      // Create breakdown
+      const breakdown = {
+        byMediaType: records.reduce((acc, record) => {
+          acc[record.mediaType] = (acc[record.mediaType] || 0) + record.cost;
+          return acc;
+        }, {} as Record<string, number>),
+        byModel: modelCosts,
+        byOperation: operationCosts,
+      };
+      
+      return {
+        totalSpent,
+        averageCostPerOperation,
+        mostExpensiveOperation: mostExpensiveOperation.operation,
+        costliestModel: costliestModel.model,
+        spendingTrend,
+        recommendations,
+        breakdown,
+      };
+    }
+    
+    // Get spending forecast
+    getSpendingForecast(budgetId: string): {
+      projectedSpending: number;
+      daysUntilExhaustion: number;
+      confidence: number;
+      recommendations: string[];
+    } | null {
+      const budget = this.budgets.get(budgetId);
+      if (!budget) return null;
+      
+      const analytics = this.getBudgetAnalytics(budgetId);
+      if (!analytics) return null;
+      
+      const now = new Date();
+      const startDate = new Date(budget.startDate);
+      const daysElapsed = Math.max(1, (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const dailySpending = analytics.totalSpent / daysElapsed;
+      const remainingBudget = budget.amount - analytics.totalSpent;
+      const daysUntilExhaustion = remainingBudget / dailySpending;
+      
+      const confidence = Math.min(0.95, 1 - (Math.abs(daysElapsed - 7) / 30)); // Higher confidence with more data
+      
+      const recommendations: string[] = [];
+      if (daysUntilExhaustion < 7) {
+        recommendations.push('Budget will be exhausted soon - consider increasing limit or reducing usage');
+      } else if (daysUntilExhaustion < 30) {
+        recommendations.push('Monitor spending closely - consider optimization strategies');
+      }
+      
+      if (dailySpending > budget.amount / 30) { // Assuming monthly budget
+        recommendations.push('Daily spending rate is high - consider cost optimization');
+      }
+      
+      return {
+        projectedSpending: dailySpending * 30, // Project for 30 days
+        daysUntilExhaustion: Math.max(0, daysUntilExhaustion),
+        confidence,
+        recommendations,
+      };
+    }
+    
+    // Get cost optimization suggestions
+    getOptimizationSuggestions(budgetId: string): string[] {
+      const analytics = this.getBudgetAnalytics(budgetId);
+      if (!analytics) return [];
+      
+      const suggestions: string[] = [];
+      
+      // Model optimization
+      if (analytics.costliestModel === 'gpt-4') {
+        suggestions.push('Consider using GPT-3.5-turbo for non-critical operations');
+      }
+      
+      if (analytics.costliestModel === 'claude-3-opus') {
+        suggestions.push('Consider using Claude-3-Haiku for faster, cheaper processing');
+      }
+      
+      // Operation optimization
+      if (analytics.averageCostPerOperation > 0.05) {
+        suggestions.push('Batch similar operations to reduce overhead costs');
+      }
+      
+      // Media type optimization
+      const mediaBreakdown = analytics.breakdown.byMediaType;
+      if (mediaBreakdown.video && mediaBreakdown.video > analytics.totalSpent * 0.5) {
+        suggestions.push('Video processing is expensive - consider lower quality or shorter clips');
+      }
+      
+      if (mediaBreakdown.image && mediaBreakdown.image > analytics.totalSpent * 0.3) {
+        suggestions.push('Image processing costs are high - consider lower resolution');
+      }
+      
+      return suggestions;
+    }
+    
+    // Helper methods
+    private calculateSpentAmount(budgetId: string): number {
+      return this.spendingRecords
+        .filter(record => record.budgetId === budgetId)
+        .reduce((sum, record) => sum + record.cost, 0);
+    }
+    
+    private getSpendingRecordsInRange(
+      budgetId: string,
+      timeRange?: { start: string; end: string }
+    ): SpendingRecord[] {
+      let records = this.spendingRecords.filter(record => record.budgetId === budgetId);
+      
+      if (timeRange) {
+        records = records.filter(record => {
+          const timestamp = new Date(record.timestamp);
+          const start = new Date(timeRange.start);
+          const end = new Date(timeRange.end);
+          return timestamp >= start && timestamp <= end;
+        });
+      }
+      
+      return records;
+    }
+    
+    private calculateSpendingTrend(records: SpendingRecord[]): 'increasing' | 'decreasing' | 'stable' {
+      if (records.length < 2) return 'stable';
+      
+      const sortedRecords = records.sort((a, b) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+      
+      const midPoint = Math.floor(sortedRecords.length / 2);
+      const firstHalf = sortedRecords.slice(0, midPoint);
+      const secondHalf = sortedRecords.slice(midPoint);
+      
+      const firstHalfTotal = firstHalf.reduce((sum, record) => sum + record.cost, 0);
+      const secondHalfTotal = secondHalf.reduce((sum, record) => sum + record.cost, 0);
+      
+      if (secondHalfTotal > firstHalfTotal * 1.1) return 'increasing';
+      if (secondHalfTotal < firstHalfTotal * 0.9) return 'decreasing';
+      return 'stable';
+    }
+    
+    private generateBudgetRecommendations(records: SpendingRecord[], budget: BudgetLimit): string[] {
+      const recommendations: string[] = [];
+      const totalSpent = records.reduce((sum, record) => sum + record.cost, 0);
+      
+      if (totalSpent > budget.amount * 0.8) {
+        recommendations.push('Budget usage is high - consider cost optimization');
+      }
+      
+      if (records.length > 100) {
+        recommendations.push('High number of operations - consider batching');
+      }
+      
+      const modelUsage = records.reduce((acc, record) => {
+        acc[record.model] = (acc[record.model] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const expensiveModels = Object.entries(modelUsage)
+        .filter(([model]) => ['gpt-4', 'claude-3-opus'].includes(model))
+        .reduce((sum, [, count]) => sum + count, 0);
+      
+      if (expensiveModels > records.length * 0.5) {
+        recommendations.push('High usage of expensive models - consider cheaper alternatives');
+      }
+      
+      return recommendations;
+    }
+    
+    // Export data for backup/analysis
+    exportData(): { budgets: BudgetLimit[]; spendingRecords: SpendingRecord[] } {
+      return {
+        budgets: Array.from(this.budgets.values()),
+        spendingRecords: this.spendingRecords,
+      };
+    }
+    
+    // Import data from backup
+    importData(data: { budgets: BudgetLimit[]; spendingRecords: SpendingRecord[] }): void {
+      this.budgets.clear();
+      this.spendingRecords = [];
+      
+      data.budgets.forEach(budget => this.budgets.set(budget.id, budget));
+ 

@@ -1,0 +1,671 @@
+name: "Protocol Translation Base"
+description: "Multi-protocol translation and format conversion for seamless communication between different systems"
+category: "communication"
+tags:
+  primary: "communication"
+  secondary: ["translation", "protocols", "formats", "conversion", "interoperability"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface ProtocolMapping {
+    id: string;
+    name: string;
+    sourceProtocol: string;
+    targetProtocol: string;
+    mappingRules: MappingRule[];
+    validationRules: ValidationRule[];
+    enabled: boolean;
+  }
+  
+  export interface MappingRule {
+    id: string;
+    sourceField: string;
+    targetField: string;
+    transformation: TransformationType;
+    parameters: Record<string, any>;
+    required: boolean;
+  }
+  
+  export interface ValidationRule {
+    field: string;
+    type: 'required' | 'format' | 'range' | 'custom';
+    parameters: Record<string, any>;
+    errorMessage: string;
+  }
+  
+  export type TransformationType = 
+    | 'direct' 
+    | 'rename' 
+    | 'transform' 
+    | 'combine' 
+    | 'split' 
+    | 'format' 
+    | 'encode' 
+    | 'decode';
+  
+  export interface TranslationResult {
+    success: boolean;
+    translatedData: any;
+    originalData: any;
+    mappingId: string;
+    errors: string[];
+    warnings: string[];
+    performance: {
+      translationTime: number;
+      fieldCount: number;
+      validationErrors: number;
+    };
+  }
+  
+  export interface ProtocolDefinition {
+    id: string;
+    name: string;
+    version: string;
+    format: 'json' | 'xml' | 'yaml' | 'protobuf' | 'avro' | 'thrift' | 'custom';
+    schema: Record<string, any>;
+    examples: any[];
+  }
+  
+  export class ProtocolTranslationSkill {
+    private protocolMappings: Map<string, ProtocolMapping>;
+    private protocolDefinitions: Map<string, ProtocolDefinition>;
+    private transformers: Map<string, Function>;
+    private validators: Map<string, Function>;
+    
+    constructor() {
+      this.protocolMappings = new Map();
+      this.protocolDefinitions = new Map();
+      this.transformers = new Map();
+      this.validators = new Map();
+      this.initializeTransformers();
+      this.initializeValidators();
+      this.initializeDefaultMappings();
+      this.initializeProtocolDefinitions();
+    }
+    
+    // Initialize built-in transformers
+    private initializeTransformers(): void {
+      // Direct copy
+      this.transformers.set('direct', (value: any) => value);
+      
+      // Rename field
+      this.transformers.set('rename', (value: any, params: { newName: string }) => {
+        return { [params.newName]: value };
+      });
+      
+      // Type transformation
+      this.transformers.set('transform', (value: any, params: { type: string }) => {
+        switch (params.type) {
+          case 'string':
+            return String(value);
+          case 'number':
+            return Number(value);
+          case 'boolean':
+            return Boolean(value);
+          case 'date':
+            return new Date(value);
+          case 'array':
+            return Array.isArray(value) ? value : [value];
+          case 'object':
+            return typeof value === 'object' ? value : { value };
+          default:
+            return value;
+        }
+      });
+      
+      // Combine fields
+      this.transformers.set('combine', (value: any, params: { fields: string[], separator: string }) => {
+        if (Array.isArray(value)) {
+          return value.join(params.separator || ' ');
+        }
+        return value;
+      });
+      
+      // Split field
+      this.transformers.set('split', (value: any, params: { separator: string, index?: number }) => {
+        if (typeof value === 'string') {
+          const parts = value.split(params.separator);
+          return params.index !== undefined ? parts[params.index] : parts;
+        }
+        return value;
+      });
+      
+      // Format transformation
+      this.transformers.set('format', (value: any, params: { format: string }) => {
+        if (value instanceof Date) {
+          return this.formatDate(value, params.format);
+        }
+        if (typeof value === 'number') {
+          return this.formatNumber(value, params.format);
+        }
+        return value;
+      });
+      
+      // Encode data
+      this.transformers.set('encode', (value: any, params: { encoding: string }) => {
+        switch (params.encoding) {
+          case 'base64':
+            return btoa(JSON.stringify(value));
+          case 'url':
+            return encodeURIComponent(JSON.stringify(value));
+          case 'hex':
+            return Buffer.from(JSON.stringify(value)).toString('hex');
+          default:
+            return value;
+        }
+      });
+      
+      // Decode data
+      this.transformers.set('decode', (value: any, params: { encoding: string }) => {
+        try {
+          switch (params.encoding) {
+            case 'base64':
+              return JSON.parse(atob(value));
+            case 'url':
+              return JSON.parse(decodeURIComponent(value));
+            case 'hex':
+              return JSON.parse(Buffer.from(value, 'hex').toString());
+            default:
+              return value;
+          }
+        } catch {
+          return value;
+        }
+      });
+    }
+    
+    // Initialize built-in validators
+    private initializeValidators(): void {
+      // Required field validator
+      this.validators.set('required', (value: any) => {
+        return value !== undefined && value !== null && value !== '';
+      });
+      
+      // Format validator
+      this.validators.set('format', (value: any, params: { pattern: string }) => {
+        if (typeof value !== 'string') return false;
+        try {
+          const regex = new RegExp(params.pattern);
+          return regex.test(value);
+        } catch {
+          return false;
+        }
+      });
+      
+      // Range validator
+      this.validators.set('range', (value: any, params: { min?: number, max?: number }) => {
+        if (typeof value !== 'number') return false;
+        if (params.min !== undefined && value < params.min) return false;
+        if (params.max !== undefined && value > params.max) return false;
+        return true;
+      });
+      
+      // Email validator
+      this.validators.set('email', (value: any) => {
+        if (typeof value !== 'string') return false;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(value);
+      });
+      
+      // URL validator
+      this.validators.set('url', (value: any) => {
+        if (typeof value !== 'string') return false;
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+    }
+    
+    // Initialize default protocol mappings
+    private initializeDefaultMappings(): void {
+      // JSON to XML mapping
+      this.protocolMappings.set('json_to_xml', {
+        id: 'json_to_xml',
+        name: 'JSON to XML Translation',
+        sourceProtocol: 'json',
+        targetProtocol: 'xml',
+        mappingRules: [
+          {
+            id: 'root_element',
+            sourceField: '*',
+            targetField: 'root',
+            transformation: 'direct',
+            parameters: {},
+            required: true
+          }
+        ],
+        validationRules: [
+          {
+            field: 'root',
+            type: 'required',
+            parameters: {},
+            errorMessage: 'Root element is required'
+          }
+        ],
+        enabled: true
+      });
+      
+      // REST to GraphQL mapping
+      this.protocolMappings.set('rest_to_graphql', {
+        id: 'rest_to_graphql',
+        name: 'REST to GraphQL Translation',
+        sourceProtocol: 'rest',
+        targetProtocol: 'graphql',
+        mappingRules: [
+          {
+            id: 'endpoint_to_query',
+            sourceField: 'endpoint',
+            targetField: 'query',
+            transformation: 'transform',
+            parameters: { type: 'string' },
+            required: true
+          },
+          {
+            id: 'method_to_operation',
+            sourceField: 'method',
+            targetField: 'operation',
+            transformation: 'transform',
+            parameters: { type: 'string' },
+            required: true
+          }
+        ],
+        validationRules: [
+          {
+            field: 'query',
+            type: 'required',
+            parameters: {},
+            errorMessage: 'GraphQL query is required'
+          }
+        ],
+        enabled: true
+      });
+      
+      // HTTP to WebSocket mapping
+      this.protocolMappings.set('http_to_websocket', {
+        id: 'http_to_websocket',
+        name: 'HTTP to WebSocket Translation',
+        sourceProtocol: 'http',
+        targetProtocol: 'websocket',
+        mappingRules: [
+          {
+            id: 'request_to_message',
+            sourceField: 'body',
+            targetField: 'message',
+            transformation: 'direct',
+            parameters: {},
+            required: true
+          },
+          {
+            id: 'headers_to_metadata',
+            sourceField: 'headers',
+            targetField: 'metadata',
+            transformation: 'direct',
+            parameters: {},
+            required: false
+          }
+        ],
+        validationRules: [
+          {
+            field: 'message',
+            type: 'required',
+            parameters: {},
+            errorMessage: 'WebSocket message is required'
+          }
+        ],
+        enabled: true
+      });
+    }
+    
+    // Initialize protocol definitions
+    private initializeProtocolDefinitions(): void {
+      // JSON protocol
+      this.protocolDefinitions.set('json', {
+        id: 'json',
+        name: 'JSON Protocol',
+        version: '1.0',
+        format: 'json',
+        schema: {
+          type: 'object',
+          properties: {
+            data: { type: 'object' },
+            metadata: { type: 'object' },
+            timestamp: { type: 'string', format: 'date-time' }
+          }
+        },
+        examples: [
+          {
+            data: { message: 'Hello World' },
+            metadata: { source: 'api' },
+            timestamp: new Date().toISOString()
+          }
+        ]
+      });
+      
+      // XML protocol
+      this.protocolDefinitions.set('xml', {
+        id: 'xml',
+        name: 'XML Protocol',
+        version: '1.0',
+        format: 'xml',
+        schema: {
+          root: {
+            data: { type: 'element' },
+            metadata: { type: 'element' },
+            timestamp: { type: 'attribute' }
+          }
+        },
+        examples: [
+          `<root timestamp="${new Date().toISOString()}">
+            <data>
+              <message>Hello World</message>
+            </data>
+            <metadata>
+              <source>api</source>
+            </metadata>
+          </root>`
+        ]
+      });
+      
+      // REST protocol
+      this.protocolDefinitions.set('rest', {
+        id: 'rest',
+        name: 'REST Protocol',
+        version: '1.0',
+        format: 'custom',
+        schema: {
+          method: { type: 'string', enum: ['GET', 'POST', 'PUT', 'DELETE'] },
+          endpoint: { type: 'string' },
+          headers: { type: 'object' },
+          body: { type: 'object' }
+        },
+        examples: [
+          {
+            method: 'POST',
+            endpoint: '/api/messages',
+            headers: { 'Content-Type': 'application/json' },
+            body: { message: 'Hello World' }
+          }
+        ]
+      });
+    }
+    
+    // Translate data between protocols
+    translate(
+      data: any,
+      sourceProtocol: string,
+      targetProtocol: string,
+      mappingId?: string
+    ): TranslationResult {
+      const startTime = Date.now();
+      const errors: string[] = [];
+      const warnings: string[] = [];
+      
+      try {
+        // Find appropriate mapping
+        const mapping = this.findMapping(sourceProtocol, targetProtocol, mappingId);
+        if (!mapping) {
+          throw new Error(`No mapping found from ${sourceProtocol} to ${targetProtocol}`);
+        }
+        
+        // Validate source data
+        const validationErrors = this.validateData(data, mapping.validationRules);
+        errors.push(...validationErrors);
+        
+        // Apply mapping rules
+        const translatedData = this.applyMappingRules(data, mapping.mappingRules);
+        
+        // Validate target data
+        const targetValidationErrors = this.validateTargetData(translatedData, targetProtocol);
+        errors.push(...targetValidationErrors);
+        
+        const translationTime = Date.now() - startTime;
+        
+        return {
+          success: errors.length === 0,
+          translatedData,
+          originalData: data,
+          mappingId: mapping.id,
+          errors,
+          warnings,
+          performance: {
+            translationTime,
+            fieldCount: Object.keys(translatedData).length,
+            validationErrors: errors.length
+          }
+        };
+        
+      } catch (error) {
+        errors.push(error instanceof Error ? error.message : 'Unknown error');
+        
+        return {
+          success: false,
+          translatedData: null,
+          originalData: data,
+          mappingId: mappingId || 'unknown',
+          errors,
+          warnings,
+          performance: {
+            translationTime: Date.now() - startTime,
+            fieldCount: 0,
+            validationErrors: errors.length
+          }
+        };
+      }
+    }
+    
+    // Find appropriate mapping
+    private findMapping(
+      sourceProtocol: string,
+      targetProtocol: string,
+      mappingId?: string
+    ): ProtocolMapping | undefined {
+      if (mappingId) {
+        return this.protocolMappings.get(mappingId);
+      }
+      
+      // Find by protocol pair
+      for (const mapping of this.protocolMappings.values()) {
+        if (mapping.enabled && 
+            mapping.sourceProtocol === sourceProtocol && 
+            mapping.targetProtocol === targetProtocol) {
+          return mapping;
+        }
+      }
+      
+      return undefined;
+    }
+    
+    // Apply mapping rules
+    private applyMappingRules(data: any, rules: MappingRule[]): any {
+      const result: any = {};
+      
+      for (const rule of rules) {
+        try {
+          const sourceValue = this.getNestedValue(data, rule.sourceField);
+          const transformer = this.transformers.get(rule.transformation);
+          
+          if (transformer) {
+            const transformedValue = transformer(sourceValue, rule.parameters);
+            
+            if (rule.transformation === 'rename') {
+              Object.assign(result, transformedValue);
+            } else {
+              result[rule.targetField] = transformedValue;
+            }
+          } else {
+            result[rule.targetField] = sourceValue;
+          }
+          
+        } catch (error) {
+          if (rule.required) {
+            throw new Error(`Failed to apply required mapping rule ${rule.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        }
+      }
+      
+      return result;
+    }
+    
+    // Validate data against rules
+    private validateData(data: any, rules: ValidationRule[]): string[] {
+      const errors: string[] = [];
+      
+      for (const rule of rules) {
+        const value = this.getNestedValue(data, rule.field);
+        const validator = this.validators.get(rule.type);
+        
+        if (validator && !validator(value, rule.parameters)) {
+          errors.push(rule.errorMessage);
+        }
+      }
+      
+      return errors;
+    }
+    
+    // Validate target data against protocol schema
+    private validateTargetData(data: any, protocol: string): string[] {
+      const errors: string[] = [];
+      const definition = this.protocolDefinitions.get(protocol);
+      
+      if (definition && definition.schema) {
+        // Basic schema validation
+        const schemaErrors = this.validateSchema(data, definition.schema);
+        errors.push(...schemaErrors);
+      }
+      
+      return errors;
+    }
+    
+    // Validate against schema
+    private validateSchema(data: any, schema: any): string[] {
+      const errors: string[] = [];
+      
+      // Basic schema validation implementation
+      if (schema.type === 'object' && typeof data !== 'object') {
+        errors.push('Data must be an object');
+      }
+      
+      if (schema.properties) {
+        for (const [field, fieldSchema] of Object.entries(schema.properties)) {
+          if (fieldSchema.required && !data.hasOwnProperty(field)) {
+            errors.push(`Required field '${field}' is missing`);
+          }
+        }
+      }
+      
+      return errors;
+    }
+    
+    // Get nested value from object
+    private getNestedValue(obj: any, path: string): any {
+      if (path === '*') return obj;
+      
+      return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+      }, obj);
+    }
+    
+    // Format date
+    private formatDate(date: Date, format: string): string {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      
+      return format
+        .replace('YYYY', year.toString())
+        .replace('MM', month)
+        .replace('DD', day)
+        .replace('HH', hours)
+        .replace('mm', minutes)
+        .replace('ss', seconds);
+    }
+    
+    // Format number
+    private formatNumber(num: number, format: string): string {
+      if (format === 'currency') {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD'
+        }).format(num);
+      }
+      
+      if (format === 'percentage') {
+        return `${(num * 100).toFixed(2)}%`;
+      }
+      
+      if (format === 'decimal') {
+        return num.toFixed(2);
+      }
+      
+      return num.toString();
+    }
+    
+    // Add custom mapping
+    addMapping(mapping: ProtocolMapping): void {
+      this.protocolMappings.set(mapping.id, mapping);
+    }
+    
+    // Remove mapping
+    removeMapping(mappingId: string): boolean {
+      return this.protocolMappings.delete(mappingId);
+    }
+    
+    // Add custom transformer
+    addTransformer(name: string, transformer: Function): void {
+      this.transformers.set(name, transformer);
+    }
+    
+    // Add custom validator
+    addValidator(name: string, validator: Function): void {
+      this.validators.set(name, validator);
+    }
+    
+    // Get available mappings
+    getMappings(): ProtocolMapping[] {
+      return Array.from(this.protocolMappings.values());
+    }
+    
+    // Get protocol definitions
+    getProtocolDefinitions(): ProtocolDefinition[] {
+      return Array.from(this.protocolDefinitions.values());
+    }
+    
+    // Get supported protocols
+    getSupportedProtocols(): string[] {
+      return Array.from(this.protocolDefinitions.keys());
+    }
+    
+    // Check if translation is supported
+    isTranslationSupported(sourceProtocol: string, targetProtocol: string): boolean {
+      return this.findMapping(sourceProtocol, targetProtocol) !== undefined;
+    }
+    
+    // Get translation statistics
+    getTranslationStats(): {
+      totalMappings: number;
+      enabledMappings: number;
+      supportedProtocols: number;
+      customTransformers: number;
+    } {
+      const mappings = Array.from(this.protocolMappings.values());
+      
+      return {
+        totalMappings: mappings.length,
+        enabledMappings: mappings.filter(m => m.enabled).length,
+        supportedProtocols: this.protocolDefinitions.size,
+        customTransformers: this.transformers.size - 8 // Subtract built-in transformers
+      };
+    }
+  } 

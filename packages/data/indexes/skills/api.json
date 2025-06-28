@@ -1,0 +1,36 @@
+{
+  "category": "api",
+  "asset_type": "skills",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.340629",
+  "files": [
+    {
+      "name": "Http Client",
+      "path": "skills/api/http_client.yaml",
+      "type": "skills",
+      "category": "api",
+      "size": 7,
+      "lastModified": "2025-06-28T06:25:54.496625",
+      "hash": "c84da696a95682318d6e32684caccbc7c78a0691f4dc70cf187da96189abefad",
+      "description": "Comprehensive HTTP client operations including GET, POST, PUT, DELETE requests with authentication, headers, and error handling",
+      "tags": {
+        "primary": "api",
+        "secondary": [
+          "http",
+          "rest",
+          "authentication",
+          "headers",
+          "error-handling"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

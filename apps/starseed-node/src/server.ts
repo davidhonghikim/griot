@@ -1,289 +1,282 @@
+#!/usr/bin/env node
+
 /**
- * Griot Node Server
- * Main entry point for running the Griot Node application
+ * Starseed Node Server
+ * 
+ * A complete AI orchestration platform with service management,
+ * database integration, and KLF compatibility.
  */
 
-import { HttpApiNode } from '@griot/core';
-import { createLogger } from '@griot/core';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { HttpApiNode, createLogger, getEnvironmentConfig } from '@griot/core';
 import { ServiceManager, defaultServiceManagerConfig } from './service-manager.js';
 import { DatabaseManager } from './database-manager.js';
-import dotenv from 'dotenv';
-import { resolve } from 'path';
 
-// Load environment variables in priority order
-// 1. .env.local (personal overrides) - highest priority
-// 2. .env (base configuration)
-// 3. env.example (template) - lowest priority
-const envPath = resolve(process.cwd());
-dotenv.config({ path: resolve(envPath, '.env.local') }); // Personal overrides
-dotenv.config({ path: resolve(envPath, '.env') }); // Base configuration
-dotenv.config({ path: resolve(envPath, 'env.example') }); // Template fallback
+// Get the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = resolve(__filename, '..');
 
-const logger = createLogger('starseed-server');
+// Load environment configuration
+const env = getEnvironmentConfig(__dirname);
 
-// Log which environment files were loaded
-const loadedFiles = [];
-if (process.env.NODE_ENV !== 'production') {
-    if (require('fs').existsSync(resolve(envPath, '.env.local'))) {
-        loadedFiles.push('.env.local');
-    }
-    if (require('fs').existsSync(resolve(envPath, '.env'))) {
-        loadedFiles.push('.env');
-    }
-    if (loadedFiles.length === 0) {
-        loadedFiles.push('env.example (template)');
-    }
-    logger.info(`Environment files loaded: ${loadedFiles.join(' -> ')}`);
-}
+// Create logger
+const logger = createLogger('starseed-node');
 
-// Initialize managers with environment variables
+// Log loaded environment variables (without sensitive data)
+logger.info('Environment loaded:', {
+  NODE_ENV: env.NODE_ENV,
+  DEPLOYMENT_TYPE: env.DEPLOYMENT_TYPE,
+  BASE_IP: env.BASE_IP,
+  PORT: env.PORT,
+  HOST: env.HOST,
+  MONGODB_URI: env.MONGODB_URI ? '***configured***' : 'not set',
+  POSTGRES_HOST: env.POSTGRES_HOST,
+  WEAVIATE_URL: env.WEAVIATE_URL,
+  NEO4J_URI: env.NEO4J_URI ? '***configured***' : 'not set'
+});
+
+// Initialize managers
 const serviceManager = new ServiceManager({
   ...defaultServiceManagerConfig,
-  autoTestInterval: parseInt(process.env.SERVICE_TEST_INTERVAL || '30000'),
-  connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT || '5000')
+  autoTestInterval: env.SERVICE_TEST_INTERVAL,
+  connectionTimeout: env.CONNECTION_TIMEOUT
 });
 
-const databaseManager = new DatabaseManager();
-
-// Create HTTP API node with environment variables
-const httpNode = new HttpApiNode({
-  port: parseInt(process.env.PORT || '30437'),
-  host: process.env.HOST || '0.0.0.0'
-});
-
-// Initialize the server
-async function initializeServer() {
-  try {
-    logger.info('Initializing Starseed Node...');
-
-    // Initialize database connections
-    await databaseManager.initialize();
-    logger.info('Database connections established');
-
-    // Start service manager auto-testing
-    serviceManager.startAutoTesting();
-    logger.info('Service manager auto-testing started');
-
-    // Set up API routes
-    setupApiRoutes();
-
-    // Start the HTTP server
-    await httpNode.start();
-    logger.info(`Starseed Node started on port ${httpNode.port}`);
-
-  } catch (error) {
-    logger.error('Failed to initialize server:', error);
-    process.exit(1);
+const databaseManager = new DatabaseManager({
+  mongodb: {
+    uri: env.MONGODB_URI || `mongodb://${env.MONGODB_HOST}:27017`,
+    dbName: env.MONGODB_DB_NAME
+  },
+  postgresql: {
+    host: env.POSTGRES_HOST,
+    port: env.POSTGRES_PORT,
+    database: env.POSTGRES_DB,
+    username: env.POSTGRES_USER,
+    password: env.POSTGRES_PASSWORD
+  },
+  weaviate: {
+    url: env.WEAVIATE_URL || `http://${env.WEAVIATE_HOST}:${env.WEAVIATE_PORT}`,
+    apiKey: env.WEAVIATE_API_KEY
+  },
+  neo4j: {
+    uri: env.NEO4J_URI || `bolt://${env.NEO4J_HOST}:7687`,
+    username: env.NEO4J_USERNAME,
+    password: env.NEO4J_PASSWORD
   }
-}
+});
 
-// Set up API routes
-function setupApiRoutes() {
-  // Health check
-  httpNode.get('/health', async (req, res) => {
+// Create HTTP API node
+const httpNode = new HttpApiNode({
+  port: env.PORT,
+  host: env.HOST
+});
+
+// Health check endpoint
+httpNode.get('/health', async (req: any, res: any) => {
+  try {
     const dbStatus = databaseManager.getStatus();
     const serviceStats = serviceManager.getConnectionStats();
     
     res.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      version: '1.0.0',
+      version: '2.0.0',
       database: dbStatus,
       services: serviceStats
     });
-  });
-
-  // Service management endpoints
-  httpNode.get('/api/services', async (req, res) => {
-    try {
-      const instances = serviceManager.getAllInstances();
-      res.json({
-        services: instances,
-        stats: serviceManager.getConnectionStats()
-      });
-    } catch (error) {
-      logger.error('Error getting services:', error);
-      res.status(500).json({ error: 'Failed to get services' });
-    }
-  });
-
-  httpNode.post('/api/services', async (req, res) => {
-    try {
-      const { serviceType, host, port, instanceId } = req.body;
-      
-      if (!serviceType) {
-        return res.status(400).json({ error: 'serviceType is required' });
-      }
-
-      const instance = await serviceManager.registerService(serviceType, host, port, instanceId);
-      res.status(201).json(instance);
-    } catch (error) {
-      logger.error('Error registering service:', error);
-      res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to register service' });
-    }
-  });
-
-  httpNode.get('/api/services/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const instance = serviceManager.getInstance(id);
-      
-      if (!instance) {
-        return res.status(404).json({ error: 'Service not found' });
-      }
-
-      res.json(instance);
-    } catch (error) {
-      logger.error('Error getting service:', error);
-      res.status(500).json({ error: 'Failed to get service' });
-    }
-  });
-
-  httpNode.post('/api/services/:id/test', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const instance = serviceManager.getInstance(id);
-      
-      if (!instance) {
-        return res.status(404).json({ error: 'Service not found' });
-      }
-
-      const result = await serviceManager.testServiceConnection(instance);
-      res.json(result);
-    } catch (error) {
-      logger.error('Error testing service:', error);
-      res.status(500).json({ error: 'Failed to test service' });
-    }
-  });
-
-  httpNode.delete('/api/services/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const removed = serviceManager.removeInstance(id);
-      
-      if (!removed) {
-        return res.status(404).json({ error: 'Service not found' });
-      }
-
-      res.json({ message: 'Service removed successfully' });
-    } catch (error) {
-      logger.error('Error removing service:', error);
-      res.status(500).json({ error: 'Failed to remove service' });
-    }
-  });
-
-  httpNode.post('/api/services/test-all', async (req, res) => {
-    try {
-      const results = await serviceManager.testAllServices();
-      const resultsArray = Array.from(results.entries()).map(([id, result]) => ({
-        id,
-        ...result
-      }));
-      
-      res.json({
-        results: resultsArray,
-        stats: serviceManager.getConnectionStats()
-      });
-    } catch (error) {
-      logger.error('Error testing all services:', error);
-      res.status(500).json({ error: 'Failed to test services' });
-    }
-  });
-
-  httpNode.get('/api/services/categories/:category', async (req, res) => {
-    try {
-      const { category } = req.params;
-      const services = serviceManager.getServicesByCategory(category);
-      res.json({ category, services });
-    } catch (error) {
-      logger.error('Error getting services by category:', error);
-      res.status(500).json({ error: 'Failed to get services by category' });
-    }
-  });
-
-  // Service types and categories
-  httpNode.get('/api/service-types', async (req, res) => {
-    try {
-      const types = serviceManager.getAvailableServiceTypes();
-      res.json({ types });
-    } catch (error) {
-      logger.error('Error getting service types:', error);
-      res.status(500).json({ error: 'Failed to get service types' });
-    }
-  });
-
-  // Database endpoints
-  httpNode.get('/api/database/status', async (req, res) => {
-    try {
-      const status = databaseManager.getStatus();
-      res.json(status);
-    } catch (error) {
-      logger.error('Error getting database status:', error);
-      res.status(500).json({ error: 'Failed to get database status' });
-    }
-  });
-
-  // Node information (KLF compatibility)
-  httpNode.get('/api/nodes', async (req, res) => {
-    res.json({
-      nodes: [
-        {
-          id: 'starseed-node',
-          name: 'Starseed Node',
-          type: 'orchestrator',
-          version: '1.0.0',
-          status: 'active',
-          capabilities: [
-            'service_orchestration',
-            'database_management',
-            'klf_protocol'
-          ]
-        }
-      ]
-    });
-  });
-
-  // Root endpoint with system information
-  httpNode.get('/', async (req, res) => {
-    const dbStatus = databaseManager.getStatus();
-    const serviceStats = serviceManager.getConnectionStats();
-    
-    res.json({
-      name: 'Starseed Node',
-      version: '1.0.0',
-      description: 'Primary orchestrator for the kOS ecosystem',
-      status: 'active',
-      timestamp: new Date().toISOString(),
-      database: dbStatus,
-      services: serviceStats,
-      endpoints: {
-        health: '/health',
-        services: '/api/services',
-        database: '/api/database/status',
-        nodes: '/api/nodes'
-      }
-    });
-  });
-}
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  logger.info('Shutting down Starseed Node...');
-  
-  try {
-    serviceManager.stopAutoTesting();
-    await databaseManager.close();
-    await httpNode.stop();
-    logger.info('Starseed Node shutdown complete');
-    process.exit(0);
   } catch (error) {
-    logger.error('Error during shutdown:', error);
-    process.exit(1);
+    logger.error('Health check failed:', error);
+    res.status(500).json({
+      status: 'unhealthy',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 });
 
+// Service management endpoints
+httpNode.get('/api/services', async (req: any, res: any) => {
+  try {
+    const instances = serviceManager.getAllInstances();
+    res.json({
+      services: instances,
+      stats: serviceManager.getConnectionStats()
+    });
+  } catch (error) {
+    logger.error('Failed to list services:', error);
+    res.status(500).json({ error: 'Failed to list services' });
+  }
+});
+
+httpNode.post('/api/services', async (req: any, res: any) => {
+  try {
+    const { serviceType, host, port, instanceId } = req.body;
+    const service = await serviceManager.registerService(serviceType, host, port, instanceId);
+    res.json(service);
+  } catch (error) {
+    logger.error('Failed to register service:', error);
+    res.status(500).json({ error: 'Failed to register service' });
+  }
+});
+
+httpNode.get('/api/services/:id', async (req: any, res: any) => {
+  try {
+    const service = serviceManager.getInstance(req.params.id);
+    if (!service) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    res.json(service);
+  } catch (error) {
+    logger.error('Failed to get service:', error);
+    res.status(500).json({ error: 'Failed to get service' });
+  }
+});
+
+httpNode.post('/api/services/:id/test', async (req: any, res: any) => {
+  try {
+    const service = serviceManager.getInstance(req.params.id);
+    if (!service) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    const result = await serviceManager.testServiceConnection(service);
+    res.json(result);
+  } catch (error) {
+    logger.error('Failed to test service:', error);
+    res.status(500).json({ error: 'Failed to test service' });
+  }
+});
+
+httpNode.delete('/api/services/:id', async (req: any, res: any) => {
+  try {
+    const removed = serviceManager.removeInstance(req.params.id);
+    if (!removed) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    res.json({ message: 'Service removed successfully' });
+  } catch (error) {
+    logger.error('Failed to remove service:', error);
+    res.status(500).json({ error: 'Failed to remove service' });
+  }
+});
+
+httpNode.post('/api/services/test-all', async (req: any, res: any) => {
+  try {
+    const results = await serviceManager.testAllServices();
+    const resultsArray = Array.from(results.entries()).map(([id, result]) => ({
+      id,
+      ...result
+    }));
+    
+    res.json({
+      results: resultsArray,
+      stats: serviceManager.getConnectionStats()
+    });
+  } catch (error) {
+    logger.error('Failed to test all services:', error);
+    res.status(500).json({ error: 'Failed to test all services' });
+  }
+});
+
+httpNode.get('/api/services/categories/:category', async (req: any, res: any) => {
+  try {
+    const services = serviceManager.getServicesByCategory(req.params.category);
+    res.json({ category: req.params.category, services });
+  } catch (error) {
+    logger.error('Failed to get services by category:', error);
+    res.status(500).json({ error: 'Failed to get services by category' });
+  }
+});
+
+httpNode.get('/api/service-types', async (req: any, res: any) => {
+  try {
+    const types = serviceManager.getAvailableServiceTypes();
+    res.json({ types });
+  } catch (error) {
+    logger.error('Failed to get service types:', error);
+    res.status(500).json({ error: 'Failed to get service types' });
+  }
+});
+
+// Database status endpoint
+httpNode.get('/api/database/status', async (req: any, res: any) => {
+  try {
+    const status = databaseManager.getStatus();
+    res.json(status);
+  } catch (error) {
+    logger.error('Failed to get database status:', error);
+    res.status(500).json({ error: 'Failed to get database status' });
+  }
+});
+
+// KLF-compatible nodes endpoint
+httpNode.get('/api/nodes', async (req: any, res: any) => {
+  try {
+    const nodes = [
+      {
+        id: 'starseed-node',
+        name: 'Starseed Node',
+        type: 'orchestration',
+        version: '2.0.0',
+        status: 'active',
+        capabilities: [
+          'service-management',
+          'database-integration',
+          'persona-forge',
+          'recipe-execution',
+          'klf-compatibility'
+        ]
+      }
+    ];
+    res.json({ nodes });
+  } catch (error) {
+    logger.error('Failed to get nodes:', error);
+    res.status(500).json({ error: 'Failed to get nodes' });
+  }
+});
+
+// Root endpoint
+httpNode.get('/', async (req: any, res: any) => {
+  res.json({
+    name: 'Starseed Node',
+    version: '2.0.0',
+    description: 'Complete AI orchestration platform',
+    endpoints: {
+      health: '/health',
+      services: '/api/services',
+      database: '/api/database/status',
+      nodes: '/api/nodes'
+    }
+  });
+});
+
 // Start the server
-initializeServer().catch((error) => {
-  logger.error('Failed to start server:', error);
-  process.exit(1);
-}); 
+async function start() {
+  try {
+    // Initialize database connections
+    await databaseManager.initialize();
+    logger.info('Database connections established');
+
+    // Start service manager auto-testing
+    serviceManager.startAutoTesting();
+    logger.info('Service manager started');
+
+    // Start HTTP server
+    await httpNode.start();
+    logger.info(`Starseed Node server running on http://${env.HOST}:${env.PORT}`);
+
+    // Graceful shutdown
+    process.on('SIGINT', async () => {
+      logger.info('Shutting down...');
+      serviceManager.stopAutoTesting();
+      await databaseManager.close();
+      await httpNode.stop();
+      process.exit(0);
+    });
+
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+start(); 

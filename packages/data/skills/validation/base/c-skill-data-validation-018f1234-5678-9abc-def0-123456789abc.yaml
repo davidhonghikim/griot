@@ -1,0 +1,721 @@
+name: "Data Validation Base"
+description: "Comprehensive data validation and quality assurance capabilities for ensuring data integrity"
+category: "validation"
+tags:
+  primary: "validation"
+  secondary: ["quality", "integrity", "verification", "rules", "standards"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface ValidationRule {
+    id: string;
+    name: string;
+    description: string;
+    field: string;
+    type: 'required' | 'format' | 'range' | 'length' | 'pattern' | 'custom' | 'reference' | 'business';
+    parameters: Record<string, any>;
+    severity: 'error' | 'warning' | 'info';
+    enabled: boolean;
+  }
+  
+  export interface ValidationResult {
+    id: string;
+    ruleId: string;
+    field: string;
+    value: any;
+    valid: boolean;
+    message: string;
+    severity: 'error' | 'warning' | 'info';
+    timestamp: Date;
+    metadata: Record<string, any>;
+  }
+  
+  export interface ValidationReport {
+    id: string;
+    dataId: string;
+    timestamp: Date;
+    results: ValidationResult[];
+    summary: {
+      total: number;
+      valid: number;
+      invalid: number;
+      errors: number;
+      warnings: number;
+      info: number;
+    };
+    quality: {
+      score: number; // 0-1
+      grade: 'A' | 'B' | 'C' | 'D' | 'F';
+      issues: string[];
+    };
+  }
+  
+  export interface DataSchema {
+    id: string;
+    name: string;
+    version: string;
+    fields: SchemaField[];
+    rules: ValidationRule[];
+    metadata: Record<string, any>;
+  }
+  
+  export interface SchemaField {
+    name: string;
+    type: 'string' | 'number' | 'boolean' | 'date' | 'email' | 'url' | 'phone' | 'custom';
+    required: boolean;
+    defaultValue?: any;
+    constraints: FieldConstraint[];
+  }
+  
+  export interface FieldConstraint {
+    type: 'min' | 'max' | 'pattern' | 'format' | 'enum' | 'custom';
+    value: any;
+    message: string;
+  }
+  
+  export class DataValidationSkill {
+    private rules: Map<string, ValidationRule>;
+    private schemas: Map<string, DataSchema>;
+    private reports: Map<string, ValidationReport>;
+    private customValidators: Map<string, Function>;
+    
+    constructor() {
+      this.rules = new Map();
+      this.schemas = new Map();
+      this.reports = new Map();
+      this.customValidators = new Map();
+      this.initializeDefaultRules();
+      this.initializeCustomValidators();
+    }
+    
+    // Initialize default validation rules
+    private initializeDefaultRules(): void {
+      // Required field rule
+      this.rules.set('required', {
+        id: 'required',
+        name: 'Required Field',
+        description: 'Field must not be empty or null',
+        field: '*',
+        type: 'required',
+        parameters: {},
+        severity: 'error',
+        enabled: true
+      });
+      
+      // Email format rule
+      this.rules.set('email_format', {
+        id: 'email_format',
+        name: 'Email Format',
+        description: 'Field must be a valid email address',
+        field: 'email',
+        type: 'format',
+        parameters: { format: 'email' },
+        severity: 'error',
+        enabled: true
+      });
+      
+      // URL format rule
+      this.rules.set('url_format', {
+        id: 'url_format',
+        name: 'URL Format',
+        description: 'Field must be a valid URL',
+        field: 'url',
+        type: 'format',
+        parameters: { format: 'url' },
+        severity: 'error',
+        enabled: true
+      });
+      
+      // Phone format rule
+      this.rules.set('phone_format', {
+        id: 'phone_format',
+        name: 'Phone Format',
+        description: 'Field must be a valid phone number',
+        field: 'phone',
+        type: 'format',
+        parameters: { format: 'phone' },
+        severity: 'error',
+        enabled: true
+      });
+      
+      // String length rule
+      this.rules.set('string_length', {
+        id: 'string_length',
+        name: 'String Length',
+        description: 'String must be within specified length range',
+        field: 'text',
+        type: 'length',
+        parameters: { min: 1, max: 1000 },
+        severity: 'warning',
+        enabled: true
+      });
+      
+      // Number range rule
+      this.rules.set('number_range', {
+        id: 'number_range',
+        name: 'Number Range',
+        description: 'Number must be within specified range',
+        field: 'value',
+        type: 'range',
+        parameters: { min: 0, max: 1000000 },
+        severity: 'error',
+        enabled: true
+      });
+      
+      // Date format rule
+      this.rules.set('date_format', {
+        id: 'date_format',
+        name: 'Date Format',
+        description: 'Field must be a valid date',
+        field: 'date',
+        type: 'format',
+        parameters: { format: 'date' },
+        severity: 'error',
+        enabled: true
+      });
+      
+      // Pattern matching rule
+      this.rules.set('pattern_match', {
+        id: 'pattern_match',
+        name: 'Pattern Match',
+        description: 'Field must match specified pattern',
+        field: 'code',
+        type: 'pattern',
+        parameters: { pattern: '^[A-Z]{2}\\d{6}$' },
+        severity: 'error',
+        enabled: true
+      });
+    }
+    
+    // Initialize custom validators
+    private initializeCustomValidators(): void {
+      // Email validator
+      this.customValidators.set('email', (value: any): boolean => {
+        if (typeof value !== 'string') return false;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(value);
+      });
+      
+      // URL validator
+      this.customValidators.set('url', (value: any): boolean => {
+        if (typeof value !== 'string') return false;
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      
+      // Phone validator
+      this.customValidators.set('phone', (value: any): boolean => {
+        if (typeof value !== 'string') return false;
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        return phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''));
+      });
+      
+      // Date validator
+      this.customValidators.set('date', (value: any): boolean => {
+        if (value instanceof Date) return true;
+        if (typeof value === 'string') {
+          const date = new Date(value);
+          return !isNaN(date.getTime());
+        }
+        return false;
+      });
+      
+      // Credit card validator
+      this.customValidators.set('credit_card', (value: any): boolean => {
+        if (typeof value !== 'string') return false;
+        const cleaned = value.replace(/\s/g, '');
+        if (!/^\d{13,19}$/.test(cleaned)) return false;
+        
+        // Luhn algorithm
+        let sum = 0;
+        let isEven = false;
+        
+        for (let i = cleaned.length - 1; i >= 0; i--) {
+          let digit = parseInt(cleaned.charAt(i));
+          
+          if (isEven) {
+            digit *= 2;
+            if (digit > 9) {
+              digit -= 9;
+            }
+          }
+          
+          sum += digit;
+          isEven = !isEven;
+        }
+        
+        return sum % 10 === 0;
+      });
+      
+      // Password strength validator
+      this.customValidators.set('password_strength', (value: any): boolean => {
+        if (typeof value !== 'string') return false;
+        
+        const hasLength = value.length >= 8;
+        const hasUpperCase = /[A-Z]/.test(value);
+        const hasLowerCase = /[a-z]/.test(value);
+        const hasNumbers = /\d/.test(value);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+        
+        return hasLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+      });
+    }
+    
+    // Validate data against rules
+    validateData(data: any, rules?: ValidationRule[]): ValidationReport {
+      const startTime = Date.now();
+      const results: ValidationResult[] = [];
+      
+      // Use provided rules or all enabled rules
+      const validationRules = rules || Array.from(this.rules.values()).filter(rule => rule.enabled);
+      
+      // Validate each rule
+      for (const rule of validationRules) {
+        const fieldValue = this.getNestedValue(data, rule.field);
+        const result = this.validateField(rule, fieldValue, data);
+        results.push(result);
+      }
+      
+      // Generate summary
+      const summary = this.generateSummary(results);
+      
+      // Calculate quality score
+      const quality = this.calculateQuality(summary);
+      
+      // Create report
+      const report: ValidationReport = {
+        id: this.generateReportId(),
+        dataId: typeof data === 'object' && data.id ? data.id : 'unknown',
+        timestamp: new Date(),
+        results,
+        summary,
+        quality
+      };
+      
+      // Store report
+      this.reports.set(report.id, report);
+      
+      return report;
+    }
+    
+    // Validate a single field
+    private validateField(rule: ValidationRule, value: any, data: any): ValidationResult {
+      const isValid = this.evaluateRule(rule, value, data);
+      const message = this.generateMessage(rule, value, isValid);
+      
+      return {
+        id: this.generateResultId(),
+        ruleId: rule.id,
+        field: rule.field,
+        value,
+        valid: isValid,
+        message,
+        severity: rule.severity,
+        timestamp: new Date(),
+        metadata: {
+          ruleType: rule.type,
+          parameters: rule.parameters
+        }
+      };
+    }
+    
+    // Evaluate a validation rule
+    private evaluateRule(rule: ValidationRule, value: any, data: any): boolean {
+      switch (rule.type) {
+        case 'required':
+          return this.validateRequired(value);
+        case 'format':
+          return this.validateFormat(value, rule.parameters);
+        case 'range':
+          return this.validateRange(value, rule.parameters);
+        case 'length':
+          return this.validateLength(value, rule.parameters);
+        case 'pattern':
+          return this.validatePattern(value, rule.parameters);
+        case 'custom':
+          return this.validateCustom(value, rule.parameters);
+        case 'reference':
+          return this.validateReference(value, rule.parameters, data);
+        case 'business':
+          return this.validateBusiness(value, rule.parameters, data);
+        default:
+          return true;
+      }
+    }
+    
+    // Validate required field
+    private validateRequired(value: any): boolean {
+      if (value === null || value === undefined) return false;
+      if (typeof value === 'string') return value.trim().length > 0;
+      if (Array.isArray(value)) return value.length > 0;
+      return true;
+    }
+    
+    // Validate format
+    private validateFormat(value: any, parameters: Record<string, any>): boolean {
+      const format = parameters.format;
+      const validator = this.customValidators.get(format);
+      
+      if (validator) {
+        return validator(value);
+      }
+      
+      return true;
+    }
+    
+    // Validate range
+    private validateRange(value: any, parameters: Record<string, any>): boolean {
+      if (typeof value !== 'number') return false;
+      
+      const min = parameters.min;
+      const max = parameters.max;
+      
+      if (min !== undefined && value < min) return false;
+      if (max !== undefined && value > max) return false;
+      
+      return true;
+    }
+    
+    // Validate length
+    private validateLength(value: any, parameters: Record<string, any>): boolean {
+      if (typeof value !== 'string' && !Array.isArray(value)) return false;
+      
+      const length = value.length;
+      const min = parameters.min;
+      const max = parameters.max;
+      
+      if (min !== undefined && length < min) return false;
+      if (max !== undefined && length > max) return false;
+      
+      return true;
+    }
+    
+    // Validate pattern
+    private validatePattern(value: any, parameters: Record<string, any>): boolean {
+      if (typeof value !== 'string') return false;
+      
+      const pattern = parameters.pattern;
+      if (!pattern) return true;
+      
+      try {
+        const regex = new RegExp(pattern);
+        return regex.test(value);
+      } catch {
+        return false;
+      }
+    }
+    
+    // Validate custom rule
+    private validateCustom(value: any, parameters: Record<string, any>): boolean {
+      const validatorName = parameters.validator;
+      const validator = this.customValidators.get(validatorName);
+      
+      if (validator) {
+        return validator(value);
+      }
+      
+      return true;
+    }
+    
+    // Validate reference
+    private validateReference(value: any, parameters: Record<string, any>, data: any): boolean {
+      const referenceField = parameters.field;
+      const referenceValue = this.getNestedValue(data, referenceField);
+      
+      if (parameters.operator === 'equals') {
+        return value === referenceValue;
+      } else if (parameters.operator === 'not_equals') {
+        return value !== referenceValue;
+      } else if (parameters.operator === 'greater_than') {
+        return value > referenceValue;
+      } else if (parameters.operator === 'less_than') {
+        return value < referenceValue;
+      }
+      
+      return true;
+    }
+    
+    // Validate business rule
+    private validateBusiness(value: any, parameters: Record<string, any>, data: any): boolean {
+      const ruleType = parameters.type;
+      
+      switch (ruleType) {
+        case 'age_restriction':
+          const minAge = parameters.minAge;
+          const birthDate = new Date(value);
+          const age = this.calculateAge(birthDate);
+          return age >= minAge;
+        
+        case 'date_range':
+          const startDate = new Date(parameters.startDate);
+          const endDate = new Date(parameters.endDate);
+          const checkDate = new Date(value);
+          return checkDate >= startDate && checkDate <= endDate;
+        
+        case 'conditional_required':
+          const conditionField = parameters.conditionField;
+          const conditionValue = parameters.conditionValue;
+          const actualValue = this.getNestedValue(data, conditionField);
+          
+          if (actualValue === conditionValue) {
+            return this.validateRequired(value);
+          }
+          return true;
+        
+        default:
+          return true;
+      }
+    }
+    
+    // Calculate age from birth date
+    private calculateAge(birthDate: Date): number {
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      return age;
+    }
+    
+    // Generate validation message
+    private generateMessage(rule: ValidationRule, value: any, isValid: boolean): string {
+      if (isValid) {
+        return `${rule.field} is valid`;
+      }
+      
+      switch (rule.type) {
+        case 'required':
+          return `${rule.field} is required`;
+        case 'format':
+          return `${rule.field} must be a valid ${rule.parameters.format}`;
+        case 'range':
+          const { min, max } = rule.parameters;
+          if (min !== undefined && max !== undefined) {
+            return `${rule.field} must be between ${min} and ${max}`;
+          } else if (min !== undefined) {
+            return `${rule.field} must be at least ${min}`;
+          } else if (max !== undefined) {
+            return `${rule.field} must be at most ${max}`;
+          }
+          return `${rule.field} is invalid`;
+        case 'length':
+          const { min: minLen, max: maxLen } = rule.parameters;
+          if (minLen !== undefined && maxLen !== undefined) {
+            return `${rule.field} must be between ${minLen} and ${maxLen} characters`;
+          } else if (minLen !== undefined) {
+            return `${rule.field} must be at least ${minLen} characters`;
+          } else if (maxLen !== undefined) {
+            return `${rule.field} must be at most ${maxLen} characters`;
+          }
+          return `${rule.field} length is invalid`;
+        case 'pattern':
+          return `${rule.field} does not match required pattern`;
+        default:
+          return `${rule.field} is invalid`;
+      }
+    }
+    
+    // Generate summary
+    private generateSummary(results: ValidationResult[]): ValidationReport['summary'] {
+      const total = results.length;
+      const valid = results.filter(r => r.valid).length;
+      const invalid = total - valid;
+      const errors = results.filter(r => r.severity === 'error' && !r.valid).length;
+      const warnings = results.filter(r => r.severity === 'warning' && !r.valid).length;
+      const info = results.filter(r => r.severity === 'info' && !r.valid).length;
+      
+      return {
+        total,
+        valid,
+        invalid,
+        errors,
+        warnings,
+        info
+      };
+    }
+    
+    // Calculate quality score
+    private calculateQuality(summary: ValidationReport['summary']): ValidationReport['quality'] {
+      const { total, errors, warnings } = summary;
+      
+      if (total === 0) {
+        return {
+          score: 1,
+          grade: 'A',
+          issues: []
+        };
+      }
+      
+      // Calculate score (errors have more weight than warnings)
+      const errorPenalty = errors * 0.5;
+      const warningPenalty = warnings * 0.1;
+      const totalPenalty = errorPenalty + warningPenalty;
+      const score = Math.max(0, 1 - totalPenalty / total);
+      
+      // Determine grade
+      let grade: 'A' | 'B' | 'C' | 'D' | 'F';
+      if (score >= 0.9) grade = 'A';
+      else if (score >= 0.8) grade = 'B';
+      else if (score >= 0.7) grade = 'C';
+      else if (score >= 0.6) grade = 'D';
+      else grade = 'F';
+      
+      // Generate issues list
+      const issues: string[] = [];
+      if (errors > 0) issues.push(`${errors} validation errors`);
+      if (warnings > 0) issues.push(`${warnings} validation warnings`);
+      
+      return {
+        score,
+        grade,
+        issues
+      };
+    }
+    
+    // Get nested value from object
+    private getNestedValue(obj: any, path: string): any {
+      if (path === '*') return obj;
+      
+      return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+      }, obj);
+    }
+    
+    // Generate report ID
+    private generateReportId(): string {
+      return `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Generate result ID
+    private generateResultId(): string {
+      return `result_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Add validation rule
+    addRule(rule: ValidationRule): void {
+      this.rules.set(rule.id, rule);
+    }
+    
+    // Remove validation rule
+    removeRule(ruleId: string): boolean {
+      return this.rules.delete(ruleId);
+    }
+    
+    // Update validation rule
+    updateRule(ruleId: string, updates: Partial<ValidationRule>): boolean {
+      const rule = this.rules.get(ruleId);
+      if (!rule) return false;
+      
+      this.rules.set(ruleId, { ...rule, ...updates });
+      return true;
+    }
+    
+    // Add custom validator
+    addCustomValidator(name: string, validator: Function): void {
+      this.customValidators.set(name, validator);
+    }
+    
+    // Get all rules
+    getRules(): ValidationRule[] {
+      return Array.from(this.rules.values());
+    }
+    
+    // Get rules by field
+    getRulesByField(field: string): ValidationRule[] {
+      return Array.from(this.rules.values())
+        .filter(rule => rule.field === field || rule.field === '*');
+    }
+    
+    // Get validation report
+    getReport(reportId: string): ValidationReport | undefined {
+      return this.reports.get(reportId);
+    }
+    
+    // Get all reports
+    getAllReports(): ValidationReport[] {
+      return Array.from(this.reports.values());
+    }
+    
+    // Get reports by data ID
+    getReportsByDataId(dataId: string): ValidationReport[] {
+      return Array.from(this.reports.values())
+        .filter(report => report.dataId === dataId);
+    }
+    
+    // Create data schema
+    createSchema(
+      name: string,
+      version: string,
+      fields: SchemaField[],
+      rules: ValidationRule[] = []
+    ): DataSchema {
+      const schema: DataSchema = {
+        id: this.generateSchemaId(),
+        name,
+        version,
+        fields,
+        rules,
+        metadata: {}
+      };
+      
+      this.schemas.set(schema.id, schema);
+      return schema;
+    }
+    
+    // Generate schema ID
+    private generateSchemaId(): string {
+      return `schema_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Validate against schema
+    validateAgainstSchema(data: any, schemaId: string): ValidationReport {
+      const schema = this.schemas.get(schemaId);
+      if (!schema) {
+        throw new Error(`Schema ${schemaId} not found`);
+      }
+      
+      return this.validateData(data, schema.rules);
+    }
+    
+    // Get all schemas
+    getSchemas(): DataSchema[] {
+      return Array.from(this.schemas.values());
+    }
+    
+    // Get schema by ID
+    getSchema(schemaId: string): DataSchema | undefined {
+      return this.schemas.get(schemaId);
+    }
+    
+    // Get statistics
+    getStatistics(): {
+      totalRules: number;
+      totalSchemas: number;
+      totalReports: number;
+      averageQualityScore: number;
+    } {
+      const reports = Array.from(this.reports.values());
+      const averageQualityScore = reports.length > 0 ?
+        reports.reduce((sum, report) => sum + report.quality.score, 0) / reports.length : 1;
+      
+      return {
+        totalRules: this.rules.size,
+        totalSchemas: this.schemas.size,
+        totalReports: this.reports.size,
+        averageQualityScore
+      };
+    }
+  } 

@@ -1,0 +1,183 @@
+name: "Testing Requirements Check"
+description: "Ensures proper test coverage and testing best practices"
+category: "compliance"
+tags:
+  primary: "testing"
+  secondary: ["compliance", "coverage", "unit", "integration", "e2e"]
+  nodes: ["musa", "griot", "tohunga", "ronin", "oracle", "skald", "amauta", "mzee"]
+  priority: "high"
+  complexity: "moderate"
+  cultural: ["hieros"]
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { readFileSync, existsSync } from 'fs';
+  import { glob } from 'glob';
+  import { join } from 'path';
+  
+  export async function testing_requirements_check(input: {
+    check_test_coverage: boolean;
+    check_test_structure: boolean;
+    check_test_naming: boolean;
+    check_integration_tests: boolean;
+  }) {
+    const violations = [];
+    const recommendations = [];
+    
+    // Get all source files
+    const sourceFiles = await glob('**/*.{ts,js}', { 
+      ignore: ['node_modules/**', 'dist/**', '**/*.test.*', '**/*.spec.*', 'tests/**'] 
+    });
+    
+    // Get all test files
+    const testFiles = await glob('**/*.{test,spec}.{ts,js}', { ignore: ['node_modules/**', 'dist/**'] });
+    
+    if (input.check_test_coverage) {
+      // Check for missing tests
+      for (const sourceFile of sourceFiles) {
+        const testFile = sourceFile.replace(/\.(ts|js)$/, '.test.$1');
+        const specFile = sourceFile.replace(/\.(ts|js)$/, '.spec.$1');
+        
+        if (!existsSync(testFile) && !existsSync(specFile)) {
+          // Check if this is a test file itself
+          if (!sourceFile.includes('test') && !sourceFile.includes('spec')) {
+            recommendations.push({
+              file: sourceFile,
+              issue: 'Missing test file - consider adding unit tests',
+              severity: 'warning'
+            });
+          }
+        }
+      }
+      
+      // Check test file quality
+      for (const testFile of testFiles) {
+        const content = readFileSync(testFile, 'utf8');
+        
+        // Check for proper test structure
+        if (!content.includes('describe(') && !content.includes('test(') && !content.includes('it(')) {
+          violations.push({
+            file: testFile,
+            issue: 'Test file should contain proper test structure (describe/test/it)',
+            severity: 'error'
+          });
+        }
+        
+        // Check for assertions
+        if (!content.includes('expect(') && !content.includes('assert(')) {
+          violations.push({
+            file: testFile,
+            issue: 'Test file should contain assertions (expect/assert)',
+            severity: 'error'
+          });
+        }
+        
+        // Check for proper test naming
+        if (input.check_test_naming) {
+          const describeMatches = content.match(/describe\(['"`]([^'"`]+)['"`]/g);
+          if (describeMatches) {
+            for (const match of describeMatches) {
+              const description = match.match(/describe\(['"`]([^'"`]+)['"`]/)?.[1];
+              if (description && description.length < 10) {
+                recommendations.push({
+                  file: testFile,
+                  issue: `Test description too short: "${description}" - be more descriptive`,
+                  severity: 'info'
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (input.check_test_structure) {
+      // Check for proper test directory structure
+      const testDirs = ['tests', 'test', '__tests__'];
+      let hasTestDir = false;
+      
+      for (const dir of testDirs) {
+        if (existsSync(dir)) {
+          hasTestDir = true;
+          break;
+        }
+      }
+      
+      if (!hasTestDir && testFiles.length > 0) {
+        recommendations.push({
+          file: 'project-root',
+          issue: 'Consider organizing tests in a dedicated tests/ directory',
+          severity: 'info'
+        });
+      }
+      
+      // Check for integration test structure
+      if (input.check_integration_tests) {
+        const integrationTestDirs = ['tests/integration', 'tests/e2e', 'integration-tests'];
+        let hasIntegrationTests = false;
+        
+        for (const dir of integrationTestDirs) {
+          if (existsSync(dir)) {
+            hasIntegrationTests = true;
+            break;
+          }
+        }
+        
+        if (!hasIntegrationTests) {
+          recommendations.push({
+            file: 'project-root',
+            issue: 'Consider adding integration tests for end-to-end scenarios',
+            severity: 'info'
+          });
+        }
+      }
+    }
+    
+    // Check for test configuration
+    const configFiles = ['jest.config.js', 'jest.config.ts', 'vitest.config.ts', 'mocha.opts', '.mocharc.json'];
+    let hasTestConfig = false;
+    
+    for (const configFile of configFiles) {
+      if (existsSync(configFile)) {
+        hasTestConfig = true;
+        break;
+      }
+    }
+    
+    if (!hasTestConfig && testFiles.length > 0) {
+      violations.push({
+        file: 'project-root',
+        issue: 'Missing test configuration file',
+        severity: 'error'
+      });
+    }
+    
+    // Check package.json for test scripts
+    if (existsSync('package.json')) {
+      const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+      const scripts = packageJson.scripts || {};
+      
+      if (!scripts.test && !scripts['test:unit'] && !scripts['test:integration']) {
+        violations.push({
+          file: 'package.json',
+          issue: 'Missing test scripts in package.json',
+          severity: 'error'
+        });
+      }
+    }
+    
+    return {
+      success: violations.length === 0,
+      violations,
+      recommendations,
+      summary: `Found ${violations.length} violations and ${recommendations.length} recommendations`,
+      coverage: {
+        sourceFiles: sourceFiles.length,
+        testFiles: testFiles.length,
+        coverageRatio: testFiles.length / Math.max(sourceFiles.length, 1)
+      }
+    };
+  } 

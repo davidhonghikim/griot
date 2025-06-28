@@ -1,0 +1,214 @@
+name: "Comprehensive Prompt Engineering"
+description: "Complete workflow for analyzing, optimizing, and testing prompts using atomic skills"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["prompt", "engineering", "workflow", "optimization"]
+  priority: "high"
+  complexity: "complex"
+  dependencies: ["template_rendering", "prompt_optimization", "prompt_analysis", "llm_integration"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+workflow:
+  steps:
+    - step: 1
+      name: "Initial Analysis"
+      description: "Analyze the original prompt for quality and issues"
+      skills:
+        - skill: "prompt_analysis"
+          action: "analyzePrompt"
+          input:
+            prompt: "{{original_prompt}}"
+          output: "analysis_result"
+      
+    - step: 2
+      name: "Template Processing"
+      description: "Process any templates and extract variables"
+      skills:
+        - skill: "template_rendering"
+          action: "extractVariables"
+          input:
+            template: "{{original_prompt}}"
+          output: "template_variables"
+        - skill: "template_rendering"
+          action: "validateTemplate"
+          input:
+            template: "{{original_prompt}}"
+            providedVariables: "{{provided_variables}}"
+          output: "template_validation"
+      
+    - step: 3
+      name: "Prompt Optimization"
+      description: "Optimize the prompt based on analysis results"
+      condition: "analysis_result.score < 0.8"
+      skills:
+        - skill: "prompt_optimization"
+          action: "optimizePrompt"
+          input:
+            prompt: "{{original_prompt}}"
+            target: "{{optimization_target}}"
+          output: "optimized_prompt"
+      
+    - step: 4
+      name: "A/B Testing"
+      description: "Test multiple prompt variants"
+      condition: "{{enable_ab_testing}}"
+      skills:
+        - skill: "prompt_optimization"
+          action: "testPromptVariants"
+          input:
+            variants: "{{prompt_variants}}"
+            testCases: "{{test_cases}}"
+            metric: "{{test_metric}}"
+          output: "ab_test_results"
+      
+    - step: 5
+      name: "Iterative Optimization"
+      description: "Perform iterative optimization if needed"
+      condition: "ab_test_results[0].score < 0.85"
+      skills:
+        - skill: "prompt_optimization"
+          action: "iterativeOptimization"
+          input:
+            initialPrompt: "{{best_prompt_variant}}"
+            target: "{{optimization_target}}"
+            testCases: "{{test_cases}}"
+          output: "final_optimized_prompt"
+      
+    - step: 6
+      name: "Final Analysis"
+      description: "Analyze the final optimized prompt"
+      skills:
+        - skill: "prompt_analysis"
+          action: "analyzePrompt"
+          input:
+            prompt: "{{final_prompt}}"
+          output: "final_analysis"
+        - skill: "prompt_analysis"
+          action: "comparePrompts"
+          input:
+            prompt1: "{{original_prompt}}"
+            prompt2: "{{final_prompt}}"
+          output: "comparison_result"
+      
+    - step: 7
+      name: "Template Rendering"
+      description: "Render the final prompt with variables"
+      condition: "template_variables.length > 0"
+      skills:
+        - skill: "template_rendering"
+          action: "render"
+          input:
+            template: "{{final_prompt}}"
+            variables: "{{final_variables}}"
+          output: "rendered_prompt"
+      
+    - step: 8
+      name: "Quality Assurance"
+      description: "Final validation and quality check"
+      skills:
+        - skill: "prompt_analysis"
+          action: "analyzePrompt"
+          input:
+            prompt: "{{rendered_prompt}}"
+          output: "final_qa_result"
+  
+  inputs:
+    original_prompt:
+      type: "string"
+      required: true
+      description: "The original prompt to be engineered"
+    
+    optimization_target:
+      type: "string"
+      required: false
+      description: "Target goal for optimization"
+    
+    provided_variables:
+      type: "object"
+      required: false
+      description: "Variables to substitute in templates"
+    
+    enable_ab_testing:
+      type: "boolean"
+      default: false
+      description: "Whether to perform A/B testing"
+    
+    prompt_variants:
+      type: "array"
+      required: false
+      description: "Alternative prompt variants to test"
+    
+    test_cases:
+      type: "array"
+      required: false
+      description: "Test cases for evaluation"
+    
+    test_metric:
+      type: "string"
+      default: "accuracy"
+      enum: ["accuracy", "relevance", "completeness"]
+      description: "Metric to use for testing"
+  
+  outputs:
+    final_prompt:
+      type: "string"
+      description: "The final optimized and rendered prompt"
+    
+    analysis_report:
+      type: "object"
+      description: "Complete analysis of the prompt engineering process"
+    
+    improvement_metrics:
+      type: "object"
+      description: "Metrics showing improvement from original to final"
+    
+    recommendations:
+      type: "array"
+      description: "Recommendations for future prompt engineering"
+  
+  configuration:
+    max_iterations: 3
+    improvement_threshold: 0.1
+    quality_threshold: 0.8
+    enable_detailed_logging: true
+    
+  error_handling:
+    - condition: "template_validation.isValid === false"
+      action: "log_error"
+      message: "Template validation failed: {{template_validation.errors}}"
+      recovery: "use_original_prompt"
+    
+    - condition: "optimization_failed"
+      action: "log_warning"
+      message: "Prompt optimization failed, using original"
+      recovery: "continue_with_original"
+    
+    - condition: "ab_test_results.length === 0"
+      action: "skip_step"
+      message: "No A/B test results, skipping optimization"
+      recovery: "continue_to_next_step"
+  
+  examples:
+    simple_optimization:
+      inputs:
+        original_prompt: "Write a story about a cat"
+        optimization_target: "Create an engaging, detailed story with character development"
+      expected_outputs:
+        final_prompt: "Write a compelling 500-word story about a cat named [name] who [specific situation]. Include character development, vivid descriptions, and a satisfying conclusion."
+        improvement_metrics:
+          clarity: "+0.3"
+          specificity: "+0.4"
+          completeness: "+0.5"
+    
+    template_rendering:
+      inputs:
+        original_prompt: "Analyze the sentiment of {{text}} and provide {{output_format}}"
+        provided_variables:
+          text: "I love this product!"
+          output_format: "a detailed report with scores"
+      expected_outputs:
+        rendered_prompt: "Analyze the sentiment of I love this product! and provide a detailed report with scores"
+        template_variables: ["text", "output_format"] 

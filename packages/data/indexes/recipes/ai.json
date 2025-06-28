@@ -1,0 +1,168 @@
+{
+  "category": "ai",
+  "asset_type": "recipes",
+  "total_files": 5,
+  "last_updated": "2025-06-28T07:58:39.541649",
+  "files": [
+    {
+      "name": "Budget Aware Chat",
+      "path": "recipes/ai/budget_aware_chat.yaml",
+      "type": "recipes",
+      "category": "ai",
+      "size": 12,
+      "lastModified": "2025-06-28T06:58:45.942271",
+      "hash": "0afa41ad288678e3bbce1a80288021a504c1e64f609a0c07d081f8dfeaafa8d7",
+      "description": "Intelligent chat system with budget tracking, cost estimation, and spending optimization",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "chat",
+          "budget",
+          "cost",
+          "optimization",
+          "media"
+        ],
+        "priority": "high",
+        "complexity": "high",
+        "dependencies": [
+          "token_price_estimator",
+          "budget_manager",
+          "token_calculator"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Dining Experience",
+      "path": "recipes/ai/dining_experience.yaml",
+      "type": "recipes",
+      "category": "ai",
+      "size": 9,
+      "lastModified": "2025-06-28T06:51:03.133458",
+      "hash": "85a33e059af02052faa4c391f5d5ff62c0296182f189b05a8f7c00f6d6930269",
+      "description": "Orchestrate multiple recipes in parallel and sequential patterns like a fine dining experience",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "orchestration",
+          "parallel",
+          "sequential",
+          "dining",
+          "experience"
+        ],
+        "priority": "high",
+        "complexity": "complex",
+        "dependencies": [
+          "efficient_prompt_engineering",
+          "token_calculator",
+          "llm_integration"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Media Processing Budget",
+      "path": "recipes/ai/media_processing_budget.yaml",
+      "type": "recipes",
+      "category": "ai",
+      "size": 17,
+      "lastModified": "2025-06-28T06:59:34.187705",
+      "hash": "eab2e0e3f54c50afc25edaf12d8fbd2a288c7949743813b837d94d9b3629d1bd",
+      "description": "Intelligent media processing with budget-aware cost optimization for images, video, and audio",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "media",
+          "processing",
+          "budget",
+          "optimization",
+          "images",
+          "video",
+          "audio"
+        ],
+        "priority": "high",
+        "complexity": "high",
+        "dependencies": [
+          "token_price_estimator",
+          "budget_manager"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Efficient Prompt Engineering",
+      "path": "recipes/ai/efficient_prompt_engineering.yaml",
+      "type": "recipes",
+      "category": "ai",
+      "size": 5,
+      "lastModified": "2025-06-28T06:46:21.365120",
+      "hash": "8aa8e4723d577b78508329b439189788b67c5673a0597d700e6b6573df3dc43d",
+      "description": "Optimize prompts for minimal token usage and maximum effectiveness in single requests",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "efficiency",
+          "token",
+          "optimization",
+          "cost"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [
+          "token_optimization",
+          "prompt_analysis",
+          "template_rendering"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Comprehensive Prompt Engineering",
+      "path": "recipes/ai/comprehensive_prompt_engineering.yaml",
+      "type": "recipes",
+      "category": "ai",
+      "size": 7,
+      "lastModified": "2025-06-28T06:39:52.051849",
+      "hash": "e516ae5f5774b62c3a7a1b3b25e9ed48e43090ac9d478a3adc6990c91d18827d",
+      "description": "Complete workflow for analyzing, optimizing, and testing prompts using atomic skills",
+      "tags": {
+        "primary": "ai",
+        "secondary": [
+          "prompt",
+          "engineering",
+          "workflow",
+          "optimization"
+        ],
+        "priority": "high",
+        "complexity": "complex",
+        "dependencies": [
+          "template_rendering",
+          "prompt_optimization",
+          "prompt_analysis",
+          "llm_integration"
+        ],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

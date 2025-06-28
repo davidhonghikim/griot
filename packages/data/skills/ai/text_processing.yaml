@@ -1,0 +1,408 @@
+name: "Text Processing"
+description: "Text processing operations including tokenization, summarization, extraction, and text analysis"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["text", "tokenization", "summarization", "extraction", "analysis"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface TextProcessingConfig {
+    maxTokens?: number;
+    chunkSize?: number;
+    overlapSize?: number;
+    language?: string;
+  }
+  
+  export interface TextChunk {
+    id: string;
+    content: string;
+    startIndex: number;
+    endIndex: number;
+    metadata?: Record<string, any>;
+  }
+  
+  export interface SummaryResult {
+    summary: string;
+    keyPoints: string[];
+    wordCount: number;
+    compressionRatio: number;
+  }
+  
+  export interface ExtractionResult {
+    entities: Array<{text: string, type: string, confidence: number}>;
+    keywords: string[];
+    sentences: string[];
+    paragraphs: string[];
+  }
+  
+  export interface TextAnalysis {
+    wordCount: number;
+    sentenceCount: number;
+    paragraphCount: number;
+    averageSentenceLength: number;
+    readabilityScore: number;
+    sentiment: 'positive' | 'negative' | 'neutral';
+    topics: string[];
+  }
+  
+  export class TextProcessing {
+    private config: TextProcessingConfig;
+    private llmIntegration: any; // LLMIntegration instance
+    
+    constructor(config: TextProcessingConfig, llmIntegration: any) {
+      this.config = {
+        maxTokens: 4000,
+        chunkSize: 1000,
+        overlapSize: 200,
+        language: 'en',
+        ...config,
+      };
+      this.llmIntegration = llmIntegration;
+    }
+    
+    // Text chunking
+    chunkText(text: string, chunkSize?: number, overlapSize?: number): TextChunk[] {
+      const size = chunkSize || this.config.chunkSize!;
+      const overlap = overlapSize || this.config.overlapSize!;
+      const chunks: TextChunk[] = [];
+      
+      for (let i = 0; i < text.length; i += size - overlap) {
+        const chunkContent = text.slice(i, i + size);
+        const chunkId = `chunk_${chunks.length}`;
+        
+        chunks.push({
+          id: chunkId,
+          content: chunkContent,
+          startIndex: i,
+          endIndex: Math.min(i + size, text.length),
+          metadata: {
+            chunkIndex: chunks.length,
+            originalLength: text.length,
+          },
+        });
+      }
+      
+      return chunks;
+    }
+    
+    // Tokenization
+    tokenize(text: string): string[] {
+      // Simple word-based tokenization
+      return text
+        .toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(token => token.length > 0);
+    }
+    
+    tokenizeSentences(text: string): string[] {
+      // Simple sentence tokenization
+      return text
+        .replace(/([.!?])\s*(?=[A-Z])/g, '$1|')
+        .split('|')
+        .map(sentence => sentence.trim())
+        .filter(sentence => sentence.length > 0);
+    }
+    
+    tokenizeParagraphs(text: string): string[] {
+      // Paragraph tokenization
+      return text
+        .split(/\n\s*\n/)
+        .map(paragraph => paragraph.trim())
+        .filter(paragraph => paragraph.length > 0);
+    }
+    
+    // Text summarization
+    async summarize(text: string, maxLength?: number): Promise<SummaryResult> {
+      const prompt = `
+        Summarize the following text in a clear and concise way:
+        
+        ${text}
+        
+        Provide a summary that captures the main points and key information.
+        ${maxLength ? `Keep it under ${maxLength} words.` : ''}
+        
+        Format your response as JSON:
+        {
+          "summary": "...",
+          "keyPoints": ["...", "..."],
+          "wordCount": 150,
+          "compressionRatio": 0.3
+        }
+      `;
+      
+      const response = await this.llmIntegration.generate({
+        prompt,
+        maxTokens: 500,
+        temperature: 0.3,
+      });
+      
+      try {
+        const result = JSON.parse(response.text);
+        return {
+          summary: result.summary,
+          keyPoints: result.keyPoints,
+          wordCount: result.wordCount,
+          compressionRatio: result.compressionRatio,
+        };
+      } catch {
+        // Fallback to simple extraction
+        return this.extractiveSummarize(text, maxLength);
+      }
+    }
+    
+    // Extractive summarization (fallback)
+    private extractiveSummarize(text: string, maxLength?: number): SummaryResult {
+      const sentences = this.tokenizeSentences(text);
+      const words = this.tokenize(text);
+      
+      // Simple TF-IDF based sentence scoring
+      const sentenceScores = sentences.map(sentence => {
+        const sentenceWords = this.tokenize(sentence);
+        const score = sentenceWords.reduce((total, word) => {
+          const wordFreq = words.filter(w => w === word).length;
+          return total + wordFreq;
+        }, 0);
+        return { sentence, score: score / sentenceWords.length };
+      });
+      
+      // Sort by score and take top sentences
+      sentenceScores.sort((a, b) => b.score - a.score);
+      
+      const maxSentences = maxLength ? Math.ceil(maxLength / 20) : 3;
+      const topSentences = sentenceScores.slice(0, maxSentences);
+      
+      // Reconstruct in original order
+      const summarySentences = sentences.filter(sentence => 
+        topSentences.some(ts => ts.sentence === sentence)
+      );
+      
+      const summary = summarySentences.join(' ');
+      const keyPoints = topSentences.map(ts => ts.sentence);
+      
+      return {
+        summary,
+        keyPoints,
+        wordCount: this.tokenize(summary).length,
+        compressionRatio: summary.length / text.length,
+      };
+    }
+    
+    // Information extraction
+    async extractInformation(text: string): Promise<ExtractionResult> {
+      const prompt = `
+        Extract key information from the following text:
+        
+        ${text}
+        
+        Identify:
+        1. Named entities (people, places, organizations, dates)
+        2. Important keywords
+        3. Key sentences
+        4. Main paragraphs
+        
+        Format your response as JSON:
+        {
+          "entities": [
+            {"text": "John Doe", "type": "PERSON", "confidence": 0.9}
+          ],
+          "keywords": ["important", "key", "words"],
+          "sentences": ["Key sentence 1", "Key sentence 2"],
+          "paragraphs": ["Main paragraph 1", "Main paragraph 2"]
+        }
+      `;
+      
+      const response = await this.llmIntegration.generate({
+        prompt,
+        maxTokens: 1000,
+        temperature: 0.2,
+      });
+      
+      try {
+        return JSON.parse(response.text);
+      } catch {
+        // Fallback to simple extraction
+        return this.simpleExtraction(text);
+      }
+    }
+    
+    // Simple extraction (fallback)
+    private simpleExtraction(text: string): ExtractionResult {
+      const sentences = this.tokenizeSentences(text);
+      const paragraphs = this.tokenizeParagraphs(text);
+      const words = this.tokenize(text);
+      
+      // Extract keywords (simple frequency-based)
+      const wordFreq: Record<string, number> = {};
+      words.forEach(word => {
+        if (word.length > 3) { // Skip short words
+          wordFreq[word] = (wordFreq[word] || 0) + 1;
+        }
+      });
+      
+      const keywords = Object.entries(wordFreq)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 10)
+        .map(([word]) => word);
+      
+      // Key sentences (longer sentences with important words)
+      const keySentences = sentences
+        .filter(sentence => {
+          const sentenceWords = this.tokenize(sentence);
+          const importantWords = sentenceWords.filter(word => keywords.includes(word));
+          return importantWords.length > 0 && sentenceWords.length > 10;
+        })
+        .slice(0, 5);
+      
+      return {
+        entities: [], // Would need NER model for proper entity extraction
+        keywords,
+        sentences: keySentences,
+        paragraphs: paragraphs.slice(0, 3),
+      };
+    }
+    
+    // Text analysis
+    async analyzeText(text: string): Promise<TextAnalysis> {
+      const words = this.tokenize(text);
+      const sentences = this.tokenizeSentences(text);
+      const paragraphs = this.tokenizeParagraphs(text);
+      
+      // Basic statistics
+      const wordCount = words.length;
+      const sentenceCount = sentences.length;
+      const paragraphCount = paragraphs.length;
+      const averageSentenceLength = wordCount / sentenceCount;
+      
+      // Readability score (Flesch Reading Ease)
+      const syllables = this.countSyllables(text);
+      const readabilityScore = 206.835 - (1.015 * averageSentenceLength) - (84.6 * (syllables / wordCount));
+      
+      // Sentiment analysis
+      const sentiment = await this.analyzeSentiment(text);
+      
+      // Topic extraction
+      const topics = await this.extractTopics(text);
+      
+      return {
+        wordCount,
+        sentenceCount,
+        paragraphCount,
+        averageSentenceLength,
+        readabilityScore: Math.max(0, Math.min(100, readabilityScore)),
+        sentiment,
+        topics,
+      };
+    }
+    
+    // Sentiment analysis
+    async analyzeSentiment(text: string): Promise<'positive' | 'negative' | 'neutral'> {
+      const prompt = `
+        Analyze the sentiment of the following text:
+        
+        ${text}
+        
+        Respond with only one word: positive, negative, or neutral.
+      `;
+      
+      const response = await this.llmIntegration.generate({
+        prompt,
+        maxTokens: 10,
+        temperature: 0.1,
+      });
+      
+      const sentiment = response.text.trim().toLowerCase();
+      
+      if (sentiment.includes('positive')) return 'positive';
+      if (sentiment.includes('negative')) return 'negative';
+      return 'neutral';
+    }
+    
+    // Topic extraction
+    async extractTopics(text: string): Promise<string[]> {
+      const prompt = `
+        Extract the main topics from the following text:
+        
+        ${text}
+        
+        Provide a list of 3-5 main topics as a JSON array:
+        ["topic1", "topic2", "topic3"]
+      `;
+      
+      const response = await this.llmIntegration.generate({
+        prompt,
+        maxTokens: 100,
+        temperature: 0.2,
+      });
+      
+      try {
+        return JSON.parse(response.text);
+      } catch {
+        // Fallback to keyword extraction
+        const words = this.tokenize(text);
+        const wordFreq: Record<string, number> = {};
+        words.forEach(word => {
+          if (word.length > 4) {
+            wordFreq[word] = (wordFreq[word] || 0) + 1;
+          }
+        });
+        
+        return Object.entries(wordFreq)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 5)
+          .map(([word]) => word);
+      }
+    }
+    
+    // Utility methods
+    private countSyllables(text: string): number {
+      // Simple syllable counting (approximate)
+      const words = this.tokenize(text);
+      return words.reduce((total, word) => {
+        const syllables = word.replace(/[^aeiou]/gi, '').length;
+        return total + Math.max(1, syllables);
+      }, 0);
+    }
+    
+    // Text cleaning
+    cleanText(text: string): string {
+      return text
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .replace(/[^\w\s.,!?;:()]/g, '') // Remove special characters
+        .trim();
+    }
+    
+    // Text normalization
+    normalizeText(text: string): string {
+      return text
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    // Text similarity
+    calculateSimilarity(text1: string, text2: string): number {
+      const words1 = new Set(this.tokenize(text1));
+      const words2 = new Set(this.tokenize(text2));
+      
+      const intersection = new Set([...words1].filter(x => words2.has(x)));
+      const union = new Set([...words1, ...words2]);
+      
+      return intersection.size / union.size;
+    }
+    
+    // Configuration management
+    updateConfig(newConfig: Partial<TextProcessingConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    getConfig(): TextProcessingConfig {
+      return { ...this.config };
+    }
+  } 

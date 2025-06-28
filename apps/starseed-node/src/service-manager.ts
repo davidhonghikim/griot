@@ -8,9 +8,10 @@ import {
   getConnectorsByCategory,
 } from '@griot/service-connectors';
 import type { ServiceDefinition, ConnectionResult } from '@griot/service-connectors';
-import { createLogger } from '@griot/core';
+import { createLogger, getEnvironmentConfig } from '@griot/core';
 
 const logger = createLogger('service-manager');
+const env = getEnvironmentConfig();
 
 export interface ServiceInstance {
   id: string;
@@ -28,31 +29,40 @@ export interface ServiceManagerConfig {
   defaultPorts: { [serviceType: string]: number };
   autoTestInterval: number; // milliseconds
   connectionTimeout: number; // milliseconds
+  deploymentType: 'direct' | 'nginx' | 'apache' | 'cloudflare' | 'custom';
+}
+
+function getDeploymentHostsFromEnv(env: ReturnType<typeof getEnvironmentConfig>): { [serviceType: string]: string } {
+  const deploymentType = env.DEPLOYMENT_TYPE || 'direct';
+  const baseIP = env.BASE_IP;
+  const localHost = deploymentType === 'direct' ? (baseIP || 'localhost') : '127.0.0.1';
+  return {
+    ollama: env.OLLAMA_HOST || localHost,
+    comfyui: env.COMFYUI_HOST || localHost,
+    qdrant: env.QDRANT_HOST || localHost,
+    openai: env.OPENAI_HOST || 'api.openai.com',
+    anthropic: env.ANTHROPIC_HOST || 'api.anthropic.com',
+    weaviate: env.WEAVIATE_HOST || localHost,
+    neo4j: env.NEO4J_HOST || localHost,
+    postgresql: env.POSTGRES_HOST || localHost,
+  };
 }
 
 export const defaultServiceManagerConfig: ServiceManagerConfig = {
-  defaultHosts: {
-    ollama: process.env.OLLAMA_HOST || 'localhost',
-    comfyui: process.env.COMFYUI_HOST || 'localhost',
-    qdrant: process.env.QDRANT_HOST || 'localhost',
-    openai: process.env.OPENAI_HOST || 'api.openai.com',
-    anthropic: process.env.ANTHROPIC_HOST || 'api.anthropic.com',
-    weaviate: process.env.WEAVIATE_HOST || 'localhost',
-    neo4j: process.env.NEO4J_HOST || 'localhost',
-    postgresql: process.env.POSTGRES_HOST || 'localhost',
-  },
+  defaultHosts: getDeploymentHostsFromEnv(env),
   defaultPorts: {
-    ollama: parseInt(process.env.OLLAMA_PORT || '11434'),
-    comfyui: parseInt(process.env.COMFYUI_PORT || '8188'),
-    qdrant: parseInt(process.env.QDRANT_PORT || '6333'),
-    openai: parseInt(process.env.OPENAI_PORT || '443'),
-    anthropic: parseInt(process.env.ANTHROPIC_PORT || '443'),
-    weaviate: parseInt(process.env.WEAVIATE_PORT || '8080'),
-    neo4j: parseInt(process.env.NEO4J_PORT || '7474'),
-    postgresql: parseInt(process.env.POSTGRES_PORT || '5432'),
+    ollama: env.OLLAMA_PORT || 11434,
+    comfyui: env.COMFYUI_PORT || 8188,
+    qdrant: env.QDRANT_PORT || 6333,
+    openai: env.OPENAI_PORT || 443,
+    anthropic: env.ANTHROPIC_PORT || 443,
+    weaviate: env.WEAVIATE_PORT || 8080,
+    neo4j: env.NEO4J_PORT || 7474,
+    postgresql: env.POSTGRES_PORT || 5432,
   },
-  autoTestInterval: parseInt(process.env.SERVICE_TEST_INTERVAL || '30000'), // 30 seconds
-  connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT || '5000'), // 5 seconds
+  autoTestInterval: env.SERVICE_TEST_INTERVAL || 30000,
+  connectionTimeout: env.CONNECTION_TIMEOUT || 5000,
+  deploymentType: env.DEPLOYMENT_TYPE || 'direct',
 };
 
 export class ServiceManager {
@@ -64,6 +74,20 @@ export class ServiceManager {
   constructor(config: ServiceManagerConfig = defaultServiceManagerConfig) {
     this.connectionManager = ServiceConnectionManager.getInstance();
     this.config = config;
+    logger.info(`Service Manager initialized with deployment type: ${this.config.deploymentType}`);
+    logger.debug('Default hosts:', this.config.defaultHosts);
+  }
+
+  /**
+   * Get deployment information
+   */
+  getDeploymentInfo() {
+    return {
+      type: this.config.deploymentType,
+      isProduction: env.NODE_ENV === 'production',
+      baseIP: env.BASE_IP,
+      localServicesUseLocalhost: this.config.deploymentType !== 'direct',
+    };
   }
 
   /**

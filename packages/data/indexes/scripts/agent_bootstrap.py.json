@@ -1,0 +1,18 @@
+{
+  "category": "agent_bootstrap.py",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.547068",
+  "files": [
+    {
+      "name": "Agent Bootstrap",
+      "path": "scripts/agent_bootstrap.py",
+      "type": "scripts",
+      "category": "agent_bootstrap.py",
+      "size": 10,
+      "lastModified": "2025-06-28T07:51:37.477741",
+      "hash": "47e171b7718137e05c8819ee8d654af9df78a2434dbf2b1a7ad69bc88f17e540",
+      "description": "!/usr/bin/env python3  "
+    }
+  ]
+}

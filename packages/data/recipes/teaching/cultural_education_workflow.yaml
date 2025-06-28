@@ -1,0 +1,453 @@
+name: "Cultural Education Workflow"
+description: "Comprehensive workflow for cultural education with traditional and modern methods"
+category: "teaching"
+tags:
+  primary: "teaching"
+  secondary: ["cultural", "education", "workflow", "traditional", "modern"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: ["skills/teaching/cultural_educator.yaml", "skills/teaching/knowledge_transmission.yaml"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+workflow: |
+  export interface CulturalEducationConfig {
+    culturalContext: string;
+    learnerLevel: 'beginner' | 'intermediate' | 'advanced';
+    focusAreas: string[];
+    duration: number; // in weeks
+    methods: string[];
+    culturalElements: string[];
+    assessmentFrequency: 'weekly' | 'biweekly' | 'monthly';
+  }
+  
+  export interface EducationSession {
+    sessionId: string;
+    sessionType: 'introduction' | 'exploration' | 'practice' | 'reflection' | 'assessment';
+    date: Date;
+    duration: number; // in minutes
+    topics: string[];
+    culturalContext: string;
+    methods: string[];
+    outcomes: string[];
+    nextSteps: string[];
+  }
+  
+  export class CulturalEducationWorkflow {
+    private config: CulturalEducationConfig;
+    private culturalEducator: any; // CulturalEducatorSkill instance
+    private knowledgeTransmission: any; // KnowledgeTransmissionSkill instance
+    private sessions: EducationSession[] = [];
+    
+    constructor(config: CulturalEducationConfig) {
+      this.config = config;
+      this.initializeSkills();
+    }
+    
+    private initializeSkills(): void {
+      // Initialize cultural educator and knowledge transmission skills
+      this.culturalEducator = new CulturalEducatorSkill();
+      this.knowledgeTransmission = new KnowledgeTransmissionSkill();
+    }
+    
+    // Initialize cultural education program
+    async initializeEducation(learnerId: string): Promise<{
+      educationPlan: any;
+      initialAssessment: any;
+      culturalGuidance: string[];
+    }> {
+      // Create education plan
+      const educationPlan = await this.createEducationPlan(learnerId);
+      
+      // Conduct initial assessment
+      const initialAssessment = await this.conductInitialAssessment(learnerId);
+      
+      // Provide cultural guidance
+      const culturalGuidance = this.getCulturalGuidance();
+      
+      // Schedule first session
+      await this.scheduleSession({
+        sessionId: `session_${learnerId}_introduction`,
+        sessionType: 'introduction',
+        date: new Date(),
+        duration: 60,
+        topics: ['cultural_context', 'learning_objectives', 'traditional_methods'],
+        culturalContext: this.config.culturalContext,
+        methods: ['discussion', 'storytelling'],
+        outcomes: [],
+        nextSteps: []
+      });
+      
+      return {
+        educationPlan,
+        initialAssessment,
+        culturalGuidance
+      };
+    }
+    
+    // Create education plan
+    private async createEducationPlan(learnerId: string): Promise<{
+      learnerId: string;
+      culturalContext: string;
+      focusAreas: string[];
+      timeline: {
+        startDate: Date;
+        endDate: Date;
+        duration: number; // in weeks
+      };
+      milestones: Array<{
+        id: string;
+        description: string;
+        targetDate: Date;
+        completed: boolean;
+      }>;
+    }> {
+      const startDate = new Date();
+      const endDate = new Date(startDate.getTime() + this.config.duration * 7 * 24 * 60 * 60 * 1000);
+      
+      const milestones = this.config.focusAreas.map((area, index) => ({
+        id: `milestone_${learnerId}_${index}`,
+        description: `Complete ${area} education`,
+        targetDate: new Date(startDate.getTime() + (index + 1) * (this.config.duration / this.config.focusAreas.length) * 7 * 24 * 60 * 60 * 1000),
+        completed: false
+      }));
+      
+      return {
+        learnerId,
+        culturalContext: this.config.culturalContext,
+        focusAreas: this.config.focusAreas,
+        timeline: {
+          startDate,
+          endDate,
+          duration: this.config.duration
+        },
+        milestones
+      };
+    }
+    
+    // Conduct initial assessment
+    private async conductInitialAssessment(learnerId: string): Promise<{
+      currentLevel: string;
+      culturalAwareness: number;
+      learningPreferences: string[];
+      culturalBackground: string;
+      goals: string[];
+    }> {
+      // Simulate assessment (in real implementation, this would involve actual evaluation)
+      const currentLevel = this.config.learnerLevel;
+      const culturalAwareness = Math.random() * 0.4 + 0.6; // 0.6-1.0
+      const learningPreferences = ['storytelling', 'observation', 'discussion', 'practice'];
+      const culturalBackground = 'diverse';
+      const goals = this.config.focusAreas.map(area => `Learn about ${area}`);
+      
+      return {
+        currentLevel,
+        culturalAwareness,
+        learningPreferences,
+        culturalBackground,
+        goals
+      };
+    }
+    
+    // Get cultural guidance for education
+    private getCulturalGuidance(): string[] {
+      const guidance = [
+        'Approach cultural education with respect and humility',
+        'Ensure authentic transmission of cultural knowledge',
+        'Maintain cultural sensitivity in all interactions',
+        'Honor traditional teaching methods when appropriate',
+        'Encourage cultural preservation and responsible sharing',
+        'Include community voices and perspectives'
+      ];
+      
+      if (this.config.culturalContext === 'HIEROS') {
+        guidance.push('Apply HIEROS principles in all educational interactions');
+        guidance.push('Respect the Seven Sacred Intentions in knowledge transmission');
+        guidance.push('Ensure cultural stewardship and preservation');
+      }
+      
+      return guidance;
+    }
+    
+    // Conduct education session
+    async conductSession(sessionId: string): Promise<{
+      insights: string[];
+      culturalGuidance: string[];
+      nextSteps: string[];
+      assessment: any;
+    }> {
+      const session = this.sessions.find(s => s.sessionId === sessionId);
+      if (!session) {
+        throw new Error(`Session not found: ${sessionId}`);
+      }
+      
+      // Conduct session based on type
+      let sessionResults;
+      
+      switch (session.sessionType) {
+        case 'introduction':
+          sessionResults = await this.conductIntroductionSession(session);
+          break;
+        case 'exploration':
+          sessionResults = await this.conductExplorationSession(session);
+          break;
+        case 'practice':
+          sessionResults = await this.conductPracticeSession(session);
+          break;
+        case 'reflection':
+          sessionResults = await this.conductReflectionSession(session);
+          break;
+        case 'assessment':
+          sessionResults = await this.conductAssessmentSession(session);
+          break;
+        default:
+          throw new Error(`Unknown session type: ${session.sessionType}`);
+      }
+      
+      // Update session with outcomes
+      session.outcomes = sessionResults.insights;
+      session.nextSteps = sessionResults.nextSteps;
+      
+      return sessionResults;
+    }
+    
+    // Conduct introduction session
+    private async conductIntroductionSession(session: EducationSession): Promise<any> {
+      const insights = [
+        'Established cultural education foundation',
+        'Introduced cultural context and learning objectives',
+        'Explained traditional teaching methods',
+        'Set expectations for cultural learning journey'
+      ];
+      
+      const culturalGuidance = [
+        'Approach learning with cultural humility and respect',
+        'Be open to new perspectives and cultural wisdom',
+        'Maintain cultural sensitivity throughout the journey'
+      ];
+      
+      const nextSteps = [
+        'Begin cultural exploration and learning',
+        'Practice cultural observation and reflection',
+        'Engage with cultural community respectfully'
+      ];
+      
+      return { insights, culturalGuidance, nextSteps, assessment: null };
+    }
+    
+    // Conduct exploration session
+    private async conductExplorationSession(session: EducationSession): Promise<any> {
+      const insights = [
+        'Explored cultural concepts and traditions',
+        'Learned about cultural significance and history',
+        'Discussed modern applications of cultural knowledge',
+        'Identified areas for deeper learning'
+      ];
+      
+      const culturalGuidance = [
+        'Continue exploring with cultural respect and curiosity',
+        'Seek to understand cultural significance and context',
+        'Ask questions with cultural humility'
+      ];
+      
+      const nextSteps = [
+        'Practice cultural concepts in appropriate contexts',
+        'Continue exploration of cultural topics',
+        'Prepare for hands-on practice sessions'
+      ];
+      
+      return { insights, culturalGuidance, nextSteps, assessment: null };
+    }
+    
+    // Conduct practice session
+    private async conductPracticeSession(session: EducationSession): Promise<any> {
+      const insights = [
+        'Practiced cultural skills and knowledge',
+        'Applied cultural concepts in real-world contexts',
+        'Received feedback on cultural practice',
+        'Identified areas for improvement'
+      ];
+      
+      const culturalGuidance = [
+        'Practice with cultural respect and authenticity',
+        'Seek guidance from cultural experts when needed',
+        'Maintain cultural sensitivity in practice'
+      ];
+      
+      const nextSteps = [
+        'Continue practicing cultural skills',
+        'Reflect on practice experiences',
+        'Prepare for assessment and evaluation'
+      ];
+      
+      return { insights, culturalGuidance, nextSteps, assessment: null };
+    }
+    
+    // Conduct reflection session
+    private async conductReflectionSession(session: EducationSession): Promise<any> {
+      const insights = [
+        'Reflected on cultural learning experiences',
+        'Identified personal growth and understanding',
+        'Considered cultural significance and impact',
+        'Planned next steps in cultural journey'
+      ];
+      
+      const culturalGuidance = [
+        'Reflect with cultural gratitude and respect',
+        'Honor the knowledge and wisdom shared',
+        'Consider how to give back to cultural community'
+      ];
+      
+      const nextSteps = [
+        'Continue cultural learning and practice',
+        'Share cultural knowledge respectfully',
+        'Contribute to cultural preservation'
+      ];
+      
+      return { insights, culturalGuidance, nextSteps, assessment: null };
+    }
+    
+    // Conduct assessment session
+    private async conductAssessmentSession(session: EducationSession): Promise<any> {
+      // Conduct comprehensive assessment using cultural educator skill
+      const assessment = await this.culturalEducator.assessCulturalUnderstanding(
+        'current_learner',
+        'hieros_principles'
+      );
+      
+      const insights = [
+        `Cultural understanding: ${(assessment.understanding * 100).toFixed(1)}%`,
+        `Cultural appreciation: ${(assessment.culturalAppreciation * 100).toFixed(1)}%`,
+        `Practical application: ${(assessment.practicalApplication * 100).toFixed(1)}%`,
+        `Recommendations: ${assessment.recommendations.length} provided`
+      ];
+      
+      const culturalGuidance = [
+        'Assessment conducted with cultural sensitivity and respect',
+        'Results reflect both learning progress and cultural understanding',
+        'Use assessment to guide continued cultural learning'
+      ];
+      
+      const nextSteps = [
+        'Review assessment results and recommendations',
+        'Plan next phase of cultural learning',
+        'Continue cultural practice and understanding'
+      ];
+      
+      return { insights, culturalGuidance, nextSteps, assessment };
+    }
+    
+    // Schedule next session
+    async scheduleNextSession(
+      currentSessionId: string,
+      sessionType: 'exploration' | 'practice' | 'reflection' | 'assessment'
+    ): Promise<string> {
+      const currentSession = this.sessions.find(s => s.sessionId === currentSessionId);
+      if (!currentSession) {
+        throw new Error(`Current session not found: ${currentSessionId}`);
+      }
+      
+      // Calculate next session date based on assessment frequency
+      const daysUntilNext = this.getDaysUntilNext(this.config.assessmentFrequency);
+      const nextDate = new Date(currentSession.date.getTime() + daysUntilNext * 24 * 60 * 60 * 1000);
+      
+      const nextSessionId = `session_${currentSessionId.split('_')[1]}_${sessionType}_${Date.now()}`;
+      
+      const nextSession: EducationSession = {
+        sessionId: nextSessionId,
+        sessionType,
+        date: nextDate,
+        duration: 60,
+        topics: this.getTopicsForSessionType(sessionType),
+        culturalContext: this.config.culturalContext,
+        methods: this.getMethodsForSessionType(sessionType),
+        outcomes: [],
+        nextSteps: []
+      };
+      
+      this.sessions.push(nextSession);
+      
+      return nextSessionId;
+    }
+    
+    // Get days until next session based on frequency
+    private getDaysUntilNext(frequency: string): number {
+      switch (frequency) {
+        case 'weekly': return 7;
+        case 'biweekly': return 14;
+        case 'monthly': return 30;
+        default: return 7;
+      }
+    }
+    
+    // Get topics for session type
+    private getTopicsForSessionType(sessionType: string): string[] {
+      switch (sessionType) {
+        case 'exploration':
+          return ['cultural_concepts', 'traditional_wisdom', 'modern_applications'];
+        case 'practice':
+          return ['cultural_practice', 'skill_development', 'real_world_application'];
+        case 'reflection':
+          return ['learning_reflection', 'personal_growth', 'cultural_impact'];
+        case 'assessment':
+          return ['comprehensive_assessment', 'cultural_evaluation', 'learning_outcomes'];
+        default:
+          return ['general_cultural_education'];
+      }
+    }
+    
+    // Get methods for session type
+    private getMethodsForSessionType(sessionType: string): string[] {
+      switch (sessionType) {
+        case 'exploration':
+          return ['discussion', 'storytelling', 'observation'];
+        case 'practice':
+          return ['practice', 'hands_on', 'demonstration'];
+        case 'reflection':
+          return ['reflection', 'discussion', 'journaling'];
+        case 'assessment':
+          return ['assessment', 'evaluation', 'feedback'];
+        default:
+          return ['discussion'];
+      }
+    }
+    
+    // Get education recommendations
+    getEducationRecommendations(): string[] {
+      return this.culturalEducator.getEducationRecommendations(
+        this.config.learnerLevel,
+        this.config.culturalContext
+      );
+    }
+    
+    // Get transmission recommendations
+    getTransmissionRecommendations(): string[] {
+      return this.knowledgeTransmission.getTransmissionRecommendations(
+        'cultural',
+        this.config.culturalContext
+      );
+    }
+    
+    // Get workflow summary
+    getWorkflowSummary(): {
+      totalSessions: number;
+      completedSessions: number;
+      nextSession: EducationSession | null;
+      overallProgress: number;
+    } {
+      const completedSessions = this.sessions.filter(s => s.outcomes.length > 0).length;
+      const nextSession = this.sessions
+        .filter(s => s.date > new Date())
+        .sort((a, b) => a.date.getTime() - b.date.getTime())[0] || null;
+      
+      const overallProgress = completedSessions / Math.max(this.sessions.length, 1);
+      
+      return {
+        totalSessions: this.sessions.length,
+        completedSessions,
+        nextSession,
+        overallProgress
+      };
+    }
+  } 

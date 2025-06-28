@@ -1,0 +1,704 @@
+name: "Pattern Recognition Base"
+description: "Advanced pattern recognition and predictive analysis capabilities for forecasting and trend identification"
+category: "prediction"
+tags:
+  primary: "prediction"
+  secondary: ["patterns", "forecasting", "trends", "analysis", "prediction"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface DataPoint {
+    id: string;
+    timestamp: Date;
+    value: number;
+    category: string;
+    metadata: Record<string, any>;
+  }
+  
+  export interface Pattern {
+    id: string;
+    name: string;
+    description: string;
+    type: 'trend' | 'seasonal' | 'cyclical' | 'anomaly' | 'correlation';
+    confidence: number; // 0-1
+    strength: number; // 0-1
+    direction: 'increasing' | 'decreasing' | 'stable' | 'variable';
+    duration: number; // in time units
+    dataPoints: DataPoint[];
+    metadata: Record<string, any>;
+  }
+  
+  export interface Prediction {
+    id: string;
+    patternId: string;
+    targetDate: Date;
+    predictedValue: number;
+    confidence: number; // 0-1
+    range: {
+      min: number;
+      max: number;
+    };
+    factors: string[];
+    assumptions: string[];
+    timestamp: Date;
+  }
+  
+  export interface TrendAnalysis {
+    id: string;
+    category: string;
+    timeRange: {
+      start: Date;
+      end: Date;
+    };
+    patterns: Pattern[];
+    predictions: Prediction[];
+    summary: {
+      overallTrend: 'increasing' | 'decreasing' | 'stable' | 'variable';
+      confidence: number;
+      volatility: number;
+      seasonality: boolean;
+    };
+  }
+  
+  export interface PatternConfig {
+    minDataPoints: number;
+    minConfidence: number;
+    maxPatterns: number;
+    timeWindow: number; // in milliseconds
+    sensitivity: number; // 0-1
+  }
+  
+  export class PatternRecognitionSkill {
+    private dataPoints: Map<string, DataPoint[]>;
+    private patterns: Map<string, Pattern>;
+    private predictions: Map<string, Prediction>;
+    private config: PatternConfig;
+    private baselineData: Map<string, number[]>;
+    
+    constructor(config: Partial<PatternConfig> = {}) {
+      this.dataPoints = new Map();
+      this.patterns = new Map();
+      this.predictions = new Map();
+      this.baselineData = new Map();
+      this.config = {
+        minDataPoints: 10,
+        minConfidence: 0.6,
+        maxPatterns: 50,
+        timeWindow: 30 * 24 * 60 * 60 * 1000, // 30 days
+        sensitivity: 0.7,
+        ...config
+      };
+    }
+    
+    // Add data point
+    addDataPoint(dataPoint: DataPoint): void {
+      if (!this.dataPoints.has(dataPoint.category)) {
+        this.dataPoints.set(dataPoint.category, []);
+      }
+      
+      this.dataPoints.get(dataPoint.category)!.push(dataPoint);
+      
+      // Update baseline data
+      this.updateBaseline(dataPoint);
+    }
+    
+    // Add multiple data points
+    addDataPoints(dataPoints: DataPoint[]): void {
+      dataPoints.forEach(dataPoint => this.addDataPoint(dataPoint));
+    }
+    
+    // Analyze patterns for a category
+    analyzePatterns(category: string): Pattern[] {
+      const points = this.dataPoints.get(category);
+      if (!points || points.length < this.config.minDataPoints) {
+        return [];
+      }
+      
+      const patterns: Pattern[] = [];
+      
+      // Detect trends
+      const trendPatterns = this.detectTrends(points, category);
+      patterns.push(...trendPatterns);
+      
+      // Detect seasonal patterns
+      const seasonalPatterns = this.detectSeasonalPatterns(points, category);
+      patterns.push(...seasonalPatterns);
+      
+      // Detect cyclical patterns
+      const cyclicalPatterns = this.detectCyclicalPatterns(points, category);
+      patterns.push(...cyclicalPatterns);
+      
+      // Detect anomalies
+      const anomalyPatterns = this.detectAnomalies(points, category);
+      patterns.push(...anomalyPatterns);
+      
+      // Store patterns
+      patterns.forEach(pattern => {
+        this.patterns.set(pattern.id, pattern);
+      });
+      
+      return patterns;
+    }
+    
+    // Detect trends
+    private detectTrends(points: DataPoint[], category: string): Pattern[] {
+      const patterns: Pattern[] = [];
+      const sortedPoints = points.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      
+      // Simple linear trend detection
+      const trend = this.calculateLinearTrend(sortedPoints);
+      
+      if (Math.abs(trend.slope) > this.config.sensitivity * 0.1) {
+        const pattern: Pattern = {
+          id: this.generatePatternId(category, 'trend'),
+          name: `${category} Trend`,
+          description: `Linear trend with slope ${trend.slope.toFixed(4)}`,
+          type: 'trend',
+          confidence: Math.min(Math.abs(trend.slope) * 10, 1),
+          strength: Math.abs(trend.slope),
+          direction: trend.slope > 0 ? 'increasing' : 'decreasing',
+          duration: sortedPoints[sortedPoints.length - 1].timestamp.getTime() - sortedPoints[0].timestamp.getTime(),
+          dataPoints: sortedPoints,
+          metadata: {
+            slope: trend.slope,
+            intercept: trend.intercept,
+            rSquared: trend.rSquared
+          }
+        };
+        
+        patterns.push(pattern);
+      }
+      
+      return patterns;
+    }
+    
+    // Calculate linear trend
+    private calculateLinearTrend(points: DataPoint[]): {
+      slope: number;
+      intercept: number;
+      rSquared: number;
+    } {
+      const n = points.length;
+      const xValues = points.map((_, index) => index);
+      const yValues = points.map(point => point.value);
+      
+      const sumX = xValues.reduce((sum, x) => sum + x, 0);
+      const sumY = yValues.reduce((sum, y) => sum + y, 0);
+      const sumXY = xValues.reduce((sum, x, i) => sum + x * yValues[i], 0);
+      const sumXX = xValues.reduce((sum, x) => sum + x * x, 0);
+      
+      const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+      const intercept = (sumY - slope * sumX) / n;
+      
+      // Calculate R-squared
+      const meanY = sumY / n;
+      const ssRes = yValues.reduce((sum, y, i) => {
+        const predicted = slope * xValues[i] + intercept;
+        return sum + Math.pow(y - predicted, 2);
+      }, 0);
+      const ssTot = yValues.reduce((sum, y) => sum + Math.pow(y - meanY, 2), 0);
+      const rSquared = 1 - (ssRes / ssTot);
+      
+      return { slope, intercept, rSquared };
+    }
+    
+    // Detect seasonal patterns
+    private detectSeasonalPatterns(points: DataPoint[], category: string): Pattern[] {
+      const patterns: Pattern[] = [];
+      const sortedPoints = points.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      
+      // Group by time periods (e.g., hours, days, months)
+      const hourlyGroups = this.groupByHour(sortedPoints);
+      const dailyGroups = this.groupByDay(sortedPoints);
+      const monthlyGroups = this.groupByMonth(sortedPoints);
+      
+      // Check for hourly patterns
+      if (hourlyGroups.size > 1) {
+        const hourlyPattern = this.analyzeSeasonalGroup(hourlyGroups, 'hourly', category);
+        if (hourlyPattern) patterns.push(hourlyPattern);
+      }
+      
+      // Check for daily patterns
+      if (dailyGroups.size > 1) {
+        const dailyPattern = this.analyzeSeasonalGroup(dailyGroups, 'daily', category);
+        if (dailyPattern) patterns.push(dailyPattern);
+      }
+      
+      // Check for monthly patterns
+      if (monthlyGroups.size > 1) {
+        const monthlyPattern = this.analyzeSeasonalGroup(monthlyGroups, 'monthly', category);
+        if (monthlyPattern) patterns.push(monthlyPattern);
+      }
+      
+      return patterns;
+    }
+    
+    // Group data points by hour
+    private groupByHour(points: DataPoint[]): Map<number, DataPoint[]> {
+      const groups = new Map<number, DataPoint[]>();
+      
+      points.forEach(point => {
+        const hour = point.timestamp.getHours();
+        if (!groups.has(hour)) {
+          groups.set(hour, []);
+        }
+        groups.get(hour)!.push(point);
+      });
+      
+      return groups;
+    }
+    
+    // Group data points by day of week
+    private groupByDay(points: DataPoint[]): Map<number, DataPoint[]> {
+      const groups = new Map<number, DataPoint[]>();
+      
+      points.forEach(point => {
+        const day = point.timestamp.getDay();
+        if (!groups.has(day)) {
+          groups.set(day, []);
+        }
+        groups.get(day)!.push(point);
+      });
+      
+      return groups;
+    }
+    
+    // Group data points by month
+    private groupByMonth(points: DataPoint[]): Map<number, DataPoint[]> {
+      const groups = new Map<number, DataPoint[]>();
+      
+      points.forEach(point => {
+        const month = point.timestamp.getMonth();
+        if (!groups.has(month)) {
+          groups.set(month, []);
+        }
+        groups.get(month)!.push(point);
+      });
+      
+      return groups;
+    }
+    
+    // Analyze seasonal group
+    private analyzeSeasonalGroup(
+      groups: Map<number, DataPoint[]>,
+      period: string,
+      category: string
+    ): Pattern | null {
+      const averages = new Map<number, number>();
+      
+      groups.forEach((points, periodValue) => {
+        const avg = points.reduce((sum, point) => sum + point.value, 0) / points.length;
+        averages.set(periodValue, avg);
+      });
+      
+      // Calculate variance to determine if pattern is significant
+      const values = Array.from(averages.values());
+      const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+      const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+      const coefficientOfVariation = Math.sqrt(variance) / mean;
+      
+      if (coefficientOfVariation > this.config.sensitivity * 0.1) {
+        const pattern: Pattern = {
+          id: this.generatePatternId(category, `seasonal_${period}`),
+          name: `${category} ${period.charAt(0).toUpperCase() + period.slice(1)} Pattern`,
+          description: `${period} seasonal pattern with ${coefficientOfVariation.toFixed(3)} variation`,
+          type: 'seasonal',
+          confidence: Math.min(coefficientOfVariation * 5, 1),
+          strength: coefficientOfVariation,
+          direction: 'variable',
+          duration: 24 * 60 * 60 * 1000 * (period === 'hourly' ? 1 : period === 'daily' ? 7 : 12),
+          dataPoints: Array.from(groups.values()).flat(),
+          metadata: {
+            period,
+            averages: Object.fromEntries(averages),
+            coefficientOfVariation
+          }
+        };
+        
+        return pattern;
+      }
+      
+      return null;
+    }
+    
+    // Detect cyclical patterns
+    private detectCyclicalPatterns(points: DataPoint[], category: string): Pattern[] {
+      const patterns: Pattern[] = [];
+      const sortedPoints = points.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      
+      // Simple cyclical pattern detection using autocorrelation
+      const autocorrelation = this.calculateAutocorrelation(sortedPoints.map(p => p.value));
+      
+      // Find peaks in autocorrelation (potential cycle lengths)
+      const peaks = this.findPeaks(autocorrelation);
+      
+      peaks.forEach(peak => {
+        if (peak.value > this.config.sensitivity && peak.index > 1) {
+          const pattern: Pattern = {
+            id: this.generatePatternId(category, `cyclical_${peak.index}`),
+            name: `${category} Cyclical Pattern`,
+            description: `Cyclical pattern with period ${peak.index}`,
+            type: 'cyclical',
+            confidence: peak.value,
+            strength: peak.value,
+            direction: 'variable',
+            duration: peak.index * (sortedPoints[1].timestamp.getTime() - sortedPoints[0].timestamp.getTime()),
+            dataPoints: sortedPoints,
+            metadata: {
+              period: peak.index,
+              autocorrelation: peak.value
+            }
+          };
+          
+          patterns.push(pattern);
+        }
+      });
+      
+      return patterns;
+    }
+    
+    // Calculate autocorrelation
+    private calculateAutocorrelation(values: number[]): number[] {
+      const n = values.length;
+      const autocorr: number[] = [];
+      
+      for (let lag = 0; lag < Math.min(n / 2, 20); lag++) {
+        let sum = 0;
+        let count = 0;
+        
+        for (let i = 0; i < n - lag; i++) {
+          sum += values[i] * values[i + lag];
+          count++;
+        }
+        
+        autocorr.push(count > 0 ? sum / count : 0);
+      }
+      
+      return autocorr;
+    }
+    
+    // Find peaks in array
+    private findPeaks(values: number[]): Array<{ index: number; value: number }> {
+      const peaks: Array<{ index: number; value: number }> = [];
+      
+      for (let i = 1; i < values.length - 1; i++) {
+        if (values[i] > values[i - 1] && values[i] > values[i + 1]) {
+          peaks.push({ index: i, value: values[i] });
+        }
+      }
+      
+      return peaks.sort((a, b) => b.value - a.value);
+    }
+    
+    // Detect anomalies
+    private detectAnomalies(points: DataPoint[], category: string): Pattern[] {
+      const patterns: Pattern[] = [];
+      const values = points.map(p => p.value);
+      
+      // Calculate statistics
+      const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+      const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+      const stdDev = Math.sqrt(variance);
+      
+      // Find outliers (beyond 2 standard deviations)
+      const outliers = points.filter(point => 
+        Math.abs(point.value - mean) > 2 * stdDev
+      );
+      
+      if (outliers.length > 0) {
+        const pattern: Pattern = {
+          id: this.generatePatternId(category, 'anomaly'),
+          name: `${category} Anomalies`,
+          description: `${outliers.length} anomalous data points detected`,
+          type: 'anomaly',
+          confidence: Math.min(outliers.length / points.length * 10, 1),
+          strength: outliers.length / points.length,
+          direction: 'variable',
+          duration: outliers[outliers.length - 1].timestamp.getTime() - outliers[0].timestamp.getTime(),
+          dataPoints: outliers,
+          metadata: {
+            outlierCount: outliers.length,
+            totalPoints: points.length,
+            mean,
+            stdDev
+          }
+        };
+        
+        patterns.push(pattern);
+      }
+      
+      return patterns;
+    }
+    
+    // Make prediction
+    makePrediction(
+      category: string,
+      targetDate: Date,
+      patternId?: string
+    ): Prediction | null {
+      const patterns = Array.from(this.patterns.values())
+        .filter(p => p.category === category);
+      
+      if (patterns.length === 0) return null;
+      
+      // Use specified pattern or best pattern
+      const pattern = patternId ? 
+        patterns.find(p => p.id === patternId) : 
+        patterns.reduce((best, current) => 
+          current.confidence > best.confidence ? current : best
+        );
+      
+      if (!pattern) return null;
+      
+      // Generate prediction based on pattern type
+      let predictedValue: number;
+      let confidence: number;
+      let range: { min: number; max: number };
+      
+      switch (pattern.type) {
+        case 'trend':
+          const trendPrediction = this.predictTrend(pattern, targetDate);
+          predictedValue = trendPrediction.value;
+          confidence = trendPrediction.confidence;
+          range = trendPrediction.range;
+          break;
+        case 'seasonal':
+          const seasonalPrediction = this.predictSeasonal(pattern, targetDate);
+          predictedValue = seasonalPrediction.value;
+          confidence = seasonalPrediction.confidence;
+          range = seasonalPrediction.range;
+          break;
+        case 'cyclical':
+          const cyclicalPrediction = this.predictCyclical(pattern, targetDate);
+          predictedValue = cyclicalPrediction.value;
+          confidence = cyclicalPrediction.confidence;
+          range = cyclicalPrediction.range;
+          break;
+        default:
+          return null;
+      }
+      
+      const prediction: Prediction = {
+        id: this.generatePredictionId(),
+        patternId: pattern.id,
+        targetDate,
+        predictedValue,
+        confidence,
+        range,
+        factors: this.identifyFactors(pattern),
+        assumptions: this.generateAssumptions(pattern),
+        timestamp: new Date()
+      };
+      
+      this.predictions.set(prediction.id, prediction);
+      return prediction;
+    }
+    
+    // Predict trend
+    private predictTrend(pattern: Pattern, targetDate: Date): {
+      value: number;
+      confidence: number;
+      range: { min: number; max: number };
+    } {
+      const metadata = pattern.metadata;
+      const lastPoint = pattern.dataPoints[pattern.dataPoints.length - 1];
+      const timeDiff = targetDate.getTime() - lastPoint.timestamp.getTime();
+      const timeUnits = timeDiff / (pattern.duration / pattern.dataPoints.length);
+      
+      const predictedValue = metadata.slope * timeUnits + metadata.intercept;
+      const confidence = Math.max(0, pattern.confidence - timeUnits * 0.01);
+      const range = {
+        min: predictedValue * (1 - confidence),
+        max: predictedValue * (1 + confidence)
+      };
+      
+      return { value: predictedValue, confidence, range };
+    }
+    
+    // Predict seasonal
+    private predictSeasonal(pattern: Pattern, targetDate: Date): {
+      value: number;
+      confidence: number;
+      range: { min: number; max: number };
+    } {
+      const metadata = pattern.metadata;
+      const averages = metadata.averages;
+      
+      let periodValue: number;
+      if (metadata.period === 'hourly') {
+        periodValue = targetDate.getHours();
+      } else if (metadata.period === 'daily') {
+        periodValue = targetDate.getDay();
+      } else if (metadata.period === 'monthly') {
+        periodValue = targetDate.getMonth();
+      } else {
+        periodValue = 0;
+      }
+      
+      const predictedValue = averages[periodValue] || Object.values(averages)[0];
+      const confidence = pattern.confidence;
+      const range = {
+        min: predictedValue * (1 - pattern.strength),
+        max: predictedValue * (1 + pattern.strength)
+      };
+      
+      return { value: predictedValue, confidence, range };
+    }
+    
+    // Predict cyclical
+    private predictCyclical(pattern: Pattern, targetDate: Date): {
+      value: number;
+      confidence: number;
+      range: { min: number; max: number };
+    } {
+      const metadata = pattern.metadata;
+      const period = metadata.period;
+      const lastPoint = pattern.dataPoints[pattern.dataPoints.length - 1];
+      const timeDiff = targetDate.getTime() - lastPoint.timestamp.getTime();
+      const cyclePosition = (timeDiff % pattern.duration) / pattern.duration;
+      
+      // Simple sinusoidal prediction
+      const predictedValue = Math.sin(cyclePosition * 2 * Math.PI) * pattern.strength;
+      const confidence = Math.max(0, pattern.confidence - cyclePosition * 0.1);
+      const range = {
+        min: predictedValue * (1 - confidence),
+        max: predictedValue * (1 + confidence)
+      };
+      
+      return { value: predictedValue, confidence, range };
+    }
+    
+    // Identify factors
+    private identifyFactors(pattern: Pattern): string[] {
+      const factors: string[] = [];
+      
+      switch (pattern.type) {
+        case 'trend':
+          factors.push('Linear trend direction');
+          factors.push('Historical data slope');
+          break;
+        case 'seasonal':
+          factors.push('Seasonal periodicity');
+          factors.push('Time-based patterns');
+          break;
+        case 'cyclical':
+          factors.push('Cyclical period');
+          factors.push('Autocorrelation strength');
+          break;
+        case 'anomaly':
+          factors.push('Statistical outliers');
+          factors.push('Deviation from mean');
+          break;
+      }
+      
+      return factors;
+    }
+    
+    // Generate assumptions
+    private generateAssumptions(pattern: Pattern): string[] {
+      const assumptions: string[] = [];
+      
+      assumptions.push('Historical patterns will continue');
+      assumptions.push('No major external changes');
+      assumptions.push('Data quality remains consistent');
+      
+      if (pattern.type === 'trend') {
+        assumptions.push('Linear relationship continues');
+      } else if (pattern.type === 'seasonal') {
+        assumptions.push('Seasonal factors remain stable');
+      } else if (pattern.type === 'cyclical') {
+        assumptions.push('Cyclical period remains constant');
+      }
+      
+      return assumptions;
+    }
+    
+    // Update baseline data
+    private updateBaseline(dataPoint: DataPoint): void {
+      if (!this.baselineData.has(dataPoint.category)) {
+        this.baselineData.set(dataPoint.category, []);
+      }
+      
+      this.baselineData.get(dataPoint.category)!.push(dataPoint.value);
+      
+      // Keep only recent data
+      const baseline = this.baselineData.get(dataPoint.category)!;
+      if (baseline.length > 1000) {
+        baseline.splice(0, baseline.length - 1000);
+      }
+    }
+    
+    // Generate pattern ID
+    private generatePatternId(category: string, type: string): string {
+      return `pattern_${category}_${type}_${Date.now()}`;
+    }
+    
+    // Generate prediction ID
+    private generatePredictionId(): string {
+      return `prediction_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Get patterns for category
+    getPatterns(category: string): Pattern[] {
+      return Array.from(this.patterns.values())
+        .filter(pattern => pattern.dataPoints.some(p => p.category === category));
+    }
+    
+    // Get all patterns
+    getAllPatterns(): Pattern[] {
+      return Array.from(this.patterns.values());
+    }
+    
+    // Get predictions
+    getPredictions(category?: string): Prediction[] {
+      let predictions = Array.from(this.predictions.values());
+      
+      if (category) {
+        predictions = predictions.filter(prediction => {
+          const pattern = this.patterns.get(prediction.patternId);
+          return pattern && pattern.dataPoints.some(p => p.category === category);
+        });
+      }
+      
+      return predictions;
+    }
+    
+    // Get data points
+    getDataPoints(category: string): DataPoint[] {
+      return this.dataPoints.get(category) || [];
+    }
+    
+    // Update configuration
+    updateConfig(newConfig: Partial<PatternConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    // Get current configuration
+    getConfig(): PatternConfig {
+      return { ...this.config };
+    }
+    
+    // Get statistics
+    getStatistics(): {
+      totalDataPoints: number;
+      totalPatterns: number;
+      totalPredictions: number;
+      categories: string[];
+    } {
+      const totalDataPoints = Array.from(this.dataPoints.values())
+        .reduce((sum, points) => sum + points.length, 0);
+      
+      return {
+        totalDataPoints,
+        totalPatterns: this.patterns.size,
+        totalPredictions: this.predictions.size,
+        categories: Array.from(this.dataPoints.keys())
+      };
+    }
+  } 

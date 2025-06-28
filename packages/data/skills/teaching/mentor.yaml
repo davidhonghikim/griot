@@ -1,0 +1,264 @@
+name: "Mentor"
+description: "Mentorship and guidance skills for teaching and supporting individual learning paths"
+category: "teaching"
+tags:
+  primary: "teaching"
+  secondary: ["mentorship", "guidance", "learning", "individual"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface MentorshipSession {
+    menteeId: string;
+    mentorId: string;
+    sessionType: 'initial' | 'progress' | 'review' | 'guidance';
+    goals: string[];
+    progress: Record<string, number>;
+    challenges: string[];
+    nextSteps: string[];
+    culturalContext?: string;
+  }
+  
+  export interface LearningPath {
+    menteeId: string;
+    currentLevel: string;
+    targetLevel: string;
+    milestones: Array<{
+      id: string;
+      description: string;
+      completed: boolean;
+      difficulty: 'beginner' | 'intermediate' | 'advanced';
+    }>;
+    culturalElements: string[];
+    timeline: {
+      startDate: Date;
+      targetDate: Date;
+      estimatedDuration: number; // in weeks
+    };
+  }
+  
+  export class MentorSkill {
+    private culturalFrameworks: Map<string, any>;
+    private teachingMethods: Map<string, any>;
+    
+    constructor() {
+      this.culturalFrameworks = new Map();
+      this.teachingMethods = new Map();
+      this.initializeFrameworks();
+    }
+    
+    // Initialize cultural teaching frameworks
+    private initializeFrameworks(): void {
+      // HIEROS framework
+      this.culturalFrameworks.set('HIEROS', {
+        principles: [
+          'Honor All Beings',
+          'Interoperability Over Control',
+          'Equity of Voice',
+          'Respect Temporal Flow',
+          'Openness With Boundaries',
+          'Stewardship Not Extraction',
+          'Guided Evolution'
+        ],
+        teachingApproach: 'holistic_and_respectful',
+        assessmentMethod: 'cultural_validation'
+      });
+      
+      // Traditional teaching methods
+      this.teachingMethods.set('traditional', {
+        storytelling: true,
+        observation: true,
+        practice: true,
+        reflection: true,
+        community_learning: true
+      });
+    }
+    
+    // Create personalized learning path
+    async createLearningPath(
+      menteeId: string,
+      goals: string[],
+      culturalContext: string = 'HIEROS'
+    ): Promise<LearningPath> {
+      const framework = this.culturalFrameworks.get(culturalContext);
+      
+      // Analyze goals and create milestones
+      const milestones = goals.map((goal, index) => ({
+        id: `milestone_${menteeId}_${index}`,
+        description: goal,
+        completed: false,
+        difficulty: this.assessDifficulty(goal)
+      }));
+      
+      return {
+        menteeId,
+        currentLevel: 'beginner',
+        targetLevel: 'advanced',
+        milestones,
+        culturalElements: framework?.principles || [],
+        timeline: {
+          startDate: new Date(),
+          targetDate: new Date(Date.now() + 12 * 7 * 24 * 60 * 60 * 1000), // 12 weeks
+          estimatedDuration: 12
+        }
+      };
+    }
+    
+    // Conduct mentorship session
+    async conductSession(session: MentorshipSession): Promise<{
+      insights: string[];
+      recommendations: string[];
+      culturalGuidance: string[];
+      nextSession: Date;
+    }> {
+      const insights: string[] = [];
+      const recommendations: string[] = [];
+      const culturalGuidance: string[] = [];
+      
+      // Analyze progress
+      const overallProgress = Object.values(session.progress).reduce((sum, val) => sum + val, 0) / Object.keys(session.progress).length;
+      
+      if (overallProgress < 0.3) {
+        insights.push('Mentee may need additional foundational support');
+        recommendations.push('Consider breaking down complex goals into smaller, achievable steps');
+      } else if (overallProgress > 0.7) {
+        insights.push('Mentee is making excellent progress');
+        recommendations.push('Consider introducing more advanced challenges');
+      }
+      
+      // Address challenges
+      for (const challenge of session.challenges) {
+        const culturalApproach = this.getCulturalApproach(challenge, session.culturalContext);
+        culturalGuidance.push(culturalApproach);
+      }
+      
+      // Set next session (typically 1-2 weeks later)
+      const nextSession = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week
+      
+      return {
+        insights,
+        recommendations,
+        culturalGuidance,
+        nextSession
+      };
+    }
+    
+    // Assess learning difficulty
+    private assessDifficulty(goal: string): 'beginner' | 'intermediate' | 'advanced' {
+      const complexityKeywords = {
+        beginner: ['basic', 'introduction', 'fundamental', 'simple'],
+        intermediate: ['intermediate', 'moderate', 'standard', 'regular'],
+        advanced: ['advanced', 'complex', 'expert', 'mastery', 'sophisticated']
+      };
+      
+      const goalLower = goal.toLowerCase();
+      
+      for (const [level, keywords] of Object.entries(complexityKeywords)) {
+        if (keywords.some(keyword => goalLower.includes(keyword))) {
+          return level as 'beginner' | 'intermediate' | 'advanced';
+        }
+      }
+      
+      return 'intermediate'; // default
+    }
+    
+    // Get cultural approach for challenges
+    private getCulturalApproach(challenge: string, culturalContext?: string): string {
+      const framework = this.culturalFrameworks.get(culturalContext || 'HIEROS');
+      
+      if (challenge.includes('confidence') || challenge.includes('self-doubt')) {
+        return `Apply ${framework?.principles[0] || 'Honor All Beings'} - Recognize the mentee's inherent worth and potential`;
+      } else if (challenge.includes('complexity') || challenge.includes('overwhelm')) {
+        return `Apply ${framework?.principles[1] || 'Interoperability Over Control'} - Break down complex tasks into manageable components`;
+      } else if (challenge.includes('motivation') || challenge.includes('engagement')) {
+        return `Apply ${framework?.principles[6] || 'Guided Evolution'} - Support gradual, sustainable growth`;
+      }
+      
+      return `Apply cultural wisdom and traditional teaching methods to address this challenge`;
+    }
+    
+    // Evaluate learning progress
+    async evaluateProgress(learningPath: LearningPath): Promise<{
+      overallProgress: number;
+      strengths: string[];
+      areasForImprovement: string[];
+      culturalAlignment: number;
+    }> {
+      const completedMilestones = learningPath.milestones.filter(m => m.completed).length;
+      const overallProgress = completedMilestones / learningPath.milestones.length;
+      
+      const strengths = learningPath.milestones
+        .filter(m => m.completed)
+        .map(m => `Successfully completed: ${m.description}`);
+      
+      const areasForImprovement = learningPath.milestones
+        .filter(m => !m.completed)
+        .map(m => `Still working on: ${m.description}`);
+      
+      // Assess cultural alignment
+      const culturalAlignment = this.assessCulturalAlignment(learningPath);
+      
+      return {
+        overallProgress,
+        strengths,
+        areasForImprovement,
+        culturalAlignment
+      };
+    }
+    
+    // Assess cultural alignment of learning path
+    private assessCulturalAlignment(learningPath: LearningPath): number {
+      const framework = this.culturalFrameworks.get('HIEROS');
+      if (!framework) return 0.5;
+      
+      let alignmentScore = 0;
+      const totalPrinciples = framework.principles.length;
+      
+      // Check if cultural elements are present in milestones
+      for (const principle of framework.principles) {
+        const principlePresent = learningPath.milestones.some(m => 
+          m.description.toLowerCase().includes(principle.toLowerCase().split(' ')[0])
+        );
+        if (principlePresent) alignmentScore += 1;
+      }
+      
+      return alignmentScore / totalPrinciples;
+    }
+    
+    // Get mentorship recommendations
+    getMentorshipRecommendations(
+      menteeLevel: string,
+      culturalContext: string = 'HIEROS'
+    ): string[] {
+      const recommendations = [];
+      
+      if (menteeLevel === 'beginner') {
+        recommendations.push(
+          'Start with foundational concepts and cultural principles',
+          'Use storytelling and observation-based learning',
+          'Provide gentle guidance and encouragement',
+          'Focus on building confidence and cultural understanding'
+        );
+      } else if (menteeLevel === 'intermediate') {
+        recommendations.push(
+          'Introduce more complex challenges and responsibilities',
+          'Encourage independent problem-solving with cultural guidance',
+          'Use community learning and peer mentorship',
+          'Balance traditional methods with modern approaches'
+        );
+      } else if (menteeLevel === 'advanced') {
+        recommendations.push(
+          'Support leadership and teaching of others',
+          'Encourage innovation while respecting traditions',
+          'Facilitate knowledge transmission to new learners',
+          'Guide cultural preservation and evolution'
+        );
+      }
+      
+      return recommendations;
+    }
+  } 

@@ -1,0 +1,225 @@
+name: "Encryption Operations"
+description: "Comprehensive encryption and decryption operations including symmetric, asymmetric, and hashing functions"
+category: "security"
+tags:
+  primary: "security"
+  secondary: ["encryption", "decryption", "hashing", "crypto", "aes", "rsa", "sha"]
+  priority: "high"
+  complexity: "high"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import * as crypto from 'crypto';
+  
+  export interface EncryptionConfig {
+    algorithm?: string;
+    keyLength?: number;
+    ivLength?: number;
+    saltLength?: number;
+    iterations?: number;
+  }
+  
+  export interface EncryptedData {
+    encrypted: string;
+    iv: string;
+    salt?: string;
+    algorithm: string;
+  }
+  
+  export interface KeyPair {
+    publicKey: string;
+    privateKey: string;
+  }
+  
+  export class EncryptionOperations {
+    private config: EncryptionConfig;
+    
+    constructor(config: EncryptionConfig = {}) {
+      this.config = {
+        algorithm: 'aes-256-gcm',
+        keyLength: 32,
+        ivLength: 16,
+        saltLength: 32,
+        iterations: 100000,
+        ...config,
+      };
+    }
+    
+    // Symmetric encryption (AES)
+    async encryptSymmetric(data: string, key: string, salt?: string): Promise<EncryptedData> {
+      const iv = crypto.randomBytes(this.config.ivLength!);
+      const saltBuffer = salt ? Buffer.from(salt, 'hex') : crypto.randomBytes(this.config.saltLength!);
+      
+      // Derive key from password and salt
+      const derivedKey = crypto.pbkdf2Sync(
+        key,
+        saltBuffer,
+        this.config.iterations!,
+        this.config.keyLength!,
+        'sha256'
+      );
+      
+      const cipher = crypto.createCipher(this.config.algorithm!, derivedKey, iv);
+      let encrypted = cipher.update(data, 'utf8', 'hex');
+      encrypted += cipher.final('hex');
+      
+      return {
+        encrypted,
+        iv: iv.toString('hex'),
+        salt: saltBuffer.toString('hex'),
+        algorithm: this.config.algorithm!,
+      };
+    }
+    
+    async decryptSymmetric(encryptedData: EncryptedData, key: string): Promise<string> {
+      const iv = Buffer.from(encryptedData.iv, 'hex');
+      const salt = Buffer.from(encryptedData.salt!, 'hex');
+      
+      // Derive key from password and salt
+      const derivedKey = crypto.pbkdf2Sync(
+        key,
+        salt,
+        this.config.iterations!,
+        this.config.keyLength!,
+        'sha256'
+      );
+      
+      const decipher = crypto.createDecipher(this.config.algorithm!, derivedKey, iv);
+      let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      
+      return decrypted;
+    }
+    
+    // Asymmetric encryption (RSA)
+    generateKeyPair(keySize: number = 2048): KeyPair {
+      const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+        modulusLength: keySize,
+        publicKeyEncoding: {
+          type: 'spki',
+          format: 'pem',
+        },
+        privateKeyEncoding: {
+          type: 'pkcs8',
+          format: 'pem',
+        },
+      });
+      
+      return { publicKey, privateKey };
+    }
+    
+    async encryptAsymmetric(data: string, publicKey: string): Promise<string> {
+      const encrypted = crypto.publicEncrypt(
+        {
+          key: publicKey,
+          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+          oaepHash: 'sha256',
+        },
+        Buffer.from(data, 'utf8')
+      );
+      
+      return encrypted.toString('base64');
+    }
+    
+    async decryptAsymmetric(encryptedData: string, privateKey: string): Promise<string> {
+      const decrypted = crypto.privateDecrypt(
+        {
+          key: privateKey,
+          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+          oaepHash: 'sha256',
+        },
+        Buffer.from(encryptedData, 'base64')
+      );
+      
+      return decrypted.toString('utf8');
+    }
+    
+    // Digital signatures
+    async sign(data: string, privateKey: string): Promise<string> {
+      const signature = crypto.sign('sha256', Buffer.from(data, 'utf8'), {
+        key: privateKey,
+        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+      });
+      
+      return signature.toString('base64');
+    }
+    
+    async verify(data: string, signature: string, publicKey: string): Promise<boolean> {
+      try {
+        return crypto.verify('sha256', Buffer.from(data, 'utf8'), {
+          key: publicKey,
+          padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+        }, Buffer.from(signature, 'base64'));
+      } catch {
+        return false;
+      }
+    }
+    
+    // Hashing functions
+    hash(data: string, algorithm: string = 'sha256'): string {
+      return crypto.createHash(algorithm).update(data, 'utf8').digest('hex');
+    }
+    
+    hashWithSalt(data: string, salt: string, algorithm: string = 'sha256'): string {
+      return crypto.createHash(algorithm).update(data + salt, 'utf8').digest('hex');
+    }
+    
+    // Secure random generation
+    generateRandomBytes(length: number): string {
+      return crypto.randomBytes(length).toString('hex');
+    }
+    
+    generateSecureToken(length: number = 32): string {
+      return crypto.randomBytes(length).toString('base64url');
+    }
+    
+    // Password hashing (bcrypt-like)
+    async hashPassword(password: string, saltRounds: number = 12): Promise<string> {
+      return new Promise((resolve, reject) => {
+        crypto.scrypt(password, crypto.randomBytes(16), 64, (err, derivedKey) => {
+          if (err) reject(err);
+          else resolve(derivedKey.toString('hex'));
+        });
+      });
+    }
+    
+    async verifyPassword(password: string, hash: string): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+        crypto.scrypt(password, Buffer.from(hash.slice(0, 32), 'hex'), 64, (err, derivedKey) => {
+          if (err) reject(err);
+          else resolve(derivedKey.toString('hex') === hash.slice(32));
+        });
+      });
+    }
+    
+    // Utility methods
+    generateUUID(): string {
+      return crypto.randomUUID();
+    }
+    
+    generateNonce(): string {
+      return crypto.randomBytes(16).toString('base64url');
+    }
+    
+    // Key derivation
+    deriveKey(password: string, salt: string, keyLength: number = 32): Buffer {
+      return crypto.pbkdf2Sync(password, salt, this.config.iterations!, keyLength, 'sha256');
+    }
+    
+    // Certificate operations
+    generateSelfSignedCertificate(commonName: string, days: number = 365): { cert: string; key: string } {
+      const { privateKey, publicKey } = this.generateKeyPair();
+      
+      const cert = crypto.createCertificate();
+      cert.setPublicKey(publicKey);
+      cert.sign(privateKey, 'sha256');
+      
+      return {
+        cert: cert.export({ type: 'spki', format: 'pem' }),
+        key: privateKey,
+      };
+    }
+  } 

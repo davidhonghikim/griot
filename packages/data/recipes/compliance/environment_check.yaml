@@ -1,0 +1,54 @@
+name: "Environment Check"
+description: "Validates environment configuration and centralized config usage"
+category: "compliance"
+tags:
+  primary: "compliance"
+  secondary: ["environment", "configuration", "deployment"]
+  nodes: ["musa", "griot"]
+  priority: "high"
+  complexity: "moderate"
+  cultural: ["hieros"]
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { readFileSync, existsSync } from 'fs';
+  import { glob } from 'glob';
+  
+  export async function environment_check(input: {
+    check_centralized_config: boolean;
+    verify_package_dependencies: boolean;
+    validate_klf_compatibility: boolean;
+  }) {
+    const violations = [];
+    
+    // Check for direct process.env usage
+    const files = await glob('**/*.{ts,js}', { ignore: ['node_modules/**', 'dist/**', 'packages/core/src/config/environment.ts'] });
+    
+    for (const file of files) {
+      const content = readFileSync(file, 'utf8');
+      if (content.includes('process.env.') && !content.includes('@griot/core')) {
+        violations.push({
+          file,
+          issue: 'Direct process.env usage detected. Use getEnvironmentConfig() from @griot/core',
+          severity: 'error'
+        });
+      }
+      
+      if (content.includes('dotenv') && !file.includes('environment.ts')) {
+        violations.push({
+          file,
+          issue: 'Direct dotenv usage detected. Use centralized config from @griot/core',
+          severity: 'error'
+        });
+      }
+    }
+    
+    return {
+      success: violations.length === 0,
+      violations,
+      summary: `Found ${violations.length} environment configuration violations`
+    };
+  } 

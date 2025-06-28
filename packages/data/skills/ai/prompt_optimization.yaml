@@ -1,0 +1,191 @@
+name: "Prompt Optimization"
+description: "Optimize prompts for better LLM performance and accuracy"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["prompt", "optimization", "llm", "performance"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface OptimizationConfig {
+    maxIterations?: number;
+    improvementThreshold?: number;
+    testCases?: Array<{input: any, expectedOutput: string}>;
+  }
+  
+  export interface OptimizationResult {
+    originalPrompt: string;
+    optimizedPrompt: string;
+    improvements: string[];
+    score: number;
+    testResults: Array<{input: any, expected: string, actual: string, score: number}>;
+  }
+  
+  export class PromptOptimization {
+    private config: OptimizationConfig;
+    private llmIntegration: any; // LLMIntegration instance
+    
+    constructor(config: OptimizationConfig, llmIntegration: any) {
+      this.config = {
+        maxIterations: 3,
+        improvementThreshold: 0.1,
+        testCases: [],
+        ...config,
+      };
+      this.llmIntegration = llmIntegration;
+    }
+    
+    // Optimize a single prompt
+    async optimizePrompt(prompt: string, target: string): Promise<OptimizationResult> {
+      const optimizationPrompt = `
+        Analyze and optimize the following prompt to better achieve the target goal.
+        
+        Original Prompt:
+        ${prompt}
+        
+        Target Goal:
+        ${target}
+        
+        Provide an optimized version with specific improvements listed.
+        Format your response as JSON:
+        {
+          "optimizedPrompt": "...",
+          "improvements": ["...", "..."],
+          "score": 0.85
+        }
+      `;
+      
+      const response = await this.llmIntegration.generate({
+        prompt: optimizationPrompt,
+        temperature: 0.3,
+        maxTokens: 1000,
+      });
+      
+      try {
+        const result = JSON.parse(response.text);
+        return {
+          originalPrompt: prompt,
+          optimizedPrompt: result.optimizedPrompt,
+          improvements: result.improvements,
+          score: result.score,
+          testResults: [],
+        };
+      } catch {
+        throw new Error('Failed to parse optimization result');
+      }
+    }
+    
+    // A/B test prompt variants
+    async testPromptVariants(
+      variants: string[],
+      testCases: Array<{input: any, expectedOutput: string}>,
+      metric: 'accuracy' | 'relevance' | 'completeness' = 'accuracy'
+    ): Promise<Array<{prompt: string, score: number, results: any[]}>> {
+      const results = [];
+      
+      for (const variant of variants) {
+        let totalScore = 0;
+        const variantResults = [];
+        
+        for (const testCase of testCases) {
+          const response = await this.llmIntegration.generate({
+            prompt: variant,
+            temperature: 0.1,
+          });
+          
+          const score = this.calculateScore(response.text, testCase.expectedOutput, metric);
+          totalScore += score;
+          variantResults.push({
+            input: testCase.input,
+            expected: testCase.expectedOutput,
+            actual: response.text,
+            score,
+          });
+        }
+        
+        results.push({
+          prompt: variant,
+          score: totalScore / testCases.length,
+          results: variantResults,
+        });
+      }
+      
+      return results.sort((a, b) => b.score - a.score);
+    }
+    
+    // Iterative optimization
+    async iterativeOptimization(
+      initialPrompt: string,
+      target: string,
+      testCases: Array<{input: any, expectedOutput: string}>
+    ): Promise<OptimizationResult> {
+      let currentPrompt = initialPrompt;
+      let bestScore = 0;
+      let bestPrompt = initialPrompt;
+      
+      for (let iteration = 0; iteration < this.config.maxIterations!; iteration++) {
+        // Test current prompt
+        const testResults = await this.testPromptVariants([currentPrompt], testCases);
+        const currentScore = testResults[0].score;
+        
+        if (currentScore > bestScore) {
+          bestScore = currentScore;
+          bestPrompt = currentPrompt;
+        }
+        
+        // Check if improvement threshold is met
+        if (iteration > 0 && (currentScore - bestScore) < this.config.improvementThreshold!) {
+          break;
+        }
+        
+        // Generate optimization suggestion
+        const optimizationResult = await this.optimizePrompt(currentPrompt, target);
+        currentPrompt = optimizationResult.optimizedPrompt;
+      }
+      
+      return {
+        originalPrompt: initialPrompt,
+        optimizedPrompt: bestPrompt,
+        improvements: [`Improved score from 0 to ${bestScore}`],
+        score: bestScore,
+        testResults: [],
+      };
+    }
+    
+    // Calculate score based on metric
+    private calculateScore(actual: string, expected: string, metric: string): number {
+      switch (metric) {
+        case 'accuracy':
+          return actual.toLowerCase().includes(expected.toLowerCase()) ? 1.0 : 0.0;
+        case 'relevance':
+          // Simple relevance scoring based on keyword overlap
+          const actualWords = new Set(actual.toLowerCase().split(/\s+/));
+          const expectedWords = new Set(expected.toLowerCase().split(/\s+/));
+          const intersection = new Set([...actualWords].filter(x => expectedWords.has(x)));
+          return intersection.size / expectedWords.size;
+        case 'completeness':
+          // Check if all expected elements are present
+          const expectedElements = expected.split(',').map(e => e.trim());
+          const presentElements = expectedElements.filter(element => 
+            actual.toLowerCase().includes(element.toLowerCase())
+          );
+          return presentElements.length / expectedElements.length;
+        default:
+          return 0.0;
+      }
+    }
+    
+    // Configuration management
+    updateConfig(newConfig: Partial<OptimizationConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    getConfig(): OptimizationConfig {
+      return { ...this.config };
+    }
+  } 

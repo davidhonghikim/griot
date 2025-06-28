@@ -15,5 +15,8 @@ export * from './nodes/http-api/http-api-node.js';
 // Utilities
 export * from './core/utils/logger.js';
 
+// Configuration
+export * from './config/environment.js';
+
 // Examples
 export * from './examples/basic-system.js'; 

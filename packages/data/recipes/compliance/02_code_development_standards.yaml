@@ -1,0 +1,53 @@
+name: "Code Development Standards"
+description: "Enforces consistent coding patterns, package usage, and KLF compatibility"
+version: "1.0.0"
+trigger_phrases: ["write code", "implement", "develop", "create feature"]
+
+steps:
+  - skill: "package_priority_check"
+    input:
+      check_existing_packages: true
+      use_core_packages_first: true
+      avoid_duplication: true
+    conditions:
+      required: true
+      order: 1
+
+  - skill: "environment_config_usage"
+    input:
+      use_centralized_config: true
+      avoid_direct_process_env: true
+      validate_env_types: true
+    conditions:
+      required: true
+      order: 2
+
+  - skill: "klf_compatibility_check"
+    input:
+      verify_node_interfaces: true
+      check_protocol_compliance: true
+      validate_message_types: true
+    conditions:
+      required: true
+      order: 3
+
+  - skill: "code_style_enforcement"
+    input:
+      follow_naming_conventions: true
+      use_typescript_strict: true
+      implement_error_handling: true
+    conditions:
+      required: true
+      order: 4
+
+  - skill: "testing_requirement"
+    input:
+      write_unit_tests: true
+      add_integration_tests: true
+      update_test_scripts: true
+    conditions:
+      required: true
+      order: 5
+
+dependencies: ["standard_agent_onboarding"]
+tags: ["development", "standards", "compliance"] 

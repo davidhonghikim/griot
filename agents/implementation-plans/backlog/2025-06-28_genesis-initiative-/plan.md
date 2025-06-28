@@ -20,10 +20,11 @@ This master plan unifies the goals of the "kOS Starseed Restructure" and the "Pe
 ## 3. Detailed Tasks
 
 ### Phase 1: Foundational Database & API Setup (Depends on nothing)
-- [ ] **Task 1.1**: Set up MongoDB, Weaviate, and Neo4j infrastructure (Docker or cloud).
-- [ ] **Task 1.2**: Establish core database connection library in the `griot-node` src.
-- [ ] **Task 1.3**: Define initial Mongoose schemas for `Skill` and `Persona`.
-- [ ] **Task 1.4**: Build a placeholder KLF-compatible API service with basic health check endpoints.
+- [x] **Task 1.1**: Set up MongoDB, Weaviate, and Neo4j infrastructure (Docker or cloud).
+- [x] **Task 1.2**: Establish core database connection library in the `griot-node` src.
+- [x] **Task 1.3**: Define initial Mongoose schemas for `Skill` and `Persona`.
+- [x] **Task 1.4**: Build a placeholder KLF-compatible API service with basic health check endpoints.
+- [x] **Task 1.5**: Update and modernize the SDK client for the new Starseed Node architecture.
 
 ### Phase 2: Dynamic Persona Management (Depends on Phase 1)
 - [ ] **Task 2.1**: Implement the `/import` service to read all YAML files from `agents/skills` and `agents/personas` and populate the database.

@@ -1,0 +1,90 @@
+{
+  "category": "database",
+  "asset_type": "skills",
+  "total_files": 3,
+  "last_updated": "2025-06-28T07:58:39.339139",
+  "files": [
+    {
+      "name": "Mongodb Operations",
+      "path": "skills/database/mongodb_operations.yaml",
+      "type": "skills",
+      "category": "database",
+      "size": 5,
+      "lastModified": "2025-06-28T06:25:54.470727",
+      "hash": "74075a9f2ee5d1b0fbcba9dcff7577cf7988cf424a9c6bc4b6aa60aa909cb50b",
+      "description": "Core MongoDB database operations including connection, CRUD operations, aggregation, and indexing",
+      "tags": {
+        "primary": "database",
+        "secondary": [
+          "mongodb",
+          "nosql",
+          "crud",
+          "aggregation",
+          "indexing"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Postgresql Operations",
+      "path": "skills/database/postgresql_operations.yaml",
+      "type": "skills",
+      "category": "database",
+      "size": 8,
+      "lastModified": "2025-06-28T06:34:33.052966",
+      "hash": "9c0ec973b58c76938e331d066ce9d0c24022ceba46a2f9eab88ae23123d567c8",
+      "description": "PostgreSQL database operations including connection, SQL queries, transactions, and schema management",
+      "tags": {
+        "primary": "database",
+        "secondary": [
+          "postgresql",
+          "sql",
+          "transactions",
+          "schema"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    },
+    {
+      "name": "Weaviate Operations",
+      "path": "skills/database/weaviate_operations.yaml",
+      "type": "skills",
+      "category": "database",
+      "size": 14,
+      "lastModified": "2025-06-28T06:35:29.436140",
+      "hash": "ba27616d5c70fa6431902789a3d08b1059761cf5689ff0d3a06f73d3ed589fc6",
+      "description": "Weaviate vector database operations including schema management, vector storage, and similarity search",
+      "tags": {
+        "primary": "database",
+        "secondary": [
+          "weaviate",
+          "vector",
+          "similarity",
+          "schema"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

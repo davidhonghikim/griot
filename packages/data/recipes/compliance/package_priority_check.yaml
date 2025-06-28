@@ -1,0 +1,68 @@
+name: "Package Priority Check"
+description: "Ensures agents use existing packages first and avoid code duplication"
+category: "compliance"
+tags:
+  primary: "compliance"
+  secondary: ["packages", "dependencies", "architecture"]
+  nodes: ["musa", "griot"]
+  priority: "high"
+  complexity: "moderate"
+  cultural: ["hieros"]
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { readFileSync, existsSync } from 'fs';
+  import { glob } from 'glob';
+  
+  export async function package_priority_check(input: {
+    check_existing_packages: boolean;
+    use_core_packages_first: boolean;
+    avoid_duplication: boolean;
+  }) {
+    const violations = [];
+    const recommendations = [];
+    
+    // Check for common patterns that should use existing packages
+    const files = await glob('**/*.{ts,js}', { ignore: ['node_modules/**', 'dist/**', 'packages/**'] });
+    
+    for (const file of files) {
+      const content = readFileSync(file, 'utf8');
+      
+      // Check for logging patterns that should use @griot/core
+      if (content.includes('console.log') && !content.includes('@griot/core')) {
+        recommendations.push({
+          file,
+          issue: 'Use createLogger() from @griot/core instead of console.log',
+          severity: 'warning'
+        });
+      }
+      
+      // Check for environment patterns that should use centralized config
+      if (content.includes('process.env') && !content.includes('@griot/core')) {
+        violations.push({
+          file,
+          issue: 'Use getEnvironmentConfig() from @griot/core instead of process.env',
+          severity: 'error'
+        });
+      }
+      
+      // Check for HTTP patterns that should use @griot/core
+      if (content.includes('express') && !content.includes('@griot/core')) {
+        recommendations.push({
+          file,
+          issue: 'Consider using HttpApiNode from @griot/core for HTTP endpoints',
+          severity: 'info'
+        });
+      }
+    }
+    
+    return {
+      success: violations.length === 0,
+      violations,
+      recommendations,
+      summary: `Found ${violations.length} violations and ${recommendations.length} recommendations`
+    };
+  } 

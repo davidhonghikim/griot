@@ -1,0 +1,313 @@
+name: "Prompt Analysis"
+description: "Analyze prompts for clarity, effectiveness, and potential issues"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["prompt", "analysis", "evaluation", "quality"]
+  priority: "medium"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface AnalysisConfig {
+    includeMetrics?: string[];
+    threshold?: number;
+    detailedReport?: boolean;
+  }
+  
+  export interface PromptMetrics {
+    clarity: number;
+    specificity: number;
+    completeness: number;
+    ambiguity: number;
+    length: number;
+    complexity: number;
+  }
+  
+  export interface AnalysisResult {
+    prompt: string;
+    metrics: PromptMetrics;
+    issues: string[];
+    suggestions: string[];
+    score: number;
+    category: 'excellent' | 'good' | 'fair' | 'poor';
+  }
+  
+  export class PromptAnalysis {
+    private config: AnalysisConfig;
+    
+    constructor(config: AnalysisConfig = {}) {
+      this.config = {
+        includeMetrics: ['clarity', 'specificity', 'completeness', 'ambiguity'],
+        threshold: 0.7,
+        detailedReport: true,
+        ...config,
+      };
+    }
+    
+    // Analyze a single prompt
+    analyzePrompt(prompt: string): AnalysisResult {
+      const metrics = this.calculateMetrics(prompt);
+      const issues = this.identifyIssues(prompt, metrics);
+      const suggestions = this.generateSuggestions(prompt, metrics, issues);
+      const score = this.calculateOverallScore(metrics);
+      const category = this.categorizePrompt(score);
+      
+      return {
+        prompt,
+        metrics,
+        issues,
+        suggestions,
+        score,
+        category,
+      };
+    }
+    
+    // Calculate various metrics
+    private calculateMetrics(prompt: string): PromptMetrics {
+      return {
+        clarity: this.calculateClarity(prompt),
+        specificity: this.calculateSpecificity(prompt),
+        completeness: this.calculateCompleteness(prompt),
+        ambiguity: this.calculateAmbiguity(prompt),
+        length: this.calculateLength(prompt),
+        complexity: this.calculateComplexity(prompt),
+      };
+    }
+    
+    // Clarity: How easy to understand
+    private calculateClarity(prompt: string): number {
+      const words = prompt.split(/\s+/).length;
+      const sentences = prompt.split(/[.!?]+/).length;
+      const avgWordsPerSentence = words / sentences;
+      
+      // Penalize very long or very short sentences
+      let clarity = 1.0;
+      if (avgWordsPerSentence > 25) clarity -= 0.3;
+      if (avgWordsPerSentence < 5) clarity -= 0.2;
+      
+      // Check for complex words (3+ syllables)
+      const complexWords = prompt.match(/\b\w*[aeiou]{3,}\w*\b/gi)?.length || 0;
+      const complexityRatio = complexWords / words;
+      clarity -= complexityRatio * 0.5;
+      
+      return Math.max(0, Math.min(1, clarity));
+    }
+    
+    // Specificity: How specific the instructions are
+    private calculateSpecificity(prompt: string): number {
+      let specificity = 0.5; // Base score
+      
+      // Bonus for specific numbers, dates, formats
+      const numbers = (prompt.match(/\d+/g) || []).length;
+      const dates = (prompt.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/g) || []).length;
+      const formats = (prompt.match(/format|structure|template|example/gi) || []).length;
+      
+      specificity += (numbers * 0.05) + (dates * 0.1) + (formats * 0.1);
+      
+      // Penalty for vague words
+      const vagueWords = (prompt.match(/\b(good|bad|nice|interesting|maybe|perhaps|might)\b/gi) || []).length;
+      specificity -= vagueWords * 0.1;
+      
+      return Math.max(0, Math.min(1, specificity));
+    }
+    
+    // Completeness: How complete the instructions are
+    private calculateCompleteness(prompt: string): number {
+      let completeness = 0.5;
+      
+      // Check for essential elements
+      const hasContext = /\b(context|background|situation|scenario)\b/gi.test(prompt);
+      const hasAction = /\b(do|create|write|analyze|explain|summarize)\b/gi.test(prompt);
+      const hasFormat = /\b(format|output|response|result)\b/gi.test(prompt);
+      const hasConstraints = /\b(limit|maximum|minimum|within|only)\b/gi.test(prompt);
+      
+      if (hasContext) completeness += 0.2;
+      if (hasAction) completeness += 0.2;
+      if (hasFormat) completeness += 0.15;
+      if (hasConstraints) completeness += 0.15;
+      
+      return Math.max(0, Math.min(1, completeness));
+    }
+    
+    // Ambiguity: How ambiguous the prompt is
+    private calculateAmbiguity(prompt: string): number {
+      let ambiguity = 0.0;
+      
+      // Check for ambiguous words
+      const ambiguousWords = (prompt.match(/\b(it|this|that|these|those|them|they)\b/gi) || []).length;
+      const pronouns = (prompt.match(/\b(he|she|it|they|them|their|his|her|its)\b/gi) || []).length;
+      const vagueTerms = (prompt.match(/\b(some|many|few|several|various|different)\b/gi) || []).length;
+      
+      ambiguity += (ambiguousWords * 0.1) + (pronouns * 0.05) + (vagueTerms * 0.1);
+      
+      return Math.min(1, ambiguity);
+    }
+    
+    // Length: Normalized length score
+    private calculateLength(prompt: string): number {
+      const words = prompt.split(/\s+/).length;
+      const chars = prompt.length;
+      
+      // Optimal length: 50-200 words
+      if (words >= 50 && words <= 200) return 1.0;
+      if (words < 20) return 0.3;
+      if (words > 500) return 0.4;
+      
+      return 0.7;
+    }
+    
+    // Complexity: How complex the prompt structure is
+    private calculateComplexity(prompt: string): number {
+      const sentences = prompt.split(/[.!?]+/).length;
+      const paragraphs = prompt.split(/\n\s*\n/).length;
+      const clauses = (prompt.match(/,|;|:|\(|\)/g) || []).length;
+      
+      let complexity = 0.5;
+      complexity += (sentences - 1) * 0.1;
+      complexity += (paragraphs - 1) * 0.2;
+      complexity += clauses * 0.05;
+      
+      return Math.min(1, complexity);
+    }
+    
+    // Identify specific issues
+    private identifyIssues(prompt: string, metrics: PromptMetrics): string[] {
+      const issues: string[] = [];
+      
+      if (metrics.clarity < 0.6) {
+        issues.push('Low clarity - consider simplifying language and sentence structure');
+      }
+      
+      if (metrics.specificity < 0.5) {
+        issues.push('Low specificity - add concrete details, numbers, or examples');
+      }
+      
+      if (metrics.completeness < 0.6) {
+        issues.push('Incomplete instructions - add context, action, format, or constraints');
+      }
+      
+      if (metrics.ambiguity > 0.3) {
+        issues.push('High ambiguity - clarify pronouns and vague terms');
+      }
+      
+      if (metrics.length < 0.5) {
+        issues.push('Prompt may be too short - consider adding more context or details');
+      }
+      
+      if (metrics.complexity > 0.8) {
+        issues.push('High complexity - consider breaking into simpler instructions');
+      }
+      
+      return issues;
+    }
+    
+    // Generate improvement suggestions
+    private generateSuggestions(prompt: string, metrics: PromptMetrics, issues: string[]): string[] {
+      const suggestions: string[] = [];
+      
+      if (metrics.clarity < 0.7) {
+        suggestions.push('Use shorter sentences and simpler vocabulary');
+        suggestions.push('Break complex instructions into bullet points');
+      }
+      
+      if (metrics.specificity < 0.6) {
+        suggestions.push('Add specific numbers, dates, or quantities');
+        suggestions.push('Include example outputs or formats');
+      }
+      
+      if (metrics.completeness < 0.7) {
+        suggestions.push('Add context about the situation or background');
+        suggestions.push('Specify the desired output format');
+      }
+      
+      if (metrics.ambiguity > 0.2) {
+        suggestions.push('Replace pronouns with specific nouns');
+        suggestions.push('Define any unclear terms or concepts');
+      }
+      
+      return suggestions;
+    }
+    
+    // Calculate overall score
+    private calculateOverallScore(metrics: PromptMetrics): number {
+      const weights = {
+        clarity: 0.25,
+        specificity: 0.25,
+        completeness: 0.25,
+        ambiguity: 0.15,
+        length: 0.05,
+        complexity: 0.05,
+      };
+      
+      let score = 0;
+      score += metrics.clarity * weights.clarity;
+      score += metrics.specificity * weights.specificity;
+      score += metrics.completeness * weights.completeness;
+      score += (1 - metrics.ambiguity) * weights.ambiguity;
+      score += metrics.length * weights.length;
+      score += (1 - metrics.complexity) * weights.complexity;
+      
+      return Math.max(0, Math.min(1, score));
+    }
+    
+    // Categorize prompt quality
+    private categorizePrompt(score: number): 'excellent' | 'good' | 'fair' | 'poor' {
+      if (score >= 0.85) return 'excellent';
+      if (score >= 0.7) return 'good';
+      if (score >= 0.5) return 'fair';
+      return 'poor';
+    }
+    
+    // Batch analysis
+    analyzePrompts(prompts: string[]): AnalysisResult[] {
+      return prompts.map(prompt => this.analyzePrompt(prompt));
+    }
+    
+    // Compare prompts
+    comparePrompts(prompt1: string, prompt2: string): {
+      prompt1: AnalysisResult;
+      prompt2: AnalysisResult;
+      comparison: {
+        betterPrompt: string;
+        scoreDifference: number;
+        keyDifferences: string[];
+      };
+    } {
+      const result1 = this.analyzePrompt(prompt1);
+      const result2 = this.analyzePrompt(prompt2);
+      
+      const scoreDifference = result1.score - result2.score;
+      const betterPrompt = scoreDifference > 0 ? prompt1 : prompt2;
+      
+      const keyDifferences: string[] = [];
+      if (Math.abs(result1.metrics.clarity - result2.metrics.clarity) > 0.1) {
+        keyDifferences.push('Clarity differs significantly');
+      }
+      if (Math.abs(result1.metrics.specificity - result2.metrics.specificity) > 0.1) {
+        keyDifferences.push('Specificity differs significantly');
+      }
+      
+      return {
+        prompt1: result1,
+        prompt2: result2,
+        comparison: {
+          betterPrompt,
+          scoreDifference: Math.abs(scoreDifference),
+          keyDifferences,
+        },
+      };
+    }
+    
+    // Configuration management
+    updateConfig(newConfig: Partial<AnalysisConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    getConfig(): AnalysisConfig {
+      return { ...this.config };
+    }
+  } 

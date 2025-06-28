@@ -1,0 +1,385 @@
+name: "Token Calculator (RAG)"
+description: "Semantic token calculation and cost estimation using RAG-based pricing system"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["token", "calculator", "pricing", "cost", "rag", "semantic"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: ["pricing_rag_service"]
+  version: "2.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { PricingRAGService } from '../../core/rag/pricing_rag_service';
+  import { CostBreakdown, ModelPricing } from '../../core/types/pricing_types';
+  
+  export interface TokenCalculationOptions {
+    method?: 'character' | 'word' | 'custom';
+    charsPerToken?: number;
+    wordsPerToken?: number;
+    model?: string;
+    provider?: string;
+    useCase?: string;
+    maxBudget?: number;
+    performance?: 'fast' | 'balanced' | 'high_quality';
+  }
+  
+  export interface SemanticPricingQuery {
+    useCase: string;
+    budget: number;
+    performance: 'fast' | 'balanced' | 'high_quality';
+    contextWindow?: number;
+    mediaType?: 'text' | 'image' | 'video' | 'audio';
+  }
+  
+  export class TokenCalculatorRAG {
+    private pricingRAG: PricingRAGService;
+    private tokenizerConfig: any;
+    
+    constructor(pricingRAG: PricingRAGService, options?: { tokenizerConfig?: any }) {
+      this.pricingRAG = pricingRAG;
+      this.tokenizerConfig = options?.tokenizerConfig || { charsPerToken: 4 };
+    }
+    
+    /**
+     * Calculate tokens in text using various methods
+     */
+    calculateTokens(text: string, options?: TokenCalculationOptions): number {
+      const method = options?.method || 'character';
+      const charsPerToken = options?.charsPerToken || this.tokenizerConfig.charsPerToken;
+      
+      switch (method) {
+        case 'character':
+          return Math.ceil(text.length / charsPerToken);
+        case 'word':
+          const wordsPerToken = options?.wordsPerToken || 0.75;
+          const words = text.split(/\s+/).length;
+          return Math.ceil(words / wordsPerToken);
+        case 'custom':
+          return this.customTokenization(text, options);
+        default:
+          return Math.ceil(text.length / charsPerToken);
+      }
+    }
+    
+    /**
+     * Custom tokenization method (can be overridden)
+     */
+    private customTokenization(text: string, options?: any): number {
+      // Default implementation - can be extended
+      return Math.ceil(text.length / 4);
+    }
+    
+    /**
+     * Calculate cost using RAG-based pricing
+     */
+    async calculateCost(
+      inputTokens: number,
+      outputTokens: number,
+      model?: string,
+      provider?: string,
+      options?: TokenCalculationOptions
+    ): Promise<CostBreakdown> {
+      let modelPricing: ModelPricing | null = null;
+      
+      if (model) {
+        // Get specific model pricing
+        const pricingResult = await this.pricingRAG.getModelPricing(model, provider);
+        if (pricingResult) {
+          modelPricing = {
+            modelKey: pricingResult.model,
+            providerKey: pricingResult.provider,
+            displayName: pricingResult.description,
+            description: pricingResult.description,
+            inputPricePer1MTokens: pricingResult.inputPrice,
+            outputPricePer1MTokens: pricingResult.outputPrice,
+            contextWindow: pricingResult.contextWindow,
+            maxTokens: pricingResult.maxTokens,
+            isActive: true,
+            lastUpdated: new Date().toISOString()
+          };
+        }
+      }
+      
+      if (!modelPricing) {
+        throw new Error(`Model pricing not found for ${model || 'specified model'}`);
+      }
+      
+      // Calculate costs
+      const inputCost = (inputTokens / 1_000_000) * modelPricing.inputPricePer1MTokens;
+      const outputCost = (outputTokens / 1_000_000) * modelPricing.outputPricePer1MTokens;
+      
+      return {
+        inputCost,
+        outputCost,
+        totalCost: inputCost + outputCost,
+        currency: 'USD',
+        modelKey: modelPricing.modelKey,
+        providerKey: modelPricing.providerKey,
+        tokenCount: {
+          input: inputTokens,
+          output: outputTokens
+        }
+      };
+    }
+    
+    /**
+     * Calculate cost for text input/output with semantic model selection
+     */
+    async calculateTextCost(
+      inputText: string,
+      outputText: string = '',
+      options?: TokenCalculationOptions
+    ): Promise<CostBreakdown> {
+      const inputTokens = this.calculateTokens(inputText, options);
+      const outputTokens = this.calculateTokens(outputText, options);
+      
+      // If no specific model provided, use semantic search to find best model
+      if (!options?.model && options?.useCase) {
+        const bestModel = await this.pricingRAG.findBestModel(
+          options.useCase,
+          options.maxBudget || 100,
+          options.performance || 'balanced'
+        );
+        
+        if (bestModel) {
+          options.model = bestModel.model;
+          options.provider = bestModel.provider;
+        }
+      }
+      
+      return this.calculateCost(inputTokens, outputTokens, options?.model, options?.provider, options);
+    }
+    
+    /**
+     * Find best model for a specific use case and budget
+     */
+    async findBestModel(query: SemanticPricingQuery): Promise<ModelPricing | null> {
+      const pricingResult = await this.pricingRAG.findBestModel(
+        query.useCase,
+        query.budget,
+        query.performance
+      );
+      
+      if (!pricingResult) return null;
+      
+      return {
+        modelKey: pricingResult.model,
+        providerKey: pricingResult.provider,
+        displayName: pricingResult.description,
+        description: pricingResult.description,
+        inputPricePer1MTokens: pricingResult.inputPrice,
+        outputPricePer1MTokens: pricingResult.outputPrice,
+        contextWindow: pricingResult.contextWindow,
+        maxTokens: pricingResult.maxTokens,
+        isActive: true,
+        lastUpdated: new Date().toISOString()
+      };
+    }
+    
+    /**
+     * Compare costs between multiple models
+     */
+    async compareModels(modelKeys: string[]): Promise<Array<ModelPricing & { estimatedCost: number }>> {
+      const results = await this.pricingRAG.compareModels(modelKeys);
+      
+      return results.map(result => ({
+        modelKey: result.model,
+        providerKey: result.provider,
+        displayName: result.description,
+        description: result.description,
+        inputPricePer1MTokens: result.inputPrice,
+        outputPricePer1MTokens: result.outputPrice,
+        contextWindow: result.contextWindow,
+        maxTokens: result.maxTokens,
+        isActive: true,
+        lastUpdated: new Date().toISOString(),
+        estimatedCost: result.inputPrice // Base cost for comparison
+      }));
+    }
+    
+    /**
+     * Get pricing information for all available models
+     */
+    async getPricingInfo(): Promise<{
+      totalModels: number;
+      averageInputPrice: number;
+      averageOutputPrice: number;
+      priceRange: { min: number; max: number };
+    }> {
+      const stats = await this.pricingRAG.getPricingStats();
+      
+      return {
+        totalModels: stats.totalModels,
+        averageInputPrice: stats.averageInputPrice,
+        averageOutputPrice: stats.averageOutputPrice,
+        priceRange: stats.priceRange
+      };
+    }
+    
+    /**
+     * Get model pricing details
+     */
+    async getModelPricing(modelKey: string, providerKey?: string): Promise<ModelPricing | null> {
+      const pricingResult = await this.pricingRAG.getModelPricing(modelKey, providerKey);
+      
+      if (!pricingResult) return null;
+      
+      return {
+        modelKey: pricingResult.model,
+        providerKey: pricingResult.provider,
+        displayName: pricingResult.description,
+        description: pricingResult.description,
+        inputPricePer1MTokens: pricingResult.inputPrice,
+        outputPricePer1MTokens: pricingResult.outputPrice,
+        contextWindow: pricingResult.contextWindow,
+        maxTokens: pricingResult.maxTokens,
+        isActive: true,
+        lastUpdated: new Date().toISOString()
+      };
+    }
+    
+    /**
+     * Estimate cost for a specific use case
+     */
+    async estimateUseCaseCost(
+      useCase: string,
+      estimatedTokens: number,
+      budget: number,
+      performance: 'fast' | 'balanced' | 'high_quality' = 'balanced'
+    ): Promise<{
+      recommendedModel: ModelPricing;
+      estimatedCost: number;
+      withinBudget: boolean;
+      alternatives: ModelPricing[];
+    }> {
+      const bestModel = await this.findBestModel({
+        useCase,
+        budget,
+        performance
+      });
+      
+      if (!bestModel) {
+        throw new Error(`No suitable model found for use case: ${useCase}`);
+      }
+      
+      const estimatedCost = (estimatedTokens / 1_000_000) * bestModel.inputPricePer1MTokens;
+      const withinBudget = estimatedCost <= budget;
+      
+      // Get alternatives if over budget
+      let alternatives: ModelPricing[] = [];
+      if (!withinBudget) {
+        const searchResults = await this.pricingRAG.searchPricing({
+          useCase,
+          maxPrice: budget / (estimatedTokens / 1_000_000),
+          performance
+        });
+        
+        alternatives = searchResults.slice(0, 3).map(result => ({
+          modelKey: result.model,
+          providerKey: result.provider,
+          displayName: result.description,
+          description: result.description,
+          inputPricePer1MTokens: result.inputPrice,
+          outputPricePer1MTokens: result.outputPrice,
+          contextWindow: result.contextWindow,
+          maxTokens: result.maxTokens,
+          isActive: true,
+          lastUpdated: new Date().toISOString()
+        }));
+      }
+      
+      return {
+        recommendedModel: bestModel,
+        estimatedCost,
+        withinBudget,
+        alternatives
+      };
+    }
+    
+    /**
+     * Get cost optimization recommendations
+     */
+    async getOptimizationRecommendations(
+      currentModel: string,
+      currentCost: number,
+      budget: number
+    ): Promise<{
+      currentModel: ModelPricing;
+      recommendations: Array<{
+        model: ModelPricing;
+        costSavings: number;
+        tradeOff: string;
+      }>;
+    }> {
+      const currentModelPricing = await this.getModelPricing(currentModel);
+      if (!currentModelPricing) {
+        throw new Error(`Current model not found: ${currentModel}`);
+      }
+      
+      // Search for cheaper alternatives
+      const alternatives = await this.pricingRAG.searchPricing({
+        maxPrice: currentModelPricing.inputPricePer1MTokens * 0.8, // 20% cheaper
+        performance: 'balanced'
+      });
+      
+      const recommendations = alternatives
+        .filter(result => result.model !== currentModel)
+        .slice(0, 5)
+        .map(result => {
+          const modelPricing: ModelPricing = {
+            modelKey: result.model,
+            providerKey: result.provider,
+            displayName: result.description,
+            description: result.description,
+            inputPricePer1MTokens: result.inputPrice,
+            outputPricePer1MTokens: result.outputPrice,
+            contextWindow: result.contextWindow,
+            maxTokens: result.maxTokens,
+            isActive: true,
+            lastUpdated: new Date().toISOString()
+          };
+          
+          const costSavings = currentModelPricing.inputPricePer1MTokens - result.inputPrice;
+          const tradeOff = this.getTradeOffDescription(currentModelPricing, modelPricing);
+          
+          return {
+            model: modelPricing,
+            costSavings,
+            tradeOff
+          };
+        });
+      
+      return {
+        currentModel: currentModelPricing,
+        recommendations
+      };
+    }
+    
+    /**
+     * Get trade-off description between models
+     */
+    private getTradeOffDescription(current: ModelPricing, alternative: ModelPricing): string {
+      const tradeOffs: string[] = [];
+      
+      if (alternative.inputPricePer1MTokens < current.inputPricePer1MTokens) {
+        tradeOffs.push('Lower cost');
+      }
+      
+      if (alternative.contextWindow < current.contextWindow) {
+        tradeOffs.push('Smaller context window');
+      }
+      
+      if (alternative.maxTokens < current.maxTokens) {
+        tradeOffs.push('Lower max tokens');
+      }
+      
+      if (tradeOffs.length === 0) {
+        return 'Similar capabilities';
+      }
+      
+      return tradeOffs.join(', ');
+    }
+  } 

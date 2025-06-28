@@ -1,0 +1,371 @@
+name: "Budget-Aware Chat"
+description: "Intelligent chat system with budget tracking, cost estimation, and spending optimization"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["chat", "budget", "cost", "optimization", "media"]
+  priority: "high"
+  complexity: "high"
+  dependencies: ["token_price_estimator", "budget_manager", "token_calculator"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { TokenPriceEstimator } from '../../skills/ai/token_price_estimator';
+  import { BudgetManager } from '../../skills/ai/budget_manager';
+  import { TokenCalculator } from '../../skills/ai/token_calculator';
+  
+  export interface ChatMessage {
+    id: string;
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    mediaType?: 'text' | 'image' | 'video' | 'audio';
+    mediaConfig?: {
+      size?: number;
+      duration?: number;
+      resolution?: string;
+      quality?: 'low' | 'medium' | 'high';
+    };
+    timestamp: string;
+    cost?: number;
+    tokens?: number;
+  }
+  
+  export interface ChatSession {
+    id: string;
+    budgetId: string;
+    messages: ChatMessage[];
+    totalCost: number;
+    totalTokens: number;
+    startTime: string;
+    lastActivity: string;
+    isActive: boolean;
+  }
+  
+  export interface ChatResponse {
+    message: ChatMessage;
+    cost: number;
+    tokens: number;
+    budgetStatus: {
+      remaining: number;
+      percentageUsed: number;
+      warning?: string;
+    };
+    recommendations: string[];
+  }
+  
+  export interface ChatAnalytics {
+    sessionId: string;
+    totalMessages: number;
+    totalCost: number;
+    averageCostPerMessage: number;
+    costBreakdown: {
+      byMediaType: Record<string, number>;
+      byModel: Record<string, number>;
+    };
+    efficiencyScore: number; // 0-100, higher is better
+    optimizationOpportunities: string[];
+  }
+  
+  export class BudgetAwareChat {
+    private tokenEstimator: TokenPriceEstimator;
+    private budgetManager: BudgetManager;
+    private tokenCalculator: TokenCalculator;
+    private sessions: Map<string, ChatSession>;
+    
+    constructor(
+      tokenEstimator: TokenPriceEstimator,
+      budgetManager: BudgetManager,
+      tokenCalculator: TokenCalculator
+    ) {
+      this.tokenEstimator = tokenEstimator;
+      this.budgetManager = budgetManager;
+      this.tokenCalculator = tokenCalculator;
+      this.sessions = new Map();
+    }
+    
+    // Start a new chat session
+    startSession(budgetId: string, systemPrompt?: string): string {
+      const sessionId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      const session: ChatSession = {
+        id: sessionId,
+        budgetId,
+        messages: [],
+        totalCost: 0,
+        totalTokens: 0,
+        startTime: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+        isActive: true,
+      };
+      
+      // Add system prompt if provided
+      if (systemPrompt) {
+        const systemMessage: ChatMessage = {
+          id: `msg_${Date.now()}_system`,
+          role: 'system',
+          content: systemPrompt,
+          timestamp: new Date().toISOString(),
+        };
+        session.messages.push(systemMessage);
+      }
+      
+      this.sessions.set(sessionId, session);
+      return sessionId;
+    }
+    
+    // Send a message and get response
+    async sendMessage(
+      sessionId: string,
+      content: string,
+      mediaConfig?: {
+        type: 'text' | 'image' | 'video' | 'audio';
+        size?: number;
+        duration?: number;
+        resolution?: string;
+        quality?: 'low' | 'medium' | 'high';
+      },
+      model?: string
+    ): Promise<ChatResponse> {
+      const session = this.sessions.get(sessionId);
+      if (!session || !session.isActive) {
+        throw new Error('Session not found or inactive');
+      }
+      
+      // Estimate cost before processing
+      const estimatedCost = await this.estimateMessageCost(content, mediaConfig, model);
+      
+      // Check budget
+      const budgetCheck = this.budgetManager.canAffordOperation(session.budgetId, estimatedCost);
+      if (!budgetCheck.canAfford) {
+        throw new Error(`Insufficient budget. Required: $${estimatedCost.toFixed(4)}, Available: $${budgetCheck.remainingBudget.toFixed(4)}`);
+      }
+      
+      // Create user message
+      const userMessage: ChatMessage = {
+        id: `msg_${Date.now()}_user`,
+        role: 'user',
+        content,
+        mediaType: mediaConfig?.type || 'text',
+        mediaConfig: mediaConfig,
+        timestamp: new Date().toISOString(),
+      };
+      
+      session.messages.push(userMessage);
+      
+      // Generate response (simulated - replace with actual AI call)
+      const response = await this.generateResponse(session, model);
+      
+      // Calculate actual cost
+      const actualCost = await this.calculateActualCost(response, model);
+      const actualTokens = this.tokenCalculator.calculateTokens(response.content);
+      
+      // Update response message with cost info
+      response.cost = actualCost;
+      response.tokens = actualTokens;
+      
+      // Record spending
+      this.budgetManager.recordSpending({
+        operation: 'chat_message',
+        mediaType: mediaConfig?.type || 'text',
+        model: model || 'gpt-3.5-turbo',
+        tokens: actualTokens,
+        cost: actualCost,
+        currency: 'USD',
+        budgetId: session.budgetId,
+      });
+      
+      // Update session
+      session.messages.push(response);
+      session.totalCost += actualCost;
+      session.totalTokens += actualTokens;
+      session.lastActivity = new Date().toISOString();
+      
+      // Get updated budget status
+      const budgetStatus = this.budgetManager.getBudgetStatus(session.budgetId);
+      
+      // Generate recommendations
+      const recommendations = this.generateRecommendations(session, budgetStatus);
+      
+      return {
+        message: response,
+        cost: actualCost,
+        tokens: actualTokens,
+        budgetStatus: {
+          remaining: budgetStatus?.remaining || 0,
+          percentageUsed: budgetStatus?.percentageUsed || 0,
+          warning: budgetCheck.warning,
+        },
+        recommendations,
+      };
+    }
+    
+    // Get chat analytics
+    getChatAnalytics(sessionId: string): ChatAnalytics | null {
+      const session = this.sessions.get(sessionId);
+      if (!session) return null;
+      
+      const totalMessages = session.messages.length;
+      const averageCostPerMessage = session.totalCost / Math.max(1, totalMessages);
+      
+      // Calculate cost breakdown
+      const costBreakdown = {
+        byMediaType: {} as Record<string, number>,
+        byModel: {} as Record<string, number>,
+      };
+      
+      session.messages.forEach(msg => {
+        if (msg.cost && msg.mediaType) {
+          costBreakdown.byMediaType[msg.mediaType] = (costBreakdown.byMediaType[msg.mediaType] || 0) + msg.cost;
+        }
+      });
+      
+      // Calculate efficiency score (0-100)
+      const efficiencyScore = this.calculateEfficiencyScore(session);
+      
+      // Find optimization opportunities
+      const optimizationOpportunities = this.findOptimizationOpportunities(session);
+      
+      return {
+        sessionId,
+        totalMessages,
+        totalCost: session.totalCost,
+        averageCostPerMessage,
+        costBreakdown,
+        efficiencyScore,
+        optimizationOpportunities,
+      };
+    }
+    
+    // Get session summary
+    getSessionSummary(sessionId: string): {
+      session: ChatSession;
+      analytics: ChatAnalytics;
+      budgetStatus: any;
+    } | null {
+      const session = this.sessions.get(sessionId);
+      if (!session) return null;
+      
+      const analytics = this.getChatAnalytics(sessionId);
+      const budgetStatus = this.budgetManager.getBudgetStatus(session.budgetId);
+      
+      return { session, analytics, budgetStatus };
+    }
+    
+    // End a chat session
+    endSession(sessionId: string): boolean {
+      const session = this.sessions.get(sessionId);
+      if (!session) return false;
+      
+      session.isActive = false;
+      return true;
+    }
+    
+    // Get all active sessions
+    getActiveSessions(): ChatSession[] {
+      return Array.from(this.sessions.values()).filter(session => session.isActive);
+    }
+    
+    // Helper methods
+    private async estimateMessageCost(
+      content: string,
+      mediaConfig?: any,
+      model?: string
+    ): Promise<number> {
+      if (mediaConfig) {
+        const estimation = this.tokenEstimator.estimateMixedMedia([mediaConfig], model);
+        return estimation.estimatedCost;
+      } else {
+        const estimation = this.tokenEstimator.estimateText(content, model);
+        return estimation.estimatedCost;
+      }
+    }
+    
+    private async generateResponse(session: ChatSession, model?: string): Promise<ChatMessage> {
+      // This is a placeholder - replace with actual AI model call
+      const responseContent = `This is a simulated response to: "${session.messages[session.messages.length - 1].content}"`;
+      
+      return {
+        id: `msg_${Date.now()}_assistant`,
+        role: 'assistant',
+        content: responseContent,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    
+    private async calculateActualCost(response: ChatMessage, model?: string): Promise<number> {
+      const tokens = this.tokenCalculator.calculateTokens(response.content);
+      const cost = this.tokenCalculator.calculateCost(0, tokens, model);
+      return cost.totalCost;
+    }
+    
+    private generateRecommendations(session: ChatSession, budgetStatus: any): string[] {
+      const recommendations: string[] = [];
+      
+      if (budgetStatus?.percentageUsed > 75) {
+        recommendations.push('Budget usage is high - consider using cheaper models');
+      }
+      
+      if (session.totalCost > 0.50) {
+        recommendations.push('Session cost is high - consider summarizing long conversations');
+      }
+      
+      const mediaMessages = session.messages.filter(msg => msg.mediaType && msg.mediaType !== 'text');
+      if (mediaMessages.length > 5) {
+        recommendations.push('High media usage - consider text-only for routine questions');
+      }
+      
+      return recommendations;
+    }
+    
+    private calculateEfficiencyScore(session: ChatSession): number {
+      let score = 100;
+      
+      // Penalize high cost per message
+      const avgCostPerMessage = session.totalCost / Math.max(1, session.messages.length);
+      if (avgCostPerMessage > 0.10) score -= 20;
+      else if (avgCostPerMessage > 0.05) score -= 10;
+      
+      // Penalize long messages without value
+      const longMessages = session.messages.filter(msg => 
+        msg.content.length > 1000 && msg.role === 'user'
+      );
+      if (longMessages.length > session.messages.length * 0.3) score -= 15;
+      
+      // Penalize excessive media usage
+      const mediaMessages = session.messages.filter(msg => 
+        msg.mediaType && msg.mediaType !== 'text'
+      );
+      if (mediaMessages.length > session.messages.length * 0.5) score -= 15;
+      
+      return Math.max(0, score);
+    }
+    
+    private findOptimizationOpportunities(session: ChatSession): string[] {
+      const opportunities: string[] = [];
+      
+      // Check for expensive models
+      const expensiveModels = session.messages.filter(msg => 
+        msg.cost && msg.cost > 0.05
+      );
+      if (expensiveModels.length > 0) {
+        opportunities.push('Consider using cheaper models for routine questions');
+      }
+      
+      // Check for long conversations
+      if (session.messages.length > 20) {
+        opportunities.push('Long conversation detected - consider starting fresh session');
+      }
+      
+      // Check for media-heavy sessions
+      const mediaMessages = session.messages.filter(msg => 
+        msg.mediaType && msg.mediaType !== 'text'
+      );
+      if (mediaMessages.length > 10) {
+        opportunities.push('High media usage - consider batch processing');
+      }
+      
+      return opportunities;
+    }
+  } 

@@ -1,0 +1,374 @@
+name: "Prompt Engineering"
+description: "Template management, prompt optimization, and structured prompt generation for LLM interactions"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["prompt", "template", "optimization", "llm", "generation"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface PromptTemplate {
+    id: string;
+    name: string;
+    description: string;
+    template: string;
+    variables: string[];
+    examples?: Array<{
+      input: Record<string, any>;
+      output: string;
+    }>;
+    metadata?: Record<string, any>;
+  }
+  
+  export interface PromptRequest {
+    templateId: string;
+    variables: Record<string, any>;
+    options?: {
+      temperature?: number;
+      maxTokens?: number;
+      systemPrompt?: string;
+    };
+  }
+  
+  export interface PromptOptimizationResult {
+    originalPrompt: string;
+    optimizedPrompt: string;
+    improvements: string[];
+    score: number;
+  }
+  
+  export interface PromptAnalysis {
+    tokenCount: number;
+    complexity: number;
+    clarity: number;
+    specificity: number;
+    suggestions: string[];
+  }
+  
+  export class PromptEngineering {
+    private templates: Map<string, PromptTemplate>;
+    private llmIntegration: any; // LLMIntegration instance
+    
+    constructor(llmIntegration: any) {
+      this.templates = new Map();
+      this.llmIntegration = llmIntegration;
+    }
+    
+    // Template management
+    registerTemplate(template: PromptTemplate): void {
+      this.templates.set(template.id, template);
+    }
+    
+    getTemplate(templateId: string): PromptTemplate | undefined {
+      return this.templates.get(templateId);
+    }
+    
+    listTemplates(): PromptTemplate[] {
+      return Array.from(this.templates.values());
+    }
+    
+    deleteTemplate(templateId: string): boolean {
+      return this.templates.delete(templateId);
+    }
+    
+    // Template rendering
+    renderTemplate(templateId: string, variables: Record<string, any>): string {
+      const template = this.templates.get(templateId);
+      if (!template) {
+        throw new Error(`Template not found: ${templateId}`);
+      }
+      
+      let rendered = template.template;
+      
+      // Replace variables in template
+      for (const [key, value] of Object.entries(variables)) {
+        const placeholder = `{{${key}}}`;
+        if (rendered.includes(placeholder)) {
+          rendered = rendered.replace(new RegExp(placeholder, 'g'), String(value));
+        }
+      }
+      
+      // Check for missing variables
+      const missingVars = template.variables.filter(varName => 
+        !Object.keys(variables).includes(varName)
+      );
+      
+      if (missingVars.length > 0) {
+        throw new Error(`Missing required variables: ${missingVars.join(', ')}`);
+      }
+      
+      return rendered;
+    }
+    
+    // Prompt generation with LLM
+    async generatePrompt(request: PromptRequest): Promise<string> {
+      const template = this.templates.get(request.templateId);
+      if (!template) {
+        throw new Error(`Template not found: ${request.templateId}`);
+      }
+      
+      const renderedPrompt = this.renderTemplate(request.templateId, request.variables);
+      
+      if (request.options?.systemPrompt) {
+        return `${request.options.systemPrompt}\n\n${renderedPrompt}`;
+      }
+      
+      return renderedPrompt;
+    }
+    
+    // Prompt optimization
+    async optimizePrompt(prompt: string, target: string): Promise<PromptOptimizationResult> {
+      const optimizationPrompt = `
+        Analyze and optimize the following prompt to better achieve the target goal.
+        
+        Original Prompt:
+        ${prompt}
+        
+        Target Goal:
+        ${target}
+        
+        Provide an optimized version with specific improvements listed.
+        Format your response as JSON:
+        {
+          "optimizedPrompt": "...",
+          "improvements": ["...", "..."],
+          "score": 0.85
+        }
+      `;
+      
+      const response = await this.llmIntegration.generate({
+        prompt: optimizationPrompt,
+        temperature: 0.3,
+        maxTokens: 1000,
+      });
+      
+      try {
+        const result = JSON.parse(response.text);
+        return {
+          originalPrompt: prompt,
+          optimizedPrompt: result.optimizedPrompt,
+          improvements: result.improvements,
+          score: result.score,
+        };
+      } catch {
+        throw new Error('Failed to parse optimization result');
+      }
+    }
+    
+    // Prompt analysis
+    async analyzePrompt(prompt: string): Promise<PromptAnalysis> {
+      const analysisPrompt = `
+        Analyze the following prompt for effectiveness and provide suggestions for improvement.
+        
+        Prompt:
+        ${prompt}
+        
+        Provide analysis as JSON:
+        {
+          "tokenCount": 150,
+          "complexity": 0.7,
+          "clarity": 0.8,
+          "specificity": 0.9,
+          "suggestions": ["...", "..."]
+        }
+      `;
+      
+      const response = await this.llmIntegration.generate({
+        prompt: analysisPrompt,
+        temperature: 0.2,
+        maxTokens: 500,
+      });
+      
+      try {
+        return JSON.parse(response.text);
+      } catch {
+        throw new Error('Failed to parse analysis result');
+      }
+    }
+    
+    // Chain of thought prompting
+    createChainOfThoughtPrompt(basePrompt: string): string {
+      return `${basePrompt}
+
+Let's approach this step by step:
+1. First, let's understand what we need to do
+2. Then, let's break it down into smaller parts
+3. Finally, let's put it all together
+
+Step-by-step reasoning:`;
+    }
+    
+    // Few-shot prompting
+    createFewShotPrompt(examples: Array<{input: string, output: string}>, query: string): string {
+      let prompt = '';
+      
+      for (const example of examples) {
+        prompt += `Input: ${example.input}\nOutput: ${example.output}\n\n`;
+      }
+      
+      prompt += `Input: ${query}\nOutput:`;
+      
+      return prompt;
+    }
+    
+    // Role-based prompting
+    createRolePrompt(role: string, task: string, context?: string): string {
+      let prompt = `You are a ${role}. `;
+      
+      if (context) {
+        prompt += `Context: ${context}\n\n`;
+      }
+      
+      prompt += `Task: ${task}`;
+      
+      return prompt;
+    }
+    
+    // Structured output prompting
+    createStructuredOutputPrompt(basePrompt: string, schema: Record<string, any>): string {
+      return `${basePrompt}
+
+Please provide your response in the following JSON format:
+${JSON.stringify(schema, null, 2)}
+
+Response:`;
+    }
+    
+    // A/B testing prompts
+    async testPromptVariants(
+      variants: string[],
+      testCases: Array<{input: any, expectedOutput: string}>,
+      metric: 'accuracy' | 'relevance' | 'completeness' = 'accuracy'
+    ): Promise<Array<{prompt: string, score: number, results: any[]}>> {
+      const results = [];
+      
+      for (const variant of variants) {
+        let totalScore = 0;
+        const variantResults = [];
+        
+        for (const testCase of testCases) {
+          const response = await this.llmIntegration.generate({
+            prompt: this.renderTemplate(variant, testCase.input),
+            temperature: 0.1,
+          });
+          
+          const score = this.calculateScore(response.text, testCase.expectedOutput, metric);
+          totalScore += score;
+          variantResults.push({
+            input: testCase.input,
+            expected: testCase.expectedOutput,
+            actual: response.text,
+            score,
+          });
+        }
+        
+        results.push({
+          prompt: variant,
+          score: totalScore / testCases.length,
+          results: variantResults,
+        });
+      }
+      
+      return results.sort((a, b) => b.score - a.score);
+    }
+    
+    private calculateScore(actual: string, expected: string, metric: string): number {
+      switch (metric) {
+        case 'accuracy':
+          return actual.toLowerCase().includes(expected.toLowerCase()) ? 1.0 : 0.0;
+        case 'relevance':
+          // Simple relevance scoring based on keyword overlap
+          const actualWords = new Set(actual.toLowerCase().split(/\s+/));
+          const expectedWords = new Set(expected.toLowerCase().split(/\s+/));
+          const intersection = new Set([...actualWords].filter(x => expectedWords.has(x)));
+          return intersection.size / expectedWords.size;
+        case 'completeness':
+          // Check if all expected elements are present
+          const expectedElements = expected.split(',').map(e => e.trim());
+          const presentElements = expectedElements.filter(element => 
+            actual.toLowerCase().includes(element.toLowerCase())
+          );
+          return presentElements.length / expectedElements.length;
+        default:
+          return 0.0;
+      }
+    }
+    
+    // Template validation
+    validateTemplate(template: PromptTemplate): Array<{type: 'error' | 'warning', message: string}> {
+      const issues: Array<{type: 'error' | 'warning', message: string}> = [];
+      
+      // Check for required fields
+      if (!template.id) issues.push({type: 'error', message: 'Template ID is required'});
+      if (!template.name) issues.push({type: 'error', message: 'Template name is required'});
+      if (!template.template) issues.push({type: 'error', message: 'Template content is required'});
+      
+      // Check for variable consistency
+      const templateVars = this.extractVariables(template.template);
+      const declaredVars = new Set(template.variables);
+      
+      for (const varName of templateVars) {
+        if (!declaredVars.has(varName)) {
+          issues.push({type: 'warning', message: `Variable ${varName} used but not declared`});
+        }
+      }
+      
+      for (const varName of template.variables) {
+        if (!templateVars.includes(varName)) {
+          issues.push({type: 'warning', message: `Variable ${varName} declared but not used`});
+        }
+      }
+      
+      // Check template length
+      if (template.template.length > 4000) {
+        issues.push({type: 'warning', message: 'Template is very long, consider breaking it down'});
+      }
+      
+      return issues;
+    }
+    
+    private extractVariables(template: string): string[] {
+      const variableRegex = /\{\{(\w+)\}\}/g;
+      const variables: string[] = [];
+      let match;
+      
+      while ((match = variableRegex.exec(template)) !== null) {
+        variables.push(match[1]);
+      }
+      
+      return [...new Set(variables)];
+    }
+    
+    // Export/Import templates
+    exportTemplates(): PromptTemplate[] {
+      return Array.from(this.templates.values());
+    }
+    
+    importTemplates(templates: PromptTemplate[]): void {
+      for (const template of templates) {
+        this.registerTemplate(template);
+      }
+    }
+    
+    // Template search
+    searchTemplates(query: string): PromptTemplate[] {
+      const results: PromptTemplate[] = [];
+      const searchTerms = query.toLowerCase().split(/\s+/);
+      
+      for (const template of this.templates.values()) {
+        const searchableText = `${template.name} ${template.description} ${template.template}`.toLowerCase();
+        
+        const matches = searchTerms.every(term => searchableText.includes(term));
+        if (matches) {
+          results.push(template);
+        }
+      }
+      
+      return results;
+    }
+  } 

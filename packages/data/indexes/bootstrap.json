@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-06-28T07:58:39.652253",
+  "description": "Essential bootstrap index for agent initialization",
+  "system": {
+    "projectRoot": ".",
+    "indexesPath": "indexes",
+    "totalAssets": 64,
+    "lastIndexUpdate": "2025-06-28T07:58:39.652267"
+  },
+  "critical": {
+    "coreSkills": [],
+    "coreRecipes": [],
+    "coreScripts": [],
+    "coreConfigs": [],
+    "corePersonas": []
+  },
+  "indexes": {
+    "skills": {
+      "chunks": [
+        "api",
+        "ai",
+        "security",
+        "data",
+        "utils",
+        "category",
+        "database",
+        ".json"
+      ],
+      "totalFiles": 25
+    },
+    "recipes": {
+      "chunks": [
+        "ai",
+        "compliance",
+        ".json"
+      ],
+      "totalFiles": 14
+    },
+    "scripts": {
+      "chunks": [
+        "setup_pricing_rag.py",
+        "agent_bootstrap.py",
+        "asset_indexer.py",
+        "update_pricing.sh",
+        "auto_index_hook.py",
+        "price_aggregator.py",
+        "self_hosting_calculator.py",
+        "generic_price_aggregator.py"
+      ],
+      "totalFiles": 8
+    },
+    "configs": {
+      "chunks": [
+        "general"
+      ],
+      "totalFiles": 3
+    },
+    "personas": {
+      "chunks": [
+        "scholarship",
+        "wisdom",
+        "teaching",
+        "defense",
+        "leadership",
+        "storytelling",
+        "communication",
+        "security",
+        "elder",
+        "governance",
+        "knowledge",
+        "healing",
+        ".json"
+      ],
+      "totalFiles": 14
+    }
+  }
+}

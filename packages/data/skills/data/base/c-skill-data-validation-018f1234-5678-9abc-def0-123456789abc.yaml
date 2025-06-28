@@ -1,0 +1,487 @@
+name: "Data Validation Core"
+description: "Comprehensive data validation and quality assurance for structured and unstructured data"
+category: "data"
+tags:
+  primary: "data"
+  secondary: ["validation", "quality", "assurance", "verification", "integrity"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "core"
+code: |
+  export interface ValidationRule {
+    id: string;
+    name: string;
+    description: string;
+    ruleType: 'format' | 'range' | 'pattern' | 'custom' | 'reference';
+    field: string;
+    parameters: Record<string, any>;
+    severity: 'error' | 'warning' | 'info';
+    message: string;
+  }
+  
+  export interface ValidationResult {
+    ruleId: string;
+    field: string;
+    value: any;
+    isValid: boolean;
+    severity: 'error' | 'warning' | 'info';
+    message: string;
+    suggestions: string[];
+  }
+  
+  export interface DataValidationConfig {
+    rules: ValidationRule[];
+    strictMode: boolean;
+    allowPartialValidation: boolean;
+    customValidators: Record<string, Function>;
+  }
+  
+  export class DataValidationSkill {
+    private validationRules: Map<string, ValidationRule>;
+    private customValidators: Map<string, Function>;
+    private builtInValidators: Map<string, Function>;
+    
+    constructor() {
+      this.validationRules = new Map();
+      this.customValidators = new Map();
+      this.builtInValidators = new Map();
+      this.initializeBuiltInValidators();
+    }
+    
+    // Initialize built-in validators
+    private initializeBuiltInValidators(): void {
+      // Format validators
+      this.builtInValidators.set('email', (value: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(value);
+      });
+      
+      this.builtInValidators.set('url', (value: string) => {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      
+      this.builtInValidators.set('uuid', (value: string) => {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(value);
+      });
+      
+      this.builtInValidators.set('date', (value: string) => {
+        const date = new Date(value);
+        return !isNaN(date.getTime());
+      });
+      
+      // Range validators
+      this.builtInValidators.set('minLength', (value: string, min: number) => {
+        return value.length >= min;
+      });
+      
+      this.builtInValidators.set('maxLength', (value: string, max: number) => {
+        return value.length <= max;
+      });
+      
+      this.builtInValidators.set('minValue', (value: number, min: number) => {
+        return value >= min;
+      });
+      
+      this.builtInValidators.set('maxValue', (value: number, max: number) => {
+        return value <= max;
+      });
+      
+      // Pattern validators
+      this.builtInValidators.set('regex', (value: string, pattern: string) => {
+        const regex = new RegExp(pattern);
+        return regex.test(value);
+      });
+      
+      // Reference validators
+      this.builtInValidators.set('required', (value: any) => {
+        return value !== null && value !== undefined && value !== '';
+      });
+      
+      this.builtInValidators.set('unique', (value: any, existingValues: any[]) => {
+        return !existingValues.includes(value);
+      });
+    }
+    
+    // Add validation rule
+    addValidationRule(rule: ValidationRule): void {
+      this.validationRules.set(rule.id, rule);
+    }
+    
+    // Add custom validator
+    addCustomValidator(name: string, validator: Function): void {
+      this.customValidators.set(name, validator);
+    }
+    
+    // Validate single field
+    validateField(
+      field: string,
+      value: any,
+      rules: ValidationRule[]
+    ): ValidationResult[] {
+      const results: ValidationResult[] = [];
+      
+      for (const rule of rules) {
+        if (rule.field === field) {
+          const isValid = this.evaluateRule(rule, value);
+          const suggestions = this.generateSuggestions(rule, value, isValid);
+          
+          results.push({
+            ruleId: rule.id,
+            field: rule.field,
+            value,
+            isValid,
+            severity: rule.severity,
+            message: rule.message,
+            suggestions
+          });
+        }
+      }
+      
+      return results;
+    }
+    
+    // Validate entire object
+    validateObject(
+      data: Record<string, any>,
+      config: DataValidationConfig
+    ): {
+      isValid: boolean;
+      results: ValidationResult[];
+      summary: {
+        total: number;
+        passed: number;
+        failed: number;
+        errors: number;
+        warnings: number;
+        info: number;
+      };
+    } {
+      const results: ValidationResult[] = [];
+      
+      // Apply all rules to the data
+      for (const rule of config.rules) {
+        const value = this.getNestedValue(data, rule.field);
+        const isValid = this.evaluateRule(rule, value);
+        const suggestions = this.generateSuggestions(rule, value, isValid);
+        
+        results.push({
+          ruleId: rule.id,
+          field: rule.field,
+          value,
+          isValid,
+          severity: rule.severity,
+          message: rule.message,
+          suggestions
+        });
+      }
+      
+      // Calculate summary
+      const summary = this.calculateSummary(results);
+      const isValid = config.strictMode ? summary.errors === 0 : summary.failed < summary.total * 0.5;
+      
+      return {
+        isValid,
+        results,
+        summary
+      };
+    }
+    
+    // Evaluate a single rule
+    private evaluateRule(rule: ValidationRule, value: any): boolean {
+      try {
+        switch (rule.ruleType) {
+          case 'format':
+            return this.evaluateFormatRule(rule, value);
+          case 'range':
+            return this.evaluateRangeRule(rule, value);
+          case 'pattern':
+            return this.evaluatePatternRule(rule, value);
+          case 'custom':
+            return this.evaluateCustomRule(rule, value);
+          case 'reference':
+            return this.evaluateReferenceRule(rule, value);
+          default:
+            return true;
+        }
+      } catch (error) {
+        console.error(`Error evaluating rule ${rule.id}:`, error);
+        return false;
+      }
+    }
+    
+    // Evaluate format rule
+    private evaluateFormatRule(rule: ValidationRule, value: any): boolean {
+      const format = rule.parameters.format;
+      const validator = this.builtInValidators.get(format);
+      
+      if (validator) {
+        return validator(value);
+      }
+      
+      return true;
+    }
+    
+    // Evaluate range rule
+    private evaluateRangeRule(rule: ValidationRule, value: any): boolean {
+      const { min, max, minLength, maxLength } = rule.parameters;
+      
+      if (typeof value === 'string') {
+        if (minLength !== undefined) {
+          const validator = this.builtInValidators.get('minLength');
+          if (!validator(value, minLength)) return false;
+        }
+        if (maxLength !== undefined) {
+          const validator = this.builtInValidators.get('maxLength');
+          if (!validator(value, maxLength)) return false;
+        }
+      } else if (typeof value === 'number') {
+        if (min !== undefined) {
+          const validator = this.builtInValidators.get('minValue');
+          if (!validator(value, min)) return false;
+        }
+        if (max !== undefined) {
+          const validator = this.builtInValidators.get('maxValue');
+          if (!validator(value, max)) return false;
+        }
+      }
+      
+      return true;
+    }
+    
+    // Evaluate pattern rule
+    private evaluatePatternRule(rule: ValidationRule, value: any): boolean {
+      const { pattern } = rule.parameters;
+      const validator = this.builtInValidators.get('regex');
+      
+      if (validator && typeof value === 'string') {
+        return validator(value, pattern);
+      }
+      
+      return true;
+    }
+    
+    // Evaluate custom rule
+    private evaluateCustomRule(rule: ValidationRule, value: any): boolean {
+      const { validatorName, ...params } = rule.parameters;
+      const validator = this.customValidators.get(validatorName);
+      
+      if (validator) {
+        return validator(value, params);
+      }
+      
+      return true;
+    }
+    
+    // Evaluate reference rule
+    private evaluateReferenceRule(rule: ValidationRule, value: any): boolean {
+      const { type, ...params } = rule.parameters;
+      const validator = this.builtInValidators.get(type);
+      
+      if (validator) {
+        return validator(value, params);
+      }
+      
+      return true;
+    }
+    
+    // Generate suggestions for failed validation
+    private generateSuggestions(rule: ValidationRule, value: any, isValid: boolean): string[] {
+      if (isValid) return [];
+      
+      const suggestions: string[] = [];
+      
+      switch (rule.ruleType) {
+        case 'format':
+          suggestions.push(`Ensure the value follows the ${rule.parameters.format} format`);
+          break;
+        case 'range':
+          if (rule.parameters.min !== undefined) {
+            suggestions.push(`Value must be at least ${rule.parameters.min}`);
+          }
+          if (rule.parameters.max !== undefined) {
+            suggestions.push(`Value must be at most ${rule.parameters.max}`);
+          }
+          if (rule.parameters.minLength !== undefined) {
+            suggestions.push(`Length must be at least ${rule.parameters.minLength} characters`);
+          }
+          if (rule.parameters.maxLength !== undefined) {
+            suggestions.push(`Length must be at most ${rule.parameters.maxLength} characters`);
+          }
+          break;
+        case 'pattern':
+          suggestions.push(`Value must match the pattern: ${rule.parameters.pattern}`);
+          break;
+        case 'reference':
+          if (rule.parameters.type === 'required') {
+            suggestions.push('This field is required and cannot be empty');
+          } else if (rule.parameters.type === 'unique') {
+            suggestions.push('This value must be unique');
+          }
+          break;
+      }
+      
+      return suggestions;
+    }
+    
+    // Get nested value from object
+    private getNestedValue(obj: any, path: string): any {
+      return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+      }, obj);
+    }
+    
+    // Calculate validation summary
+    private calculateSummary(results: ValidationResult[]): {
+      total: number;
+      passed: number;
+      failed: number;
+      errors: number;
+      warnings: number;
+      info: number;
+    } {
+      const summary = {
+        total: results.length,
+        passed: 0,
+        failed: 0,
+        errors: 0,
+        warnings: 0,
+        info: 0
+      };
+      
+      for (const result of results) {
+        if (result.isValid) {
+          summary.passed++;
+        } else {
+          summary.failed++;
+        }
+        
+        switch (result.severity) {
+          case 'error':
+            summary.errors++;
+            break;
+          case 'warning':
+            summary.warnings++;
+            break;
+          case 'info':
+            summary.info++;
+            break;
+        }
+      }
+      
+      return summary;
+    }
+    
+    // Create common validation rules
+    createCommonRules(): ValidationRule[] {
+      return [
+        {
+          id: 'required_fields',
+          name: 'Required Fields',
+          description: 'Ensure all required fields are present',
+          ruleType: 'reference',
+          field: 'id',
+          parameters: { type: 'required' },
+          severity: 'error',
+          message: 'ID field is required'
+        },
+        {
+          id: 'email_format',
+          name: 'Email Format',
+          description: 'Validate email format',
+          ruleType: 'format',
+          field: 'email',
+          parameters: { format: 'email' },
+          severity: 'error',
+          message: 'Invalid email format'
+        },
+        {
+          id: 'url_format',
+          name: 'URL Format',
+          description: 'Validate URL format',
+          ruleType: 'format',
+          field: 'url',
+          parameters: { format: 'url' },
+          severity: 'warning',
+          message: 'Invalid URL format'
+        },
+        {
+          id: 'uuid_format',
+          name: 'UUID Format',
+          description: 'Validate UUID format',
+          ruleType: 'format',
+          field: 'uuid',
+          parameters: { format: 'uuid' },
+          severity: 'error',
+          message: 'Invalid UUID format'
+        },
+        {
+          id: 'name_length',
+          name: 'Name Length',
+          description: 'Validate name length',
+          ruleType: 'range',
+          field: 'name',
+          parameters: { minLength: 1, maxLength: 100 },
+          severity: 'error',
+          message: 'Name must be between 1 and 100 characters'
+        }
+      ];
+    }
+    
+    // Validate data schema
+    validateSchema(
+      data: any,
+      schema: Record<string, any>
+    ): {
+      isValid: boolean;
+      errors: string[];
+      warnings: string[];
+    } {
+      const errors: string[] = [];
+      const warnings: string[] = [];
+      
+      // Check required fields
+      if (schema.required) {
+        for (const field of schema.required) {
+          if (!this.getNestedValue(data, field)) {
+            errors.push(`Required field '${field}' is missing`);
+          }
+        }
+      }
+      
+      // Check field types
+      if (schema.properties) {
+        for (const [field, fieldSchema] of Object.entries(schema.properties)) {
+          const value = this.getNestedValue(data, field);
+          if (value !== undefined) {
+            if (fieldSchema.type && typeof value !== fieldSchema.type) {
+              errors.push(`Field '${field}' must be of type ${fieldSchema.type}`);
+            }
+            
+            if (fieldSchema.format) {
+              const validator = this.builtInValidators.get(fieldSchema.format);
+              if (validator && !validator(value)) {
+                errors.push(`Field '${field}' has invalid format: ${fieldSchema.format}`);
+              }
+            }
+          }
+        }
+      }
+      
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+      };
+    }
+  } 

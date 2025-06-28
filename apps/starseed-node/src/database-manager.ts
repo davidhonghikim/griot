@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
-import { createLogger } from '@griot/core';
+import { createLogger, getEnvironmentConfig } from '@griot/core';
 import { Skill, Persona } from '@griot/schemas';
 
 const logger = createLogger('database-manager');
+const env = getEnvironmentConfig();
 
 export interface DatabaseConfig {
   mongodb: {
@@ -32,30 +33,51 @@ export class DatabaseManager {
   private isConnected = false;
 
   constructor(config?: Partial<DatabaseConfig>) {
-    // Use environment variables with fallbacks
     this.config = {
       mongodb: {
-        uri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
-        dbName: process.env.MONGODB_DB_NAME || 'starseed'
+        uri: env.MONGODB_URI || `mongodb://${env.MONGODB_HOST}:27017`,
+        dbName: env.MONGODB_DB_NAME || 'starseed'
       },
       postgresql: {
-        host: process.env.POSTGRES_HOST || 'localhost',
-        port: parseInt(process.env.POSTGRES_PORT || '5432'),
-        database: process.env.POSTGRES_DB || 'starseed',
-        username: process.env.POSTGRES_USER || 'postgres',
-        password: process.env.POSTGRES_PASSWORD || 'password'
+        host: env.POSTGRES_HOST,
+        port: env.POSTGRES_PORT,
+        database: env.POSTGRES_DB,
+        username: env.POSTGRES_USER,
+        password: env.POSTGRES_PASSWORD
       },
       weaviate: {
-        url: process.env.WEAVIATE_URL || 'http://localhost:8080',
-        apiKey: process.env.WEAVIATE_API_KEY
+        url: env.WEAVIATE_URL || `http://${env.WEAVIATE_HOST}:${env.WEAVIATE_PORT}`,
+        apiKey: env.WEAVIATE_API_KEY
       },
       neo4j: {
-        uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
-        username: process.env.NEO4J_USERNAME || 'neo4j',
-        password: process.env.NEO4J_PASSWORD || 'password'
+        uri: env.NEO4J_URI || `bolt://${env.NEO4J_HOST}:7687`,
+        username: env.NEO4J_USERNAME,
+        password: env.NEO4J_PASSWORD
       },
       ...config
     };
+
+    logger.info('Database configuration:', {
+      deploymentType: env.DEPLOYMENT_TYPE || 'direct',
+      mongodb: {
+        uri: this.config.mongodb.uri.replace(/\/\/.*@/, '//***:***@'),
+        dbName: this.config.mongodb.dbName
+      },
+      postgresql: {
+        host: this.config.postgresql.host,
+        port: this.config.postgresql.port,
+        database: this.config.postgresql.database,
+        username: this.config.postgresql.username
+      },
+      weaviate: {
+        url: this.config.weaviate.url,
+        hasApiKey: !!this.config.weaviate.apiKey
+      },
+      neo4j: {
+        uri: this.config.neo4j.uri.replace(/\/\/.*@/, '//***:***@'),
+        username: this.config.neo4j.username
+      }
+    });
   }
 
   /**

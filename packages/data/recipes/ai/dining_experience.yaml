@@ -1,0 +1,254 @@
+name: "Dining Experience"
+description: "Orchestrate multiple recipes in parallel and sequential patterns like a fine dining experience"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["orchestration", "parallel", "sequential", "dining", "experience"]
+  priority: "high"
+  complexity: "complex"
+  dependencies: ["efficient_prompt_engineering", "token_calculator", "llm_integration"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+workflow:
+  steps:
+    - step: 1
+      name: "Amuse-Bouche (Appetizer)"
+      description: "Quick, efficient prompt to whet the appetite"
+      parallel: false
+      skills:
+        - skill: "efficient_prompt_engineering"
+          action: "executeRecipe"
+          input:
+            original_prompt: "{{appetizer_prompt}}"
+            target_tokens: 200
+            preserve_quality: true
+          output: "appetizer_result"
+        - skill: "token_calculator"
+          action: "generateReport"
+          input:
+            operation: "amuse_bouche"
+            inputText: "{{appetizer_prompt}}"
+            outputText: "{{appetizer_result.optimized_prompt}}"
+          output: "appetizer_cost"
+    
+    - step: 2
+      name: "First Course (Parallel Preparation)"
+      description: "Prepare multiple components simultaneously"
+      parallel: true
+      skills:
+        - skill: "efficient_prompt_engineering"
+          action: "executeRecipe"
+          input:
+            original_prompt: "{{soup_prompt}}"
+            target_tokens: 300
+          output: "soup_result"
+        - skill: "efficient_prompt_engineering"
+          action: "executeRecipe"
+          input:
+            original_prompt: "{{salad_prompt}}"
+            target_tokens: 250
+          output: "salad_result"
+        - skill: "token_calculator"
+          action: "generateReport"
+          input:
+            operation: "first_course"
+            inputText: "{{soup_prompt}} + {{salad_prompt}}"
+            outputText: "{{soup_result.optimized_prompt}} + {{salad_result.optimized_prompt}}"
+          output: "first_course_cost"
+    
+    - step: 3
+      name: "Main Course (Sequential Refinement)"
+      description: "Build complexity through sequential steps"
+      parallel: false
+      skills:
+        - skill: "efficient_prompt_engineering"
+          action: "executeRecipe"
+          input:
+            original_prompt: "{{main_dish_prompt}}"
+            target_tokens: 500
+            consolidate_requests: true
+          output: "main_dish_result"
+        - skill: "efficient_prompt_engineering"
+          action: "executeRecipe"
+          input:
+            original_prompt: "{{main_dish_result.optimized_prompt}} + {{side_dish_prompt}}"
+            target_tokens: 400
+          output: "main_course_result"
+        - skill: "token_calculator"
+          action: "generateReport"
+          input:
+            operation: "main_course"
+            inputText: "{{main_dish_prompt}} + {{side_dish_prompt}}"
+            outputText: "{{main_course_result.optimized_prompt}}"
+          output: "main_course_cost"
+    
+    - step: 4
+      name: "Dessert & Drinks (Parallel Finale)"
+      description: "Sweet finish with multiple options"
+      parallel: true
+      skills:
+        - skill: "efficient_prompt_engineering"
+          action: "executeRecipe"
+          input:
+            original_prompt: "{{dessert_prompt}}"
+            target_tokens: 200
+          output: "dessert_result"
+        - skill: "efficient_prompt_engineering"
+          action: "executeRecipe"
+          input:
+            original_prompt: "{{beverage_prompt}}"
+            target_tokens: 150
+          output: "beverage_result"
+        - skill: "token_calculator"
+          action: "generateReport"
+          input:
+            operation: "dessert_drinks"
+            inputText: "{{dessert_prompt}} + {{beverage_prompt}}"
+            outputText: "{{dessert_result.optimized_prompt}} + {{beverage_result.optimized_prompt}}"
+          output: "dessert_cost"
+    
+    - step: 5
+      name: "Bill & Review (Cost Analysis)"
+      description: "Calculate total cost and provide recommendations"
+      parallel: false
+      skills:
+        - skill: "token_calculator"
+          action: "generateBatchReport"
+          input:
+            operations: [
+              { operation: "amuse_bouche", inputText: "{{appetizer_prompt}}", outputText: "{{appetizer_result.optimized_prompt}}" },
+              { operation: "first_course", inputText: "{{soup_prompt}} + {{salad_prompt}}", outputText: "{{soup_result.optimized_prompt}} + {{salad_result.optimized_prompt}}" },
+              { operation: "main_course", inputText: "{{main_dish_prompt}} + {{side_dish_prompt}}", outputText: "{{main_course_result.optimized_prompt}}" },
+              { operation: "dessert_drinks", inputText: "{{dessert_prompt}} + {{beverage_prompt}}", outputText: "{{dessert_result.optimized_prompt}} + {{beverage_result.optimized_prompt}}" }
+            ]
+          output: "total_bill"
+        - skill: "token_calculator"
+          action: "generateCostTrends"
+          input:
+            reports: "{{all_cost_reports}}"
+            timeframe: "day"
+          output: "cost_trends"
+
+inputs:
+  appetizer_prompt:
+    type: "string"
+    required: true
+    description: "Quick appetizer prompt"
+  
+  soup_prompt:
+    type: "string"
+    required: true
+    description: "Soup course prompt"
+  
+  salad_prompt:
+    type: "string"
+    required: true
+    description: "Salad course prompt"
+  
+  main_dish_prompt:
+    type: "string"
+    required: true
+    description: "Main dish prompt"
+  
+  side_dish_prompt:
+    type: "string"
+    required: true
+    description: "Side dish prompt"
+  
+  dessert_prompt:
+    type: "string"
+    required: true
+    description: "Dessert prompt"
+  
+  beverage_prompt:
+    type: "string"
+    required: true
+    description: "Beverage prompt"
+  
+  budget_limit:
+    type: "number"
+    default: 10.0
+    description: "Maximum budget for the dining experience"
+
+outputs:
+  complete_meal:
+    type: "object"
+    description: "All optimized prompts for the complete dining experience"
+  
+  total_cost:
+    type: "object"
+    description: "Complete cost breakdown and analysis"
+  
+  efficiency_score:
+    type: "number"
+    description: "Overall efficiency score for the dining experience"
+  
+  recommendations:
+    type: "array"
+    description: "Recommendations for future dining experiences"
+
+configuration:
+  enable_parallel_execution: true
+  max_parallel_operations: 3
+  cost_optimization_enabled: true
+  quality_threshold: 0.8
+  timeout_per_course: 30000
+
+error_handling:
+  - condition: "total_bill.summary.totalCost > budget_limit"
+    action: "log_warning"
+    message: "Dining experience exceeded budget"
+    recovery: "continue_with_warning"
+  
+  - condition: "any_course_quality < 0.6"
+    action: "retry_course"
+    message: "Course quality below threshold, retrying"
+    recovery: "retry_with_different_approach"
+  
+  - condition: "parallel_execution_failed"
+    action: "fallback_to_sequential"
+    message: "Parallel execution failed, falling back to sequential"
+    recovery: "execute_sequentially"
+
+examples:
+  content_creation_meal:
+    inputs:
+      appetizer_prompt: "Write a catchy headline for a tech article"
+      soup_prompt: "Create an engaging introduction paragraph"
+      salad_prompt: "Generate 3 key talking points"
+      main_dish_prompt: "Write a comprehensive article body with examples"
+      side_dish_prompt: "Add relevant statistics and data"
+      dessert_prompt: "Create a compelling conclusion"
+      beverage_prompt: "Suggest 3 related topics for follow-up articles"
+      budget_limit: 5.0
+    expected_outputs:
+      complete_meal:
+        courses: ["headline", "intro", "talking_points", "article_body", "statistics", "conclusion", "related_topics"]
+        total_tokens: 2500
+      total_cost:
+        totalCost: 0.075
+        currency: "USD"
+      efficiency_score: 0.92
+      recommendations: ["Consider batch processing for similar content", "Use templates for recurring formats"]
+  
+  analysis_banquet:
+    inputs:
+      appetizer_prompt: "Summarize the key findings"
+      soup_prompt: "Identify the main trends"
+      salad_prompt: "List potential risks"
+      main_dish_prompt: "Provide detailed analysis with recommendations"
+      side_dish_prompt: "Include supporting data and evidence"
+      dessert_prompt: "Create executive summary"
+      beverage_prompt: "Suggest next steps and action items"
+      budget_limit: 15.0
+    expected_outputs:
+      complete_meal:
+        courses: ["summary", "trends", "risks", "analysis", "data", "exec_summary", "next_steps"]
+        total_tokens: 4000
+      total_cost:
+        totalCost: 0.12
+        currency: "USD"
+      efficiency_score: 0.88
+      recommendations: ["Consider using cheaper models for initial analysis", "Implement caching for repeated queries"] 

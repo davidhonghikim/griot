@@ -3,28 +3,36 @@
  * Structured logging for the Griot framework
  */
 
-import { pino } from 'pino';
+import { getEnvironmentConfig } from '../config/environment.js';
 
-const baseLogger = pino(
-  process.env.NODE_ENV !== 'production' 
-    ? {
-        level: process.env.LOG_LEVEL || 'info',
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname'
-          }
-        }
-      }
-    : {
-        level: process.env.LOG_LEVEL || 'info'
-      }
-);
+const env = getEnvironmentConfig();
 
 export function createLogger(name: string) {
-  return baseLogger.child({ component: name });
+  const logLevel = env.LOG_LEVEL || 'info';
+  const isProd = env.NODE_ENV === 'production';
+
+  return {
+    info: (...args: any[]) => {
+      if (logLevel === 'info' || logLevel === 'debug') {
+        // eslint-disable-next-line no-console
+        console.log(`[INFO][${name}]`, ...args);
+      }
+    },
+    debug: (...args: any[]) => {
+      if (logLevel === 'debug' && !isProd) {
+        // eslint-disable-next-line no-console
+        console.debug(`[DEBUG][${name}]`, ...args);
+      }
+    },
+    warn: (...args: any[]) => {
+      // eslint-disable-next-line no-console
+      console.warn(`[WARN][${name}]`, ...args);
+    },
+    error: (...args: any[]) => {
+      // eslint-disable-next-line no-console
+      console.error(`[ERROR][${name}]`, ...args);
+    },
+  };
 }
 
 export { baseLogger as logger }; 

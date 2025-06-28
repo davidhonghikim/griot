@@ -1,0 +1,387 @@
+name: "Tag Manager"
+description: "Comprehensive tag management system for discovering, validating, and organizing recipes, skills, and personas"
+category: "data"
+tags:
+  primary: "data"
+  secondary: ["organization", "metadata", "discovery", "validation"]
+  priority: "high"
+  complexity: "moderate"
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { readFileSync, readdirSync, existsSync } from 'fs';
+  import { glob } from 'glob';
+  import { join } from 'path';
+  
+  export interface TagQuery {
+    type?: 'recipe' | 'skill' | 'persona';
+    primary?: string;
+    secondary?: string[];
+    nodes?: string[];
+    priority?: string;
+    complexity?: string;
+    cultural?: string[];
+    dependencies?: string[];
+    conflicts?: string[];
+  }
+  
+  export interface TaggedItem {
+    path: string;
+    type: 'recipe' | 'skill' | 'persona';
+    tags: TagMetadata;
+    content: any;
+  }
+  
+  export interface TagMetadata {
+    primary?: string;
+    secondary?: string[];
+    nodes?: string[];
+    priority?: string;
+    complexity?: string;
+    cultural?: string[];
+    dependencies?: string[];
+    conflicts?: string[];
+    version?: string;
+    created?: string;
+    updated?: string;
+    author?: string;
+  }
+  
+  export async function tag_manager(input: {
+    action: 'discover' | 'validate' | 'analyze' | 'recommend' | 'organize';
+    query?: TagQuery;
+    path?: string;
+    tags?: TagMetadata;
+  }) {
+    switch (input.action) {
+      case 'discover':
+        return await discover_tagged_items(input.query);
+      case 'validate':
+        return await validate_tags(input.path, input.tags);
+      case 'analyze':
+        return await analyze_tag_usage();
+      case 'recommend':
+        return await recommend_tags(input.path);
+      case 'organize':
+        return await organize_by_tags(input.query);
+      default:
+        throw new Error(`Unknown action: ${input.action}`);
+    }
+  }
+  
+  async function discover_tagged_items(query?: TagQuery): Promise<TaggedItem[]> {
+    const items: TaggedItem[] = [];
+    
+    // Scan all YAML files in packages/data
+    const files = await glob('packages/data/**/*.yaml', { ignore: ['node_modules/**'] });
+    
+    for (const file of files) {
+      try {
+        const content = readFileSync(file, 'utf8');
+        const yamlContent = parseYamlWithTags(content);
+        
+        if (yamlContent && yamlContent.tags) {
+          const item: TaggedItem = {
+            path: file,
+            type: determineType(file),
+            tags: yamlContent.tags,
+            content: yamlContent
+          };
+          
+          if (matchesQuery(item, query)) {
+            items.push(item);
+          }
+        }
+      } catch (error) {
+        console.warn(`Error parsing ${file}:`, error.message);
+      }
+    }
+    
+    return items;
+  }
+  
+  async function validate_tags(path: string, tags: TagMetadata): Promise<{
+    valid: boolean;
+    issues: string[];
+    suggestions: string[];
+  }> {
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+    
+    // Validate primary tag
+    if (tags.primary) {
+      const validPrimaries = [
+        'compliance', 'security', 'development', 'testing', 
+        'deployment', 'maintenance', 'ai', 'data', 'communication'
+      ];
+      
+      if (!validPrimaries.includes(tags.primary)) {
+        issues.push(`Invalid primary tag: ${tags.primary}`);
+        suggestions.push(`Use one of: ${validPrimaries.join(', ')}`);
+      }
+    }
+    
+    // Validate priority tags
+    if (tags.priority) {
+      const validPriorities = ['critical', 'high', 'medium', 'low'];
+      if (!validPriorities.includes(tags.priority)) {
+        issues.push(`Invalid priority tag: ${tags.priority}`);
+        suggestions.push(`Use one of: ${validPriorities.join(', ')}`);
+      }
+    }
+    
+    // Validate complexity tags
+    if (tags.complexity) {
+      const validComplexities = ['simple', 'moderate', 'complex', 'expert'];
+      if (!validComplexities.includes(tags.complexity)) {
+        issues.push(`Invalid complexity tag: ${tags.complexity}`);
+        suggestions.push(`Use one of: ${validComplexities.join(', ')}`);
+      }
+    }
+    
+    // Check for missing required tags
+    if (!tags.primary) {
+      issues.push('Missing primary tag');
+      suggestions.push('Add a primary tag to categorize this item');
+    }
+    
+    if (!tags.priority) {
+      suggestions.push('Consider adding a priority tag');
+    }
+    
+    if (!tags.complexity) {
+      suggestions.push('Consider adding a complexity tag');
+    }
+    
+    return {
+      valid: issues.length === 0,
+      issues,
+      suggestions
+    };
+  }
+  
+  async function analyze_tag_usage(): Promise<{
+    tag_frequency: Record<string, number>;
+    node_distribution: Record<string, number>;
+    priority_distribution: Record<string, number>;
+    complexity_distribution: Record<string, number>;
+    cultural_usage: Record<string, number>;
+  }> {
+    const items = await discover_tagged_items();
+    
+    const tagFrequency: Record<string, number> = {};
+    const nodeDistribution: Record<string, number> = {};
+    const priorityDistribution: Record<string, number> = {};
+    const complexityDistribution: Record<string, number> = {};
+    const culturalUsage: Record<string, number> = {};
+    
+    for (const item of items) {
+      // Count primary tags
+      if (item.tags.primary) {
+        tagFrequency[item.tags.primary] = (tagFrequency[item.tags.primary] || 0) + 1;
+      }
+      
+      // Count secondary tags
+      if (item.tags.secondary) {
+        for (const tag of item.tags.secondary) {
+          tagFrequency[tag] = (tagFrequency[tag] || 0) + 1;
+        }
+      }
+      
+      // Count node tags
+      if (item.tags.nodes) {
+        for (const node of item.tags.nodes) {
+          nodeDistribution[node] = (nodeDistribution[node] || 0) + 1;
+        }
+      }
+      
+      // Count priority tags
+      if (item.tags.priority) {
+        priorityDistribution[item.tags.priority] = (priorityDistribution[item.tags.priority] || 0) + 1;
+      }
+      
+      // Count complexity tags
+      if (item.tags.complexity) {
+        complexityDistribution[item.tags.complexity] = (complexityDistribution[item.tags.complexity] || 0) + 1;
+      }
+      
+      // Count cultural tags
+      if (item.tags.cultural) {
+        for (const cultural of item.tags.cultural) {
+          culturalUsage[cultural] = (culturalUsage[cultural] || 0) + 1;
+        }
+      }
+    }
+    
+    return {
+      tag_frequency: tagFrequency,
+      node_distribution: nodeDistribution,
+      priority_distribution: priorityDistribution,
+      complexity_distribution: complexityDistribution,
+      cultural_usage: culturalUsage
+    };
+  }
+  
+  async function recommend_tags(path: string): Promise<{
+    recommended_tags: TagMetadata;
+    reasoning: string[];
+  }> {
+    const recommendations: TagMetadata = {};
+    const reasoning: string[] = [];
+    
+    // Analyze file path and content
+    const content = readFileSync(path, 'utf8');
+    const filename = path.split('/').pop() || '';
+    
+    // Recommend based on file path
+    if (path.includes('security') || content.includes('security')) {
+      recommendations.primary = 'security';
+      reasoning.push('File contains security-related content');
+    } else if (path.includes('compliance') || content.includes('compliance')) {
+      recommendations.primary = 'compliance';
+      reasoning.push('File contains compliance-related content');
+    } else if (path.includes('test') || content.includes('test')) {
+      recommendations.primary = 'testing';
+      reasoning.push('File contains testing-related content');
+    }
+    
+    // Recommend node based on directory structure
+    if (path.includes('/musa/')) {
+      recommendations.nodes = ['musa'];
+      reasoning.push('File is in Musa node directory');
+    } else if (path.includes('/griot/')) {
+      recommendations.nodes = ['griot'];
+      reasoning.push('File is in Griot node directory');
+    }
+    
+    // Recommend cultural tags for compliance items
+    if (recommendations.primary === 'compliance' || recommendations.primary === 'security') {
+      recommendations.cultural = ['hieros'];
+      reasoning.push('Compliance and security items should include HIEROS cultural compliance');
+    }
+    
+    // Recommend priority based on content
+    if (content.includes('critical') || content.includes('CRITICAL')) {
+      recommendations.priority = 'critical';
+      reasoning.push('Content mentions critical issues');
+    } else if (content.includes('error') || content.includes('Error')) {
+      recommendations.priority = 'high';
+      reasoning.push('Content mentions errors or issues');
+    }
+    
+    // Recommend complexity based on content length and structure
+    const lines = content.split('\n').length;
+    if (lines > 200) {
+      recommendations.complexity = 'complex';
+      reasoning.push('File is large and likely complex');
+    } else if (lines > 100) {
+      recommendations.complexity = 'moderate';
+      reasoning.push('File is medium-sized');
+    } else {
+      recommendations.complexity = 'simple';
+      reasoning.push('File is small and likely simple');
+    }
+    
+    return {
+      recommended_tags: recommendations,
+      reasoning
+    };
+  }
+  
+  async function organize_by_tags(query: TagQuery): Promise<{
+    organized_items: Record<string, TaggedItem[]>;
+    summary: Record<string, number>;
+  }> {
+    const items = await discover_tagged_items(query);
+    const organized: Record<string, TaggedItem[]> = {};
+    const summary: Record<string, number> = {};
+    
+    // Organize by primary tag
+    for (const item of items) {
+      const primary = item.tags.primary || 'uncategorized';
+      if (!organized[primary]) {
+        organized[primary] = [];
+      }
+      organized[primary].push(item);
+      summary[primary] = (summary[primary] || 0) + 1;
+    }
+    
+    return {
+      organized_items: organized,
+      summary
+    };
+  }
+  
+  // Helper functions
+  function parseYamlWithTags(content: string): any {
+    // Simple YAML parsing for tags - in production, use a proper YAML parser
+    const lines = content.split('\n');
+    const result: any = {};
+    let inTags = false;
+    let tags: any = {};
+    
+    for (const line of lines) {
+      if (line.trim().startsWith('tags:')) {
+        inTags = true;
+        continue;
+      }
+      
+      if (inTags) {
+        if (line.trim().startsWith('  ') || line.trim().startsWith('\t')) {
+          const [key, value] = line.trim().split(':').map(s => s.trim());
+          if (key && value) {
+            tags[key] = value.replace(/['"]/g, '');
+          }
+        } else if (line.trim() === '') {
+          inTags = false;
+        }
+      }
+    }
+    
+    if (Object.keys(tags).length > 0) {
+      result.tags = tags;
+    }
+    
+    return result;
+  }
+  
+  function determineType(path: string): 'recipe' | 'skill' | 'persona' {
+    if (path.includes('/recipes/')) return 'recipe';
+    if (path.includes('/skills/')) return 'skill';
+    if (path.includes('/personas/')) return 'persona';
+    return 'skill'; // default
+  }
+  
+  function matchesQuery(item: TaggedItem, query?: TagQuery): boolean {
+    if (!query) return true;
+    
+    if (query.type && item.type !== query.type) return false;
+    if (query.primary && item.tags.primary !== query.primary) return false;
+    if (query.priority && item.tags.priority !== query.priority) return false;
+    if (query.complexity && item.tags.complexity !== query.complexity) return false;
+    
+    if (query.secondary) {
+      const hasSecondary = query.secondary.some(tag => 
+        item.tags.secondary?.includes(tag)
+      );
+      if (!hasSecondary) return false;
+    }
+    
+    if (query.nodes) {
+      const hasNode = query.nodes.some(node => 
+        item.tags.nodes?.includes(node)
+      );
+      if (!hasNode) return false;
+    }
+    
+    if (query.cultural) {
+      const hasCultural = query.cultural.some(cultural => 
+        item.tags.cultural?.includes(cultural)
+      );
+      if (!hasCultural) return false;
+    }
+    
+    return true;
+  } 

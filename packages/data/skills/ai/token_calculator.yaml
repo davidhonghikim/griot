@@ -1,0 +1,349 @@
+name: "Token Calculator"
+description: "Generic token calculation and cost estimation with external configuration"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["token", "calculator", "pricing", "cost"]
+  priority: "high"
+  complexity: "low"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import * as fs from 'fs';
+  import * as path from 'path';
+  
+  export interface PricingConfig {
+    version: string;
+    lastUpdated: string;
+    description: string;
+    pricing: Record<string, ModelPricing>;
+    mediaPricing: Record<string, MediaPricing>;
+    metadata: {
+      updateFrequency: string;
+      dataSource: string;
+      notes: string;
+    };
+  }
+  
+  export interface ModelPricing {
+    input: number;
+    output: number;
+    description: string;
+    provider: string;
+    isActive: boolean;
+  }
+  
+  export interface MediaPricing {
+    pricing: string;
+    baseCost?: number;
+    baseCostPerMinute?: number;
+    resolutionMultipliers?: Record<string, number>;
+    qualityMultipliers?: Record<string, number>;
+  }
+  
+  export interface CostBreakdown {
+    inputCost: number;
+    outputCost: number;
+    totalCost: number;
+    currency: string;
+  }
+  
+  export interface PricingInfo {
+    availableModels: string[];
+    lastUpdated: string;
+    version: string;
+    totalModels: number;
+  }
+  
+  export class TokenCalculator {
+    private pricingConfig: PricingConfig | null = null;
+    private configPath: string;
+    private tokenizerConfig: any;
+    
+    constructor(options?: {
+      configPath?: string;
+      tokenizerConfig?: any;
+    }) {
+      this.configPath = options?.configPath || path.join(process.cwd(), 'packages/data/config/model_pricing.json');
+      this.tokenizerConfig = options?.tokenizerConfig || { charsPerToken: 4 };
+      this.loadPricingConfig();
+    }
+    
+    // Load pricing configuration from external file
+    private loadPricingConfig(): void {
+      try {
+        if (fs.existsSync(this.configPath)) {
+          const configData = fs.readFileSync(this.configPath, 'utf8');
+          this.pricingConfig = JSON.parse(configData);
+        } else {
+          console.warn(`Pricing config not found at ${this.configPath}`);
+          this.pricingConfig = null;
+        }
+      } catch (error) {
+        console.warn(`Failed to load pricing config: ${error}`);
+        this.pricingConfig = null;
+      }
+    }
+    
+    // Reload pricing configuration
+    reloadPricingConfig(): void {
+      this.loadPricingConfig();
+    }
+    
+    // Calculate tokens in text (generic implementation)
+    calculateTokens(text: string, options?: {
+      method?: 'character' | 'word' | 'custom';
+      charsPerToken?: number;
+      wordsPerToken?: number;
+    }): number {
+      const method = options?.method || 'character';
+      const charsPerToken = options?.charsPerToken || this.tokenizerConfig.charsPerToken;
+      
+      switch (method) {
+        case 'character':
+          return Math.ceil(text.length / charsPerToken);
+        case 'word':
+          const wordsPerToken = options?.wordsPerToken || 0.75;
+          const words = text.split(/\s+/).length;
+          return Math.ceil(words / wordsPerToken);
+        case 'custom':
+          // Allow custom tokenization logic
+          return this.customTokenization(text, options);
+        default:
+          return Math.ceil(text.length / charsPerToken);
+      }
+    }
+    
+    // Custom tokenization method (can be overridden)
+    private customTokenization(text: string, options?: any): number {
+      // Default implementation - can be extended
+      return Math.ceil(text.length / 4);
+    }
+    
+    // Calculate cost for token usage (generic)
+    calculateCost(
+      inputTokens: number,
+      outputTokens: number,
+      model: string = 'default',
+      options?: {
+        currency?: string;
+        tokenUnit?: number; // tokens per unit (default: 1M)
+      }
+    ): CostBreakdown {
+      if (!this.pricingConfig) {
+        throw new Error('Pricing configuration not loaded');
+      }
+      
+      const modelPricing = this.pricingConfig.pricing[model];
+      if (!modelPricing || !modelPricing.isActive) {
+        throw new Error(`Model ${model} not found or inactive`);
+      }
+      
+      const tokenUnit = options?.tokenUnit || 1_000_000;
+      const currency = options?.currency || 'USD';
+      
+      // Convert tokens to units and calculate cost
+      const inputCost = (inputTokens / tokenUnit) * modelPricing.input;
+      const outputCost = (outputTokens / tokenUnit) * modelPricing.output;
+      
+      return {
+        inputCost,
+        outputCost,
+        totalCost: inputCost + outputCost,
+        currency
+      };
+    }
+    
+    // Calculate cost for text input/output
+    calculateTextCost(
+      inputText: string,
+      outputText: string = '',
+      model: string = 'default',
+      options?: any
+    ): CostBreakdown {
+      const inputTokens = this.calculateTokens(inputText, options);
+      const outputTokens = this.calculateTokens(outputText, options);
+      
+      return this.calculateCost(inputTokens, outputTokens, model, options);
+    }
+    
+    // Get pricing information
+    getPricingInfo(): PricingInfo | null {
+      if (!this.pricingConfig) return null;
+      
+      const availableModels = Object.entries(this.pricingConfig.pricing)
+        .filter(([, pricing]) => pricing.isActive)
+        .map(([model]) => model);
+      
+      return {
+        availableModels,
+        lastUpdated: this.pricingConfig.lastUpdated,
+        version: this.pricingConfig.version,
+        totalModels: availableModels.length
+      };
+    }
+    
+    // Get model pricing details
+    getModelPricing(model: string): ModelPricing | null {
+      return this.pricingConfig?.pricing[model] || null;
+    }
+    
+    // Get media pricing details
+    getMediaPricing(mediaType: string): MediaPricing | null {
+      return this.pricingConfig?.mediaPricing[mediaType] || null;
+    }
+    
+    // Compare costs between models
+    compareModelCosts(
+      inputTokens: number,
+      outputTokens: number,
+      models: string[],
+      options?: any
+    ): Array<{ model: string; cost: number; pricing: ModelPricing }> {
+      return models
+        .map(model => {
+          try {
+            const pricing = this.getModelPricing(model);
+            if (!pricing) return null;
+            
+            const cost = this.calculateCost(inputTokens, outputTokens, model, options);
+            return { model, cost: cost.totalCost, pricing };
+          } catch (error) {
+            console.warn(`Failed to calculate cost for model ${model}: ${error}`);
+            return null;
+          }
+        })
+        .filter(Boolean)
+        .sort((a, b) => a!.cost - b!.cost);
+    }
+    
+    // Estimate cost for a conversation
+    estimateConversationCost(
+      messages: Array<{ role: string; content: string }>,
+      model: string = 'default',
+      options?: any
+    ): CostBreakdown {
+      let totalInputTokens = 0;
+      let totalOutputTokens = 0;
+      
+      for (const message of messages) {
+        const tokens = this.calculateTokens(message.content, options);
+        if (message.role === 'assistant') {
+          totalOutputTokens += tokens;
+        } else {
+          totalInputTokens += tokens;
+        }
+      }
+      
+      return this.calculateCost(totalInputTokens, totalOutputTokens, model, options);
+    }
+    
+    // Format cost for display (generic)
+    formatCost(cost: number, options?: {
+      currency?: string;
+      precision?: number;
+      format?: 'decimal' | 'cents' | 'scientific';
+    }): string {
+      const currency = options?.currency || 'USD';
+      const precision = options?.precision || 4;
+      const format = options?.format || 'decimal';
+      
+      switch (format) {
+        case 'cents':
+          return `${(cost * 1000).toFixed(2)}¢`;
+        case 'scientific':
+          return `${cost.toExponential(precision)} ${currency}`;
+        case 'decimal':
+        default:
+          return `${currency === 'USD' ? '$' : ''}${cost.toFixed(precision)}`;
+      }
+    }
+    
+    // Get cost summary for multiple operations
+    getCostSummary(
+      operations: Array<{ tokens: number; model: string }>,
+      options?: any
+    ): {
+      totalCost: number;
+      breakdown: Record<string, number>;
+      totalTokens: number;
+    } {
+      const breakdown: Record<string, number> = {};
+      let totalCost = 0;
+      let totalTokens = 0;
+      
+      for (const op of operations) {
+        try {
+          const cost = this.calculateCost(op.tokens, 0, op.model, options);
+          breakdown[op.model] = (breakdown[op.model] || 0) + cost.totalCost;
+          totalCost += cost.totalCost;
+          totalTokens += op.tokens;
+        } catch (error) {
+          console.warn(`Failed to calculate cost for operation: ${error}`);
+        }
+      }
+      
+      return { totalCost, breakdown, totalTokens };
+    }
+    
+    // Validate pricing configuration
+    validatePricingConfig(): {
+      isValid: boolean;
+      errors: string[];
+      warnings: string[];
+    } {
+      const errors: string[] = [];
+      const warnings: string[] = [];
+      
+      if (!this.pricingConfig) {
+        errors.push('Pricing configuration not loaded');
+        return { isValid: false, errors, warnings };
+      }
+      
+      // Check required fields
+      if (!this.pricingConfig.pricing) {
+        errors.push('Missing pricing data');
+      }
+      
+      if (!this.pricingConfig.version) {
+        warnings.push('Missing version information');
+      }
+      
+      // Validate model pricing
+      for (const [model, pricing] of Object.entries(this.pricingConfig.pricing)) {
+        if (pricing.input < 0 || pricing.output < 0) {
+          errors.push(`Invalid pricing for model ${model}: negative values`);
+        }
+        
+        if (!pricing.provider) {
+          warnings.push(`Missing provider for model ${model}`);
+        }
+      }
+      
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+      };
+    }
+    
+    // Get configuration status
+    getConfigStatus(): {
+      loaded: boolean;
+      path: string;
+      lastUpdated?: string;
+      validation: any;
+    } {
+      const validation = this.validatePricingConfig();
+      
+      return {
+        loaded: this.pricingConfig !== null,
+        path: this.configPath,
+        lastUpdated: this.pricingConfig?.lastUpdated,
+        validation
+      };
+    }
+  } 

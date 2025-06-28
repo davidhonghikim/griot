@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-06-28T07:58:16.547429",
+  "description": "Essential bootstrap index for agent initialization",
+  "system": {
+    "projectRoot": "packages/data",
+    "indexesPath": "packages/data/indexes",
+    "totalAssets": 0,
+    "lastIndexUpdate": "2025-06-28T07:58:16.547451"
+  },
+  "critical": {
+    "coreSkills": [],
+    "coreRecipes": [],
+    "coreScripts": [],
+    "coreConfigs": [],
+    "corePersonas": []
+  },
+  "indexes": {}
+}

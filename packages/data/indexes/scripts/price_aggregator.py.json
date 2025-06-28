@@ -1,0 +1,18 @@
+{
+  "category": "price_aggregator.py",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.546552",
+  "files": [
+    {
+      "name": "Price Aggregator",
+      "path": "scripts/price_aggregator.py",
+      "type": "scripts",
+      "category": "price_aggregator.py",
+      "size": 11,
+      "lastModified": "2025-06-28T07:03:48.762255",
+      "hash": "0a59b848c05c8588b2c2536e65f954341bff77bcb7d5051edb42e252a0f6b7fd",
+      "description": "!/usr/bin/env python3  "
+    }
+  ]
+}

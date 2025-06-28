@@ -1,0 +1,387 @@
+name: "RAG Operations"
+description: "Retrieval-augmented generation operations including document retrieval, context building, and enhanced generation"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["rag", "retrieval", "augmentation", "generation", "context"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface Document {
+    id: string;
+    content: string;
+    metadata?: Record<string, any>;
+    embedding?: number[];
+    score?: number;
+  }
+  
+  export interface RAGRequest {
+    query: string;
+    context?: string;
+    maxDocuments?: number;
+    similarityThreshold?: number;
+    includeMetadata?: boolean;
+  }
+  
+  export interface RAGResponse {
+    query: string;
+    retrievedDocuments: Document[];
+    augmentedContext: string;
+    generatedResponse: string;
+    metadata: {
+      retrievalTime: number;
+      generationTime: number;
+      totalTokens: number;
+      documentCount: number;
+    };
+  }
+  
+  export interface RAGConfig {
+    vectorOperations: any; // VectorOperations instance
+    llmIntegration: any; // LLMIntegration instance
+    maxContextLength: number;
+    chunkSize: number;
+    overlapSize: number;
+    similarityThreshold: number;
+  }
+  
+  export class RAGOperations {
+    private config: RAGConfig;
+    private documents: Map<string, Document>;
+    
+    constructor(config: RAGConfig) {
+      this.config = {
+        maxContextLength: 4000,
+        chunkSize: 1000,
+        overlapSize: 200,
+        similarityThreshold: 0.7,
+        ...config,
+      };
+      this.documents = new Map();
+    }
+    
+    // Document management
+    addDocument(document: Document): void {
+      this.documents.set(document.id, document);
+    }
+    
+    addDocuments(documents: Document[]): void {
+      for (const doc of documents) {
+        this.addDocument(doc);
+      }
+    }
+    
+    removeDocument(documentId: string): boolean {
+      return this.documents.delete(documentId);
+    }
+    
+    getDocument(documentId: string): Document | undefined {
+      return this.documents.get(documentId);
+    }
+    
+    listDocuments(): Document[] {
+      return Array.from(this.documents.values());
+    }
+    
+    // Document chunking
+    chunkDocument(document: Document): Document[] {
+      const chunks: Document[] = [];
+      const content = document.content;
+      const chunkSize = this.config.chunkSize;
+      const overlapSize = this.config.overlapSize;
+      
+      for (let i = 0; i < content.length; i += chunkSize - overlapSize) {
+        const chunkContent = content.slice(i, i + chunkSize);
+        const chunkId = `${document.id}_chunk_${chunks.length}`;
+        
+        chunks.push({
+          id: chunkId,
+          content: chunkContent,
+          metadata: {
+            ...document.metadata,
+            originalDocumentId: document.id,
+            chunkIndex: chunks.length,
+            startPosition: i,
+            endPosition: Math.min(i + chunkSize, content.length),
+          },
+          embedding: document.embedding, // Will be updated with chunk-specific embedding
+        });
+      }
+      
+      return chunks;
+    }
+    
+    // Document retrieval
+    async retrieveDocuments(request: RAGRequest): Promise<Document[]> {
+      const queryEmbedding = await this.generateEmbedding(request.query);
+      const documents = Array.from(this.documents.values());
+      
+      // Calculate similarities
+      const scoredDocuments = documents.map(doc => ({
+        ...doc,
+        score: doc.embedding ? 
+          this.config.vectorOperations.cosineSimilarity(queryEmbedding, doc.embedding) : 0,
+      }));
+      
+      // Filter by threshold and sort by score
+      const filteredDocuments = scoredDocuments
+        .filter(doc => doc.score >= (request.similarityThreshold || this.config.similarityThreshold))
+        .sort((a, b) => b.score - a.score);
+      
+      // Limit results
+      const maxDocs = request.maxDocuments || 5;
+      return filteredDocuments.slice(0, maxDocs);
+    }
+    
+    // Context building
+    buildContext(documents: Document[], query: string): string {
+      let context = `Query: ${query}\n\nRelevant Information:\n`;
+      
+      for (let i = 0; i < documents.length; i++) {
+        const doc = documents[i];
+        context += `${i + 1}. ${doc.content}\n\n`;
+        
+        // Check if we're approaching the context limit
+        if (context.length > this.config.maxContextLength) {
+          context = context.slice(0, this.config.maxContextLength) + '...';
+          break;
+        }
+      }
+      
+      return context;
+    }
+    
+    // RAG generation
+    async generateRAGResponse(request: RAGRequest): Promise<RAGResponse> {
+      const startTime = Date.now();
+      
+      // Retrieve relevant documents
+      const retrievedDocuments = await this.retrieveDocuments(request);
+      
+      // Build augmented context
+      const augmentedContext = this.buildContext(retrievedDocuments, request.query);
+      
+      // Generate response using LLM
+      const generationStart = Date.now();
+      const llmResponse = await this.config.llmIntegration.generate({
+        prompt: `${augmentedContext}\n\nBased on the information above, please answer the query: ${request.query}`,
+        maxTokens: 1000,
+        temperature: 0.3,
+      });
+      
+      const generationTime = Date.now() - generationStart;
+      const retrievalTime = generationStart - startTime;
+      
+      return {
+        query: request.query,
+        retrievedDocuments: request.includeMetadata ? retrievedDocuments : 
+          retrievedDocuments.map(doc => ({ id: doc.id, content: doc.content })),
+        augmentedContext,
+        generatedResponse: llmResponse.text,
+        metadata: {
+          retrievalTime,
+          generationTime,
+          totalTokens: llmResponse.usage?.totalTokens || 0,
+          documentCount: retrievedDocuments.length,
+        },
+      };
+    }
+    
+    // Multi-step RAG
+    async multiStepRAG(request: RAGRequest, steps: number = 3): Promise<RAGResponse> {
+      let currentQuery = request.query;
+      let allDocuments: Document[] = [];
+      
+      for (let step = 0; step < steps; step++) {
+        // Retrieve documents for current query
+        const stepDocuments = await this.retrieveDocuments({
+          ...request,
+          query: currentQuery,
+        });
+        
+        // Add new documents to collection
+        allDocuments = [...new Map([...allDocuments, ...stepDocuments].map(doc => [doc.id, doc])).values()];
+        
+        // Generate refined query for next step
+        if (step < steps - 1) {
+          const refinementPrompt = `
+            Based on the following context, generate a more specific query to find additional relevant information:
+            
+            Original Query: ${request.query}
+            Current Query: ${currentQuery}
+            Retrieved Information: ${this.buildContext(stepDocuments, currentQuery)}
+            
+            Generate a refined query that will help find more specific or related information:
+          `;
+          
+          const refinementResponse = await this.config.llmIntegration.generate({
+            prompt: refinementPrompt,
+            maxTokens: 200,
+            temperature: 0.3,
+          });
+          
+          currentQuery = refinementResponse.text.trim();
+        }
+      }
+      
+      // Generate final response with all retrieved documents
+      return this.generateRAGResponse({
+        ...request,
+        query: request.query,
+      });
+    }
+    
+    // Hybrid search (combine vector and keyword search)
+    async hybridSearch(request: RAGRequest): Promise<Document[]> {
+      const vectorResults = await this.retrieveDocuments(request);
+      const keywordResults = this.keywordSearch(request.query);
+      
+      // Combine and deduplicate results
+      const allResults = [...vectorResults, ...keywordResults];
+      const uniqueResults = new Map();
+      
+      for (const doc of allResults) {
+        if (!uniqueResults.has(doc.id)) {
+          uniqueResults.set(doc.id, doc);
+        } else {
+          // Merge scores if document appears in both results
+          const existing = uniqueResults.get(doc.id);
+          existing.score = Math.max(existing.score || 0, doc.score || 0);
+        }
+      }
+      
+      return Array.from(uniqueResults.values())
+        .sort((a, b) => (b.score || 0) - (a.score || 0))
+        .slice(0, request.maxDocuments || 5);
+    }
+    
+    // Keyword search
+    private keywordSearch(query: string): Document[] {
+      const queryTerms = query.toLowerCase().split(/\s+/);
+      const documents = Array.from(this.documents.values());
+      
+      const scoredDocuments = documents.map(doc => {
+        const content = doc.content.toLowerCase();
+        let score = 0;
+        
+        for (const term of queryTerms) {
+          if (content.includes(term)) {
+            score += 1;
+          }
+        }
+        
+        return {
+          ...doc,
+          score: score / queryTerms.length,
+        };
+      });
+      
+      return scoredDocuments
+        .filter(doc => doc.score > 0)
+        .sort((a, b) => b.score - a.score);
+    }
+    
+    // Generate embeddings (placeholder - would integrate with embedding service)
+    private async generateEmbedding(text: string): Promise<number[]> {
+      // This is a placeholder implementation
+      // In production, you'd call an embedding service like OpenAI, Cohere, etc.
+      return Array.from({ length: 384 }, () => Math.random() * 2 - 1);
+    }
+    
+    // RAG evaluation
+    async evaluateRAGResponse(
+      query: string,
+      response: RAGResponse,
+      groundTruth?: string
+    ): Promise<{
+      relevance: number;
+      completeness: number;
+      accuracy: number;
+      overall: number;
+    }> {
+      const evaluationPrompt = `
+        Evaluate the following RAG response for relevance, completeness, and accuracy:
+        
+        Query: ${query}
+        Retrieved Documents: ${response.retrievedDocuments.map(doc => doc.content).join('\n\n')}
+        Generated Response: ${response.generatedResponse}
+        ${groundTruth ? `Ground Truth: ${groundTruth}` : ''}
+        
+        Rate each aspect from 0-1 and provide overall score:
+        {
+          "relevance": 0.8,
+          "completeness": 0.7,
+          "accuracy": 0.9,
+          "overall": 0.8
+        }
+      `;
+      
+      const evaluationResponse = await this.config.llmIntegration.generate({
+        prompt: evaluationPrompt,
+        maxTokens: 200,
+        temperature: 0.1,
+      });
+      
+      try {
+        return JSON.parse(evaluationResponse.text);
+      } catch {
+        return {
+          relevance: 0.5,
+          completeness: 0.5,
+          accuracy: 0.5,
+          overall: 0.5,
+        };
+      }
+    }
+    
+    // Batch RAG processing
+    async batchRAG(requests: RAGRequest[]): Promise<RAGResponse[]> {
+      const responses: RAGResponse[] = [];
+      
+      for (const request of requests) {
+        try {
+          const response = await this.generateRAGResponse(request);
+          responses.push(response);
+        } catch (error) {
+          responses.push({
+            query: request.query,
+            retrievedDocuments: [],
+            augmentedContext: '',
+            generatedResponse: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            metadata: {
+              retrievalTime: 0,
+              generationTime: 0,
+              totalTokens: 0,
+              documentCount: 0,
+            },
+          });
+        }
+      }
+      
+      return responses;
+    }
+    
+    // Document indexing
+    async indexDocuments(documents: Document[]): Promise<void> {
+      for (const doc of documents) {
+        if (!doc.embedding) {
+          doc.embedding = await this.generateEmbedding(doc.content);
+        }
+        this.addDocument(doc);
+      }
+    }
+    
+    // Configuration management
+    updateConfig(newConfig: Partial<RAGConfig>): void {
+      this.config = { ...this.config, ...newConfig };
+    }
+    
+    getConfig(): RAGConfig {
+      return { ...this.config };
+    }
+  } 

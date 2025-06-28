@@ -1,0 +1,258 @@
+name: "Compliance Runner"
+description: "Orchestrates all compliance checks and generates comprehensive security and code quality reports"
+category: "compliance"
+tags:
+  primary: "compliance"
+  secondary: ["security", "orchestration", "reporting", "automation"]
+  nodes: ["musa"]
+  priority: "critical"
+  complexity: "complex"
+  cultural: ["hieros"]
+  dependencies: ["security_compliance_check", "environment_check", "package_priority_check", "klf_compatibility_check", "code_style_check", "testing_requirements_check"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { security_compliance_check } from './security_compliance_check.js';
+  import { environment_check } from './environment_check.js';
+  import { package_priority_check } from './package_priority_check.js';
+  import { klf_compatibility_check } from './klf_compatibility_check.js';
+  import { code_style_check } from './code_style_check.js';
+  import { testing_requirements_check } from './testing_requirements_check.js';
+  
+  export async function compliance_runner(input: {
+    run_security_checks: boolean;
+    run_environment_checks: boolean;
+    run_package_checks: boolean;
+    run_klf_checks: boolean;
+    run_style_checks: boolean;
+    run_testing_checks: boolean;
+    generate_report: boolean;
+    fail_on_critical: boolean;
+  }) {
+    const results = {
+      timestamp: new Date().toISOString(),
+      overall_score: 0,
+      critical_violations: [],
+      violations: [],
+      recommendations: [],
+      security_score: 0,
+      compliance_summary: {},
+      detailed_results: {}
+    };
+    
+    // Run Security Compliance Check (Musa's primary domain)
+    if (input.run_security_checks) {
+      console.log('🔒 Running security compliance checks...');
+      const securityResult = await security_compliance_check({
+        check_input_validation: true,
+        check_sql_injection: true,
+        check_xss_prevention: true,
+        check_command_injection: true,
+        check_authentication: true,
+        check_authorization: true,
+        check_secrets_management: true,
+        check_https_usage: true
+      });
+      
+      results.detailed_results.security = securityResult;
+      results.critical_violations.push(...securityResult.critical_violations || []);
+      results.violations.push(...securityResult.violations || []);
+      results.recommendations.push(...securityResult.recommendations || []);
+      results.security_score = securityResult.security_score || 0;
+      
+      console.log(`🚨 Security: ${securityResult.critical_violations?.length || 0} critical, ${securityResult.violations?.length || 0} violations`);
+    }
+    
+    // Run Environment Configuration Check
+    if (input.run_environment_checks) {
+      console.log('🌍 Running environment configuration checks...');
+      const envResult = await environment_check({
+        check_centralized_config: true,
+        check_environment_variables: true,
+        check_deployment_config: true
+      });
+      
+      results.detailed_results.environment = envResult;
+      results.violations.push(...envResult.violations || []);
+      results.recommendations.push(...envResult.recommendations || []);
+      
+      console.log(`🌍 Environment: ${envResult.violations?.length || 0} violations, ${envResult.recommendations?.length || 0} recommendations`);
+    }
+    
+    // Run Package Priority Check
+    if (input.run_package_checks) {
+      console.log('📦 Running package priority checks...');
+      const packageResult = await package_priority_check({
+        check_existing_packages: true,
+        use_core_packages_first: true,
+        avoid_duplication: true
+      });
+      
+      results.detailed_results.packages = packageResult;
+      results.violations.push(...packageResult.violations || []);
+      results.recommendations.push(...packageResult.recommendations || []);
+      
+      console.log(`📦 Packages: ${packageResult.violations?.length || 0} violations, ${packageResult.recommendations?.length || 0} recommendations`);
+    }
+    
+    // Run KLF Compatibility Check
+    if (input.run_klf_checks) {
+      console.log('🔗 Running KLF compatibility checks...');
+      const klfResult = await klf_compatibility_check({
+        check_node_patterns: true,
+        check_protocol_compliance: true,
+        check_naming_conventions: true
+      });
+      
+      results.detailed_results.klf = klfResult;
+      results.violations.push(...klfResult.violations || []);
+      results.recommendations.push(...klfResult.recommendations || []);
+      
+      console.log(`🔗 KLF: ${klfResult.violations?.length || 0} violations, ${klfResult.recommendations?.length || 0} recommendations`);
+    }
+    
+    // Run Code Style Check
+    if (input.run_style_checks) {
+      console.log('🎨 Running code style checks...');
+      const styleResult = await code_style_check({
+        check_typescript: true,
+        check_formatting: true,
+        check_imports: true,
+        check_documentation: true
+      });
+      
+      results.detailed_results.style = styleResult;
+      results.violations.push(...styleResult.violations || []);
+      results.recommendations.push(...styleResult.recommendations || []);
+      
+      console.log(`🎨 Style: ${styleResult.violations?.length || 0} violations, ${styleResult.recommendations?.length || 0} recommendations`);
+    }
+    
+    // Run Testing Requirements Check
+    if (input.run_testing_checks) {
+      console.log('🧪 Running testing requirements checks...');
+      const testingResult = await testing_requirements_check({
+        check_test_coverage: true,
+        check_test_structure: true,
+        check_test_naming: true,
+        check_integration_tests: true
+      });
+      
+      results.detailed_results.testing = testingResult;
+      results.violations.push(...testingResult.violations || []);
+      results.recommendations.push(...testingResult.recommendations || []);
+      
+      console.log(`🧪 Testing: ${testingResult.violations?.length || 0} violations, ${testingResult.recommendations?.length || 0} recommendations`);
+    }
+    
+    // Calculate Overall Score
+    const totalIssues = results.critical_violations.length + results.violations.length + results.recommendations.length;
+    const maxScore = 100;
+    const criticalPenalty = results.critical_violations.length * 20;
+    const violationPenalty = results.violations.length * 5;
+    const recommendationPenalty = results.recommendations.length * 1;
+    
+    results.overall_score = Math.max(0, maxScore - criticalPenalty - violationPenalty - recommendationPenalty);
+    
+    // Generate Compliance Summary
+    results.compliance_summary = {
+      security: {
+        score: results.security_score,
+        critical: results.critical_violations.filter(v => v.file.includes('security')).length,
+        violations: results.violations.filter(v => v.file.includes('security')).length
+      },
+      environment: {
+        violations: results.violations.filter(v => v.file.includes('env') || v.file.includes('config')).length,
+        recommendations: results.recommendations.filter(r => r.file.includes('env') || r.file.includes('config')).length
+      },
+      packages: {
+        violations: results.violations.filter(v => v.file.includes('package') || v.file.includes('node_modules')).length,
+        recommendations: results.recommendations.filter(r => r.file.includes('package') || r.file.includes('node_modules')).length
+      },
+      klf: {
+        violations: results.violations.filter(v => v.file.includes('klf') || v.file.includes('protocol')).length,
+        recommendations: results.recommendations.filter(r => r.file.includes('klf') || r.file.includes('protocol')).length
+      },
+      style: {
+        violations: results.violations.filter(v => v.file.includes('.ts') || v.file.includes('.js')).length,
+        recommendations: results.recommendations.filter(r => r.file.includes('.ts') || r.file.includes('.js')).length
+      },
+      testing: {
+        violations: results.violations.filter(v => v.file.includes('test') || v.file.includes('spec')).length,
+        recommendations: results.recommendations.filter(r => r.file.includes('test') || r.file.includes('spec')).length
+      }
+    };
+    
+    // Generate Report
+    if (input.generate_report) {
+      const report = generate_compliance_report(results);
+      console.log('\n📊 COMPLIANCE REPORT');
+      console.log('='.repeat(50));
+      console.log(report);
+    }
+    
+    // Fail on Critical Violations
+    if (input.fail_on_critical && results.critical_violations.length > 0) {
+      throw new Error(`🚨 CRITICAL: ${results.critical_violations.length} critical security violations detected. Immediate action required.`);
+    }
+    
+    return results;
+  }
+  
+  function generate_compliance_report(results: any): string {
+    let report = '';
+    
+    // Overall Score
+    report += `Overall Compliance Score: ${results.overall_score}/100\n`;
+    report += `Security Score: ${results.security_score}/100\n\n`;
+    
+    // Critical Violations
+    if (results.critical_violations.length > 0) {
+      report += `🚨 CRITICAL VIOLATIONS (${results.critical_violations.length}):\n`;
+      results.critical_violations.forEach((v: any, i: number) => {
+        report += `  ${i + 1}. ${v.file}: ${v.issue}\n`;
+        if (v.fix) report += `     Fix: ${v.fix}\n`;
+      });
+      report += '\n';
+    }
+    
+    // Regular Violations
+    if (results.violations.length > 0) {
+      report += `⚠️ VIOLATIONS (${results.violations.length}):\n`;
+      results.violations.slice(0, 10).forEach((v: any, i: number) => {
+        report += `  ${i + 1}. ${v.file}: ${v.issue}\n`;
+        if (v.fix) report += `     Fix: ${v.fix}\n`;
+      });
+      if (results.violations.length > 10) {
+        report += `  ... and ${results.violations.length - 10} more violations\n`;
+      }
+      report += '\n';
+    }
+    
+    // Recommendations
+    if (results.recommendations.length > 0) {
+      report += `💡 RECOMMENDATIONS (${results.recommendations.length}):\n`;
+      results.recommendations.slice(0, 5).forEach((r: any, i: number) => {
+        report += `  ${i + 1}. ${r.file}: ${r.issue}\n`;
+        if (r.fix) report += `     Fix: ${r.fix}\n`;
+      });
+      if (results.recommendations.length > 5) {
+        report += `  ... and ${results.recommendations.length - 5} more recommendations\n`;
+      }
+      report += '\n';
+    }
+    
+    // Compliance Summary
+    report += `📊 COMPLIANCE SUMMARY:\n`;
+    Object.entries(results.compliance_summary).forEach(([category, data]: [string, any]) => {
+      report += `  ${category.toUpperCase()}: `;
+      if (data.score !== undefined) {
+        report += `Score: ${data.score}/100, `;
+      }
+      report += `Violations: ${data.violations || 0}, Recommendations: ${data.recommendations || 0}\n`;
+    });
+    
+    return report;
+  } 

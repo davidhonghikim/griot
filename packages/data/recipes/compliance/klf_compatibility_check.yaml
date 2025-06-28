@@ -1,0 +1,126 @@
+name: "KLF Compatibility Check"
+description: "Ensures code follows Kind Link Framework patterns and conventions"
+category: "compliance"
+tags:
+  primary: "compliance"
+  secondary: ["klf", "protocol", "naming", "architecture"]
+  nodes: ["musa", "griot", "tohunga", "ronin", "oracle", "skald", "amauta", "mzee"]
+  priority: "high"
+  complexity: "moderate"
+  cultural: ["hieros"]
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { readFileSync } from 'fs';
+  import { glob } from 'glob';
+  
+  export async function klf_compatibility_check(input: {
+    check_node_patterns: boolean;
+    check_protocol_compliance: boolean;
+    check_naming_conventions: boolean;
+  }) {
+    const violations = [];
+    const recommendations = [];
+    
+    // Check for Node.js files that should follow KLF patterns
+    const nodeFiles = await glob('**/*.{ts,js}', { ignore: ['node_modules/**', 'dist/**'] });
+    
+    for (const file of nodeFiles) {
+      const content = readFileSync(file, 'utf8');
+      
+      // Check for proper node class structure
+      if (content.includes('class') && content.includes('extends') && !content.includes('BaseNode')) {
+        if (content.includes('HttpApiNode') || content.includes('DatabaseNode') || content.includes('ServiceNode')) {
+          // These are good - they extend proper base classes
+        } else {
+          recommendations.push({
+            file,
+            issue: 'Consider extending a BaseNode class for KLF compatibility',
+            severity: 'info'
+          });
+        }
+      }
+      
+      // Check for proper protocol handling
+      if (content.includes('protocol') && !content.includes('KindLinkProtocol')) {
+        recommendations.push({
+          file,
+          issue: 'Use KindLinkProtocol for consistent protocol handling',
+          severity: 'warning'
+        });
+      }
+      
+      // Check for proper message handling
+      if (content.includes('message') && !content.includes('MessageType')) {
+        recommendations.push({
+          file,
+          issue: 'Use MessageType enum for consistent message handling',
+          severity: 'info'
+        });
+      }
+      
+      // Check for proper error handling
+      if (content.includes('throw new Error') && !content.includes('NodeError')) {
+        recommendations.push({
+          file,
+          issue: 'Use NodeError for consistent error handling',
+          severity: 'warning'
+        });
+      }
+    }
+    
+    // Check for proper file naming conventions
+    const namingViolations = await check_naming_conventions();
+    violations.push(...namingViolations);
+    
+    return {
+      success: violations.length === 0,
+      violations,
+      recommendations,
+      summary: `Found ${violations.length} violations and ${recommendations.length} recommendations`
+    };
+  }
+  
+  async function check_naming_conventions() {
+    const violations = [];
+    
+    // Check for files that don't follow KLF naming patterns
+    const files = await glob('**/*.{ts,js}', { ignore: ['node_modules/**', 'dist/**'] });
+    
+    for (const file of files) {
+      const filename = file.split('/').pop() || '';
+      
+      // Check for proper casing
+      if (filename.includes('_') && !filename.includes('.test.') && !filename.includes('.spec.')) {
+        violations.push({
+          file,
+          issue: 'Use camelCase for TypeScript/JavaScript files',
+          severity: 'warning'
+        });
+      }
+      
+      // Check for proper class naming
+      if (filename.endsWith('.ts') || filename.endsWith('.js')) {
+        const content = readFileSync(file, 'utf8');
+        const classMatches = content.match(/class\s+(\w+)/g);
+        
+        if (classMatches) {
+          for (const match of classMatches) {
+            const className = match.replace('class ', '');
+            if (!className.endsWith('Node') && !className.endsWith('Manager') && !className.endsWith('Service')) {
+              recommendations.push({
+                file,
+                issue: `Class '${className}' should follow KLF naming conventions`,
+                severity: 'info'
+              });
+            }
+          }
+        }
+      }
+    }
+    
+    return violations;
+  } 

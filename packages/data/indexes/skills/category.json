@@ -1,0 +1,34 @@
+{
+  "category": "category",
+  "asset_type": "skills",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.338779",
+  "files": [
+    {
+      "name": " Template",
+      "path": "skills/_template.yaml",
+      "type": "skills",
+      "category": "category",
+      "size": 1,
+      "lastModified": "2025-06-28T06:25:59.817375",
+      "hash": "a83ca85b0354ff1173aea62207f2c8e4dd4ced54aadd24c2d58e57e935831b60",
+      "description": "Brief description of what this skill does",
+      "tags": {
+        "primary": "primary_tag",
+        "secondary": [
+          "secondary",
+          "tags",
+          "here"
+        ],
+        "priority": "high",
+        "complexity": "moderate",
+        "dependencies": [],
+        "version": "1.0.0",
+        "created": "2025-06-28",
+        "updated": "2025-06-28",
+        "author": "system"
+      },
+      "version": ""
+    }
+  ]
+}

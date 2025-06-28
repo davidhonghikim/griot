@@ -1,0 +1,163 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-06-28",
+  "description": "Generic AI provider configuration for extensible pricing system",
+  "providers": {
+    "openai": {
+      "name": "OpenAI",
+      "website": "https://openai.com/pricing",
+      "scraping": {
+        "enabled": true,
+        "method": "web_scraping",
+        "selectors": {
+          "gpt-4-turbo": {
+            "input": "GPT-4 Turbo.*?(\\$[\\d.]+).*?input",
+            "output": "GPT-4 Turbo.*?(\\$[\\d.]+).*?output"
+          },
+          "gpt-3.5-turbo": {
+            "input": "GPT-3\\.5 Turbo.*?(\\$[\\d.]+).*?input",
+            "output": "GPT-3\\.5 Turbo.*?(\\$[\\d.]+).*?output"
+          }
+        }
+      },
+      "api": {
+        "enabled": false,
+        "endpoint": null,
+        "auth_required": true
+      },
+      "isActive": true
+    },
+    "anthropic": {
+      "name": "Anthropic",
+      "website": "https://www.anthropic.com/pricing",
+      "scraping": {
+        "enabled": true,
+        "method": "web_scraping",
+        "selectors": {
+          "claude-3-opus": {
+            "input": "Claude 3 Opus.*?(\\$[\\d.]+).*?input",
+            "output": "Claude 3 Opus.*?(\\$[\\d.]+).*?output"
+          },
+          "claude-3-sonnet": {
+            "input": "Claude 3 Sonnet.*?(\\$[\\d.]+).*?input",
+            "output": "Claude 3 Sonnet.*?(\\$[\\d.]+).*?output"
+          },
+          "claude-3-haiku": {
+            "input": "Claude 3 Haiku.*?(\\$[\\d.]+).*?input",
+            "output": "Claude 3 Haiku.*?(\\$[\\d.]+).*?output"
+          }
+        }
+      },
+      "api": {
+        "enabled": false,
+        "endpoint": null,
+        "auth_required": true
+      },
+      "isActive": true
+    },
+    "google": {
+      "name": "Google AI",
+      "website": "https://ai.google.dev/pricing",
+      "scraping": {
+        "enabled": true,
+        "method": "web_scraping",
+        "selectors": {
+          "gemini-pro": {
+            "input": "Gemini Pro.*?(\\$[\\d.]+).*?input",
+            "output": "Gemini Pro.*?(\\$[\\d.]+).*?output"
+          }
+        }
+      },
+      "api": {
+        "enabled": false,
+        "endpoint": null,
+        "auth_required": true
+      },
+      "isActive": true
+    },
+    "meta": {
+      "name": "Meta",
+      "website": null,
+      "scraping": {
+        "enabled": false,
+        "method": null,
+        "selectors": {}
+      },
+      "api": {
+        "enabled": false,
+        "endpoint": null,
+        "auth_required": false
+      },
+      "isActive": true,
+      "notes": "Self-hosted models, pricing estimated"
+    },
+    "mistral": {
+      "name": "Mistral AI",
+      "website": "https://mistral.ai/pricing",
+      "scraping": {
+        "enabled": true,
+        "method": "web_scraping",
+        "selectors": {
+          "mistral-large": {
+            "input": "Mistral Large.*?(\\$[\\d.]+).*?input",
+            "output": "Mistral Large.*?(\\$[\\d.]+).*?output"
+          },
+          "mistral-medium": {
+            "input": "Mistral Medium.*?(\\$[\\d.]+).*?input",
+            "output": "Mistral Medium.*?(\\$[\\d.]+).*?output"
+          }
+        }
+      },
+      "api": {
+        "enabled": false,
+        "endpoint": null,
+        "auth_required": true
+      },
+      "isActive": true
+    },
+    "cohere": {
+      "name": "Cohere",
+      "website": "https://cohere.com/pricing",
+      "scraping": {
+        "enabled": true,
+        "method": "web_scraping",
+        "selectors": {
+          "command": {
+            "input": "Command.*?(\\$[\\d.]+).*?input",
+            "output": "Command.*?(\\$[\\d.]+).*?output"
+          }
+        }
+      },
+      "api": {
+        "enabled": false,
+        "endpoint": null,
+        "auth_required": true
+      },
+      "isActive": true
+    }
+  },
+  "scrapingMethods": {
+    "web_scraping": {
+      "description": "Extract pricing from provider websites",
+      "requirements": ["requests", "re"],
+      "timeout": 10,
+      "retries": 3
+    },
+    "api": {
+      "description": "Fetch pricing via provider APIs",
+      "requirements": ["requests", "json"],
+      "timeout": 30,
+      "retries": 2
+    },
+    "manual": {
+      "description": "Manually curated pricing data",
+      "requirements": [],
+      "update_frequency": "monthly"
+    }
+  },
+  "metadata": {
+    "updateFrequency": "weekly",
+    "dataSource": "automated_scraping",
+    "notes": "Generic provider configuration - easily extensible for new services"
+  }
+} 

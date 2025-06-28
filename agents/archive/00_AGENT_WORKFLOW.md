@@ -139,6 +139,7 @@ Create a new, clean `agents/handoff/LATEST_HANDOFF.md` file. Use the following t
 **UTC**: [Timestamp]
 **From Agent**: [Your Name/Model]
 **Previous Handoff**: `[Path to the handoff you just archived]`
+**Be sure to prompt the next agent to review and assume prev agents made errors and left incomplete tasks. Give analysis, and a plan for the next agent to complete the task and then wait.**
 
 ---
 

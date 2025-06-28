@@ -1,0 +1,513 @@
+name: "Data Cleaning Base"
+description: "Comprehensive data cleaning and preprocessing for structured and unstructured data"
+category: "data"
+tags:
+  primary: "data"
+  secondary: ["cleaning", "preprocessing", "normalization", "standardization", "quality"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+  type: "base"
+code: |
+  export interface CleaningRule {
+    id: string;
+    name: string;
+    description: string;
+    ruleType: 'normalize' | 'standardize' | 'remove' | 'replace' | 'transform';
+    field: string;
+    parameters: Record<string, any>;
+    priority: number;
+  }
+  
+  export interface CleaningResult {
+    ruleId: string;
+    field: string;
+    originalValue: any;
+    cleanedValue: any;
+    changes: string[];
+    confidence: number; // 0-1
+  }
+  
+  export interface DataCleaningConfig {
+    rules: CleaningRule[];
+    preserveOriginal: boolean;
+    validateAfterCleaning: boolean;
+    customCleaners: Record<string, Function>;
+  }
+  
+  export class DataCleaningSkill {
+    private cleaningRules: Map<string, CleaningRule>;
+    private customCleaners: Map<string, Function>;
+    private builtInCleaners: Map<string, Function>;
+    
+    constructor() {
+      this.cleaningRules = new Map();
+      this.customCleaners = new Map();
+      this.builtInCleaners = new Map();
+      this.initializeBuiltInCleaners();
+    }
+    
+    // Initialize built-in cleaners
+    private initializeBuiltInCleaners(): void {
+      // String cleaners
+      this.builtInCleaners.set('trim', (value: string) => {
+        return value.trim();
+      });
+      
+      this.builtInCleaners.set('lowercase', (value: string) => {
+        return value.toLowerCase();
+      });
+      
+      this.builtInCleaners.set('uppercase', (value: string) => {
+        return value.toUpperCase();
+      });
+      
+      this.builtInCleaners.set('removeSpecialChars', (value: string, chars: string = '!@#$%^&*()') => {
+        return value.replace(new RegExp(`[${chars.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}]`, 'g'), '');
+      });
+      
+      this.builtInCleaners.set('normalizeWhitespace', (value: string) => {
+        return value.replace(/\s+/g, ' ');
+      });
+      
+      // Number cleaners
+      this.builtInCleaners.set('round', (value: number, decimals: number = 2) => {
+        return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+      });
+      
+      this.builtInCleaners.set('clamp', (value: number, min: number, max: number) => {
+        return Math.min(Math.max(value, min), max);
+      });
+      
+      // Date cleaners
+      this.builtInCleaners.set('parseDate', (value: string) => {
+        const date = new Date(value);
+        return isNaN(date.getTime()) ? null : date.toISOString();
+      });
+      
+      this.builtInCleaners.set('formatDate', (value: Date, format: string = 'YYYY-MM-DD') => {
+        const year = value.getFullYear();
+        const month = String(value.getMonth() + 1).padStart(2, '0');
+        const day = String(value.getDate()).padStart(2, '0');
+        
+        return format
+          .replace('YYYY', year.toString())
+          .replace('MM', month)
+          .replace('DD', day);
+      });
+      
+      // Email cleaners
+      this.builtInCleaners.set('normalizeEmail', (value: string) => {
+        return value.toLowerCase().trim();
+      });
+      
+      // Phone cleaners
+      this.builtInCleaners.set('normalizePhone', (value: string) => {
+        return value.replace(/\D/g, '');
+      });
+      
+      // URL cleaners
+      this.builtInCleaners.set('normalizeUrl', (value: string) => {
+        if (!value.startsWith('http://') && !value.startsWith('https://')) {
+          return `https://${value}`;
+        }
+        return value;
+      });
+    }
+    
+    // Add cleaning rule
+    addCleaningRule(rule: CleaningRule): void {
+      this.cleaningRules.set(rule.id, rule);
+    }
+    
+    // Add custom cleaner
+    addCustomCleaner(name: string, cleaner: Function): void {
+      this.customCleaners.set(name, cleaner);
+    }
+    
+    // Clean single field
+    cleanField(
+      field: string,
+      value: any,
+      rules: CleaningRule[]
+    ): CleaningResult[] {
+      const results: CleaningResult[] = [];
+      
+      for (const rule of rules) {
+        if (rule.field === field) {
+          const cleanedValue = this.applyCleaningRule(rule, value);
+          const changes = this.detectChanges(value, cleanedValue);
+          const confidence = this.calculateConfidence(rule, value, cleanedValue);
+          
+          results.push({
+            ruleId: rule.id,
+            field: rule.field,
+            originalValue: value,
+            cleanedValue,
+            changes,
+            confidence
+          });
+        }
+      }
+      
+      return results;
+    }
+    
+    // Clean entire object
+    cleanObject(
+      data: Record<string, any>,
+      config: DataCleaningConfig
+    ): {
+      cleanedData: Record<string, any>;
+      results: CleaningResult[];
+      summary: {
+        total: number;
+        cleaned: number;
+        unchanged: number;
+        averageConfidence: number;
+      };
+    } {
+      const cleanedData = config.preserveOriginal ? { ...data } : data;
+      const results: CleaningResult[] = [];
+      
+      // Sort rules by priority
+      const sortedRules = config.rules.sort((a, b) => b.priority - a.priority);
+      
+      // Apply all rules to the data
+      for (const rule of sortedRules) {
+        const value = this.getNestedValue(cleanedData, rule.field);
+        const cleanedValue = this.applyCleaningRule(rule, value);
+        const changes = this.detectChanges(value, cleanedValue);
+        const confidence = this.calculateConfidence(rule, value, cleanedValue);
+        
+        // Update the data
+        this.setNestedValue(cleanedData, rule.field, cleanedValue);
+        
+        results.push({
+          ruleId: rule.id,
+          field: rule.field,
+          originalValue: value,
+          cleanedValue,
+          changes,
+          confidence
+        });
+      }
+      
+      // Calculate summary
+      const summary = this.calculateSummary(results);
+      
+      return {
+        cleanedData,
+        results,
+        summary
+      };
+    }
+    
+    // Apply a single cleaning rule
+    private applyCleaningRule(rule: CleaningRule, value: any): any {
+      try {
+        switch (rule.ruleType) {
+          case 'normalize':
+            return this.applyNormalizeRule(rule, value);
+          case 'standardize':
+            return this.applyStandardizeRule(rule, value);
+          case 'remove':
+            return this.applyRemoveRule(rule, value);
+          case 'replace':
+            return this.applyReplaceRule(rule, value);
+          case 'transform':
+            return this.applyTransformRule(rule, value);
+          default:
+            return value;
+        }
+      } catch (error) {
+        console.error(`Error applying cleaning rule ${rule.id}:`, error);
+        return value;
+      }
+    }
+    
+    // Apply normalize rule
+    private applyNormalizeRule(rule: CleaningRule, value: any): any {
+      const { operation, ...params } = rule.parameters;
+      const cleaner = this.builtInCleaners.get(operation);
+      
+      if (cleaner && typeof value === 'string') {
+        return cleaner(value, params);
+      }
+      
+      return value;
+    }
+    
+    // Apply standardize rule
+    private applyStandardizeRule(rule: CleaningRule, value: any): any {
+      const { format, ...params } = rule.parameters;
+      
+      if (format === 'date' && value) {
+        const cleaner = this.builtInCleaners.get('parseDate');
+        return cleaner(value);
+      }
+      
+      if (format === 'email' && typeof value === 'string') {
+        const cleaner = this.builtInCleaners.get('normalizeEmail');
+        return cleaner(value);
+      }
+      
+      if (format === 'phone' && typeof value === 'string') {
+        const cleaner = this.builtInCleaners.get('normalizePhone');
+        return cleaner(value);
+      }
+      
+      if (format === 'url' && typeof value === 'string') {
+        const cleaner = this.builtInCleaners.get('normalizeUrl');
+        return cleaner(value);
+      }
+      
+      return value;
+    }
+    
+    // Apply remove rule
+    private applyRemoveRule(rule: CleaningRule, value: any): any {
+      const { condition, ...params } = rule.parameters;
+      
+      if (condition === 'empty' && (value === null || value === undefined || value === '')) {
+        return null;
+      }
+      
+      if (condition === 'duplicate' && params.existingValues && params.existingValues.includes(value)) {
+        return null;
+      }
+      
+      if (condition === 'outlier' && typeof value === 'number') {
+        const { min, max } = params;
+        if ((min !== undefined && value < min) || (max !== undefined && value > max)) {
+          return null;
+        }
+      }
+      
+      return value;
+    }
+    
+    // Apply replace rule
+    private applyReplaceRule(rule: CleaningRule, value: any): any {
+      const { find, replace, regex } = rule.parameters;
+      
+      if (typeof value === 'string') {
+        if (regex) {
+          return value.replace(new RegExp(find, 'g'), replace);
+        } else {
+          return value.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
+        }
+      }
+      
+      return value;
+    }
+    
+    // Apply transform rule
+    private applyTransformRule(rule: CleaningRule, value: any): any {
+      const { operation, ...params } = rule.parameters;
+      const cleaner = this.customCleaners.get(operation);
+      
+      if (cleaner) {
+        return cleaner(value, params);
+      }
+      
+      return value;
+    }
+    
+    // Detect changes between original and cleaned values
+    private detectChanges(original: any, cleaned: any): string[] {
+      const changes: string[] = [];
+      
+      if (original !== cleaned) {
+        if (typeof original === 'string' && typeof cleaned === 'string') {
+          if (original.length !== cleaned.length) {
+            changes.push(`Length changed from ${original.length} to ${cleaned.length}`);
+          }
+          if (original.toLowerCase() !== cleaned.toLowerCase()) {
+            changes.push('Case or content modified');
+          }
+        } else if (typeof original === 'number' && typeof cleaned === 'number') {
+          if (original !== cleaned) {
+            changes.push(`Value changed from ${original} to ${cleaned}`);
+          }
+        } else if (original !== cleaned) {
+          changes.push('Value type or content changed');
+        }
+      }
+      
+      return changes;
+    }
+    
+    // Calculate confidence in cleaning result
+    private calculateConfidence(rule: CleaningRule, original: any, cleaned: any): number {
+      let confidence = 0.8; // Base confidence
+      
+      // Adjust based on rule type
+      switch (rule.ruleType) {
+        case 'normalize':
+          confidence += 0.1;
+          break;
+        case 'standardize':
+          confidence += 0.15;
+          break;
+        case 'remove':
+          confidence -= 0.1;
+          break;
+        case 'replace':
+          confidence -= 0.05;
+          break;
+        case 'transform':
+          confidence -= 0.1;
+          break;
+      }
+      
+      // Adjust based on data type
+      if (typeof original === 'string' && typeof cleaned === 'string') {
+        confidence += 0.05;
+      } else if (typeof original === 'number' && typeof cleaned === 'number') {
+        confidence += 0.05;
+      }
+      
+      return Math.min(Math.max(confidence, 0), 1);
+    }
+    
+    // Get nested value from object
+    private getNestedValue(obj: any, path: string): any {
+      return path.split('.').reduce((current, key) => {
+        return current && current[key] !== undefined ? current[key] : undefined;
+      }, obj);
+    }
+    
+    // Set nested value in object
+    private setNestedValue(obj: any, path: string, value: any): void {
+      const keys = path.split('.');
+      const lastKey = keys.pop()!;
+      const target = keys.reduce((current, key) => {
+        if (!current[key]) {
+          current[key] = {};
+        }
+        return current[key];
+      }, obj);
+      
+      target[lastKey] = value;
+    }
+    
+    // Calculate cleaning summary
+    private calculateSummary(results: CleaningResult[]): {
+      total: number;
+      cleaned: number;
+      unchanged: number;
+      averageConfidence: number;
+    } {
+      const summary = {
+        total: results.length,
+        cleaned: 0,
+        unchanged: 0,
+        averageConfidence: 0
+      };
+      
+      let totalConfidence = 0;
+      
+      for (const result of results) {
+        if (result.originalValue !== result.cleanedValue) {
+          summary.cleaned++;
+        } else {
+          summary.unchanged++;
+        }
+        
+        totalConfidence += result.confidence;
+      }
+      
+      summary.averageConfidence = summary.total > 0 ? totalConfidence / summary.total : 0;
+      
+      return summary;
+    }
+    
+    // Create common cleaning rules
+    createCommonRules(): CleaningRule[] {
+      return [
+        {
+          id: 'trim_strings',
+          name: 'Trim Strings',
+          description: 'Remove leading and trailing whitespace from strings',
+          ruleType: 'normalize',
+          field: 'name',
+          parameters: { operation: 'trim' },
+          priority: 1
+        },
+        {
+          id: 'normalize_emails',
+          name: 'Normalize Emails',
+          description: 'Standardize email format',
+          ruleType: 'standardize',
+          field: 'email',
+          parameters: { format: 'email' },
+          priority: 2
+        },
+        {
+          id: 'remove_empty',
+          name: 'Remove Empty Values',
+          description: 'Remove null, undefined, or empty string values',
+          ruleType: 'remove',
+          field: 'description',
+          parameters: { condition: 'empty' },
+          priority: 3
+        },
+        {
+          id: 'normalize_whitespace',
+          name: 'Normalize Whitespace',
+          description: 'Replace multiple whitespace with single space',
+          ruleType: 'normalize',
+          field: 'content',
+          parameters: { operation: 'normalizeWhitespace' },
+          priority: 1
+        }
+      ];
+    }
+    
+    // Validate cleaned data
+    validateCleanedData(
+      originalData: Record<string, any>,
+      cleanedData: Record<string, any>
+    ): {
+      isValid: boolean;
+      issues: string[];
+      improvements: string[];
+    } {
+      const issues: string[] = [];
+      const improvements: string[] = [];
+      
+      // Check for data loss
+      const originalKeys = Object.keys(originalData);
+      const cleanedKeys = Object.keys(cleanedData);
+      
+      const lostKeys = originalKeys.filter(key => !cleanedKeys.includes(key));
+      if (lostKeys.length > 0) {
+        issues.push(`Lost keys during cleaning: ${lostKeys.join(', ')}`);
+      }
+      
+      // Check for improvements
+      for (const key of cleanedKeys) {
+        const original = originalData[key];
+        const cleaned = cleanedData[key];
+        
+        if (original !== cleaned) {
+          if (typeof original === 'string' && typeof cleaned === 'string') {
+            if (cleaned.length < original.length) {
+              improvements.push(`Reduced ${key} length from ${original.length} to ${cleaned.length}`);
+            }
+          }
+        }
+      }
+      
+      return {
+        isValid: issues.length === 0,
+        issues,
+        improvements
+      };
+    }
+  } 

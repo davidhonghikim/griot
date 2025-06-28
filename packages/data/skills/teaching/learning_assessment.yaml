@@ -1,0 +1,405 @@
+name: "Learning Assessment"
+description: "Comprehensive assessment of learning progress with cultural sensitivity and traditional evaluation methods"
+category: "teaching"
+tags:
+  primary: "teaching"
+  secondary: ["assessment", "learning", "evaluation", "cultural", "traditional"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: []
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  export interface AssessmentCriteria {
+    id: string;
+    name: string;
+    description: string;
+    culturalContext: string;
+    assessmentMethod: 'observation' | 'discussion' | 'practice' | 'reflection' | 'community';
+    weight: number; // 0-1
+    culturalSignificance: string;
+  }
+  
+  export interface LearningAssessment {
+    learnerId: string;
+    assessmentId: string;
+    date: Date;
+    culturalContext: string;
+    criteria: AssessmentCriteria[];
+    scores: Record<string, number>; // criteriaId -> score (0-1)
+    culturalEvaluation: {
+      culturalUnderstanding: number; // 0-1
+      culturalSensitivity: number; // 0-1
+      culturalApplication: number; // 0-1
+    };
+    overallScore: number; // 0-1
+    recommendations: string[];
+    nextSteps: string[];
+  }
+  
+  export class LearningAssessmentSkill {
+    private assessmentCriteria: Map<string, AssessmentCriteria>;
+    private assessmentMethods: Map<string, any>;
+    private culturalFrameworks: Map<string, any>;
+    
+    constructor() {
+      this.assessmentCriteria = new Map();
+      this.assessmentMethods = new Map();
+      this.culturalFrameworks = new Map();
+      this.initializeCriteria();
+      this.initializeMethods();
+    }
+    
+    // Initialize assessment criteria
+    private initializeCriteria(): void {
+      // HIEROS assessment criteria
+      this.assessmentCriteria.set('hieros_understanding', {
+        id: 'hieros_understanding',
+        name: 'HIEROS Principles Understanding',
+        description: 'Understanding of the Seven Sacred Intentions and their application',
+        culturalContext: 'HIEROS',
+        assessmentMethod: 'discussion',
+        weight: 0.3,
+        culturalSignificance: 'Core foundation for ethical AI development'
+      });
+      
+      this.assessmentCriteria.set('cultural_sensitivity', {
+        id: 'cultural_sensitivity',
+        name: 'Cultural Sensitivity',
+        description: 'Demonstration of cultural awareness and respectful behavior',
+        culturalContext: 'Universal',
+        assessmentMethod: 'observation',
+        weight: 0.25,
+        culturalSignificance: 'Essential for respectful cultural interaction'
+      });
+      
+      this.assessmentCriteria.set('knowledge_application', {
+        id: 'knowledge_application',
+        name: 'Knowledge Application',
+        description: 'Ability to apply learned knowledge in appropriate contexts',
+        culturalContext: 'Universal',
+        assessmentMethod: 'practice',
+        weight: 0.25,
+        culturalSignificance: 'Demonstrates practical understanding and skill'
+      });
+      
+      this.assessmentCriteria.set('traditional_respect', {
+        id: 'traditional_respect',
+        name: 'Traditional Knowledge Respect',
+        description: 'Respect for traditional knowledge and cultural practices',
+        culturalContext: 'Universal',
+        assessmentMethod: 'reflection',
+        weight: 0.2,
+        culturalSignificance: 'Shows appreciation for cultural heritage and wisdom'
+      });
+    }
+    
+    // Initialize assessment methods
+    private initializeMethods(): void {
+      this.assessmentMethods.set('observation', {
+        description: 'Direct observation of learner behavior and interactions',
+        duration: 30,
+        culturalAppropriateness: 0.9,
+        reliability: 0.85,
+        culturalElements: ['respectful_observation', 'contextual_understanding', 'behavioral_assessment']
+      });
+      
+      this.assessmentMethods.set('discussion', {
+        description: 'Interactive dialogue to assess understanding and perspective',
+        duration: 45,
+        culturalAppropriateness: 0.8,
+        reliability: 0.8,
+        culturalElements: ['collective_wisdom', 'shared_understanding', 'cultural_dialogue']
+      });
+      
+      this.assessmentMethods.set('practice', {
+        description: 'Hands-on demonstration of skills and knowledge application',
+        duration: 60,
+        culturalAppropriateness: 0.95,
+        reliability: 0.9,
+        culturalElements: ['embodied_learning', 'skill_demonstration', 'practical_application']
+      });
+      
+      this.assessmentMethods.set('reflection', {
+        description: 'Personal reflection and self-assessment of learning',
+        duration: 20,
+        culturalAppropriateness: 0.7,
+        reliability: 0.75,
+        culturalElements: ['self_awareness', 'personal_growth', 'cultural_understanding']
+      });
+      
+      this.assessmentMethods.set('community', {
+        description: 'Community-based assessment through peer and elder feedback',
+        duration: 90,
+        culturalAppropriateness: 0.95,
+        reliability: 0.9,
+        culturalElements: ['community_wisdom', 'collective_evaluation', 'cultural_validation']
+      });
+    }
+    
+    // Plan learning assessment
+    async planAssessment(
+      learnerId: string,
+      culturalContext: string = 'HIEROS',
+      focusAreas: string[] = []
+    ): Promise<{
+      criteria: AssessmentCriteria[];
+      methods: string[];
+      duration: number;
+      culturalGuidance: string[];
+    }> {
+      // Select relevant criteria based on cultural context and focus areas
+      const criteria = Array.from(this.assessmentCriteria.values())
+        .filter(c => c.culturalContext === culturalContext || c.culturalContext === 'Universal')
+        .filter(c => focusAreas.length === 0 || focusAreas.some(area => 
+          c.name.toLowerCase().includes(area.toLowerCase())
+        ));
+      
+      // Select assessment methods
+      const methods = Array.from(new Set(criteria.map(c => c.assessmentMethod)));
+      
+      // Calculate total duration
+      const duration = methods.reduce((total, method) => {
+        const methodDetails = this.assessmentMethods.get(method);
+        return total + (methodDetails?.duration || 30);
+      }, 0);
+      
+      // Provide cultural guidance
+      const culturalGuidance = this.getCulturalGuidance(culturalContext);
+      
+      return {
+        criteria,
+        methods,
+        duration,
+        culturalGuidance
+      };
+    }
+    
+    // Conduct learning assessment
+    async conductAssessment(
+      learnerId: string,
+      criteria: AssessmentCriteria[],
+      culturalContext: string = 'HIEROS'
+    ): Promise<LearningAssessment> {
+      const assessmentId = `assessment_${learnerId}_${Date.now()}`;
+      const scores: Record<string, number> = {};
+      
+      // Conduct assessment for each criterion
+      for (const criterion of criteria) {
+        const score = await this.assessCriterion(criterion, learnerId);
+        scores[criterion.id] = score;
+      }
+      
+      // Calculate overall score
+      const totalWeight = criteria.reduce((sum, c) => sum + c.weight, 0);
+      const weightedScore = criteria.reduce((sum, c) => sum + (scores[c.id] * c.weight), 0);
+      const overallScore = totalWeight > 0 ? weightedScore / totalWeight : 0;
+      
+      // Conduct cultural evaluation
+      const culturalEvaluation = await this.conductCulturalEvaluation(learnerId, culturalContext);
+      
+      // Generate recommendations and next steps
+      const recommendations = this.generateRecommendations(scores, criteria, culturalEvaluation);
+      const nextSteps = this.generateNextSteps(overallScore, culturalEvaluation);
+      
+      return {
+        learnerId,
+        assessmentId,
+        date: new Date(),
+        culturalContext,
+        criteria,
+        scores,
+        culturalEvaluation,
+        overallScore,
+        recommendations,
+        nextSteps
+      };
+    }
+    
+    // Assess individual criterion
+    private async assessCriterion(criterion: AssessmentCriteria, learnerId: string): Promise<number> {
+      const methodDetails = this.assessmentMethods.get(criterion.assessmentMethod);
+      
+      // Simulate assessment (in real implementation, this would involve actual evaluation)
+      let baseScore = Math.random() * 0.4 + 0.6; // 0.6-1.0
+      
+      // Adjust based on method reliability
+      baseScore *= methodDetails?.reliability || 0.8;
+      
+      // Add some variation based on criterion type
+      if (criterion.id.includes('understanding')) {
+        baseScore += Math.random() * 0.1; // Slight boost for understanding
+      } else if (criterion.id.includes('application')) {
+        baseScore += Math.random() * 0.05; // Small boost for application
+      }
+      
+      return Math.min(baseScore, 1.0); // Cap at 1.0
+    }
+    
+    // Conduct cultural evaluation
+    private async conductCulturalEvaluation(
+      learnerId: string,
+      culturalContext: string
+    ): Promise<{
+      culturalUnderstanding: number;
+      culturalSensitivity: number;
+      culturalApplication: number;
+    }> {
+      // Simulate cultural evaluation (in real implementation, this would involve actual assessment)
+      const culturalUnderstanding = Math.random() * 0.4 + 0.6; // 0.6-1.0
+      const culturalSensitivity = Math.random() * 0.5 + 0.5; // 0.5-1.0
+      const culturalApplication = Math.random() * 0.6 + 0.4; // 0.4-1.0
+      
+      return {
+        culturalUnderstanding,
+        culturalSensitivity,
+        culturalApplication
+      };
+    }
+    
+    // Generate recommendations based on assessment results
+    private generateRecommendations(
+      scores: Record<string, number>,
+      criteria: AssessmentCriteria[],
+      culturalEvaluation: any
+    ): string[] {
+      const recommendations: string[] = [];
+      
+      // Analyze individual criterion scores
+      for (const criterion of criteria) {
+        const score = scores[criterion.id];
+        if (score < 0.7) {
+          recommendations.push(`Focus on improving ${criterion.name.toLowerCase()}`);
+        }
+      }
+      
+      // Analyze cultural evaluation
+      if (culturalEvaluation.culturalUnderstanding < 0.7) {
+        recommendations.push('Deepen understanding of cultural principles and context');
+      }
+      
+      if (culturalEvaluation.culturalSensitivity < 0.7) {
+        recommendations.push('Practice cultural sensitivity and respectful behavior');
+      }
+      
+      if (culturalEvaluation.culturalApplication < 0.6) {
+        recommendations.push('Apply cultural knowledge in appropriate real-world contexts');
+      }
+      
+      // Add general recommendations
+      recommendations.push('Continue learning through observation and practice');
+      recommendations.push('Seek guidance from cultural experts and community elders');
+      
+      return recommendations;
+    }
+    
+    // Generate next steps based on assessment results
+    private generateNextSteps(overallScore: number, culturalEvaluation: any): string[] {
+      const nextSteps: string[] = [];
+      
+      if (overallScore >= 0.8) {
+        nextSteps.push('Consider advanced learning opportunities');
+        nextSteps.push('Begin mentoring others if appropriate');
+        nextSteps.push('Continue deepening cultural understanding');
+      } else if (overallScore >= 0.6) {
+        nextSteps.push('Continue current learning path with focus on identified areas');
+        nextSteps.push('Practice skills in real-world contexts');
+        nextSteps.push('Seek additional guidance for challenging areas');
+      } else {
+        nextSteps.push('Review foundational concepts and principles');
+        nextSteps.push('Spend more time in cultural immersion and practice');
+        nextSteps.push('Work closely with mentors and cultural guides');
+      }
+      
+      return nextSteps;
+    }
+    
+    // Get cultural guidance for assessment
+    private getCulturalGuidance(culturalContext: string): string[] {
+      const guidance = [
+        'Conduct assessment with cultural sensitivity and respect',
+        'Ensure assessment methods are culturally appropriate',
+        'Include cultural context in evaluation criteria',
+        'Respect traditional assessment methods when appropriate'
+      ];
+      
+      if (culturalContext === 'HIEROS') {
+        guidance.push('Apply HIEROS principles in assessment process');
+        guidance.push('Ensure assessment honors cultural traditions');
+        guidance.push('Include community validation where appropriate');
+      }
+      
+      return guidance;
+    }
+    
+    // Get assessment statistics
+    getAssessmentStats(): {
+      totalCriteria: number;
+      assessmentMethods: number;
+      culturalContexts: string[];
+      averageCulturalAppropriateness: number;
+    } {
+      const culturalContexts = Array.from(new Set(
+        Array.from(this.assessmentCriteria.values()).map(c => c.culturalContext)
+      ));
+      
+      const culturalAppropriateness = Array.from(this.assessmentMethods.values())
+        .map(m => m.culturalAppropriateness);
+      const averageCulturalAppropriateness = culturalAppropriateness.reduce((sum, val) => sum + val, 0) / culturalAppropriateness.length;
+      
+      return {
+        totalCriteria: this.assessmentCriteria.size,
+        assessmentMethods: this.assessmentMethods.size,
+        culturalContexts,
+        averageCulturalAppropriateness
+      };
+    }
+    
+    // Validate assessment appropriateness
+    validateAssessment(
+      criteria: AssessmentCriteria[],
+      methods: string[],
+      culturalContext: string
+    ): {
+      isAppropriate: boolean;
+      concerns: string[];
+      suggestions: string[];
+    } {
+      const concerns: string[] = [];
+      const suggestions: string[] = [];
+      
+      // Check if all methods are culturally appropriate
+      for (const method of methods) {
+        const methodDetails = this.assessmentMethods.get(method);
+        if (methodDetails?.culturalAppropriateness < 0.7) {
+          concerns.push(`Method '${method}' may not be culturally appropriate`);
+          suggestions.push(`Consider alternative assessment methods`);
+        }
+      }
+      
+      // Check if criteria align with cultural context
+      const misalignedCriteria = criteria.filter(c => 
+        c.culturalContext !== culturalContext && c.culturalContext !== 'Universal'
+      );
+      
+      if (misalignedCriteria.length > 0) {
+        concerns.push('Some assessment criteria may not align with cultural context');
+        suggestions.push('Review criteria cultural alignment');
+        suggestions.push('Consider cultural adaptation of criteria');
+      }
+      
+      // Check if assessment is comprehensive
+      if (criteria.length < 2) {
+        concerns.push('Assessment may not be comprehensive enough');
+        suggestions.push('Include additional assessment criteria');
+      }
+      
+      return {
+        isAppropriate: concerns.length === 0,
+        concerns,
+        suggestions
+      };
+    }
+  } 

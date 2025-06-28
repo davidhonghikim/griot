@@ -1,0 +1,18 @@
+{
+  "category": "auto_index_hook.py",
+  "asset_type": "scripts",
+  "total_files": 1,
+  "last_updated": "2025-06-28T07:58:39.545471",
+  "files": [
+    {
+      "name": "Auto Index Hook",
+      "path": "scripts/auto_index_hook.py",
+      "type": "scripts",
+      "category": "auto_index_hook.py",
+      "size": 6,
+      "lastModified": "2025-06-28T07:46:24.029044",
+      "hash": "0a7b5dbf14fd4317865ee87809761fa1282745dd2c4ea6ce1da04c9aac27addd",
+      "description": "!/usr/bin/env python3  "
+    }
+  ]
+}

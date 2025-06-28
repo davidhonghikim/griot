@@ -1,0 +1,326 @@
+name: "Security Compliance Check"
+description: "Ensures proper input validation, sanitization, and security best practices - assumes all input is malicious until proven safe"
+category: "compliance"
+tags:
+  primary: "security"
+  secondary: ["compliance", "input-validation", "injection-prevention", "authentication", "authorization", "secrets", "encryption", "threat-detection"]
+  nodes: ["musa"]
+  priority: "critical"
+  complexity: "complex"
+  cultural: ["hieros"]
+  dependencies: ["environment_check", "package_priority_check"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+code: |
+  import { readFileSync } from 'fs';
+  import { glob } from 'glob';
+  
+  export async function security_compliance_check(input: {
+    check_input_validation: boolean;
+    check_sql_injection: boolean;
+    check_xss_prevention: boolean;
+    check_command_injection: boolean;
+    check_authentication: boolean;
+    check_authorization: boolean;
+    check_secrets_management: boolean;
+    check_https_usage: boolean;
+  }) {
+    const violations = [];
+    const critical_violations = [];
+    const recommendations = [];
+    
+    // Check all TypeScript/JavaScript files for security issues
+    const files = await glob('**/*.{ts,js}', { ignore: ['node_modules/**', 'dist/**'] });
+    
+    for (const file of files) {
+      const content = readFileSync(file, 'utf8');
+      
+      // CRITICAL: Check for direct user input usage without validation
+      if (input.check_input_validation) {
+        // Check for direct req.body usage without validation
+        if (content.includes('req.body') && !content.includes('validate') && !content.includes('sanitize')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Direct req.body usage without validation - potential injection attack vector',
+            severity: 'critical',
+            fix: 'Use input validation library (joi, yup, zod) before processing user input'
+          });
+        }
+        
+        // Check for direct req.query usage without validation
+        if (content.includes('req.query') && !content.includes('validate') && !content.includes('sanitize')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Direct req.query usage without validation - potential injection attack vector',
+            severity: 'critical',
+            fix: 'Validate and sanitize query parameters before use'
+          });
+        }
+        
+        // Check for direct req.params usage without validation
+        if (content.includes('req.params') && !content.includes('validate') && !content.includes('sanitize')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Direct req.params usage without validation - potential injection attack vector',
+            severity: 'critical',
+            fix: 'Validate and sanitize URL parameters before use'
+          });
+        }
+        
+        // Check for direct process.env usage without validation
+        if (content.includes('process.env') && !content.includes('validate') && !content.includes('getEnvironmentConfig')) {
+          violations.push({
+            file,
+            issue: 'Direct process.env usage without validation - use centralized environment config',
+            severity: 'error',
+            fix: 'Use getEnvironmentConfig() from @griot/core for safe environment access'
+          });
+        }
+      }
+      
+      // CRITICAL: Check for SQL injection vulnerabilities
+      if (input.check_sql_injection) {
+        // Check for string concatenation in SQL queries
+        if (content.includes('SELECT') && (content.includes('+') || content.includes('${') || content.includes('`${')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Potential SQL injection - string concatenation in SQL queries',
+            severity: 'critical',
+            fix: 'Use parameterized queries or ORM methods instead of string concatenation'
+          });
+        }
+        
+        // Check for direct database queries without parameterization
+        if ((content.includes('query(') || content.includes('execute(')) && content.includes('${')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Potential SQL injection - template literals in database queries',
+            severity: 'critical',
+            fix: 'Use parameterized queries with proper escaping'
+          });
+        }
+        
+        // Check for eval() usage (extremely dangerous)
+        if (content.includes('eval(')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: eval() usage detected - major security vulnerability',
+            severity: 'critical',
+            fix: 'Remove eval() usage - use JSON.parse() or other safe alternatives'
+          });
+        }
+      }
+      
+      // Check for XSS prevention
+      if (input.check_xss_prevention) {
+        // Check for direct innerHTML usage
+        if (content.includes('innerHTML') && !content.includes('DOMPurify') && !content.includes('sanitize')) {
+          violations.push({
+            file,
+            issue: 'Potential XSS vulnerability - direct innerHTML usage without sanitization',
+            severity: 'error',
+            fix: 'Use DOMPurify or similar library to sanitize HTML content'
+          });
+        }
+        
+        // Check for direct document.write usage
+        if (content.includes('document.write(')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: document.write() usage - major XSS vulnerability',
+            severity: 'critical',
+            fix: 'Remove document.write() usage - use safe DOM manipulation methods'
+          });
+        }
+        
+        // Check for unsafe JSON parsing
+        if (content.includes('JSON.parse(') && content.includes('req.body')) {
+          violations.push({
+            file,
+            issue: 'Potential XSS - unsafe JSON parsing of user input',
+            severity: 'warning',
+            fix: 'Validate JSON structure before parsing'
+          });
+        }
+      }
+      
+      // Check for command injection
+      if (input.check_command_injection) {
+        // Check for exec() usage with user input
+        if (content.includes('exec(') && (content.includes('req.body') || content.includes('req.query') || content.includes('req.params'))) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Command injection vulnerability - exec() with user input',
+            severity: 'critical',
+            fix: 'Never use exec() with user input - use safe alternatives or whitelist commands'
+          });
+        }
+        
+        // Check for spawn() usage with user input
+        if (content.includes('spawn(') && (content.includes('req.body') || content.includes('req.query'))) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Command injection vulnerability - spawn() with user input',
+            severity: 'critical',
+            fix: 'Validate and sanitize all command arguments'
+          });
+        }
+        
+        // Check for child_process usage
+        if (content.includes('child_process') && !content.includes('validate')) {
+          violations.push({
+            file,
+            issue: 'Potential command injection - child_process usage without validation',
+            severity: 'warning',
+            fix: 'Validate all inputs before passing to child_process'
+          });
+        }
+      }
+      
+      // Check for authentication patterns
+      if (input.check_authentication) {
+        // Check for hardcoded credentials
+        if (content.includes('password') && content.includes('"') && !content.includes('process.env')) {
+          violations.push({
+            file,
+            issue: 'Hardcoded credentials detected - security risk',
+            severity: 'error',
+            fix: 'Use environment variables or secure credential management'
+          });
+        }
+        
+        // Check for missing authentication middleware
+        if (content.includes('app.get(') || content.includes('app.post(')) {
+          if (!content.includes('authenticate') && !content.includes('auth') && !content.includes('middleware')) {
+            recommendations.push({
+              file,
+              issue: 'Consider adding authentication middleware to API endpoints',
+              severity: 'info',
+              fix: 'Add authentication middleware for protected routes'
+            });
+          }
+        }
+      }
+      
+      // Check for authorization patterns
+      if (input.check_authorization) {
+        // Check for missing role-based access control
+        if (content.includes('req.user') && !content.includes('role') && !content.includes('permission')) {
+          recommendations.push({
+            file,
+            issue: 'Consider implementing role-based access control',
+            severity: 'info',
+            fix: 'Add role/permission checks for sensitive operations'
+          });
+        }
+      }
+      
+      // Check for secrets management
+      if (input.check_secrets_management) {
+        // Check for hardcoded API keys
+        if (content.includes('api_key') && content.includes('"') && !content.includes('process.env')) {
+          critical_violations.push({
+            file,
+            issue: 'CRITICAL: Hardcoded API key detected',
+            severity: 'critical',
+            fix: 'Move API keys to environment variables or secure secret management'
+          });
+        }
+        
+        // Check for hardcoded tokens
+        if (content.includes('token') && content.includes('"') && !content.includes('process.env')) {
+          violations.push({
+            file,
+            issue: 'Hardcoded token detected - security risk',
+            severity: 'error',
+            fix: 'Use environment variables for token storage'
+          });
+        }
+        
+        // Check for console.log of sensitive data
+        if (content.includes('console.log') && (content.includes('password') || content.includes('token') || content.includes('key'))) {
+          violations.push({
+            file,
+            issue: 'Logging sensitive data - security risk',
+            severity: 'error',
+            fix: 'Remove sensitive data from logs or use secure logging'
+          });
+        }
+      }
+      
+      // Check for HTTPS usage
+      if (input.check_https_usage) {
+        // Check for HTTP URLs in production code
+        if (content.includes('http://') && !content.includes('localhost') && !content.includes('127.0.0.1')) {
+          violations.push({
+            file,
+            issue: 'HTTP URLs detected - use HTTPS for production',
+            severity: 'warning',
+            fix: 'Replace HTTP URLs with HTTPS equivalents'
+          });
+        }
+        
+        // Check for secure cookie settings
+        if (content.includes('cookie') && !content.includes('secure') && !content.includes('httpOnly')) {
+          recommendations.push({
+            file,
+            issue: 'Consider adding secure and httpOnly flags to cookies',
+            severity: 'info',
+            fix: 'Add secure: true and httpOnly: true to cookie options'
+          });
+        }
+      }
+      
+      // Additional security checks
+      
+      // Check for proper error handling (don't expose internal details)
+      if (content.includes('Error') && content.includes('stack') && !content.includes('production')) {
+        violations.push({
+          file,
+          issue: 'Exposing error stack traces - security risk',
+          severity: 'warning',
+          fix: 'Sanitize error messages in production'
+        });
+      }
+      
+      // Check for proper CORS configuration
+      if (content.includes('cors') && content.includes('origin: "*"')) {
+        violations.push({
+          file,
+          issue: 'Overly permissive CORS configuration',
+          severity: 'warning',
+          fix: 'Restrict CORS origins to specific domains'
+        });
+      }
+      
+      // Check for rate limiting
+      if (content.includes('app.use(') && !content.includes('rateLimit') && !content.includes('throttle')) {
+        recommendations.push({
+          file,
+          issue: 'Consider adding rate limiting to prevent abuse',
+          severity: 'info',
+          fix: 'Add rate limiting middleware for API endpoints'
+        });
+      }
+    }
+    
+    return {
+      success: critical_violations.length === 0 && violations.length === 0,
+      critical_violations,
+      violations,
+      recommendations,
+      summary: `Found ${critical_violations.length} CRITICAL violations, ${violations.length} violations, and ${recommendations.length} recommendations`,
+      security_score: calculate_security_score(critical_violations.length, violations.length, recommendations.length)
+    };
+  }
+  
+  function calculate_security_score(critical: number, violations: number, recommendations: number): number {
+    // Base score of 100, subtract points for issues
+    let score = 100;
+    score -= critical * 20; // Critical issues heavily penalize score
+    score -= violations * 5; // Regular violations moderately penalize
+    score -= recommendations * 1; // Recommendations slightly penalize
+    return Math.max(0, score);
+  } 

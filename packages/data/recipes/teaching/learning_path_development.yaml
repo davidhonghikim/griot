@@ -1,0 +1,431 @@
+name: "Learning Path Development"
+description: "Development of personalized learning paths with cultural sensitivity and traditional wisdom"
+category: "teaching"
+tags:
+  primary: "teaching"
+  secondary: ["learning", "path", "development", "personalized", "cultural"]
+  priority: "high"
+  complexity: "moderate"
+  dependencies: ["skills/teaching/mentor.yaml", "skills/teaching/learning_assessment.yaml"]
+  version: "1.0.0"
+  created: "2025-06-28"
+  updated: "2025-06-28"
+  author: "system"
+workflow: |
+  export interface LearningPathConfig {
+    learnerId: string;
+    culturalContext: string;
+    currentLevel: 'beginner' | 'intermediate' | 'advanced';
+    targetLevel: 'beginner' | 'intermediate' | 'advanced';
+    focusAreas: string[];
+    learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
+    culturalBackground: string;
+    timeAvailability: number; // hours per week
+    duration: number; // in weeks
+  }
+  
+  export interface LearningMilestone {
+    id: string;
+    title: string;
+    description: string;
+    targetDate: Date;
+    completed: boolean;
+    difficulty: 'beginner' | 'intermediate' | 'advanced';
+    culturalElements: string[];
+    learningMethods: string[];
+    assessmentCriteria: string[];
+  }
+  
+  export interface LearningPath {
+    pathId: string;
+    config: LearningPathConfig;
+    milestones: LearningMilestone[];
+    timeline: {
+      startDate: Date;
+      endDate: Date;
+      duration: number; // in weeks
+    };
+    progress: {
+      completedMilestones: number;
+      overallProgress: number; // 0-1
+      culturalAlignment: number; // 0-1
+    };
+    recommendations: string[];
+  }
+  
+  export class LearningPathDevelopmentWorkflow {
+    private mentorSkill: any; // MentorSkill instance
+    private learningAssessment: any; // LearningAssessmentSkill instance
+    private learningPaths: Map<string, LearningPath>;
+    
+    constructor() {
+      this.mentorSkill = new MentorSkill();
+      this.learningAssessment = new LearningAssessmentSkill();
+      this.learningPaths = new Map();
+    }
+    
+    // Create personalized learning path
+    async createLearningPath(config: LearningPathConfig): Promise<LearningPath> {
+      // Conduct initial assessment
+      const initialAssessment = await this.conductInitialAssessment(config);
+      
+      // Generate milestones based on assessment and config
+      const milestones = await this.generateMilestones(config, initialAssessment);
+      
+      // Create timeline
+      const timeline = this.createTimeline(config);
+      
+      // Generate recommendations
+      const recommendations = this.generateRecommendations(config, initialAssessment);
+      
+      const pathId = `path_${config.learnerId}_${Date.now()}`;
+      
+      const learningPath: LearningPath = {
+        pathId,
+        config,
+        milestones,
+        timeline,
+        progress: {
+          completedMilestones: 0,
+          overallProgress: 0,
+          culturalAlignment: 0
+        },
+        recommendations
+      };
+      
+      this.learningPaths.set(pathId, learningPath);
+      
+      return learningPath;
+    }
+    
+    // Conduct initial assessment
+    private async conductInitialAssessment(config: LearningPathConfig): Promise<{
+      currentSkills: Record<string, number>; // skill -> proficiency (0-1)
+      culturalUnderstanding: number; // 0-1
+      learningPreferences: string[];
+      strengths: string[];
+      areasForGrowth: string[];
+    }> {
+      // Simulate assessment (in real implementation, this would involve actual evaluation)
+      const currentSkills: Record<string, number> = {};
+      
+      // Initialize skills based on current level
+      for (const area of config.focusAreas) {
+        const baseSkill = config.currentLevel === 'beginner' ? 0.3 : 
+                         config.currentLevel === 'intermediate' ? 0.6 : 0.8;
+        currentSkills[area] = baseSkill + Math.random() * 0.2;
+      }
+      
+      const culturalUnderstanding = Math.random() * 0.4 + 0.6; // 0.6-1.0
+      const learningPreferences = ['observation', 'discussion', 'practice', 'reflection'];
+      const strengths = ['eagerness_to_learn', 'cultural_curiosity', 'respectful_attitude'];
+      const areasForGrowth = config.focusAreas.map(area => `deepen_${area}_understanding`);
+      
+      return {
+        currentSkills,
+        culturalUnderstanding,
+        learningPreferences,
+        strengths,
+        areasForGrowth
+      };
+    }
+    
+    // Generate milestones
+    private async generateMilestones(
+      config: LearningPathConfig,
+      assessment: any
+    ): Promise<LearningMilestone[]> {
+      const milestones: LearningMilestone[] = [];
+      const weeksPerMilestone = Math.ceil(config.duration / config.focusAreas.length);
+      
+      for (let i = 0; i < config.focusAreas.length; i++) {
+        const area = config.focusAreas[i];
+        const targetDate = new Date(config.timeline?.startDate.getTime() + (i + 1) * weeksPerMilestone * 7 * 24 * 60 * 60 * 1000);
+        
+        const milestone: LearningMilestone = {
+          id: `milestone_${config.learnerId}_${i}`,
+          title: `Master ${area} Fundamentals`,
+          description: `Develop comprehensive understanding and practical skills in ${area}`,
+          targetDate,
+          completed: false,
+          difficulty: this.determineDifficulty(config.currentLevel, i),
+          culturalElements: this.getCulturalElements(area, config.culturalContext),
+          learningMethods: this.getLearningMethods(config.learningStyle, area),
+          assessmentCriteria: this.getAssessmentCriteria(area, config.culturalContext)
+        };
+        
+        milestones.push(milestone);
+      }
+      
+      return milestones;
+    }
+    
+    // Determine milestone difficulty
+    private determineDifficulty(currentLevel: string, milestoneIndex: number): 'beginner' | 'intermediate' | 'advanced' {
+      if (currentLevel === 'beginner') {
+        return milestoneIndex === 0 ? 'beginner' : 'intermediate';
+      } else if (currentLevel === 'intermediate') {
+        return milestoneIndex === 0 ? 'intermediate' : 'advanced';
+      } else {
+        return 'advanced';
+      }
+    }
+    
+    // Get cultural elements for milestone
+    private getCulturalElements(area: string, culturalContext: string): string[] {
+      const elements = ['cultural_respect', 'traditional_wisdom', 'community_learning'];
+      
+      if (culturalContext === 'HIEROS') {
+        elements.push('hieros_principles', 'cultural_stewardship', 'ethical_development');
+      }
+      
+      if (area.includes('cultural') || area.includes('traditional')) {
+        elements.push('cultural_authenticity', 'traditional_methods', 'cultural_preservation');
+      }
+      
+      return elements;
+    }
+    
+    // Get learning methods based on learning style
+    private getLearningMethods(learningStyle: string, area: string): string[] {
+      const methods = {
+        visual: ['observation', 'visual_aids', 'demonstration'],
+        auditory: ['discussion', 'storytelling', 'lecture'],
+        kinesthetic: ['practice', 'hands_on', 'experiential'],
+        mixed: ['observation', 'discussion', 'practice', 'reflection']
+      };
+      
+      return methods[learningStyle as keyof typeof methods] || methods.mixed;
+    }
+    
+    // Get assessment criteria for milestone
+    private getAssessmentCriteria(area: string, culturalContext: string): string[] {
+      const criteria = ['understanding', 'application', 'cultural_sensitivity'];
+      
+      if (culturalContext === 'HIEROS') {
+        criteria.push('hieros_alignment', 'cultural_stewardship');
+      }
+      
+      if (area.includes('cultural') || area.includes('traditional')) {
+        criteria.push('cultural_authenticity', 'traditional_respect');
+      }
+      
+      return criteria;
+    }
+    
+    // Create timeline
+    private createTimeline(config: LearningPathConfig): {
+      startDate: Date;
+      endDate: Date;
+      duration: number;
+    } {
+      const startDate = new Date();
+      const endDate = new Date(startDate.getTime() + config.duration * 7 * 24 * 60 * 60 * 1000);
+      
+      return {
+        startDate,
+        endDate,
+        duration: config.duration
+      };
+    }
+    
+    // Generate recommendations
+    private generateRecommendations(config: LearningPathConfig, assessment: any): string[] {
+      const recommendations = [];
+      
+      // Learning style recommendations
+      if (config.learningStyle === 'visual') {
+        recommendations.push('Use visual aids and demonstrations for learning');
+        recommendations.push('Include cultural artwork and symbols in learning materials');
+      } else if (config.learningStyle === 'auditory') {
+        recommendations.push('Engage in storytelling and oral tradition learning');
+        recommendations.push('Participate in cultural discussions and dialogues');
+      } else if (config.learningStyle === 'kinesthetic') {
+        recommendations.push('Practice cultural skills through hands-on activities');
+        recommendations.push('Engage in experiential learning opportunities');
+      }
+      
+      // Cultural context recommendations
+      if (config.culturalContext === 'HIEROS') {
+        recommendations.push('Apply HIEROS principles throughout the learning journey');
+        recommendations.push('Respect the Seven Sacred Intentions in all learning activities');
+        recommendations.push('Ensure cultural stewardship and preservation');
+      }
+      
+      // Time availability recommendations
+      if (config.timeAvailability < 5) {
+        recommendations.push('Focus on quality over quantity in learning sessions');
+        recommendations.push('Use efficient learning methods and focused practice');
+      } else if (config.timeAvailability > 10) {
+        recommendations.push('Take advantage of extended learning opportunities');
+        recommendations.push('Engage in deep cultural immersion experiences');
+      }
+      
+      // General recommendations
+      recommendations.push('Maintain cultural humility and respect throughout learning');
+      recommendations.push('Seek guidance from cultural experts and community elders');
+      recommendations.push('Practice cultural knowledge in appropriate contexts');
+      
+      return recommendations;
+    }
+    
+    // Update learning path progress
+    async updateProgress(pathId: string, milestoneId: string): Promise<{
+      updatedPath: LearningPath;
+      progress: any;
+    }> {
+      const path = this.learningPaths.get(pathId);
+      if (!path) {
+        throw new Error(`Learning path not found: ${pathId}`);
+      }
+      
+      const milestone = path.milestones.find(m => m.id === milestoneId);
+      if (!milestone) {
+        throw new Error(`Milestone not found: ${milestoneId}`);
+      }
+      
+      // Mark milestone as completed
+      milestone.completed = true;
+      
+      // Update progress
+      const completedMilestones = path.milestones.filter(m => m.completed).length;
+      const overallProgress = completedMilestones / path.milestones.length;
+      
+      // Assess cultural alignment
+      const culturalAlignment = await this.assessCulturalAlignment(path);
+      
+      path.progress = {
+        completedMilestones,
+        overallProgress,
+        culturalAlignment
+      };
+      
+      // Update recommendations based on progress
+      path.recommendations = this.updateRecommendations(path);
+      
+      return {
+        updatedPath: path,
+        progress: path.progress
+      };
+    }
+    
+    // Assess cultural alignment
+    private async assessCulturalAlignment(path: LearningPath): Promise<number> {
+      // Simulate cultural alignment assessment
+      const completedMilestones = path.milestones.filter(m => m.completed);
+      
+      if (completedMilestones.length === 0) {
+        return 0.5; // Default alignment
+      }
+      
+      // Calculate alignment based on completed milestones
+      let alignment = 0.5; // Base alignment
+      
+      for (const milestone of completedMilestones) {
+        if (milestone.culturalElements.length > 0) {
+          alignment += 0.1; // Boost for cultural elements
+        }
+        if (milestone.difficulty === 'advanced') {
+          alignment += 0.05; // Boost for advanced milestones
+        }
+      }
+      
+      return Math.min(alignment, 1.0); // Cap at 1.0
+    }
+    
+    // Update recommendations based on progress
+    private updateRecommendations(path: LearningPath): string[] {
+      const recommendations = [...path.recommendations];
+      
+      if (path.progress.overallProgress >= 0.8) {
+        recommendations.push('Consider advanced learning opportunities');
+        recommendations.push('Begin mentoring others if appropriate');
+        recommendations.push('Contribute to cultural preservation and transmission');
+      } else if (path.progress.overallProgress >= 0.6) {
+        recommendations.push('Continue current learning path with focus on remaining areas');
+        recommendations.push('Practice skills in real-world contexts');
+        recommendations.push('Seek additional guidance for challenging areas');
+      } else {
+        recommendations.push('Review foundational concepts and principles');
+        recommendations.push('Spend more time in cultural immersion and practice');
+        recommendations.push('Work closely with mentors and cultural guides');
+      }
+      
+      if (path.progress.culturalAlignment < 0.7) {
+        recommendations.push('Focus on deepening cultural understanding and sensitivity');
+        recommendations.push('Engage more deeply with cultural traditions and practices');
+      }
+      
+      return recommendations;
+    }
+    
+    // Get learning path recommendations
+    getPathRecommendations(config: LearningPathConfig): string[] {
+      return this.mentorSkill.getMentorshipRecommendations(
+        config.currentLevel,
+        config.culturalContext
+      );
+    }
+    
+    // Validate learning path
+    validateLearningPath(path: LearningPath): {
+      isValid: boolean;
+      concerns: string[];
+      suggestions: string[];
+    } {
+      const concerns: string[] = [];
+      const suggestions: string[] = [];
+      
+      // Check if path has milestones
+      if (path.milestones.length === 0) {
+        concerns.push('Learning path has no milestones');
+        suggestions.push('Add milestones for each focus area');
+      }
+      
+      // Check if timeline is reasonable
+      if (path.timeline.duration < path.milestones.length) {
+        concerns.push('Timeline may be too short for the number of milestones');
+        suggestions.push('Extend timeline or reduce number of milestones');
+      }
+      
+      // Check if cultural elements are included
+      const milestonesWithoutCulturalElements = path.milestones.filter(m => m.culturalElements.length === 0);
+      if (milestonesWithoutCulturalElements.length > 0) {
+        concerns.push('Some milestones lack cultural elements');
+        suggestions.push('Add cultural elements to all milestones');
+      }
+      
+      // Check if learning methods are appropriate
+      const milestonesWithoutMethods = path.milestones.filter(m => m.learningMethods.length === 0);
+      if (milestonesWithoutMethods.length > 0) {
+        concerns.push('Some milestones lack learning methods');
+        suggestions.push('Add appropriate learning methods to all milestones');
+      }
+      
+      return {
+        isValid: concerns.length === 0,
+        concerns,
+        suggestions
+      };
+    }
+    
+    // Get learning path statistics
+    getPathStats(): {
+      totalPaths: number;
+      activePaths: number;
+      averageProgress: number;
+      averageCulturalAlignment: number;
+    } {
+      const paths = Array.from(this.learningPaths.values());
+      const activePaths = paths.filter(p => p.progress.overallProgress < 1.0).length;
+      const averageProgress = paths.reduce((sum, p) => sum + p.progress.overallProgress, 0) / paths.length;
+      const averageCulturalAlignment = paths.reduce((sum, p) => sum + p.progress.culturalAlignment, 0) / paths.length;
+      
+      return {
+        totalPaths: paths.length,
+        activePaths,
+        averageProgress,
+        averageCulturalAlignment
+      };
+    }
+  } 
