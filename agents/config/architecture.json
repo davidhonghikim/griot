@@ -1,0 +1,84 @@
+{
+  "version": "2.0",
+  "last_updated": "2025-06-29",
+  "project": {
+    "name": "kOS (Kindai Operating System)",
+    "type": "AI-driven orchestration framework",
+    "constitution": "ai-q/04_architecture/02_AI_Orchestration_Framework.md"
+  },
+  "core_vision": {
+    "big_vision": "kOS is not a monolithic application; it is a flexible, intelligent framework for AI-driven orchestration",
+    "primary_role": "Build core engine and nodes that allow AI agents to dynamically discover capabilities and compose complex workflows",
+    "architecture_principle": "Database-first, file-backed hybrid system"
+  },
+  "kind_link_framework": {
+    "name": "KLF",
+    "purpose": "Expose node capabilities for dynamic discovery and composition",
+    "nodes": [
+      "Griot",
+      "Tohunga", 
+      "Ronin",
+      "Musa",
+      "Hakim",
+      "Oracle",
+      "Amauta",
+      "Junzi",
+      "Yachay",
+      "Sachem",
+      "Archon",
+      "Skald",
+      "Mzee"
+    ]
+  },
+  "storage_strategy": {
+    "primary": {
+      "weaviate": "Vector embeddings, semantic search",
+      "neo4j": "Knowledge graph, relationships",
+      "postgresql": "Metadata, versioning, audit trail"
+    },
+    "secondary": {
+      "file_system": "Auto-generated views for editing and exports",
+      "documentation_viewer": "Direct database integration with real-time updates"
+    }
+  },
+  "hybrid_workflow": {
+    "database_as_truth": "All knowledge stored in structured format",
+    "file_system_as_interface": "Auto-generated markdown for editing",
+    "bi_directional_sync": "Changes in files automatically update database",
+    "version_control": "Both database and file changes tracked"
+  },
+  "ai_capabilities": {
+    "model_training": {
+      "data_sources": [
+        "agent_conversations",
+        "successful_solutions",
+        "knowledge_compositions", 
+        "user_interactions"
+      ],
+      "model_types": [
+        "embedding_models",
+        "classification_models",
+        "generation_models",
+        "recommendation_models"
+      ]
+    },
+    "evaluation_metrics": [
+      "knowledge_accuracy",
+      "composition_success_rate", 
+      "user_satisfaction",
+      "task_completion_time"
+    ]
+  },
+  "current_implementation": {
+    "status": "PersonaVectorizationService implemented",
+    "next_phase": "RAG operations extension",
+    "infrastructure": "All databases configured and ready",
+    "proven_patterns": "PricingRAGService demonstrates successful integration"
+  },
+  "key_architectural_documents": {
+    "constitution": "ai-q/04_architecture/02_AI_Orchestration_Framework.md",
+    "node_specifications": "ai-q/03_node_specifications/",
+    "protocols": "ai-q/02_protocols/",
+    "foundation": "ai-q/01_foundation/"
+  }
+} 

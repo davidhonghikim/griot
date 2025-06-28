@@ -1,0 +1,148 @@
+version: "2.0"
+status: "ACTIVE"
+last_updated: "2025-06-29"
+
+# Core Workflow Process
+workflow:
+  prime_directive: "No Surprises"
+  goal: "Perform assigned task while leaving clear, auditable trail"
+  
+  # Mandatory Steps
+  steps:
+    onboarding:
+      description: "Load essential context (first 5 minutes)"
+      command: "cat agents/README.md && echo '\n---' && cat agents/bootstrap/00_AGENT_WORKFLOW.md && echo '\n---' && cat agents/handoff/LATEST_HANDOFF.md"
+      required: true
+      
+    changelog:
+      description: "Document session in agents/bootstrap/01_AGENT_CHANGELOG.md"
+      template: |
+        ---
+        ## Agent: [Your Name/Model] - [YYYY-MM-DD]
+        **Mission**: [Brief summary from LATEST_HANDOFF.md]
+        ### Log:
+        - **[YYYY-MM-DDTHH:MM:SSZ]**: ONBOARDING - Session started.
+      required: true
+      
+    execution:
+      description: "Follow workflow in agents/bootstrap/00_AGENT_WORKFLOW.md"
+      required: true
+      
+    documentation:
+      description: "Update all relevant docs BEFORE archiving"
+      required: true
+      
+    handoff:
+      description: "Create comprehensive handoff for next agent"
+      required: true
+
+# Critical Rules
+critical_rules:
+  documentation_before_archiving:
+    description: "MUST update all relevant documentation BEFORE archiving any handoff"
+    violation: "CRITICAL_VIOLATION"
+    required_updates:
+      - "Agent Changelog - agents/bootstrap/01_AGENT_CHANGELOG.md"
+      - "Handoff Document - agents/handoff/LATEST_HANDOFF.md"
+      - "Implementation Plans - agents/implementation-plans/"
+      - "Project Documentation - README files"
+      - "Code Documentation - inline comments"
+      
+  complete_tasks:
+    description: "Complete tasks end-to-end, no partial work"
+    prohibited: ["Partial work", "Progress reports without completion"]
+    required: ["100% completion", "All errors resolved", "Code builds and passes linting"]
+    
+  fix_errors:
+    description: "Fix all errors found, don't just report them"
+    action: "Fix immediately when found"
+    
+  follow_conventions:
+    description: "Use established naming, structure, and style patterns"
+    scope: ["File naming", "Directory structure", "Code style", "Documentation format"]
+
+# GPT Agent Requirements
+gpt_requirements:
+  mandatory:
+    - "Complete tasks end-to-end before reporting"
+    - "Fix all errors found, don't just report them"
+  prohibited:
+    - "Partial work"
+    - "Progress reports without completion"
+  prompt_format: "Fix X completely. Don't stop until it's done."
+  success_criteria:
+    - "100% completion"
+    - "All errors resolved"
+    - "Code builds and passes linting"
+
+# Logging Standards
+logging:
+  entry_types:
+    finding: "Discovery of significant issue"
+    correction: "Direct action to fix a finding"
+    decision: "Choice between implementation options"
+    action: "Significant multi-step task completion"
+    
+  format: "[YYYY-MM-DDTHH:MM:SSZ]: TYPE - Description"
+  
+  session_summary_template: |
+    ### SESSION SUMMARY:
+    **Accomplishments**: 
+    - [List of completed primary goals]
+    - [List of other significant achievements]
+    **Final State**: [Brief description of codebase/documentation state]
+    **Key Findings**: 
+    - [List of critical discoveries]
+    - [If none, state "None."]
+
+# Handoff Process
+handoff:
+  archive_old:
+    command: "mv agents/handoff/LATEST_HANDOFF.md agents/handoff/archive/[YYYY-MM-DD]_[YourName]_[Description].md"
+    required: true
+    
+  create_new:
+    template_file: "agents/handoff/LATEST_HANDOFF.md"
+    required_sections:
+      - "Current Project Status"
+      - "Your Directive"
+      - "Context & History"
+    required: true
+
+# File Standards
+file_standards:
+  markdown:
+    required: true
+    frontmatter: "title and version fields matching filename"
+    headings: "Hierarchical (## follows #, ### follows ##)"
+    code_blocks: "Properly fenced with language identifier"
+    
+  naming:
+    node_specifications: "[##]_[SpecName].md"
+    handoffs: "[YYYY-MM-DD]_[AgentName]_[Description].md"
+    
+  directory_structure:
+    documentation: "ai-q/"
+    agent_processes: "agents/"
+    node_specifications: "ai-q/03_node_specifications/[##]_[NodeName]/"
+
+# Quality Standards
+quality_standards:
+  completeness: "All major changes must be documented"
+  clarity: "Clear enough for next agent to understand"
+  accuracy: "Reflect actual state of codebase"
+  timeliness: "Updated before archiving"
+  consistency: "Follow established patterns and conventions"
+
+# Documentation Checklist
+documentation_checklist:
+  before_archiving:
+    - "Agent changelog updated with session summary"
+    - "Handoff document created with clear directive"
+    - "Implementation plans updated (if applicable)"
+    - "README files updated (if architectural changes)"
+    - "Code documentation updated (if code changes)"
+    - "Configuration documentation updated (if config changes)"
+    - "User guides updated (if user-facing changes)"
+  
+  rule: "DO NOT ARCHIVE UNTIL ALL CHECKLIST ITEMS ARE COMPLETE" 

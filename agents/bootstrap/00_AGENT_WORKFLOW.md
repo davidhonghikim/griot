@@ -2,7 +2,7 @@
 
 **Version**: 2.0
 **Status**: ACTIVE
-**Last Updated**: 2025-06-28
+**Last Updated**: 2025-06-29
 
 This document is the **absolute source of truth** for the agent development workflow on the kOS project. It is non-negotiable. Adherence to this process is mandatory for all agents to ensure consistency, quality, and a traceable history.
 
@@ -35,10 +35,15 @@ Before taking any other action, you **must** ground yourself in the current proj
 Execute the following command:
 
 ```bash
-cat agents/02_SYSTEM_PROMPT.md && echo "\n---" && cat agents/00_AGENT_WORKFLOW.md && echo "\n---" && cat ai-q/04_architecture/02_AI_Orchestration_Framework.md && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
+cat agents/README.md && echo "\n---" && cat agents/bootstrap/00_AGENT_WORKFLOW.md && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
 ```
 
-This command will display your core system prompt, the agent workflow, the project's architectural vision, and the specific, up-to-date directive for your current session. Do not proceed until you have done this.
+This command will display the system overview, the agent workflow, and the specific, up-to-date directive for your current session. Do not proceed until you have done this.
+
+**OPTIONAL: For detailed context, you can also load the AI-optimized configuration files:**
+```bash
+cat agents/config/system_config.json && echo "\n---" && cat agents/config/project_context.json && echo "\n---" && cat agents/config/architecture.json
+```
 
 ### 2. The Agent Changelog (Your Primary Duty)
 
@@ -181,4 +186,91 @@ This structured process ensures a clean, traceable, and consistent workflow for 
 - [ ] Configuration documentation updated (if config changes)
 - [ ] User guides updated (if user-facing changes)
 
-**⚠️ DO NOT ARCHIVE UNTIL ALL CHECKLIST ITEMS ARE COMPLETE** 
+**⚠️ DO NOT ARCHIVE UNTIL ALL CHECKLIST ITEMS ARE COMPLETE**
+
+---
+
+## MANDATORY FINAL DOUBLE-CHECK & ERROR REVIEW
+
+Before marking any task as complete or handing off to the next agent, you MUST:
+
+1. **Double-Check All Work:**
+   - Review all new and modified files for errors, logic issues, missing imports, and missing dependencies.
+   - Trace the runtime logic, following code and pseudocode, to ensure correctness and completeness.
+   - Check for unhandled edge cases, incomplete implementations, and integration issues.
+   - Ensure all code is clear, maintainable, and well-commented where needed.
+
+2. **Integration & Dependency Verification:**
+   - Confirm that all imports and dependencies are present and correct.
+   - Verify that new modules integrate cleanly with the rest of the system.
+   - Check for missing files, references, or configuration that would prevent runtime use.
+
+3. **Quality Over Speed:**
+   - Do NOT mark a task as complete just to check it off. Only mark as complete when you are confident in the quality and correctness of the work.
+   - If you find issues, document them and address them before handoff.
+
+4. **Documentation:**
+   - Log your double-check and findings in the changelog and handoff.
+   - If you find and fix issues, document the correction and rationale.
+
+This process is mandatory for all agents and is critical for maintaining the quality and reliability of the kOS project.
+
+---
+
+## MANDATORY BUILD & LINT VERIFICATION
+
+After making any code changes, you MUST:
+
+1. **Verify All Imports and Dependencies:**
+   - Check that all imports resolve and all dependencies are present.
+   - If an import fails, fix the path or create the missing file before proceeding.
+
+2. **Run Build and Linter:**
+   - Run the project build and linter (or equivalent error checker) after every code change.
+   - Do NOT mark a task as complete if there are any build or lint errors or warnings.
+   - Only proceed when the code builds and passes linting without errors.
+
+3. **Log Errors and Fixes:**
+   - Document any errors found and the steps taken to resolve them in the changelog.
+   - If you cannot resolve an error, document it clearly for the next agent.
+
+This is mandatory for all agents and is critical for maintaining a reliable, error-free codebase.
+
+---
+
+## GPT-BASED AGENT REQUIREMENTS
+
+**For GPT-4/GPT-4.1 agents specifically:**
+
+### Mandatory Work Style:
+1. **Complete Tasks End-to-End**: Never report progress or ask questions until the entire task is finished
+2. **Fix Everything You Find**: When reviewing code, fix all errors, not just report them
+3. **No Partial Work**: Do not mark tasks as "in progress" or "partially complete"
+4. **Proactive Problem Solving**: Anticipate and resolve issues without asking for permission
+
+### Required Prompt Format for GPT Agents:
+- Use explicit completion criteria: "Fix X completely. Don't stop until it's done."
+- Require verification: "Read the errors, fix them all, verify it works."
+- Demand comprehensive review: "Do a complete review and fix everything you find."
+- Follow established workflows: "Follow the workflow exactly and complete the task."
+
+### What NOT to Accept from GPT Agents:
+- Progress reports without completion
+- Questions about how to proceed when the path is clear
+- Partial fixes or "work in progress" status
+- Promises to do better without immediate action
+
+### GPT Agent Behavior Patterns to Watch For:
+- Asking "Would you like me to..." instead of just doing it
+- Reporting "I found X issues" without fixing them
+- Stopping to ask for clarification when the next step is obvious
+- Making incremental changes instead of comprehensive fixes
+
+### Success Criteria for GPT Agents:
+- Task is 100% complete before any reporting
+- All errors are resolved, not just identified
+- Code builds and passes linting
+- Documentation is updated
+- No TODOs or incomplete implementations remain
+
+**Note**: GPT agents require explicit, completion-focused instructions. General guidance or requests to "do better" do not change their behavior. They need specific, actionable commands that require full completion. 
