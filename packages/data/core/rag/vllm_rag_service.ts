@@ -1,7 +1,7 @@
 /**
  * vLLM-RAG Integration Service
  * 
- * Integrates vLLM with the existing RAG system for
+ * Integrates vLLM high-performance inference API with the existing RAG system for
  * enhanced retrieval-augmented generation capabilities.
  */
 
@@ -10,16 +10,14 @@ import { VectorStore } from './vector_store';
 import { EmbeddingService } from './embedding_service';
 
 export interface VLLMRAGConfig {
-  vllmHost: string;
-  defaultModel: string;
-  maxTokens: number;
-  temperature: number;
-  topP: number;
-  similarityThreshold: number;
-  maxResults: number;
-  enableStreaming: boolean;
-  tensorParallelSize: number;
-  gpuMemoryUtilization: number;
+  vllmHost?: string;
+  apiKey?: string;
+  defaultModel?: string;
+  enableStreaming?: boolean;
+  maxTokens?: number;
+  topP?: number;
+  temperature?: number;
+  similarityThreshold?: number;
 }
 
 export interface VLLMRAGRequest {
@@ -42,7 +40,7 @@ export interface VLLMRAGResponse {
   retrievedDocuments: Array<{
     id: string;
     content: string;
-    similarity: number;
+    score: number;
     metadata?: Record<string, any>;
   }>;
   context: string;
@@ -52,7 +50,7 @@ export interface VLLMRAGResponse {
     totalTokens: number;
     documentCount: number;
     modelUsed: string;
-    tensorParallelSize: number;
+    apiEndpoint: string;
   };
 }
 
@@ -66,12 +64,25 @@ export interface VLLMModelInfo {
   parent: string;
 }
 
+function validateHost(host: string): { isValid: boolean; error?: string } {
+  try {
+    const url = new URL(host);
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return { isValid: false, error: 'Protocol must be http or https' };
+    }
+    return { isValid: true };
+  } catch (error) {
+    return { isValid: false, error: 'Invalid URL format' };
+  }
+}
+
 export class VLLMRAGService {
   private config: VLLMRAGConfig;
+  private vllmHost: string;
+  private apiKey: string;
   private personaLoader: PersonaLoader;
   private vectorStore: VectorStore;
   private embeddingService: EmbeddingService;
-  private vllmHost: string;
 
   constructor(
     config: VLLMRAGConfig,
@@ -81,65 +92,51 @@ export class VLLMRAGService {
   ) {
     this.config = {
       vllmHost: 'http://localhost:8000',
-      defaultModel: 'microsoft/DialoGPT-medium',
-      maxTokens: 2048,
-      temperature: 0.7,
-      topP: 0.9,
-      similarityThreshold: 0.7,
-      maxResults: 5,
+      defaultModel: 'llama2-7b',
       enableStreaming: false,
-      tensorParallelSize: 1,
-      gpuMemoryUtilization: 0.9,
+      maxTokens: 1000,
+      topP: 0.9,
+      temperature: 0.7,
+      similarityThreshold: 0.7,
       ...config,
     };
     
+    const hostValidation = validateHost(this.config.vllmHost || 'http://localhost:8000');
+    if (!hostValidation.isValid) {
+      throw new Error(`Invalid vLLM host: ${hostValidation.error}`);
+    }
+    
+    this.vllmHost = this.config.vllmHost!;
+    this.apiKey = this.config.apiKey || '';
     this.personaLoader = personaLoader;
     this.vectorStore = vectorStore;
     this.embeddingService = embeddingService;
-    this.vllmHost = this.config.vllmHost;
   }
 
-  /**
-   * Initialize the vLLM-RAG service
-   */
   async initialize(): Promise<void> {
-    console.log('🔄 Initializing vLLM-RAG Service...');
-    
-    // Check vLLM connectivity
+    // Test connection to vLLM
     await this.checkVLLMHealth();
-    
-    // Load available models
-    const models = await this.getAvailableModels();
-    console.log(`📚 Available vLLM models: ${models.map(m => m.id).join(', ')}`);
-    
-    // Verify default model is available
-    if (!models.find(m => m.id === this.config.defaultModel)) {
-      console.warn(`⚠️ Default model ${this.config.defaultModel} not found, using first available`);
-      this.config.defaultModel = models[0]?.id || 'microsoft/DialoGPT-medium';
-    }
-    
-    console.log(`✅ vLLM-RAG Service initialized with model: ${this.config.defaultModel}`);
   }
 
-  /**
-   * Perform RAG query using vLLM
-   */
   async query(request: VLLMRAGRequest): Promise<VLLMRAGResponse> {
     const startTime = Date.now();
-    const model = request.model || this.config.defaultModel;
+    const model = request.model || this.config.defaultModel!;
     
     try {
-      // Step 1: Retrieve relevant documents
+      // Retrieve relevant documents
       const retrievalStart = Date.now();
       const retrievedDocuments = await this.retrieveDocuments(request);
       const retrievalTime = Date.now() - retrievalStart;
-      
-      // Step 2: Build context from retrieved documents
-      const context = this.buildContext(retrievedDocuments, request.query);
-      
-      // Step 3: Generate response using vLLM
+
+      // Build context from retrieved documents
+      const context = this.buildContext(
+        retrievedDocuments.map(doc => ({ content: doc.content, score: doc.score })),
+        request.query
+      );
+
+      // Generate response using vLLM
       const generationStart = Date.now();
-      const vllmResponse = await this.generateWithVLLM({
+      const generationResult = await this.generateWithVLLM({
         model,
         prompt: this.buildPrompt(context, request.query),
         stream: request.stream || this.config.enableStreaming,
@@ -147,82 +144,65 @@ export class VLLMRAGService {
           max_tokens: request.maxTokens || this.config.maxTokens,
           temperature: request.temperature || this.config.temperature,
           top_p: request.topP || this.config.topP,
-        }
+        },
       });
-      
       const generationTime = Date.now() - generationStart;
-      
+
       return {
         query: request.query,
         model,
-        response: vllmResponse.response,
-        retrievedDocuments: request.includeMetadata ? retrievedDocuments : 
-          retrievedDocuments.map(doc => ({ 
-            id: doc.id, 
-            content: doc.content, 
-            similarity: doc.similarity 
-          })),
+        response: generationResult.response,
+        retrievedDocuments: request.includeMetadata ? retrievedDocuments : [],
         context,
         metadata: {
           retrievalTime,
           generationTime,
-          totalTokens: vllmResponse.usage?.total_tokens || 0,
+          totalTokens: generationResult.usage?.total_tokens || 0,
           documentCount: retrievedDocuments.length,
           modelUsed: model,
-          tensorParallelSize: this.config.tensorParallelSize,
+          apiEndpoint: this.vllmHost,
         },
       };
-      
     } catch (error) {
-      console.error('vLLM-RAG query failed:', error);
-      throw new Error(`vLLM-RAG query failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`vLLM RAG query failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
-  /**
-   * Retrieve relevant documents using vector search
-   */
   private async retrieveDocuments(request: VLLMRAGRequest): Promise<Array<{
     id: string;
     content: string;
-    similarity: number;
+    score: number;
     metadata?: Record<string, any>;
   }>> {
-    // Generate query embedding
-    const queryEmbedding = await this.embeddingService.generateEmbedding(request.query);
+    const queryEmbedding = await this.embeddingService.embedText(request.query);
     
-    // Search vector store
-    const searchResults = await this.vectorStore.search({
-      vector: queryEmbedding,
-      limit: request.maxResults || this.config.maxResults,
-      threshold: request.similarityThreshold || this.config.similarityThreshold,
+    const searchResults = await this.vectorStore.search(queryEmbedding, {
+      limit: request.maxResults || 5,
+      
     });
-    
+
     return searchResults.map(result => ({
       id: result.id,
       content: result.content,
-      similarity: result.similarity,
+      score: result.score,
       metadata: result.metadata,
     }));
   }
 
-  /**
-   * Build context from retrieved documents
-   */
-  private buildContext(documents: Array<{ content: string; similarity: number }>, query: string): string {
-    let context = `Query: ${query}\n\nRelevant Information:\n`;
-    
-    for (let i = 0; i < documents.length; i++) {
-      const doc = documents[i];
-      context += `${i + 1}. [Similarity: ${doc.similarity.toFixed(3)}] ${doc.content}\n\n`;
+  private buildContext(documents: Array<{ content: string; score: number }>, query: string): string {
+    if (documents.length === 0) {
+      return 'No relevant documents found.';
     }
-    
-    return context;
+
+    const sortedDocuments = documents
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3); // Use top 3 most relevant documents
+
+    return sortedDocuments
+      .map((doc, index) => `Document ${index + 1} (Relevance: ${doc.score.toFixed(3)}):\n${doc.content}`)
+      .join('\n\n');
   }
 
-  /**
-   * Build prompt for vLLM
-   */
   private buildPrompt(context: string, query: string): string {
     return `You are a helpful AI assistant with access to relevant information. Use the context below to answer the user's question accurately and comprehensively.
 
@@ -235,9 +215,6 @@ Question: ${query}
 Answer:`;
   }
 
-  /**
-   * Generate response using vLLM API
-   */
   private async generateWithVLLM(params: {
     model: string;
     prompt: string;
@@ -254,13 +231,9 @@ Answer:`;
       model: params.model,
       messages: [
         {
-          role: 'system',
-          content: 'You are a helpful AI assistant with access to relevant information.'
-        },
-        {
           role: 'user',
-          content: params.prompt
-        }
+          content: params.prompt,
+        },
       ],
       stream: params.stream || false,
       max_tokens: params.options?.max_tokens || this.config.maxTokens,
@@ -272,7 +245,7 @@ Answer:`;
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.vllmHost.includes('localhost') ? 'token-abc123' : 'your-api-key'}`
+        ...(this.apiKey && { 'Authorization': `Bearer ${this.apiKey}` }),
       },
       body: JSON.stringify(payload),
     });
@@ -281,17 +254,55 @@ Answer:`;
       throw new Error(`vLLM API error: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json();
-    
-    return {
-      response: data.choices[0]?.message?.content || '',
-      usage: data.usage,
-    };
+    if (params.stream) {
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('Failed to get response reader for streaming');
+      }
+      
+      let responseText = '';
+      const decoder = new TextDecoder();
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim());
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') break;
+            
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.choices?.[0]?.delta?.content) {
+                responseText += parsed.choices[0].delta.content;
+              }
+            } catch (error) {
+              // Skip malformed JSON lines
+            }
+          }
+        }
+      }
+      
+      return {
+        response: responseText,
+        usage: { total_tokens: responseText.length }, // Approximate
+      };
+    } else {
+      // Handle non-streaming response
+      const data = await response.json() as any;
+      
+      return {
+        response: data.choices?.[0]?.message?.content || '',
+        usage: (data as any).usage || { total_tokens: 0 },
+      };
+    }
   }
 
-  /**
-   * Check vLLM service health
-   */
   async checkVLLMHealth(): Promise<boolean> {
     try {
       const response = await fetch(`${this.vllmHost}/v1/models`);
@@ -305,9 +316,6 @@ Answer:`;
     }
   }
 
-  /**
-   * Get available vLLM models
-   */
   async getAvailableModels(): Promise<VLLMModelInfo[]> {
     try {
       const response = await fetch(`${this.vllmHost}/v1/models`);
@@ -315,50 +323,43 @@ Answer:`;
         throw new Error(`Failed to get models: ${response.status}`);
       }
       
-      const data = await response.json();
-      return data.data || [];
+      const data = await response.json() as any;
+      return (data as any).data || [];
     } catch (error) {
       console.error('Failed to get vLLM models:', error);
       return [];
     }
   }
 
-  /**
-   * Get service configuration
-   */
   getConfig(): VLLMRAGConfig {
     return { ...this.config };
   }
 
-  /**
-   * Update service configuration
-   */
   updateConfig(newConfig: Partial<VLLMRAGConfig>): void {
     this.config = { ...this.config, ...newConfig };
+    
+    if (newConfig.vllmHost) {
+      const hostValidation = validateHost(newConfig.vllmHost);
+      if (!hostValidation.isValid) {
+        throw new Error(`Invalid vLLM host: ${hostValidation.error}`);
+      }
+      this.vllmHost = newConfig.vllmHost;
+    }
   }
 
-  /**
-   * Get service statistics
-   */
   async getStats(): Promise<{
-    vllmHost: string;
-    defaultModel: string;
     availableModels: number;
     vectorStoreStatus: string;
     embeddingServiceStatus: string;
-    tensorParallelSize: number;
-    gpuMemoryUtilization: number;
+    apiEndpoint: string;
   }> {
     const models = await this.getAvailableModels();
     
     return {
-      vllmHost: this.vllmHost,
-      defaultModel: this.config.defaultModel,
       availableModels: models.length,
       vectorStoreStatus: 'connected', // TODO: Add actual health check
       embeddingServiceStatus: 'ready', // TODO: Add actual health check
-      tensorParallelSize: this.config.tensorParallelSize,
-      gpuMemoryUtilization: this.config.gpuMemoryUtilization,
+      apiEndpoint: this.vllmHost,
     };
   }
 } 

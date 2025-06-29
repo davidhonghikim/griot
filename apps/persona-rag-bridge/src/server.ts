@@ -9,302 +9,291 @@
 
 import express from 'express';
 import cors from 'cors';
-import { WebSocketServer } from 'ws';
-import axios from 'axios';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { OpenWebUIBridge } from './services/openwebui-bridge.service.js';
+import { getVault } from './vault/secure-vault.js';
 import dotenv from 'dotenv';
+import { PersonaRAGService } from '@griot/data/rag/persona_rag_service';
+import { VectorStore } from '@griot/data/rag/vector_store';
+import { EmbeddingService } from '@griot/data/rag/embedding_service';
+import { PersonaVectorizationService } from '@griot/data/rag/persona_vectorization_service';
+import { PersonaLoader } from '@griot/data/persona_loader';
 
+// Load environment variables
 dotenv.config();
 
-// Mock PersonaRAG Service (in production, import real service)
-class PersonaRAGService {
-  constructor() {
-    this.initialized = false;
-  }
-
-  async initialize() {
-    console.log('🔄 Initializing PersonaRAG Service...');
-    this.initialized = true;
-    console.log('✅ PersonaRAG Service initialized');
-  }
-
-  async query(request: any) {
-    const startTime = Date.now();
-    
-    // Mock persona selection based on query content
-    const personas = [
-      {
-        personaId: 'griot_001',
-        name: 'Griot',
-        relevanceScore: 0.95,
-        content: 'Griot is a traditional West African storyteller, musician, and oral historian who preserves cultural knowledge through narrative and song.',
-        contextSnippet: 'Traditional storyteller specializing in cultural preservation through narrative.',
-        metadata: {
-          base: 'griot',
-          variant: 'traditional',
-          author: 'system',
-          tags: ['storytelling', 'culture', 'music', 'history'],
-          description: 'Traditional West African storyteller and cultural preservationist'
-        }
-      },
-      {
-        personaId: 'tohunga_001',
-        name: 'Tohunga',
-        relevanceScore: 0.87,
-        content: 'Tohunga is a Māori priest and expert in traditional knowledge, serving as a spiritual guide and keeper of cultural wisdom.',
-        contextSnippet: 'Māori spiritual guide focusing on traditional wisdom and cultural guidance.',
-        metadata: {
-          base: 'tohunga',
-          variant: 'traditional',
-          author: 'system',
-          tags: ['spirituality', 'culture', 'wisdom', 'guidance'],
-          description: 'Māori spiritual guide and keeper of traditional knowledge'
-        }
-      }
-    ];
-
-    const relevantPersonas = personas.filter(p => 
-      request.query.toLowerCase().includes('story') || 
-      request.query.toLowerCase().includes('culture') ||
-      request.query.toLowerCase().includes('wisdom')
-    );
-
-    const processingTime = Date.now() - startTime;
-    
-    return {
-      query: request.query,
-      results: relevantPersonas,
-      totalResults: relevantPersonas.length,
-      processingTime,
-      selectedPersona: relevantPersonas[0] || null,
-      averageRelevance: relevantPersonas.length > 0 
-        ? relevantPersonas.reduce((sum, p) => sum + p.relevanceScore, 0) / relevantPersonas.length 
-        : 0,
-      success: true
-    };
-  }
-
-  async selectBestPersona(query: string, options: any = {}) {
-    const response = await this.query({ query, ...options });
-    return response.selectedPersona;
-  }
-}
-
 const app = express();
-const PORT = process.env.PERSONA_RAG_PORT || 3000;
-const OPENWEBUI_URL = process.env.OPENWEBUI_URL || 'http://192.168.1.180:3000';
-
-// Initialize services
-const ragService = new PersonaRAGService();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["http://192.168.1.180:3000", "http://localhost:3000", "http://127.0.0.1:3000"],
+    methods: ["GET", "POST"]
+  }
+});
 
 // Middleware
 app.use(cors({
-  origin: [OPENWEBUI_URL, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: ["http://192.168.1.180:3000", "http://localhost:3000", "http://127.0.0.1:3000"],
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Initialize services
+let personaRAGService: PersonaRAGService;
+let openWebUIBridge: OpenWebUIBridge;
+
+// Initialize vault and services
+async function initializeServices() {
+  try {
+    console.log('🔐 Initializing secure vault...');
+    const vault = getVault();
+    await vault.initialize();
+    
+    // Validate vault security
+    const validation = await vault.validateSecurity();
+    if (!validation.valid) {
+      console.warn('⚠️ Vault security issues detected:');
+      validation.issues.forEach(issue => console.warn(`  • ${issue}`));
+      console.warn('💡 Run "npm run vault:validate" to see recommendations');
+    }
+    
+    // Get OpenWebUI configuration from vault
+    const openWebUIUrl = await vault.getSecret('OPENWEBUI_URL') || 'http://192.168.1.180:3000';
+    const openWebUIApiKey = await vault.getSecret('OPENWEBUI_API_KEY');
+    
+    console.log(`🌐 OpenWebUI URL: ${openWebUIUrl}`);
+    
+    if (!openWebUIApiKey) {
+      console.warn('⚠️ OpenWebUI API key not configured');
+      console.warn('💡 Run "npm run vault:set OPENWEBUI_API_KEY" to configure');
+    }
+    
+    // Get OpenAI API key from vault and set as environment variable
+    const openaiApiKey = await vault.getSecret('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      console.warn('⚠️ OpenAI API key not configured');
+      console.warn('💡 Run "npm run vault:set OPENAI_API_KEY" to configure');
+      console.warn('💡 Using mock embedding service for testing');
+      // Set a mock key for testing
+      process.env.OPENAI_API_KEY = 'mock-key-for-testing';
+    } else {
+      process.env.OPENAI_API_KEY = openaiApiKey;
+      console.log('✅ OpenAI API key loaded from vault');
+    }
+    
+    // Initialize core RAG services
+    const vectorStore = new VectorStore();
+    const embeddingService = new EmbeddingService();
+    const personaLoader = new PersonaLoader();
+    const personaVectorization = new PersonaVectorizationService({
+      vectorStore,
+      embeddingService,
+      personaLoader
+    });
+    
+    // Initialize PersonaRAG service
+    personaRAGService = new PersonaRAGService(vectorStore, embeddingService, personaVectorization);
+    await personaRAGService.initialize();
+    
+    // Initialize OpenWebUI bridge
+    openWebUIBridge = new OpenWebUIBridge(
+      openWebUIUrl,
+      openWebUIApiKey || '',
+      personaRAGService
+    );
+    
+    console.log('✅ Services initialized successfully');
+    
+  } catch (error) {
+    console.error('❌ Failed to initialize services:', error);
+    process.exit(1);
+  }
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    service: 'PersonaRAG Bridge',
-    version: '1.0.0',
     timestamp: new Date().toISOString(),
-    ragService: ragService.initialized ? 'ready' : 'initializing'
+    services: {
+      personaRAG: !!personaRAGService,
+      openWebUI: !!openWebUIBridge
+    }
   });
+});
+
+// Vault status endpoint (protected)
+app.get('/vault/status', async (req, res) => {
+  try {
+    const vault = getVault();
+    const secrets = await vault.listSecrets();
+    const validation = await vault.validateSecurity();
+    
+    res.json({
+      totalSecrets: secrets.length,
+      securityStatus: validation.valid ? 'secure' : 'issues_found',
+      issues: validation.issues
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get vault status' });
+  }
 });
 
 // Persona query endpoint
-app.post('/api/persona/query', async (req, res) => {
+app.post('/api/personas/query', async (req, res) => {
   try {
-    const { query, filters = {}, options = {} } = req.body;
+    const { query, limit = 5, threshold = 0.6 } = req.body;
     
     if (!query) {
-      return res.status(400).json({
-        error: 'Query is required',
-        code: 'MISSING_QUERY'
-      });
+      return res.status(400).json({ error: 'Query is required' });
     }
-
-    const response = await ragService.query({
+    
+    const request = {
       query,
-      personaFilter: filters,
-      limit: options.limit || 5,
-      similarityThreshold: options.threshold || 0.5,
-      includeContent: options.includeContent || false
-    });
-
-    res.json({
-      success: true,
-      data: response,
-      meta: {
-        processingTime: response.processingTime,
-        timestamp: new Date().toISOString()
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Persona query error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-      code: 'QUERY_FAILED'
-    });
-  }
-});
-
-// Best persona selection endpoint
-app.post('/api/persona/select', async (req, res) => {
-  try {
-    const { query, options = {} } = req.body;
+      limit,
+      similarityThreshold: threshold
+    };
     
-    if (!query) {
-      return res.status(400).json({
-        error: 'Query is required',
-        code: 'MISSING_QUERY'
-      });
-    }
-
-    const persona = await ragService.selectBestPersona(query, options);
-
-    res.json({
-      success: true,
-      data: {
-        query,
-        selectedPersona: persona,
-        hasSelection: !!persona
-      },
-      meta: {
-        timestamp: new Date().toISOString()
-      }
-    });
-
+    const response = await personaRAGService.query(request);
+    return res.json(response);
+    
   } catch (error) {
-    console.error('❌ Persona selection error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-      code: 'SELECTION_FAILED'
-    });
+    console.error('Error querying personas:', error);
+    return res.status(500).json({ error: 'Failed to query personas' });
   }
 });
 
-// Enhanced chat endpoint that adds persona context to OpenWebUI responses
+// Persona selection endpoint
+app.post('/api/personas/select', async (req, res) => {
+  try {
+    const { personaId, context } = req.body;
+    
+    if (!personaId) {
+      return res.status(400).json({ error: 'Persona ID is required' });
+    }
+    
+    const request = {
+      query: context || 'general context',
+      personaId,
+      limit: 1
+    };
+    
+    const response = await personaRAGService.query(request);
+    return res.json(response);
+    
+  } catch (error) {
+    console.error('Error selecting persona:', error);
+    return res.status(500).json({ error: 'Failed to select persona' });
+  }
+});
+
+// Enhanced chat endpoint
 app.post('/api/chat/enhanced', async (req, res) => {
   try {
-    const { message, conversation_id, model = 'llama3.1' } = req.body;
+    const { message, personaId, conversationHistory = [] } = req.body;
     
-    // Step 1: Get best persona for the query
-    const persona = await ragService.selectBestPersona(message, {
-      minRelevanceScore: 0.6
-    });
-
-    // Step 2: Create enhanced prompt with persona context
-    let enhancedMessage = message;
-    let personaContext = '';
-    
-    if (persona) {
-      personaContext = `[PERSONA CONTEXT - ${persona.name}]: ${persona.contextSnippet}\n\n`;
-      enhancedMessage = `${personaContext}User Query: ${message}
-
-Please respond with the wisdom and perspective of a ${persona.name}, incorporating the cultural context and expertise described above.`;
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
     }
-
-    // Step 3: Forward to OpenWebUI
-    const openWebUIResponse = await axios.post(`${OPENWEBUI_URL}/api/chat`, {
-      message: enhancedMessage,
-      conversation_id,
-      model
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      timeout: 30000
-    });
-
-    // Step 4: Return enhanced response with persona metadata
-    res.json({
-      success: true,
-      data: {
-        response: openWebUIResponse.data,
-        persona: persona ? {
-          name: persona.name,
-          relevanceScore: persona.relevanceScore,
-          description: persona.metadata.description,
-          tags: persona.metadata.tags
-        } : null,
-        enhancement: {
-          personaApplied: !!persona,
-          contextAdded: personaContext.length > 0,
-          originalQuery: message,
-          enhancedQuery: enhancedMessage
-        }
-      },
-      meta: {
-        timestamp: new Date().toISOString(),
-        processingTime: persona ? Date.now() - Date.now() : 0
-      }
-    });
-
+    
+    const response = await openWebUIBridge.enhancedChat(message, personaId, conversationHistory);
+    return res.json(response);
+    
   } catch (error) {
-    console.error('❌ Enhanced chat error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-      code: 'ENHANCED_CHAT_FAILED'
-    });
+    console.error('Error in enhanced chat:', error);
+    return res.status(500).json({ error: 'Failed to process enhanced chat' });
   }
 });
 
-// WebSocket for real-time persona suggestions
-const server = app.listen(PORT, async () => {
-  console.log(`🚀 PersonaRAG Bridge Server running on port ${PORT}`);
-  console.log(`🔗 OpenWebUI target: ${OPENWEBUI_URL}`);
-  console.log(`📋 API Endpoints:`);
-  console.log(`   GET  /health - Service health check`);
-  console.log(`   POST /api/persona/query - Query personas`);
-  console.log(`   POST /api/persona/select - Select best persona`);
-  console.log(`   POST /api/chat/enhanced - Enhanced chat with persona context`);
-  
-  await ragService.initialize();
-  console.log(`✅ PersonaRAG Bridge ready for connections`);
+// OpenWebUI integration endpoints
+app.post('/api/openwebui/chat', async (req, res) => {
+  try {
+    const { message, personaId, model = 'llama3.1' } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+    
+    const response = await openWebUIBridge.sendChatMessage(message, personaId, model);
+    return res.json(response);
+    
+  } catch (error) {
+    console.error('Error sending chat message:', error);
+    return res.status(500).json({ error: 'Failed to send chat message' });
+  }
 });
 
-// WebSocket server for real-time persona suggestions
-const wss = new WebSocketServer({ server });
-
-wss.on('connection', (ws) => {
-  console.log('📡 New WebSocket connection established');
+// WebSocket connection for real-time communication
+io.on('connection', (socket) => {
+  console.log('🔌 Client connected:', socket.id);
   
-  ws.on('message', async (message) => {
+  socket.on('query-personas', async (data) => {
     try {
-      const data = JSON.parse(message.toString());
-      
-      if (data.type === 'persona_query') {
-        const response = await ragService.query({
-          query: data.query,
-          limit: 3,
-          similarityThreshold: 0.7
-        });
-        
-        ws.send(JSON.stringify({
-          type: 'persona_suggestions',
-          data: response,
-          requestId: data.requestId
-        }));
-      }
+      const { query, limit = 5, threshold = 0.6 } = data;
+      const request = { query, limit, similarityThreshold: threshold };
+      const response = await personaRAGService.query(request);
+      socket.emit('personas-result', response);
     } catch (error) {
-      console.error('❌ WebSocket error:', error);
-      ws.send(JSON.stringify({
-        type: 'error',
-        error: error.message
-      }));
+      socket.emit('error', { message: 'Failed to query personas' });
     }
   });
   
-  ws.on('close', () => {
-    console.log('📡 WebSocket connection closed');
+  socket.on('select-persona', async (data) => {
+    try {
+      const { personaId, context } = data;
+      const request = { query: context || 'general context', personaId, limit: 1 };
+      const response = await personaRAGService.query(request);
+      socket.emit('persona-selected', response);
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to select persona' });
+    }
+  });
+  
+  socket.on('enhanced-chat', async (data) => {
+    try {
+      const { message, personaId, conversationHistory = [] } = data;
+      const response = await openWebUIBridge.enhancedChat(message, personaId, conversationHistory);
+      socket.emit('chat-response', response);
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to process enhanced chat' });
+    }
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('🔌 Client disconnected:', socket.id);
   });
 });
 
-export default app; 
+// Start server
+async function startServer() {
+  try {
+    await initializeServices();
+    
+    const port = process.env.PORT || 3000;
+    server.listen(port, () => {
+      console.log(`🚀 PersonaRAG Bridge Server running on port ${port}`);
+      console.log(`📡 WebSocket server ready for real-time communication`);
+      console.log(`🔐 Secure vault system operational`);
+      console.log(`🤖 PersonaRAG service initialized`);
+      console.log(`🌐 OpenWebUI bridge ready`);
+    });
+    
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down gracefully...');
+  if (personaRAGService) {
+    await personaRAGService.cleanup();
+  }
+  process.exit(0);
+});
+
+// Start the server
+startServer();

@@ -1,25 +1,23 @@
 /**
  * Ollama-RAG Integration Service
  * 
- * Integrates Ollama local models with the existing RAG system for
+ * Integrates Ollama local inference API with the existing RAG system for
  * enhanced retrieval-augmented generation capabilities.
  */
 
 import { PersonaLoader } from '../persona_loader';
 import { VectorStore } from './vector_store';
 import { EmbeddingService } from './embedding_service';
-import { inputValidator, validateQuery, validateModel, validateNumber, validateHost } from '../security/input_validator';
 
 export interface OllamaRAGConfig {
-  ollamaHost: string;
-  defaultModel: string;
-  maxTokens: number;
-  temperature: number;
-  topP: number;
-  topK: number;
-  similarityThreshold: number;
-  maxResults: number;
-  enableStreaming: boolean;
+  ollamaHost?: string;
+  apiKey?: string;
+  defaultModel?: string;
+  enableStreaming?: boolean;
+  maxTokens?: number;
+  topP?: number;
+  temperature?: number;
+  similarityThreshold?: number;
 }
 
 export interface OllamaRAGRequest {
@@ -29,7 +27,6 @@ export interface OllamaRAGRequest {
   maxTokens?: number;
   temperature?: number;
   topP?: number;
-  topK?: number;
   similarityThreshold?: number;
   maxResults?: number;
   includeMetadata?: boolean;
@@ -43,7 +40,7 @@ export interface OllamaRAGResponse {
   retrievedDocuments: Array<{
     id: string;
     content: string;
-    similarity: number;
+    score: number;
     metadata?: Record<string, any>;
   }>;
   context: string;
@@ -53,109 +50,97 @@ export interface OllamaRAGResponse {
     totalTokens: number;
     documentCount: number;
     modelUsed: string;
+    apiEndpoint: string;
   };
 }
 
 export interface OllamaModelInfo {
   name: string;
-  size: number;
   modified_at: string;
+  size: number;
   digest: string;
   details: {
     format: string;
     family: string;
-    families?: string[];
+    families: string[];
     parameter_size: string;
     quantization_level: string;
   };
 }
 
+function validateHost(host: string): { isValid: boolean; error?: string } {
+  try {
+    const url = new URL(host);
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return { isValid: false, error: 'Protocol must be http or https' };
+    }
+    return { isValid: true };
+  } catch (error) {
+    return { isValid: false, error: 'Invalid URL format' };
+  }
+}
+
 export class OllamaRAGService {
   private config: OllamaRAGConfig;
+  private ollamaHost: string;
+  private apiKey: string;
   private personaLoader: PersonaLoader;
   private vectorStore: VectorStore;
   private embeddingService: EmbeddingService;
-  private ollamaHost: string;
 
   constructor(
-    config: Partial<OllamaRAGConfig>,
+    config: OllamaRAGConfig,
     personaLoader: PersonaLoader,
     vectorStore: VectorStore,
     embeddingService: EmbeddingService
   ) {
-    // Validate host configuration
-    const hostValidation = validateHost(config.ollamaHost || 'http://localhost:11434');
-    if (!hostValidation.isValid) {
-      throw new Error(`Invalid Ollama host: ${hostValidation.errors.join(', ')}`);
-    }
-
     this.config = {
       ollamaHost: 'http://localhost:11434',
-      defaultModel: 'gemma3b',
-      maxTokens: 2048,
-      temperature: 0.7,
-      topP: 0.9,
-      topK: 40,
-      similarityThreshold: 0.7,
-      maxResults: 5,
+      defaultModel: 'llama2',
       enableStreaming: false,
+      maxTokens: 1000,
+      topP: 0.9,
+      temperature: 0.7,
+      similarityThreshold: 0.7,
       ...config,
     };
     
+    const hostValidation = validateHost(this.config.ollamaHost || 'http://localhost:11434');
+    if (!hostValidation.isValid) {
+      throw new Error(`Invalid Ollama host: ${hostValidation.error}`);
+    }
+    
+    this.ollamaHost = this.config.ollamaHost!;
+    this.apiKey = this.config.apiKey || '';
     this.personaLoader = personaLoader;
     this.vectorStore = vectorStore;
     this.embeddingService = embeddingService;
-    this.ollamaHost = this.config.ollamaHost;
   }
 
-  /**
-   * Initialize the Ollama-RAG service
-   */
   async initialize(): Promise<void> {
-    console.log('🔄 Initializing Ollama-RAG Service...');
-    
-    // Check Ollama connectivity
+    // Test connection to Ollama
     await this.checkOllamaHealth();
-    
-    // Load available models
-    const models = await this.getAvailableModels();
-    console.log(`📚 Available Ollama models: ${models.map(m => m.name).join(', ')}`);
-    
-    // Verify default model is available
-    if (!models.find(m => m.name === this.config.defaultModel)) {
-      console.warn(`⚠️ Default model ${this.config.defaultModel} not found, using fallback`);
-      this.config.defaultModel = models.find(m => m.name === 'qwen2.5-coder')?.name || models[0]?.name || 'gemma3b';
-    }
-    
-    console.log(`✅ Ollama-RAG Service initialized with model: ${this.config.defaultModel}`);
   }
 
-  /**
-   * Perform RAG query using Ollama
-   */
   async query(request: OllamaRAGRequest): Promise<OllamaRAGResponse> {
     const startTime = Date.now();
-    
-    // Comprehensive input validation
-    const validationResult = this.validateQueryRequest(request);
-    if (!validationResult.isValid) {
-      throw new Error(`Invalid query request: ${validationResult.errors.join(', ')}`);
-    }
-
-    const model = request.model || this.config.defaultModel;
+    const model = request.model || this.config.defaultModel!;
     
     try {
-      // Step 1: Retrieve relevant documents
+      // Retrieve relevant documents
       const retrievalStart = Date.now();
       const retrievedDocuments = await this.retrieveDocuments(request);
       const retrievalTime = Date.now() - retrievalStart;
-      
-      // Step 2: Build context from retrieved documents
-      const context = this.buildContext(retrievedDocuments, request.query);
-      
-      // Step 3: Generate response using Ollama
+
+      // Build context from retrieved documents
+      const context = this.buildContext(
+        retrievedDocuments.map(doc => ({ content: doc.content, score: doc.score })),
+        request.query
+      );
+
+      // Generate response using Ollama
       const generationStart = Date.now();
-      const ollamaResponse = await this.generateWithOllama({
+      const generationResult = await this.generateWithOllama({
         model,
         prompt: this.buildPrompt(context, request.query),
         stream: request.stream || this.config.enableStreaming,
@@ -163,154 +148,65 @@ export class OllamaRAGService {
           num_predict: request.maxTokens || this.config.maxTokens,
           temperature: request.temperature || this.config.temperature,
           top_p: request.topP || this.config.topP,
-          top_k: request.topK || this.config.topK,
-        }
+        },
       });
-      
       const generationTime = Date.now() - generationStart;
-      
+
       return {
         query: request.query,
         model,
-        response: ollamaResponse.response,
-        retrievedDocuments: request.includeMetadata ? retrievedDocuments : 
-          retrievedDocuments.map(doc => ({ 
-            id: doc.id, 
-            content: doc.content, 
-            similarity: doc.similarity 
-          })),
+        response: generationResult.response,
+        retrievedDocuments: request.includeMetadata ? retrievedDocuments : [],
         context,
         metadata: {
           retrievalTime,
           generationTime,
-          totalTokens: ollamaResponse.eval_count || 0,
+          totalTokens: generationResult.usage?.total_tokens || 0,
           documentCount: retrievedDocuments.length,
           modelUsed: model,
+          apiEndpoint: this.ollamaHost,
         },
       };
-      
     } catch (error) {
-      console.error('Ollama-RAG query failed:', error);
-      throw new Error(`Ollama-RAG query failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Ollama RAG query failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
-  /**
-   * Comprehensive validation of query request
-   */
-  private validateQueryRequest(request: OllamaRAGRequest): { isValid: boolean; errors: string[] } {
-    const errors: string[] = [];
-
-    // Validate query
-    const queryValidation = validateQuery(request.query);
-    if (!queryValidation.isValid) {
-      errors.push(...queryValidation.errors);
-    }
-
-    // Validate model if provided
-    if (request.model) {
-      const modelValidation = validateModel(request.model);
-      if (!modelValidation.isValid) {
-        errors.push(...modelValidation.errors);
-      }
-    }
-
-    // Validate numeric parameters
-    if (request.maxTokens !== undefined) {
-      const maxTokensValidation = validateNumber(request.maxTokens, 1, 8192);
-      if (!maxTokensValidation.isValid) {
-        errors.push(...maxTokensValidation.errors);
-      }
-    }
-
-    if (request.temperature !== undefined) {
-      const tempValidation = validateNumber(request.temperature, 0, 2);
-      if (!tempValidation.isValid) {
-        errors.push(...tempValidation.errors);
-      }
-    }
-
-    if (request.topP !== undefined) {
-      const topPValidation = validateNumber(request.topP, 0, 1);
-      if (!topPValidation.isValid) {
-        errors.push(...topPValidation.errors);
-      }
-    }
-
-    if (request.topK !== undefined) {
-      const topKValidation = validateNumber(request.topK, 1, 100);
-      if (!topKValidation.isValid) {
-        errors.push(...topKValidation.errors);
-      }
-    }
-
-    if (request.similarityThreshold !== undefined) {
-      const thresholdValidation = validateNumber(request.similarityThreshold, 0, 1);
-      if (!thresholdValidation.isValid) {
-        errors.push(...thresholdValidation.errors);
-      }
-    }
-
-    if (request.maxResults !== undefined) {
-      const maxResultsValidation = validateNumber(request.maxResults, 1, 100);
-      if (!maxResultsValidation.isValid) {
-        errors.push(...maxResultsValidation.errors);
-      }
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
-  }
-
-  /**
-   * Retrieve relevant documents using vector search
-   */
   private async retrieveDocuments(request: OllamaRAGRequest): Promise<Array<{
     id: string;
     content: string;
-    similarity: number;
+    score: number;
     metadata?: Record<string, any>;
   }>> {
-    // Generate query embedding
     const queryEmbedding = await this.embeddingService.embedText(request.query);
     
-    // Search vector store
     const searchResults = await this.vectorStore.search(queryEmbedding, {
-      limit: request.maxResults || this.config.maxResults,
+      limit: request.maxResults || 5,
+      
     });
-    
-    // Filter by similarity threshold and format results
-    return searchResults
-      .filter(result => result.score >= (request.similarityThreshold || this.config.similarityThreshold))
-      .map(result => ({
-        id: result.id,
-        content: result.content,
-        similarity: result.score,
-        metadata: result.metadata,
-      }));
+
+    return searchResults.map(result => ({
+      id: result.id,
+      content: result.content,
+      score: result.score,
+      metadata: result.metadata,
+    }));
   }
 
-  /**
-   * Build context from retrieved documents
-   */
-  private buildContext(documents: Array<{ content: string; similarity: number }>, query: string): string {
-    let context = `Query: ${query}\n\nRelevant Information:\n`;
-    
-    for (let i = 0; i < documents.length; i++) {
-      const doc = documents[i];
-      if (doc) {
-        context += `${i + 1}. [Similarity: ${doc.similarity.toFixed(3)}] ${doc.content}\n\n`;
-      }
+  private buildContext(documents: Array<{ content: string; score: number }>, query: string): string {
+    if (documents.length === 0) {
+      return 'No relevant documents found.';
     }
-    
-    return context;
+
+    const sortedDocuments = documents
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3); // Use top 3 most relevant documents
+
+    return sortedDocuments
+      .map((doc, index) => `Document ${index + 1} (Relevance: ${doc.score.toFixed(3)}):\n${doc.content}`)
+      .join('\n\n');
   }
 
-  /**
-   * Build prompt for Ollama
-   */
   private buildPrompt(context: string, query: string): string {
     return `You are a helpful AI assistant with access to relevant information. Use the context below to answer the user's question accurately and comprehensively.
 
@@ -323,9 +219,6 @@ Question: ${query}
 Answer:`;
   }
 
-  /**
-   * Generate response using Ollama API
-   */
   private async generateWithOllama(params: {
     model: string;
     prompt: string;
@@ -334,34 +227,26 @@ Answer:`;
       num_predict?: number;
       temperature?: number;
       top_p?: number;
-      top_k?: number;
     };
-  }): Promise<{ response: string; eval_count?: number }> {
-    // Validate model
-    const modelValidation = validateModel(params.model);
-    if (!modelValidation.isValid) {
-      throw new Error(`Invalid model: ${modelValidation.errors.join(', ')}`);
-    }
-
-    // Validate prompt
-    const promptValidation = inputValidator.validateInput(params.prompt, 'query');
-    if (!promptValidation.isValid) {
-      throw new Error(`Invalid prompt: ${promptValidation.errors.join(', ')}`);
-    }
-
+  }): Promise<{ response: string; usage?: { total_tokens: number } }> {
     const url = `${this.ollamaHost}/api/generate`;
     
     const payload = {
       model: params.model,
-      prompt: promptValidation.sanitizedValue || params.prompt,
+      prompt: params.prompt,
       stream: params.stream || false,
-      options: params.options || {},
+      options: {
+        num_predict: params.options?.num_predict || this.config.maxTokens,
+        temperature: params.options?.temperature || this.config.temperature,
+        top_p: params.options?.top_p || this.config.topP,
+      },
     };
     
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(this.apiKey && { 'Authorization': `Bearer ${this.apiKey}` }),
       },
       body: JSON.stringify(payload),
     });
@@ -370,17 +255,50 @@ Answer:`;
       throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json() as { response: string; eval_count?: number };
-    
-    return {
-      response: data.response,
-      eval_count: data.eval_count,
-    };
+    if (params.stream) {
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('Failed to get response reader for streaming');
+      }
+      
+      let responseText = '';
+      const decoder = new TextDecoder();
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim());
+        
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line);
+            if (data.response) {
+              responseText += data.response;
+            }
+          } catch (error) {
+            // Skip malformed JSON lines
+          }
+        }
+      }
+      
+      return {
+        response: responseText,
+        usage: { total_tokens: responseText.length }, // Approximate
+      };
+    } else {
+      // Handle non-streaming response
+      const data = await response.json() as any;
+      
+      return {
+        response: data.response || '',
+        usage: { total_tokens: (data as any).eval_count || 0 }, // Approximate
+      };
+    }
   }
 
-  /**
-   * Check Ollama service health
-   */
   async checkOllamaHealth(): Promise<boolean> {
     try {
       const response = await fetch(`${this.ollamaHost}/api/tags`);
@@ -394,9 +312,6 @@ Answer:`;
     }
   }
 
-  /**
-   * Get available Ollama models
-   */
   async getAvailableModels(): Promise<OllamaModelInfo[]> {
     try {
       const response = await fetch(`${this.ollamaHost}/api/tags`);
@@ -404,24 +319,15 @@ Answer:`;
         throw new Error(`Failed to get models: ${response.status}`);
       }
       
-      const data = await response.json() as { models?: OllamaModelInfo[] };
-      return data.models || [];
+      const data = await response.json() as any;
+      return (data as any).models || [];
     } catch (error) {
       console.error('Failed to get Ollama models:', error);
       return [];
     }
   }
 
-  /**
-   * Pull a model to Ollama
-   */
   async pullModel(modelName: string): Promise<void> {
-    // Validate model name
-    const modelValidation = validateModel(modelName);
-    if (!modelValidation.isValid) {
-      throw new Error(`Invalid model name: ${modelValidation.errors.join(', ')}`);
-    }
-
     try {
       const response = await fetch(`${this.ollamaHost}/api/pull`, {
         method: 'POST',
@@ -435,23 +341,36 @@ Answer:`;
         throw new Error(`Failed to pull model: ${response.status}`);
       }
       
-      console.log(`✅ Successfully pulled model: ${modelName}`);
+      // Wait for pull to complete
+      const reader = response.body?.getReader();
+      if (reader) {
+        const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n').filter(line => line.trim());
+          
+          for (const line of lines) {
+            try {
+              const data = JSON.parse(line);
+              if (data.status === 'success') {
+                return;
+              }
+            } catch (error) {
+              // Skip malformed JSON lines
+            }
+          }
+        }
+      }
     } catch (error) {
       console.error(`Failed to pull model ${modelName}:`, error);
       throw error;
     }
   }
 
-  /**
-   * Delete a model from Ollama
-   */
   async deleteModel(modelName: string): Promise<void> {
-    // Validate model name
-    const modelValidation = validateModel(modelName);
-    if (!modelValidation.isValid) {
-      throw new Error(`Invalid model name: ${modelValidation.errors.join(', ')}`);
-    }
-
     try {
       const response = await fetch(`${this.ollamaHost}/api/delete`, {
         method: 'DELETE',
@@ -464,46 +383,28 @@ Answer:`;
       if (!response.ok) {
         throw new Error(`Failed to delete model: ${response.status}`);
       }
-      
-      console.log(`✅ Successfully deleted model: ${modelName}`);
     } catch (error) {
       console.error(`Failed to delete model ${modelName}:`, error);
       throw error;
     }
   }
 
-  /**
-   * Get service configuration
-   */
   getConfig(): OllamaRAGConfig {
     return { ...this.config };
   }
 
-  /**
-   * Update service configuration
-   */
   updateConfig(newConfig: Partial<OllamaRAGConfig>): void {
-    // Validate new configuration
+    this.config = { ...this.config, ...newConfig };
+    
     if (newConfig.ollamaHost) {
       const hostValidation = validateHost(newConfig.ollamaHost);
       if (!hostValidation.isValid) {
-        throw new Error(`Invalid host in config: ${hostValidation.errors.join(', ')}`);
+        throw new Error(`Invalid Ollama host: ${hostValidation.error}`);
       }
+      this.ollamaHost = newConfig.ollamaHost;
     }
-
-    if (newConfig.defaultModel) {
-      const modelValidation = validateModel(newConfig.defaultModel);
-      if (!modelValidation.isValid) {
-        throw new Error(`Invalid model in config: ${modelValidation.errors.join(', ')}`);
-      }
-    }
-
-    this.config = { ...this.config, ...newConfig };
   }
 
-  /**
-   * Get service statistics
-   */
   async getStats(): Promise<{
     ollamaHost: string;
     defaultModel: string;
@@ -515,7 +416,7 @@ Answer:`;
     
     return {
       ollamaHost: this.ollamaHost,
-      defaultModel: this.config.defaultModel,
+      defaultModel: this.config.defaultModel!,
       availableModels: models.length,
       vectorStoreStatus: 'connected', // TODO: Add actual health check
       embeddingServiceStatus: 'ready', // TODO: Add actual health check

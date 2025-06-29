@@ -38,7 +38,9 @@ export class RecipeBox {
     try {
       // Dynamic import of the skill
       const skillModule = await import(skillPath);
-      const SkillClass = skillModule.default || skillModule[Object.keys(skillModule)[0]];
+      const keys = Object.keys(skillModule);
+      const SkillClass = skillModule.default || (keys.length > 0 && keys[0] !== undefined ? skillModule[keys[0]] : null);
+      if (!SkillClass) { throw new Error(`No valid skill class found in module: ${skillPath}`); }
       
       // Create instance
       const instance = new SkillClass(config);
@@ -157,17 +159,17 @@ export class RecipeBox {
     
     if (condition.includes('===')) {
       const [left, right] = condition.split('===').map(s => s.trim());
-      return this.context[left] === this.context[right];
+      return this.context[left!] === this.context[right!];
     }
     
     if (condition.includes('<')) {
       const [left, right] = condition.split('<').map(s => s.trim());
-      return this.context[left] < this.context[right];
+      return this.context[left!] < this.context[right!];
     }
     
     if (condition.includes('>')) {
       const [left, right] = condition.split('>').map(s => s.trim());
-      return this.context[left] > this.context[right];
+      return this.context[left!] > this.context[right!];
     }
     
     // Default: check if variable exists and is truthy

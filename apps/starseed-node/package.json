@@ -12,10 +12,10 @@
     "test-env-usage": "node scripts/test-env-usage.js"
   },
   "dependencies": {
-    "@griot/core": "workspace:*",
-    "@griot/schemas": "workspace:*",
-    "@griot/service-connectors": "workspace:*",
-    "@griot/data": "workspace:*",
+    "@griot/core": "file:../../packages/core",
+    "@griot/schemas": "file:../../packages/schemas",
+    "@griot/service-connectors": "file:../../packages/service-connectors",
+    "@griot/data": "file:../../packages/data",
     "mongoose": "^8.0.0",
     "dotenv": "^16.4.5",
     "tsx": "^4.6.2"

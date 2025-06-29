@@ -1,0 +1,52 @@
+title: "Next Agent Handoff - RAG Engine Operations"
+timestamp: "2025-01-27T02:45:00Z"
+from_agent: "Claude Sonnet 4"
+version: "1.0"
+status: "ACTIVE"
+
+current_project_status:
+  description: "kOS project with PersonaVectorizationService implemented, ready for RAG operations extension"
+  phase: "RAG_OPERATIONS_EXTENSION"
+  infrastructure: "MongoDB, PostgreSQL, Weaviate, Neo4j configured"
+  
+your_directive:
+  mission: "Extend RAG operations for persona context integration and implement PersonaRAGService to enable RAG engine operations"
+  
+  immediate_priorities:
+    - task: "Implement PersonaRAGService"
+      file: "packages/data/core/rag/persona_rag_service.ts"
+      description: "Create service extending existing RAG operations with persona context"
+      target: "<200ms for persona-aware queries"
+      
+    - task: "Extend RAG Operations Interface"
+      description: "Add PersonaRAGRequest interface for persona context in RAG requests"
+      dependencies: ["PersonaVectorizationService"]
+      
+    - task: "Design Database Schema"
+      description: "Create MongoDB collections and Neo4j schema for persona storage"
+      target: "100% migration success rate"
+
+  technical_context:
+    proven_patterns: "Follow PricingRAGService pattern (381 lines, successful integration)"
+    existing_service: "PersonaVectorizationService implemented (<5s processing time)"
+    performance_targets:
+      vectorization: "<5s"
+      search: "<200ms"
+      memory: "<100ms"
+
+  key_files_to_focus:
+    - "packages/data/core/rag/persona_vectorization_service.ts"
+    - "packages/data/skills/ai/persona_vectorization.yaml"
+    - "packages/data/core/rag/persona_rag_service.ts (to be created)"
+
+context_and_history:
+  description: "Previous agent completed comprehensive YAML conversion of 75+ files achieving project-wide format consistency"
+  last_session_summary: "YAML conversion completed successfully with full data integrity maintained"
+  ready_for: "RAG engine implementation and operations"
+
+next_steps:
+  1: "Review existing PersonaVectorizationService implementation"
+  2: "Examine PricingRAGService pattern for extension approach"
+  3: "Create PersonaRAGService following proven patterns"
+  4: "Implement persona-aware document retrieval"
+  5: "Test RAG engine operations with persona context" 

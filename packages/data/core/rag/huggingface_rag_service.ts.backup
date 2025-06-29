@@ -1,0 +1,417 @@
+/**
+ * Hugging Face-RAG Integration Service
+ * 
+ * Integrates Hugging Face Inference API with the existing RAG system for
+ * enhanced retrieval-augmented generation capabilities.
+ */
+
+import { PersonaLoader } from '../persona_loader';
+import { VectorStore } from './vector_store';
+import { EmbeddingService } from './embedding_service';
+
+export interface HuggingFaceRAGConfig {
+  huggingfaceHost?: string;
+  apiKey?: string;
+  defaultModel?: string;
+  enableStreaming?: boolean;
+  maxTokens?: number;
+  topP?: number;
+  repetitionPenalty?: number;
+  do_sample?: boolean;
+  similarityThreshold?: number;
+}
+
+export interface HuggingFaceRAGRequest {
+  query: string;
+  model?: string;
+  context?: string;
+  maxTokens?: number;
+  temperature?: number;
+  topP?: number;
+  similarityThreshold?: number;
+  maxResults?: number;
+  includeMetadata?: boolean;
+  stream?: boolean;
+  repetitionPenalty?: number;
+  do_sample?: boolean;
+}
+
+export interface HuggingFaceRAGResponse {
+  query: string;
+  model: string;
+  response: string;
+  retrievedDocuments: Array<{
+    id: string;
+    content: string;
+    score: number;
+    metadata?: Record<string, any>;
+  }>;
+  context: string;
+  metadata: {
+    retrievalTime: number;
+    generationTime: number;
+    totalTokens: number;
+    documentCount: number;
+    modelUsed: string;
+    apiEndpoint: string;
+  };
+}
+
+export interface HuggingFaceModelInfo {
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  task: string;
+  downloads: number;
+  likes: number;
+  author: string;
+}
+
+export class HuggingFaceRAGService {
+  private config: HuggingFaceRAGConfig;
+  private huggingfaceHost: string;
+  private apiKey: string;
+  private personaLoader: PersonaLoader;
+  private vectorStore: VectorStore;
+  private embeddingService: EmbeddingService;
+
+  constructor(
+    config: HuggingFaceRAGConfig,
+    personaLoader: PersonaLoader,
+    vectorStore: VectorStore,
+    embeddingService: EmbeddingService
+  ) {
+    this.config = {
+      ...config,
+    };
+    
+    this.personaLoader = personaLoader;
+    this.vectorStore = vectorStore;
+    this.embeddingService = embeddingService;
+    this.huggingfaceHost = this.config.huggingfaceHost || "";
+    this.apiKey = this.config.apiKey || "";
+  }
+
+  /**
+   * Initialize the Hugging Face-RAG service
+   */
+  async initialize(): Promise<void> {
+    console.log('🔄 Initializing Hugging Face-RAG Service...');
+    
+    // Check Hugging Face connectivity
+    await this.checkHuggingFaceHealth();
+    
+    // Load available models
+    const models = await this.getAvailableModels();
+    console.log(`📚 Available Hugging Face models: ${models.map(m => m.id).join(', ')}`);
+    
+    // Verify default model is available
+    if (!models.find(m => m.id === this.config.defaultModel)) {
+      console.warn(`⚠️ Default model ${this.config.defaultModel} not found, using first available`);
+      this.config.defaultModel = models[0]?.id || 'microsoft/DialoGPT-medium';
+    }
+    
+    console.log(`✅ Hugging Face-RAG Service initialized with model: ${this.config.defaultModel}`);
+  }
+
+  /**
+   * Perform RAG query using Hugging Face
+   */
+  async query(request: HuggingFaceRAGRequest): Promise<HuggingFaceRAGResponse> {
+    const startTime = Date.now();
+    const model = request.model || this.config.defaultModel;
+    
+    try {
+      // Step 1: Retrieve relevant documents
+      const retrievalStart = Date.now();
+      const retrievedDocuments = await this.retrieveDocuments(request);
+      const retrievalTime = Date.now() - retrievalStart;
+      
+      // Step 2: Build context from retrieved documents
+      const context = this.buildContext(retrievedDocuments, request.query);
+      
+      // Step 3: Generate response using Hugging Face
+      const generationStart = Date.now();
+      const huggingfaceResponse = await this.generateWithHuggingFace({
+        model: model || "",
+        prompt: this.buildPrompt(context, request.query),
+        stream: request.stream || this.config.enableStreaming,
+        options: {
+          max_new_tokens: request.maxTokens || this.config.maxTokens,
+          top_p: request.topP || this.config.topP,
+          repetition_penalty: request.repetitionPenalty || this.config.repetitionPenalty,
+          do_sample: request.do_sample !== undefined ? request.do_sample : this.config.do_sample,
+        }
+      });
+      
+      const generationTime = Date.now() - generationStart;
+      
+      return {
+        query: request.query,
+        model: model || "",
+        response: huggingfaceResponse.response,
+        retrievedDocuments: request.includeMetadata ? retrievedDocuments : 
+          retrievedDocuments.map(doc => ({ 
+            id: doc.id, 
+            content: doc.content, 
+            score: doc.score 
+          })),
+        context,
+        metadata: {
+          retrievalTime,
+          generationTime,
+          totalTokens: huggingfaceResponse.usage?.total_tokens || 0,
+          documentCount: retrievedDocuments.length,
+          modelUsed: model: model || "",
+          apiEndpoint: this.huggingfaceHost,
+        },
+      };
+      
+    } catch (error) {
+      console.error('Hugging Face-RAG query failed:', error);
+      throw new Error(`Hugging Face-RAG query failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Retrieve relevant documents using vector search
+   */
+  private async retrieveDocuments(request: HuggingFaceRAGRequest): Promise<Array<{
+    id: string;
+    content: string;
+    score: number;
+    metadata?: Record<string, any>;
+  }>> {
+    // Generate query embedding
+    const queryEmbedding = await this.embeddingService.embedText(request.query);
+    
+    // Search vector store
+    const searchResults = await this.vectorStore.search(queryEmbedding, {
+      limit: request.maxResults || 10,
+    });
+    
+    return searchResults.map(result => ({
+      id: result.id,
+      content: result.content,
+      score: result.score,
+      metadata: result.metadata,
+    }));
+  }
+
+  /**
+   * Build context from retrieved documents
+   */
+  private buildContext(documents: Array<{ content: string; score: number }>, query: string): string {
+    let context = `Query: ${query}\n\nRelevant Information:\n`;
+    
+    for (let i = 0; i < documents.length; i++) {
+      const doc = documents[i];
+      context += `${i + 1}. [Similarity: ${doc.similarity.toFixed(3)}] ${doc.content}\n\n`;
+    }
+    
+    return context;
+  }
+
+  /**
+   * Build prompt for Hugging Face
+   */
+  private buildPrompt(context: string, query: string): string {
+    return `You are a helpful AI assistant with access to relevant information. Use the context below to answer the user's question accurately and comprehensively.
+
+${context}
+
+Based on the information above, please answer the following question:
+
+Question: ${query}
+
+Answer:`;
+  }
+
+  /**
+   * Generate response using Hugging Face API
+   */
+  private async generateWithHuggingFace(params: {
+    model: string;
+    prompt: string;
+    stream?: boolean;
+    options?: {
+      max_new_tokens?: number;
+      temperature?: number;
+      top_p?: number;
+      repetition_penalty?: number;
+      do_sample?: boolean;
+    };
+  }): Promise<{ response: string; usage?: { total_tokens: number } }> {
+    const url = `${this.huggingfaceHost}/models/${params.model}`;
+    
+    const payload = {
+      inputs: params.prompt,
+      parameters: {
+        max_new_tokens: params.options?.max_new_tokens || this.config.maxTokens,
+        top_p: params.options?.top_p || this.config.topP,
+        repetition_penalty: params.options?.repetition_penalty || this.config.repetitionPenalty,
+        do_sample: params.options?.do_sample !== undefined ? params.options.do_sample : this.config.do_sample,
+        return_full_text: false,
+      },
+      stream: params.stream || false,
+    };
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Hugging Face API error: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Handle different response formats
+    let responseText = '';
+    if (Array.isArray(data)) {
+      responseText = data[0]?.generated_text || '';
+    } else if (typeof data === 'string') {
+      responseText = data;
+    } else {
+      responseText = data.generated_text || data.text || '';
+    }
+    
+    return {
+      response: responseText,
+      usage: { total_tokens: responseText.length }, // Approximate
+    };
+  }
+
+  /**
+   * Check Hugging Face service health
+   */
+  async checkHuggingFaceHealth(): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.huggingfaceHost}/models`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Health check failed: ${response.status}`);
+      }
+      return true;
+    } catch (error) {
+      console.error('Hugging Face health check failed:', error);
+      throw new Error(`Hugging Face service not available at ${this.huggingfaceHost}`);
+    }
+  }
+
+  /**
+   * Get available Hugging Face models
+   */
+  async getAvailableModels(): Promise<HuggingFaceModelInfo[]> {
+    try {
+      const response = await fetch(`${this.huggingfaceHost}/api/models`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to get models: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data || [];
+    } catch (error) {
+      console.error('Failed to get Hugging Face models:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Search for models by task
+   */
+  async searchModels(query: string, task?: string): Promise<HuggingFaceModelInfo[]> {
+    try {
+      const params = new URLSearchParams({
+        search: query,
+        ...(task && { filter: task }),
+      });
+      
+      const response = await fetch(`${this.huggingfaceHost}/api/models?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to search models: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data || [];
+    } catch (error) {
+      console.error('Failed to search Hugging Face models:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get model information
+   */
+  async getModelInfo(modelId: string): Promise<HuggingFaceModelInfo | null> {
+    try {
+      const response = await fetch(`${this.huggingfaceHost}/api/models/${modelId}`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to get model info: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Failed to get model info for ${modelId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get service configuration
+   */
+  getConfig(): HuggingFaceRAGConfig {
+    return { ...this.config };
+  }
+
+  /**
+   * Update service configuration
+   */
+  updateConfig(newConfig: Partial<HuggingFaceRAGConfig>): void {
+    this.config = { ...this.config, ...newConfig };
+    this.apiKey = this.config.apiKey || "";
+  }
+
+  /**
+   * Get service statistics
+   */
+  async getStats(): Promise<{
+    availableModels: number;
+    vectorStoreStatus: string;
+    embeddingServiceStatus: string;
+    apiEndpoint: string;
+  }> {
+    const models = await this.getAvailableModels();
+    
+    return {
+      availableModels: models.length,
+      vectorStoreStatus: 'connected', // TODO: Add actual health check
+      embeddingServiceStatus: 'ready', // TODO: Add actual health check
+      apiEndpoint: this.huggingfaceHost,
+    };
+  }
+} 

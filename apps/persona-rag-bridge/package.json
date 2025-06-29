@@ -1,35 +1,72 @@
 {
-  "name": "@griot/persona-rag-bridge",
+  "name": "owu-plus-extension",
   "version": "1.0.0",
-  "description": "Bridge service connecting PersonaRAG engine to OpenWebUI for persona-aware AI interactions",
+  "description": "Open-WebUI+ Browser Extension with Reticulum and KLF integration",
   "type": "module",
-  "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "test": "node scripts/test-bridge.js"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist",
+    "build:extension": "npm run clean && npm run build && npm run copy-manifest",
+    "copy-manifest": "cp public/manifest.json dist/ && cp -r public/icons dist/",
+    "watch": "vite build --watch",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@griot/core": "workspace:*",
-    "@griot/data": "workspace:*",
-    "express": "^4.19.2",
-    "cors": "^2.8.5",
-    "axios": "^1.7.2",
-    "dotenv": "^16.4.5",
-    "ws": "^8.16.0"
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "clsx": "^2.0.0",
+    "crypto-browserify": "^3.12.0",
+    "buffer": "^6.0.3",
+    "jotai": "^2.6.0",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.0.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "tsx": "^4.6.2",
-    "typescript": "^5.3.3",
-    "@types/express": "^4.17.21",
-    "@types/cors": "^2.8.17",
-    "@types/ws": "^8.5.10"
+    "@types/chrome": "^0.0.254",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "terser": "^5.24.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [
-    "persona-rag",
-    "openwebui",
-    "bridge",
-    "ai-orchestration"
-  ]
-} 
+    "browser-extension",
+    "ai",
+    "reticulum",
+    "klf",
+    "open-webui",
+    "mesh-network",
+    "orchestration"
+  ],
+  "author": "OWU+ Team",
+  "license": "MIT"
+}

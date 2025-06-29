@@ -48,4 +48,4 @@ echo "   'Tell me a story about wisdom' -> Should select Griot"
 echo "   'I need spiritual guidance' -> Should select Tohunga"
 echo ""
 
-npm run dev 
+npm run build && npm start 

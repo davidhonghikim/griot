@@ -1,0 +1,122 @@
+{
+  "manifest_version": 3,
+  "name": "OWU+ Extension",
+  "version": "1.0.0",
+  "description": "Open-WebUI+ Extension with Reticulum encrypted communications and KLF orchestration",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "webNavigation",
+    "webRequest",
+    "notifications",
+    "alarms",
+    "background"
+  ],
+  "host_permissions": [
+    "http://localhost:*",
+    "https://localhost:*",
+    "http://127.0.0.1:*",
+    "https://127.0.0.1:*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "OWU+ Extension",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "panel.html",
+        "assets/*",
+        "modules/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "options_page": "options.html",
+  "sidebar_action": {
+    "default_panel": "panel.html",
+    "default_title": "OWU+ Panel"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+O",
+        "mac": "Command+Shift+O"
+      },
+      "description": "Open OWU+ Extension"
+    },
+    "toggle-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P",
+        "mac": "Command+Shift+P"
+      },
+      "description": "Toggle OWU+ Panel"
+    },
+    "quick-chat": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+C",
+        "mac": "Command+Shift+C"
+      },
+      "description": "Quick Chat"
+    },
+    "generate-image": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+I",
+        "mac": "Command+Shift+I"
+      },
+      "description": "Generate Image"
+    },
+    "open-vault": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+V",
+        "mac": "Command+Shift+V"
+      },
+      "description": "Open Vault"
+    }
+  },
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:*",
+      "https://localhost:*",
+      "http://127.0.0.1:*",
+      "https://127.0.0.1:*"
+    ]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "minimum_chrome_version": "88",
+  "author": "kOS Development Team",
+  "homepage_url": "https://github.com/your-org/griot-node",
+  "short_name": "OWU+",
+  "theme_color": "#6366f1",
+  "background_color": "#ffffff"
+} 

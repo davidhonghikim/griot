@@ -9,7 +9,7 @@
 
 import axios from 'axios';
 
-const BRIDGE_URL = 'http://localhost:3001';
+const BRIDGE_URL = 'http://localhost:3000';
 const DEMO_QUERIES = [
   {
     query: "Tell me a story about a brave warrior who overcame impossible odds",

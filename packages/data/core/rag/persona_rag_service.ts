@@ -176,6 +176,7 @@ export class PersonaRAGService {
     }
 
     const persona = response.results[0];
+    if (!persona) { throw new Error(`No persona found for ID: ${personaId}`); }
     let context = persona.contextSnippet;
 
     // Enhance context with additional information if requested
@@ -235,7 +236,7 @@ export class PersonaRAGService {
     }
 
     // Return best candidate
-    return candidates.length > 0 ? candidates[0] : null;
+    return candidates.length > 0 ? candidates[0]! : null;
   }
 
   /**
@@ -314,6 +315,7 @@ export class PersonaRAGService {
     }
 
     const primary = response.results[0];
+    if (!primary) { throw new Error("No primary persona found for recommendations"); }
     const alternatives = response.results.slice(1, maxRecs);
 
     // Generate reasonings if requested
@@ -469,19 +471,19 @@ export class PersonaRAGService {
   ): PersonaRAGResult[] {
     if (candidates.length <= ensembleSize) return candidates;
 
-    const selected: PersonaRAGResult[] = [candidates[0]]; // Always include best match
+    const selected: PersonaRAGResult[] = [candidates[0]!]; // Always include best match
     
     for (let i = 1; i < candidates.length && selected.length < ensembleSize; i++) {
       const candidate = candidates[i];
       
       // Check if candidate is diverse enough from already selected personas
       const isDiverse = selected.every(selected => {
-        const similarity = this.calculatePersonaSimilarity(candidate, selected);
+        const similarity = this.calculatePersonaSimilarity(candidate!, selected);
         return similarity < maxSimilarity;
       });
       
       if (isDiverse) {
-        selected.push(candidate);
+        selected.push(candidate!);
       }
     }
 

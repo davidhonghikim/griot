@@ -4,12 +4,17 @@
   "private": true,
   "description": "Complete AI agent framework for building sophisticated agent systems",
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "build": "npm run build:core && npm run build:schemas && npm run build:service-connectors && npm run build:data",
     "build:core": "cd packages/core && npm run build",
     "build:schemas": "cd packages/schemas && npm run build",
     "build:service-connectors": "cd packages/service-connectors && npm run build",
     "build:data": "cd packages/data && npm run build",
+    "build:bridge": "cd apps/persona-rag-bridge && npm run build",
     "test": "for f in tests/scripts/*.js; do echo Running $f; node $f || exit 1; done",
     "test:integration": "jest tests/integration/ --config jest.config.js",
     "lint": "eslint . --ext .ts,.tsx",

@@ -45,7 +45,7 @@ export interface LlamaCppRAGResponse {
   retrievedDocuments: Array<{
     id: string;
     content: string;
-    similarity: number;
+    score: number;
     metadata?: Record<string, any>;
   }>;
   context: string;
@@ -170,7 +170,7 @@ export class LlamaCppRAGService {
           retrievedDocuments.map(doc => ({ 
             id: doc.id, 
             content: doc.content, 
-            similarity: doc.similarity 
+            score: doc.score 
           })),
         context,
         metadata: {
@@ -195,23 +195,21 @@ export class LlamaCppRAGService {
   private async retrieveDocuments(request: LlamaCppRAGRequest): Promise<Array<{
     id: string;
     content: string;
-    similarity: number;
+    score: number;
     metadata?: Record<string, any>;
   }>> {
     // Generate query embedding
-    const queryEmbedding = await this.embeddingService.generateEmbedding(request.query);
+    const queryEmbedding = await this.embeddingService.embedText(request.query);
     
     // Search vector store
-    const searchResults = await this.vectorStore.search({
-      vector: queryEmbedding,
-      limit: request.maxResults || this.config.maxResults,
-      threshold: request.similarityThreshold || this.config.similarityThreshold,
+    const searchResults = await this.vectorStore.search(queryEmbedding, {
+      limit: request.maxResults || 10,
     });
     
     return searchResults.map(result => ({
       id: result.id,
       content: result.content,
-      similarity: result.similarity,
+      score: result.score,
       metadata: result.metadata,
     }));
   }
@@ -219,12 +217,13 @@ export class LlamaCppRAGService {
   /**
    * Build context from retrieved documents
    */
-  private buildContext(documents: Array<{ content: string; similarity: number }>, query: string): string {
+  private buildContext(documents: Array<{ content: string; score: number }>, query: string): string {
     let context = `Query: ${query}\n\nRelevant Information:\n`;
     
     for (let i = 0; i < documents.length; i++) {
       const doc = documents[i];
-      context += `${i + 1}. [Similarity: ${doc.similarity.toFixed(3)}] ${doc.content}\n\n`;
+      if (!doc) continue;
+      context += `${i + 1}. [Similarity: ${doc.score.toFixed(3)}] ${doc.content}\n\n`;
     }
     
     return context;
@@ -294,11 +293,11 @@ Answer:`;
       throw new Error(`Llama.cpp API error: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json();
+    const data = await response.json() as any;
     
     return {
       response: data.choices[0]?.message?.content || '',
-      usage: data.usage,
+      usage: (data as any).usage,
     };
   }
 
@@ -328,8 +327,8 @@ Answer:`;
         throw new Error(`Failed to get models: ${response.status}`);
       }
       
-      const data = await response.json();
-      return data.data || [];
+      const data = await response.json() as any;
+      return (data as any).data || [];
     } catch (error) {
       console.error('Failed to get Llama.cpp models:', error);
       return [];

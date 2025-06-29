@@ -4,14 +4,30 @@
   "private": true,
   "type": "module",
   "description": "Seed data, including default skills and personas, for the kOS framework.",
-  "main": "index.js",
+  "main": "dist/core/rag/persona_rag_service.js",
+  "types": "dist/core/rag/persona_rag_service.d.ts",
   "scripts": {
-    "build": "echo 'Data package - no build needed'",
-    "clean": "echo 'Data package - no clean needed'"
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "openai": "^4.104.0",
     "weaviate-ts-client": "^1.6.0",
     "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  },
+  "exports": {
+    "./rag/*": {
+      "import": "./dist/rag/*.js",
+      "require": "./dist/rag/*.js",
+      "types": "./dist/rag/*.d.ts"
+    },
+    "./persona_loader": {
+      "import": "./dist/persona_loader.js",
+      "require": "./dist/persona_loader.js",
+      "types": "./dist/persona_loader.d.ts"
+    }
   }
 }
