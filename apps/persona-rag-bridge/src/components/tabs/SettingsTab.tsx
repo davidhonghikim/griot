@@ -1,13 +1,15 @@
 /// <reference path="../types/chrome.d.ts" />
 /// <reference path="../types/chrome.d.ts" />
 /// <reference path="../types/chrome.d.ts" />
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { 
   extensionStateAtom, 
   vaultStateAtom,
   notificationsStateAtom 
 } from '../../modules/state/atoms';
+import { themeManagerAtom } from '../../modules/state/themeAtoms';
+import { configManager, OWUConnectionConfig } from '../../modules/config/ConfigManager';
 import { Button } from '../ui';
 import { 
   Settings, 
@@ -23,6 +25,47 @@ export const SettingsTab: React.FC = () => {
   const [extensionState] = useAtom(extensionStateAtom);
   const [vaultState] = useAtom(vaultStateAtom);
   const [notificationsState] = useAtom(notificationsStateAtom);
+  const [currentTheme, setTheme] = useAtom(themeManagerAtom);
+  
+  // Connection configuration state
+  const [connectionConfig, setConnectionConfig] = useState<OWUConnectionConfig>(
+    configManager.getConnectionConfig()
+  );
+  const [configSource, setConfigSource] = useState<string>('default');
+
+  // Load configuration on mount
+  useEffect(() => {
+    const unsubscribe = configManager.subscribe('connection.openwebuiUrl', () => {
+      setConnectionConfig(configManager.getConnectionConfig());
+    });
+    
+    // Check configuration source
+    const source = configManager.getConfigSource('connection.openwebuiUrl');
+    setConfigSource(source?.source || 'default');
+    
+    return unsubscribe;
+  }, []);
+
+  const handleThemeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTheme = event.target.value as 'light' | 'dark' | 'system';
+    setTheme(newTheme);
+  };
+
+  const handleConnectionChange = (key: keyof OWUConnectionConfig, value: string | boolean) => {
+    configManager.set(`connection.${key}`, value);
+    setConnectionConfig(configManager.getConnectionConfig());
+  };
+
+  const handleLoadNetworkConfig = async () => {
+    try {
+      await configManager.loadFromNetworkRAG();
+      setConnectionConfig(configManager.getConnectionConfig());
+      const source = configManager.getConfigSource('connection.openwebuiUrl');
+      setConfigSource(source?.source || 'default');
+    } catch (error) {
+      console.error('Failed to load network configuration:', error);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -46,18 +89,19 @@ export const SettingsTab: React.FC = () => {
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Theme</label>
               <select 
-                className="w-full px-3 py-2 text-sm border border-border rounded bg-background"
-                value={extensionState.theme}
+                className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground"
+                value={currentTheme}
+                onChange={handleThemeChange}
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
-                <option value="auto">Auto</option>
+                <option value="system">System</option>
               </select>
             </div>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Language</label>
               <select 
-                className="w-full px-3 py-2 text-sm border border-border rounded bg-background"
+                className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground"
                 value={extensionState.language}
               >
                 <option value="en">English</option>
@@ -131,6 +175,65 @@ export const SettingsTab: React.FC = () => {
                 checked={notificationsState.settings.desktop}
                 className="rounded"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Connection Settings */}
+        <div>
+          <h3 className="text-sm font-medium mb-3 flex items-center space-x-2">
+            <Globe className="w-4 h-4" />
+            <span>Connection</span>
+          </h3>
+          <div className="space-y-3">
+            <div className="text-xs text-muted-foreground mb-2">
+              Config Source: <span className="font-medium">{configSource}</span>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">OpenWebUI Server</label>
+              <input 
+                type="text" 
+                className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground"
+                value={connectionConfig.openwebuiUrl}
+                onChange={(e) => handleConnectionChange('openwebuiUrl', e.target.value)}
+                placeholder="http://192.168.1.180:3000"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">RAG Service</label>
+              <input 
+                type="text" 
+                className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground"
+                value={connectionConfig.ragServiceUrl}
+                onChange={(e) => handleConnectionChange('ragServiceUrl', e.target.value)}
+                placeholder="http://localhost:3001"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Use Local RAG</span>
+              <input 
+                type="checkbox" 
+                checked={connectionConfig.useLocalRAG}
+                onChange={(e) => handleConnectionChange('useLocalRAG', e.target.checked)}
+                className="rounded"
+              />
+            </div>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleLoadNetworkConfig}
+                className="flex-1"
+              >
+                Load from Network
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1"
+              >
+                Test Connection
+              </Button>
             </div>
           </div>
         </div>

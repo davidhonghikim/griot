@@ -15,12 +15,12 @@
     "background"
   ],
   "host_permissions": [
-    "http://localhost:*",
-    "https://localhost:*",
-    "http://127.0.0.1:*",
-    "https://127.0.0.1:*",
-    "http://*/*",
-    "https://*/*"
+    "http://localhost:*/*",
+    "https://localhost:*/*",
+    "http://127.0.0.1:*/*",
+    "https://127.0.0.1:*/*",
+    "http://192.168.1.180:*/*",
+    "https://192.168.1.180:*/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -40,16 +40,14 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"],
-      "css": ["content.css"],
       "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
     {
       "resources": [
-        "panel.html",
-        "assets/*",
-        "modules/*"
+        "popup.html",
+        "assets/*"
       ],
       "matches": ["<all_urls>"]
     }
@@ -60,11 +58,7 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
-  "options_page": "options.html",
-  "sidebar_action": {
-    "default_panel": "panel.html",
-    "default_title": "OWU+ Panel"
-  },
+
   "commands": {
     "_execute_action": {
       "suggested_key": {
@@ -86,28 +80,16 @@
         "mac": "Command+Shift+C"
       },
       "description": "Quick Chat"
-    },
-    "generate-image": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+I",
-        "mac": "Command+Shift+I"
-      },
-      "description": "Generate Image"
-    },
-    "open-vault": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+V",
-        "mac": "Command+Shift+V"
-      },
-      "description": "Open Vault"
     }
   },
   "externally_connectable": {
     "matches": [
-      "http://localhost:*",
-      "https://localhost:*",
-      "http://127.0.0.1:*",
-      "https://127.0.0.1:*"
+      "http://localhost:*/*",
+      "https://localhost:*/*",
+      "http://127.0.0.1:*/*",
+      "https://127.0.0.1:*/*",
+      "http://192.168.1.180:*/*",
+      "https://192.168.1.180:*/*"
     ]
   },
   "content_security_policy": {
@@ -115,8 +97,5 @@
   },
   "minimum_chrome_version": "88",
   "author": "kOS Development Team",
-  "homepage_url": "https://github.com/your-org/griot-node",
-  "short_name": "OWU+",
-  "theme_color": "#6366f1",
-  "background_color": "#ffffff"
+  "short_name": "OWU+"
 } 

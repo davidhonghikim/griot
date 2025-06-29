@@ -1,0 +1,32 @@
+{
+  "connection": {
+    "openwebuiUrl": "http://YOUR_SERVER_IP:3000",
+    "openwebuiApiKey": "sk-your-api-key-here",
+    "ragServiceUrl": "http://YOUR_RAG_SERVER:3001",
+    "useLocalRAG": true,
+    "timeout": 5000,
+    "retries": 3
+  },
+  "network": {
+    "autoDiscovery": true,
+    "discoveryTimeout": 10000,
+    "preferredNetworks": ["192.168.1.*", "10.0.0.*", "localhost"],
+    "fallbackUrls": [
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "http://192.168.1.180:3000"
+    ]
+  },
+  "theme": "dark",
+  "language": "en",
+  "notifications": true,
+  "deployment": {
+    "mode": "production",
+    "environment": "local-network",
+    "customEndpoints": {
+      "ollama": "http://YOUR_OLLAMA_SERVER:11434",
+      "weaviate": "http://YOUR_WEAVIATE_SERVER:8080",
+      "postgresql": "postgresql://user:pass@YOUR_DB_SERVER:5432/db"
+    }
+  }
+} 

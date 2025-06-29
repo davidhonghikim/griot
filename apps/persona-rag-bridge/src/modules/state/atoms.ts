@@ -690,4 +690,10 @@ export const markNotificationReadAtom = atom(
       unreadCount: updatedNotifications.filter(n => !n.read).length,
     });
   }
-); 
+);
+
+// =============================================================================
+// STORAGE INTEGRATION
+// =============================================================================
+
+// Export storage atoms for unified state management

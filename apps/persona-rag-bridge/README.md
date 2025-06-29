@@ -1,355 +1,203 @@
-# OWU+ Browser Extension
+# PersonaRAG Bridge Extension
 
-A powerful browser extension that integrates Open-WebUI with Reticulum encrypted mesh networking and KLF (Kind Link Framework) service orchestration.
-
-## 🚀 **QUICK START - TESTING & DEVELOPMENT**
-
-### **Immediate Testing (5 minutes)**
-
-1. **Build the Extension**
-   ```bash
-   cd apps/persona-rag-bridge
-   npm install
-   npm run build
-   ```
-
-2. **Load in Chrome**
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode" (top right toggle)
-   - Click "Load unpacked"
-   - Select the `dist` folder from the project
-   - The OWU+ extension should appear in your toolbar
-
-3. **Test the UI**
-   - Click the OWU+ icon in your browser toolbar
-   - You should see a popup with 6 tabs: Chat, Services, Artefacts, Recipes, Agents, Settings
-   - Navigate between tabs to test the interface
-   - Check the status bar at the bottom for connection indicators
-
-### **Development Server (for UI testing)**
-
-```bash
-npm run dev
-# Open http://localhost:3000 in your browser
-# This shows the popup interface in a web page for easier development
-```
-
-## ✅ **CURRENT STATUS**
-
-### **Fully Operational Components**
-- ✅ **UI Interface**: Complete React-based popup with 6 functional tabs
-- ✅ **State Management**: Jotai atoms for all application state
-- ✅ **Build System**: Zero TypeScript errors, successful builds
-- ✅ **Extension Infrastructure**: Background script, content script, manifest
-- ✅ **Component Library**: Button, Input, Tabs, StatusBar components
-- ✅ **Tab System**: Chat, Services, Artefacts, Recipes, Agents, Settings
-
-### **Ready for Integration**
-- 🔄 **Reticulum Network**: Infrastructure ready, needs service implementation
-- 🔄 **KLF Orchestration**: Framework ready, needs service connectors
-- 🔄 **AI Services**: UI ready, needs API integration
-- 🔄 **Vault System**: UI ready, needs encryption implementation
+A Chrome extension that bridges OpenWebUI with PersonaRAG capabilities, providing enhanced AI interactions through secure vault storage and intelligent document retrieval.
 
 ## Features
 
-### 🔐 **Reticulum Integration**
-- Encrypted peer-to-peer mesh networking
-- Secure node discovery and communication
-- End-to-end encryption for all messages
-- WebRTC and WebSocket transport support
+- **Dark Theme UI** with 6 functional tabs (Chat, Services, Artifacts, Recipes, Agents, Settings)
+- **Flexible Configuration System** supporting multiple sources
+- **Secure Vault Storage** with AES-256-CBC encryption
+- **Vector Store Integration** (Weaviate + PostgreSQL)
+- **PersonaRAG Service** for intelligent document retrieval
+- **Chrome Extension** with background script and content integration
 
-### 🎯 **KLF Orchestration**
-- Service discovery and registration
-- Workflow creation and execution
-- Dynamic service composition
-- Distributed AI service management
+## Quick Start
 
-### 🤖 **AI Service Management**
-- Connect to multiple AI services (Ollama, OpenAI, etc.)
-- Service health monitoring
-- Automatic failover and load balancing
-- Service configuration management
+### Testing Configuration (Default)
+The extension comes pre-configured for testing with:
+- OpenWebUI: `http://192.168.1.180:3000`
+- RAG Service: `http://localhost:3001`
 
-### 💬 **Enhanced Chat**
-- Multi-persona conversations
-- Context-aware responses
-- Message history and persistence
-- Real-time collaboration
-
-### 🎨 **Modern UI**
-- Clean, responsive interface
-- Dark/light theme support
-- Tabbed navigation
-- Real-time status indicators
-
-## Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Browser       │    │   Reticulum     │    │   KLF           │
-│   Extension     │◄──►│   Mesh Network  │◄──►│   Orchestrator  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   UI Components │    │   Encryption    │    │   Service       │
-│   (React)       │    │   Layer         │    │   Registry      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   State         │    │   Network       │    │   Workflow      │
-│   Management    │    │   Protocol      │    │   Engine        │
-│   (Jotai)       │    │   (WebRTC/WS)   │    │   (KLF)         │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+### 1. Install Dependencies
+```bash
+npm install
 ```
 
-## Installation
+### 2. Build Extension
+```bash
+npm run build
+```
 
-### Development
+### 3. Load in Chrome
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable "Developer mode"
+3. Click "Load unpacked" and select the `dist/` folder
+4. The extension icon should appear in the Chrome toolbar
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd griot-node/apps/persona-rag-bridge
-   ```
+### 4. Test Extension
+- Click the extension icon to open the popup
+- Navigate through the 6 tabs to test functionality
+- Check the Settings tab for connection configuration
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+## Configuration System
 
-3. **Build the extension**
-   ```bash
-   npm run build
-   ```
+The extension supports multiple configuration sources with priority:
 
-4. **Load in Chrome**
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `dist` folder
+1. **Default** (Testing): Hard-coded defaults for quick testing
+2. **User File**: JSON configuration file for deployment
+3. **Network RAG**: Dynamic configuration from RAG database
+4. **Runtime**: UI changes that override other sources
 
-### Production
+### Configuration Sources (Priority Order)
 
-1. **Build for production**
-   ```bash
-   npm run build
-   ```
-
-2. **Package the extension**
-   - The built extension is in the `dist` folder
-   - Zip the contents for distribution
-
-## Configuration
-
-The extension uses environment-based configuration through the `config/environment.ts` file. Key configuration sections:
-
-### Extension UI
+#### 1. Default Configuration (Testing)
 ```typescript
-extension: {
-  theme: 'auto' | 'light' | 'dark',
-  language: 'en' | 'es' | 'fr' | 'de',
-  // ... more options
-}
+// Built-in testing defaults
+openwebuiUrl: 'http://192.168.1.180:3000'
+ragServiceUrl: 'http://localhost:3001'
+useLocalRAG: true
 ```
 
-### Reticulum Network
-```typescript
-reticulum: {
-  nodeId: 'unique-node-id',
-  enableWebRTC: true,
-  enableWebSocket: true,
-  discoveryInterval: 30000,
-  // ... more options
-}
-```
+#### 2. User Config File
+Copy `config/user-config.example.json` to `config/user-config.json` and customize:
 
-### KLF Orchestration
-```typescript
-klf: {
-  nodeId: 'unique-node-id',
-  orchestratorUrl: 'ws://localhost:8080',
-  discoveryInterval: 60000,
-  // ... more options
-}
-```
-
-### AI Services
-```typescript
-aiServices: {
-  ollama: {
-    baseUrl: 'http://localhost:11434',
-    defaultModel: 'llama2',
+```json
+{
+  "connection": {
+    "openwebuiUrl": "http://YOUR_SERVER_IP:3000",
+    "openwebuiApiKey": "sk-your-api-key-here",
+    "ragServiceUrl": "http://YOUR_RAG_SERVER:3001",
+    "useLocalRAG": true
   },
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY,
-    baseUrl: 'https://api.openai.com/v1',
-  },
-  // ... more services
+  "network": {
+    "autoDiscovery": true,
+    "preferredNetworks": ["192.168.1.*", "10.0.0.*"],
+    "fallbackUrls": ["http://localhost:3000"]
+  }
 }
 ```
 
-## Usage
+#### 3. Network RAG Configuration
+The extension can fetch configuration from your RAG service:
+```bash
+GET http://YOUR_RAG_SERVER:3001/api/config
+```
 
-### Basic Usage
+#### 4. Runtime Configuration
+Users can update settings through the extension's Settings tab.
 
-1. **Open the Extension**
-   - Click the OWU+ icon in your browser toolbar
-   - The popup will show the main interface
+## Deployment
 
-2. **Connect to Services**
-   - Go to the "Services" tab
-   - Add your AI service connections
-   - Monitor service health
+### For Production Networks
+1. **Create user config file**: Copy and customize `config/user-config.example.json`
+2. **Update IP addresses**: Replace `192.168.1.180` with your actual server IPs
+3. **Set API keys**: Add your OpenWebUI and service API keys
+4. **Configure network discovery**: Set preferred networks and fallback URLs
+5. **Build and distribute**: Run `npm run build` and distribute the `dist/` folder
 
-3. **Start Chatting**
-   - Go to the "Chat" tab
-   - Select a persona
-   - Start a conversation
+### Network RAG Integration
+The extension can automatically discover and configure services through your RAG database:
 
-4. **Manage Workflows**
-   - Go to the "Recipes" tab
-   - Create or import workflows
-   - Execute automated tasks
-
-### Advanced Features
-
-#### Reticulum Mesh Networking
-- **Node Discovery**: Automatically discover other nodes on the network
-- **Secure Communication**: All messages are end-to-end encrypted
-- **Peer-to-Peer**: Direct communication without central servers
-
-#### KLF Service Orchestration
-- **Service Registration**: Register your AI services with the network
-- **Workflow Creation**: Create complex multi-service workflows
-- **Dynamic Composition**: Automatically compose services for tasks
-
-#### Vault Security
-- **Credential Management**: Securely store API keys and credentials
-- **Encryption**: All sensitive data is encrypted at rest
-- **Access Control**: Fine-grained permission management
+```typescript
+// Example RAG configuration endpoint
+{
+  "connection.openwebuiUrl": "http://discovered-server:3000",
+  "connection.ragServiceUrl": "http://rag-service:3001",
+  "network.preferredNetworks": ["10.0.0.*", "192.168.1.*"]
+}
+```
 
 ## Development
 
-### Project Structure
+### Development Server
+```bash
+npm run dev
+# Open http://localhost:3000 for UI testing
+```
 
+### File Structure
 ```
 src/
 ├── components/          # React UI components
-│   ├── ui/             # Reusable UI components
-│   ├── tabs/           # Tab-specific components
-│   └── ...
-├── modules/            # Core modules
-│   ├── reticulum/      # Reticulum networking
-│   ├── klf/           # KLF orchestration
-│   └── state/         # State management
-├── services/           # Service connectors
-├── config/            # Configuration
-└── styles/            # Global styles
+│   ├── tabs/           # Tab components (Chat, Services, etc.)
+│   └── ui/             # Reusable UI components
+├── modules/
+│   ├── config/         # Configuration management
+│   ├── state/          # Jotai state atoms
+│   ├── reticulum/      # Network protocol
+│   └── klf/            # KLF orchestration
+├── services/           # Service integrations
+├── vault/              # Secure storage
+└── styles/             # CSS and themes
 ```
 
-### Available Scripts
+### Configuration Management
+```typescript
+import { configManager } from './modules/config/ConfigManager';
 
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run type-check   # Run TypeScript type checking
-npm run lint         # Run ESLint
-npm run preview      # Preview production build
+// Get current configuration
+const config = configManager.getConnectionConfig();
+
+// Update configuration
+configManager.set('connection.openwebuiUrl', 'http://new-server:3000');
+
+// Load from network RAG
+await configManager.loadFromNetworkRAG();
 ```
 
-### Testing the UI
+## Architecture
 
-1. **Development Mode**
-   ```bash
-   npm run dev
-   # Open http://localhost:3000
-   # This shows the popup interface in a web page
-   ```
-
-2. **Extension Mode**
-   ```bash
-   npm run build
-   # Load dist/ folder in Chrome extensions
-   # Click the extension icon to test popup
-   ```
-
-3. **Component Testing**
-   - All components are in `src/components/`
-   - State management in `src/modules/state/atoms.ts`
-   - UI components in `src/components/ui/`
-
-### Key Files
-
-- **Main Popup**: `src/popup.tsx`
-- **Extension Popup**: `src/components/ExtensionPopup.tsx`
-- **Tab Components**: `src/components/tabs/`
-- **State Management**: `src/modules/state/atoms.ts`
-- **Background Script**: `src/background.ts`
-- **Content Script**: `src/content.ts`
-- **Configuration**: `config/environment.ts`
+- **Extension Popup**: React-based UI with 6 tabs
+- **Background Script**: Extension lifecycle and service management
+- **Content Script**: Web page integration
+- **Configuration Manager**: Multi-source configuration with priority
+- **Vault System**: Secure storage with AES-256-CBC encryption
+- **RAG Integration**: PersonaRAG service for intelligent retrieval
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Extension won't load**
-   - Ensure you're in the `dist` folder, not the root
-   - Check that all files are present in `dist/`
-   - Verify manifest.json is valid
-
-2. **UI not displaying**
-   - Check browser console for errors
-   - Ensure all dependencies are installed
-   - Verify build completed successfully
-
-3. **TypeScript errors**
-   - Run `npm run type-check` to see all errors
-   - Fix any compilation issues before building
+1. **Extension won't load**: Check that all icon files are present and valid
+2. **Connection failures**: Verify IP addresses and port availability
+3. **Build errors**: Ensure all dependencies are installed with `npm install`
+4. **Configuration not updating**: Check configuration source priority in Settings
 
 ### Debug Mode
-
 Enable debug logging by setting:
 ```typescript
-// In config/environment.ts
-debug: {
-  enabled: true,
-  level: 'debug'
-}
+localStorage.setItem('owu-debug', 'true');
 ```
+
+## Testing
+
+### Unit Tests
+```bash
+npm test
+```
+
+### Integration Tests
+```bash
+npm run test:integration
+```
+
+### Manual Testing Checklist
+- [ ] Extension loads without errors
+- [ ] All 6 tabs are functional
+- [ ] Settings can be updated
+- [ ] Network configuration loads
+- [ ] Vault operations work
+- [ ] Theme switching works
+- [ ] Connection to OpenWebUI successful
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
+4. Add tests if applicable
 5. Submit a pull request
 
 ## License
 
-MIT License - see LICENSE file for details.
-
-## Support
-
-- **Documentation**: [Wiki](https://github.com/your-repo/wiki)
-- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
-
-## Roadmap
-
-### v1.1.0
-- [ ] Advanced workflow editor
-- [ ] Service marketplace
-- [ ] Mobile companion app
-
-### v1.2.0
-- [ ] Multi-language support
-- [ ] Plugin system
-- [ ] Advanced analytics
-
-### v2.0.0
-- [ ] Decentralized identity
-- [ ] Token economics
-- [ ] Cross-platform sync 
+This project is part of the kOS (Kindai Operating System) framework. 
