@@ -1,0 +1,42 @@
+metadata:
+  original_file: 02_Hakim_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Hakim Class: Data Models'
+  description: Data models for the Hakim Node Class, including HealthReport and MaintenanceJob.
+sections:
+- level: 1
+  title: Hakim Class Data Models
+  type: section
+  content: ''
+- level: 3
+  title: 1. HealthReport
+  type: section
+  content: "A structured snapshot of a node's health at a specific point in time.\
+    \ This is the primary data asset produced by the Diagnostic Engine.\n\n```json\n\
+    {\n  \"report_id\": \"string (uuid)\",\n  \"target_node_did\": \"string (did:kos:...)\"\
+    ,\n  \"timestamp\": \"string (ISO 8601 timestamp)\",\n  \"status\": \"Healthy\
+    \ | Warning | Error | Unknown\",\n  \"metrics\": {\n    \"cpu_usage_percent\"\
+    : \"number\",\n    \"memory_usage_mb\": \"number\",\n    \"disk_usage_gb\": \"\
+    number\",\n    \"network_io_kbps\": \"number\"\n  },\n  \"dependencies\": [\n\
+    \    {\n      \"dependency_did\": \"string (did:kos:...)\",\n      \"status\"\
+    : \"Healthy | Unreachable\"\n    }\n  ],\n  \"logs_summary\": {\n    \"error_count\"\
+    : \"number\",\n    \"warning_count\": \"number\"\n  },\n  \"diagnosis\": {\n \
+    \   \"code\": \"string (e.g., 'HIGH_CPU_LOAD', 'DISK_NEARING_CAPACITY')\",\n \
+    \   \"recommendation\": \"string (e.g., 'Consider restarting service XYZ', 'Recommend\
+    \ archiving old data')\"\n  }\n}\n```"
+- level: 3
+  title: 2. MaintenanceJob
+  type: section
+  content: "Represents an asynchronous task for the Hakim's Repair & Maintenance Service.\n\
+    \n```json\n{\n  \"job_id\": \"string (uuid)\",\n  \"target_node_did\": \"string\
+    \ (did:kos:...)\",\n  \"requester_did\": \"string (did:kos:...)\",\n  \"task_name\"\
+    : \"string (e.g., 'restart_service', 'apply_software_update')\",\n  \"params\"\
+    : {\n    \"service_name\": \"string (optional)\",\n    \"update_url\": \"string\
+    \ (optional)\"\n  },\n  \"status\": \"PendingApproval | Approved | Running | Completed\
+    \ | Failed | Rejected\",\n  \"status_history\": [\n    {\n      \"status\": \"\
+    PendingApproval\",\n      \"timestamp\": \"string (ISO 8601 timestamp)\",\n  \
+    \    \"message\": \"Awaiting approval from node owner.\"\n    }\n  ],\n  \"created_at\"\
+    : \"string (ISO 8601 timestamp)\",\n  \"completed_at\": \"string (ISO 8601 timestamp,\
+    \ optional)\"\n}\n```"

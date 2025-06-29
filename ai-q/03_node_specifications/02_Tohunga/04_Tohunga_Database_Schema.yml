@@ -1,0 +1,49 @@
+metadata:
+  original_file: 04_Tohunga_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Tohunga Class: Database Schema'
+  description: PostgreSQL database schema for the Tohunga Node Class.
+sections:
+- level: 1
+  title: Tohunga Class Database Schema
+  type: section
+  content: "The Tohunga node requires a persistent storage layer to manage its state.\
+    \ The following schema is designed for a PostgreSQL database.\n\n```sql\n-- Enables\
+    \ UUID generation, if not already enabled\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"\
+    ;\n\n-- Table to store reusable configurations for external data sources.\nCREATE\
+    \ TABLE data_sources (\n    -- A unique identifier for each data source configuration.\n\
+    \    source_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n\n    -- A human-readable\
+    \ name for the data source (e.g., \"GitHub Public API\").\n    source_name TEXT\
+    \ NOT NULL,\n\n    -- The type of the data source, which determines the structure\
+    \ of connection_config.\n    -- (e.g., 'http_api', 'postgresql', 's3_bucket').\n\
+    \    source_type VARCHAR(100) NOT NULL,\n\n    -- A JSONB blob containing the\
+    \ necessary connection details, such as base URLs,\n    -- connection strings,\
+    \ or API keys (should reference a secret management system).\n    connection_config\
+    \ JSONB NOT NULL,\n\n    -- The DID of the node that registered and owns this\
+    \ data source configuration.\n    -- Ensures that only the owner can modify or\
+    \ delete it.\n    owner_did VARCHAR(255) NOT NULL,\n\n    -- Timestamp of when\
+    \ the data source was registered.\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT\
+    \ NOW()\n);\n\n-- Index on owner_did for efficient lookup of sources by their\
+    \ owner.\nCREATE INDEX idx_data_sources_owner_did ON data_sources (owner_did);\n\
+    \n\n-- Table to track the status and results of data acquisition and processing\
+    \ jobs.\nCREATE TABLE acquisition_jobs (\n    -- A unique identifier for each\
+    \ acquisition job.\n    job_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n\n\
+    \    -- Foreign key referencing the data source being used for this job.\n   \
+    \ source_id UUID NOT NULL REFERENCES data_sources(source_id),\n\n    -- JSONB\
+    \ blob containing the request-specific parameters, such as API paths or SQL queries.\n\
+    \    request_params JSONB,\n\n    -- JSONB blob containing the array of pipeline\
+    \ steps (validation, transformation) to be executed.\n    pipeline_steps JSONB\
+    \ NOT NULL,\n\n    -- JSONB blob containing the configuration for the output,\
+    \ such as format and destination.\n    output_config JSONB NOT NULL,\n\n    --\
+    \ The current status of the job (e.g., pending, running, completed, failed).\n\
+    \    -- Indexed for quick filtering of jobs by their state.\n    status VARCHAR(50)\
+    \ NOT NULL,\n\n    -- URI pointing to the final data asset created by a successful\
+    \ job.\n    result_uri TEXT,\n\n    -- Timestamp of when the job was created.\n\
+    \    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n\n    -- Timestamp of\
+    \ when the job was completed or failed.\n    completed_at TIMESTAMP WITH TIME\
+    \ ZONE\n);\n\n-- Index on status for efficient querying of jobs by their state.\n\
+    CREATE INDEX idx_acquisition_jobs_status ON acquisition_jobs (status);\n\n-- Index\
+    \ on source_id to quickly find all jobs related to a specific data source.\nCREATE\
+    \ INDEX idx_acquisition_jobs_source_id ON acquisition_jobs (source_id);\n```"

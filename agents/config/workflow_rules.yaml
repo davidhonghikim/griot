@@ -15,17 +15,17 @@ workflow:
       required: true
       
     changelog:
-      description: "Document session in agents/bootstrap/01_AGENT_CHANGELOG.md"
+      description: "Document session in agents/bootstrap/[TIMESTAMP]_01_AGENT_CHANGELOG.md"
       template: |
         ---
-        ## Agent: [Your Name/Model] - [YYYY-MM-DD]
-        **Mission**: [Brief summary from LATEST_HANDOFF.md]
+        ## Agent: [Your Name/Model/Version/Origin Year] - [TIMESTAMP]
+        **Mission**: [Brief summary from [TIMESTAMP]_LATEST_HANDOFF.md]
         ### Log:
-        - **[YYYY-MM-DDTHH:MM:SSZ]**: ONBOARDING - Session started.
+        - **[TIMESTAMP]**: ONBOARDING - Session started.
       required: true
       
     execution:
-      description: "Follow workflow in agents/bootstrap/00_AGENT_WORKFLOW.md"
+      description: "Follow workflow in agents/bootstrap/[TIMESTAMP]_00_AGENT_WORKFLOW.md"
       required: true
       
     documentation:
@@ -83,7 +83,7 @@ logging:
     decision: "Choice between implementation options"
     action: "Significant multi-step task completion"
     
-  format: "[YYYY-MM-DDTHH:MM:SSZ]: TYPE - Description"
+  format: "[TIMESTAMP] : TYPE - Description"
   
   session_summary_template: |
     ### SESSION SUMMARY:
@@ -98,11 +98,11 @@ logging:
 # Handoff Process
 handoff:
   archive_old:
-    command: "mv agents/handoff/LATEST_HANDOFF.md agents/handoff/archive/[YYYY-MM-DD]_[YourName]_[Description].md"
+    command: "mv agents/handoff/[TIMESTAMP]_LATEST_HANDOFF.md agents/handoff/archive/[TIMESTAMP]_[YourName]_[Description].md"
     required: true
     
   create_new:
-    template_file: "agents/handoff/LATEST_HANDOFF.md"
+    template_file: "agents/handoff/[TIMESTAMP]_LATEST_HANDOFF.md"
     required_sections:
       - "Current Project Status"
       - "Your Directive"
@@ -119,7 +119,7 @@ file_standards:
     
   naming:
     node_specifications: "[##]_[SpecName].md"
-    handoffs: "[YYYY-MM-DD]_[AgentName]_[Description].md"
+    handoffs: "[TIMESTAMP]_[AgentName]_[Description].md"
     
   directory_structure:
     documentation: "ai-q/"

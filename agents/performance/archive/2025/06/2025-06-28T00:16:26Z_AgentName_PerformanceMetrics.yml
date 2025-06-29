@@ -1,0 +1,47 @@
+metadata:
+  version: "1.0"
+  last_updated: "2025-06-28T05:23:16.497Z"
+  total_sessions: 1
+sessions:
+  - agent_id: "test-agent"
+    session_id: "test-session"
+    task_category: "documentation"
+    start_time: "2025-01-30T21:00:00Z"
+    end_time: "2025-01-30T22:00:00Z"
+    duration_minutes: 60
+    success_status: "completed"
+    quality_score: 8.5
+    timestamp: "2025-06-28T05:23:16.490Z"
+agents:
+  test-agent:
+    total_sessions: 1
+    success_rate: 1
+    average_quality: 8.5
+    average_duration: 60
+    task_categories: {}
+task_categories:
+  code_implementation:
+    total_sessions: 0
+    success_rate: 0
+    average_quality: 0
+    average_duration: 0
+  architecture_design:
+    total_sessions: 0
+    success_rate: 0
+    average_quality: 0
+    average_duration: 0
+  documentation:
+    total_sessions: 1
+    success_rate: 1
+    average_quality: 8.5
+    average_duration: 60
+  debugging:
+    total_sessions: 0
+    success_rate: 0
+    average_quality: 0
+    average_duration: 0
+  code_review:
+    total_sessions: 0
+    success_rate: 0
+    average_quality: 0
+    average_duration: 0 

@@ -1,0 +1,7 @@
+force_backends:
+  comfyui: false    # Disable even if GPU found
+  ollama: true
+manual_gpus:        # Override autodetect
+  - id: 0
+    name: "GTX 1070"
+    vram: 8

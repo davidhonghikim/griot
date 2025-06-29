@@ -1,0 +1,52 @@
+metadata:
+  original_file: 02_Tohunga_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Tohunga Class: Data Models'
+  description: Data models for the Tohunga Node Class, including DataSource, AcquisitionJob,
+    and PipelineStep.
+sections:
+- level: 1
+  title: Tohunga Class Data Models
+  type: section
+  content: These are the core data structures used by the Tohunga node's services.
+- level: 3
+  title: 1. DataSource
+  type: section
+  content: "Defines a reusable connection to an external data source. This allows\
+    \ other nodes to define a source once and reference it in multiple acquisition\
+    \ jobs.\n\n```json\n{\n  \"source_id\": \"string (uuid)\",\n  \"source_name\"\
+    : \"string (human-readable name, e.g., 'GitHub Public API')\",\n  \"source_type\"\
+    : \"http_api | postgresql | s3_bucket\",\n  \"connection_config\": {\n    // Varies\
+    \ based on source_type\n    // For http_api:\n    \"base_url\": \"https://api.github.com\"\
+    ,\n    \"headers\": { \"Authorization\": \"Bearer ...\" },\n    // For postgresql:\n\
+    \    \"connection_uri\": \"postgresql://user:pass@host:port/db\"\n  },\n  \"owner_did\"\
+    : \"string (did:kos:... of the node that registered this source)\",\n  \"created_at\"\
+    : \"string (ISO 8601 timestamp)\"\n}\n```"
+- level: 3
+  title: 2. AcquisitionJob
+  type: section
+  content: "A request to the Tohunga node to execute a data pipeline. It references\
+    \ a `DataSource` and defines the specific steps to be taken.\n\n```json\n{\n \
+    \ \"job_id\": \"string (uuid)\",\n  \"source_id\": \"string (uuid, foreign key\
+    \ to DataSource)\",\n  \"request_params\": {\n    // Varies based on source_type\n\
+    \    // For http_api:\n    \"path\": \"/events\",\n    \"query_params\": { \"\
+    per_page\": 100 }\n  },\n  \"pipeline_steps\": [\n    // Array of PipelineStep\
+    \ objects, see below\n  ],\n  \"output_config\": {\n    \"format\": \"json_lines\
+    \ | csv\",\n    \"destination\": {\n      \"type\": \"s3\",\n      \"bucket\"\
+    : \"my-data-assets\",\n      \"key\": \"processed/github-events/{job_id}.jsonl\"\
+    \n    }\n  },\n  \"status\": \"pending | running | completed | failed\",\n  \"\
+    result_uri\": \"string (e.g., s3://my-data-assets/processed/github-events/uuid.jsonl)\"\
+    ,\n  \"created_at\": \"string (ISO 8601 timestamp)\",\n  \"completed_at\": \"\
+    string (ISO 8601 timestamp, optional)\"\n}\n```"
+- level: 3
+  title: 3. PipelineStep
+  type: section
+  content: "Defines a single, modular step within an `AcquisitionJob` pipeline.\n\n\
+    ```json\n{\n  \"step_id\": \"string (uuid)\",\n  \"step_type\": \"validation |\
+    \ transformation\",\n  \"step_module\": \"json_schema | rego_policy | field_mapping\
+    \ | format_conversion\",\n  \"definition\": {\n    // Varies based on step_module\n\
+    \    // For json_schema:\n    \"schema\": { \"type\": \"object\", \"properties\"\
+    : { \"id\": { \"type\": \"string\" } } },\n    // For field_mapping:\n    \"map\"\
+    : { \"id\": \"identifier\", \"actor.login\": \"user_login\" }\n  }\n}\n```"

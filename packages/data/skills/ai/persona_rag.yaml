@@ -1,0 +1,523 @@
+name: "Persona RAG"
+description: "Retrieval-augmented generation with persona context for intelligent persona selection and context-aware responses"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["persona", "rag", "retrieval", "context", "semantic", "generation"]
+  priority: "high" 
+  complexity: "high"
+  dependencies: ["persona_vectorization", "vector_operations", "weaviate_operations", "rag_operations"]
+  version: "1.0.0"
+  created: "2025-01-27"
+  updated: "2025-01-27"
+  author: "system"
+code: |
+  import { PersonaRAGService, PersonaRAGRequest, PersonaRAGResponse, PersonaRAGResult } from '../../core/rag/persona_rag_service';
+  import { PersonaVectorizationService } from '../../core/rag/persona_vectorization_service';
+  import { VectorStore } from '../../core/rag/vector_store';
+  import { EmbeddingService } from '../../core/rag/embedding_service';
+
+  export interface PersonaRAGSkillConfig {
+    vectorStore: VectorStore;
+    embeddingService: EmbeddingService;
+    personaVectorization: PersonaVectorizationService;
+  }
+
+  export interface QueryPersonasRequest {
+    query: string;
+    personaId?: string;
+    personaFilter?: {
+      base?: string;
+      variant?: string;
+      author?: string;
+      tags?: string[];
+    };
+    limit?: number;
+    similarityThreshold?: number;
+    includeContent?: boolean;
+    contextWindow?: number;
+  }
+
+  export interface SelectBestPersonaRequest {
+    query: string;
+    excludePersonas?: string[];
+    requiredTags?: string[];
+    preferredBase?: string;
+    minRelevanceScore?: number;
+  }
+
+  export interface GetPersonaEnsembleRequest {
+    query: string;
+    ensembleSize?: number;
+    diversityThreshold?: number;
+    maxSimilarity?: number;
+    requiredTags?: string[];
+  }
+
+  export interface GetPersonaRecommendationsRequest {
+    query: string;
+    userId?: string;
+    includeReasonings?: boolean;
+    maxRecommendations?: number;
+    contextHistory?: string[];
+  }
+
+  export interface GetPersonaContextRequest {
+    personaId: string;
+    query: string;
+    maxLength?: number;
+    includeSkills?: boolean;
+    includeKnowledge?: boolean;
+  }
+
+  export interface PersonaRAGSkillResponse {
+    success: boolean;
+    data?: any;
+    error?: string;
+    processingTime?: number;
+    metadata?: Record<string, any>;
+  }
+
+  export class PersonaRAGSkill {
+    private service: PersonaRAGService;
+    private config: PersonaRAGSkillConfig;
+
+    constructor(config: PersonaRAGSkillConfig) {
+      this.config = config;
+      this.service = new PersonaRAGService(
+        config.vectorStore,
+        config.embeddingService,
+        config.personaVectorization
+      );
+    }
+
+    /**
+     * Initialize the persona RAG skill
+     */
+    async initialize(): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        await this.service.initialize();
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: { message: 'Persona RAG Skill initialized successfully' },
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'initialize',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'initialize',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Query personas using RAG with semantic search
+     */
+    async queryPersonas(request: QueryPersonasRequest): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const ragRequest: PersonaRAGRequest = {
+          query: request.query,
+          personaId: request.personaId,
+          personaFilter: request.personaFilter,
+          limit: request.limit || 10,
+          similarityThreshold: request.similarityThreshold || 0.5,
+          includeContent: request.includeContent || false,
+          contextWindow: request.contextWindow
+        };
+
+        const response = await this.service.query(ragRequest);
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: response.success,
+          data: {
+            query: response.query,
+            results: response.results,
+            totalResults: response.totalResults,
+            selectedPersona: response.selectedPersona,
+            averageRelevance: response.averageRelevance,
+            queryProcessingTime: response.processingTime
+          },
+          error: response.error,
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'query_personas',
+            query: request.query,
+            resultsCount: response.totalResults,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'query_personas',
+            query: request.query,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Select the best persona for a query
+     */
+    async selectBestPersona(request: SelectBestPersonaRequest): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const result = await this.service.selectBestPersona(request.query, {
+          excludePersonas: request.excludePersonas,
+          requiredTags: request.requiredTags,
+          preferredBase: request.preferredBase,
+          minRelevanceScore: request.minRelevanceScore || 0.6
+        });
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: result !== null,
+          data: {
+            persona: result,
+            found: result !== null,
+            query: request.query
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'select_best_persona',
+            query: request.query,
+            found: result !== null,
+            personaId: result?.personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'select_best_persona',
+            query: request.query,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Get persona ensemble for diverse responses
+     */
+    async getPersonaEnsemble(request: GetPersonaEnsembleRequest): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const ensemble = await this.service.getPersonaEnsemble(
+          request.query,
+          request.ensembleSize || 3,
+          {
+            diversityThreshold: request.diversityThreshold || 0.3,
+            maxSimilarity: request.maxSimilarity || 0.8,
+            requiredTags: request.requiredTags
+          }
+        );
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: {
+            ensemble,
+            ensembleSize: ensemble.length,
+            query: request.query,
+            targetSize: request.ensembleSize || 3
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_persona_ensemble',
+            query: request.query,
+            ensembleSize: ensemble.length,
+            targetSize: request.ensembleSize || 3,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_persona_ensemble',
+            query: request.query,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Get persona recommendations with reasoning
+     */
+    async getPersonaRecommendations(request: GetPersonaRecommendationsRequest): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const recommendations = await this.service.getPersonaRecommendations(
+          request.query,
+          request.userId,
+          {
+            includeReasonings: request.includeReasonings || false,
+            maxRecommendations: request.maxRecommendations || 5,
+            contextHistory: request.contextHistory
+          }
+        );
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: {
+            primary: recommendations.primary,
+            alternatives: recommendations.alternatives,
+            reasonings: recommendations.reasonings,
+            query: request.query,
+            totalRecommendations: 1 + recommendations.alternatives.length
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_persona_recommendations',
+            query: request.query,
+            userId: request.userId,
+            totalRecommendations: 1 + recommendations.alternatives.length,
+            includeReasonings: request.includeReasonings || false,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_persona_recommendations',
+            query: request.query,
+            userId: request.userId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Get specific persona context for a query
+     */
+    async getPersonaContext(request: GetPersonaContextRequest): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const context = await this.service.getPersonaContext(
+          request.personaId,
+          request.query,
+          {
+            maxLength: request.maxLength,
+            includeSkills: request.includeSkills || false,
+            includeKnowledge: request.includeKnowledge || false
+          }
+        );
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: {
+            personaId: request.personaId,
+            query: request.query,
+            context: context.context,
+            relevanceScore: context.relevanceScore,
+            metadata: context.metadata,
+            contextLength: context.context.length
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_persona_context',
+            personaId: request.personaId,
+            query: request.query,
+            contextLength: context.context.length,
+            relevanceScore: context.relevanceScore,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_persona_context',
+            personaId: request.personaId,
+            query: request.query,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Update persona vectors
+     */
+    async updatePersonaVectors(personaId: string): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        await this.service.updatePersonaVectors(personaId);
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: {
+            personaId,
+            message: `Vectors updated for persona: ${personaId}`
+          },
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'update_persona_vectors',
+            personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'update_persona_vectors',
+            personaId,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Get RAG statistics
+     */
+    async getRAGStats(): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        const stats = await this.service.getRAGStats();
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: stats,
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_rag_stats',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'get_rag_stats',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+
+    /**
+     * Clean up resources
+     */
+    async cleanup(): Promise<PersonaRAGSkillResponse> {
+      const startTime = Date.now();
+      
+      try {
+        await this.service.cleanup();
+        
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: true,
+          data: { message: 'Persona RAG Skill cleaned up successfully' },
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'cleanup',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      } catch (error) {
+        const processingTime = Date.now() - startTime;
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          processingTime,
+          metadata: {
+            skill: 'persona_rag',
+            action: 'cleanup',
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    }
+  } 

@@ -1,0 +1,234 @@
+metadata:
+  original_file: 03_Junzi_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Junzi KLF API: The Integrity Starseed'
+  description: Complete Kind Link Framework API specification for the Junzi node
+  type: klf_api
+  status: active
+  priority: critical
+  last_updated: '2025-01-28'
+  version: 1.0.0
+  cultural_origin: Chinese Confucian Tradition
+sections:
+- level: 1
+  title: 'Junzi Node KLF API: The Integrity Starseed'
+  type: section
+  content: ''
+- level: 2
+  title: 🔗 Kind Link Framework Integration
+  type: section
+  content: The Junzi node provides comprehensive policy validation and compliance
+    monitoring through the Kind Link Framework, embodying the Confucian principle
+    of `Li` (礼 - proper conduct) in all system interactions.
+- level: 3
+  title: '**Core API Endpoints**'
+  type: section
+  content: '| Endpoint | Method | Description |
+
+    |----------|--------|-------------|
+
+    | `/validate` | POST | Create and execute compliance validation job |
+
+    | `/jobs/{jobId}` | GET | Retrieve validation job status and results |
+
+    | `/policies` | POST | Store reusable policy definitions |
+
+    | `/policies/{policyId}` | GET | Retrieve stored policy definitions |
+
+    | `/policies/{policyId}` | PUT | Update existing policy definitions |
+
+    | `/policies/{policyId}` | DELETE | Delete policy definitions |
+
+    | `/audit/trail` | GET | Retrieve audit trail records |
+
+    | `/cultural/assess` | POST | Perform cultural sensitivity assessment |
+
+    | `/health` | GET | Node health and status check |'
+- level: 2
+  title: 🚀 Compliance Validation API
+  type: section
+  content: ''
+- level: 3
+  title: '**POST /validate**'
+  type: section
+  content: "Creates and executes a policy validation job.\n\n**Request Body:**\n```typescript\n\
+    interface ValidateRequest {\n  inputObject: ValidationTarget;\n  policy?: PolicyDefinition;\n\
+    \  policyId?: string; // Alternative to inline policy\n  options?: ValidationOptions;\n\
+    \  culturalContext?: CulturalContext;\n}\n\ninterface ValidationOptions {\n  priority:\
+    \ ValidationPriority;\n  timeout: number; // seconds\n  enableCulturalAnalysis:\
+    \ boolean;\n  generateRecommendations: boolean;\n  auditLevel: AuditLevel;\n}\n\
+    \nenum AuditLevel {\n  MINIMAL = \"minimal\",\n  STANDARD = \"standard\",\n  COMPREHENSIVE\
+    \ = \"comprehensive\",\n  FORENSIC = \"forensic\"\n}\n```\n\n**Response:**\n```typescript\n\
+    interface ValidateResponse {\n  jobId: string;\n  status: JobStatus;\n  estimatedCompletionTime?:\
+    \ number; // seconds\n  queuePosition?: number;\n  validationEndpoint: string;\
+    \ // URL to check status\n}\n```\n\n**Example Request:**\n```json\n{\n  \"inputObject\"\
+    : {\n    \"targetId\": \"griot-config-001\",\n    \"targetType\": \"node_configuration\"\
+    ,\n    \"sourceNode\": \"griot-alpha\",\n    \"content\": {\n      \"allowPublicApi\"\
+    : true,\n      \"maxMemoryMB\": 2048,\n      \"culturalAttributions\": []\n  \
+    \  },\n    \"context\": {\n      \"environmentType\": \"production\",\n      \"\
+    culturalContext\": {\n        \"primaryTradition\": \"confucian\",\n        \"\
+    geographicRegion\": \"east_asia\"\n      }\n    }\n  },\n  \"policy\": {\n   \
+    \ \"policyId\": \"security-baseline-v1\",\n    \"language\": \"rego\",\n    \"\
+    definition\": \"package system.authz\\ndefault allow = false\\nallow {\\n  not\
+    \ input.content.allowPublicApi\\n}\"\n  },\n  \"options\": {\n    \"priority\"\
+    : \"high\",\n    \"timeout\": 30,\n    \"enableCulturalAnalysis\": true,\n   \
+    \ \"generateRecommendations\": true,\n    \"auditLevel\": \"comprehensive\"\n\
+    \  }\n}\n```"
+- level: 3
+  title: '**GET /jobs/{jobId}**'
+  type: section
+  content: "Retrieves the status and results of a validation job.\n\n**Response:**\n\
+    ```typescript\ninterface JobStatusResponse {\n  job: ComplianceJob;\n  progress?:\
+    \ JobProgress;\n  logs?: JobLogEntry[];\n}\n\ninterface JobProgress {\n  currentStage:\
+    \ ValidationStage;\n  completedStages: ValidationStage[];\n  estimatedTimeRemaining:\
+    \ number; // seconds\n  progressPercentage: number; // 0-100\n}\n\nenum ValidationStage\
+    \ {\n  QUEUED = \"queued\",\n  POLICY_LOADING = \"policy_loading\",\n  OBJECT_PARSING\
+    \ = \"object_parsing\",\n  VALIDATION_EXECUTION = \"validation_execution\",\n\
+    \  CULTURAL_ANALYSIS = \"cultural_analysis\",\n  REPORT_GENERATION = \"report_generation\"\
+    ,\n  COMPLETED = \"completed\"\n}\n```"
+- level: 2
+  title: 📋 Policy Management API
+  type: section
+  content: ''
+- level: 3
+  title: '**POST /policies**'
+  type: section
+  content: "Stores a reusable policy definition.\n\n**Request Body:**\n```typescript\n\
+    interface StorePolicyRequest {\n  policy: PolicyDefinition;\n  access: PolicyAccessConfig;\n\
+    \  lifecycle: PolicyLifecycleConfig;\n}\n\ninterface PolicyAccessConfig {\n  visibility:\
+    \ PolicyVisibility;\n  allowedNodes: string[];\n  restrictedNodes: string[];\n\
+    \  requireApproval: boolean;\n}\n\nenum PolicyVisibility {\n  PUBLIC = \"public\"\
+    ,\n  PRIVATE = \"private\",\n  ORGANIZATION = \"organization\",\n  FEDERATION\
+    \ = \"federation\"\n}\n\ninterface PolicyLifecycleConfig {\n  effectiveDate: string;\n\
+    \  expirationDate?: string;\n  reviewSchedule: ReviewSchedule;\n  deprecationNotice?:\
+    \ string;\n}\n```\n\n**Response:**\n```typescript\ninterface StorePolicyResponse\
+    \ {\n  policyId: string;\n  version: string;\n  status: PolicyStatus;\n  accessUrl:\
+    \ string;\n  validationUrl: string;\n}\n\nenum PolicyStatus {\n  ACTIVE = \"active\"\
+    ,\n  PENDING_APPROVAL = \"pending_approval\",\n  DEPRECATED = \"deprecated\",\n\
+    \  SUSPENDED = \"suspended\",\n  ARCHIVED = \"archived\"\n}\n```"
+- level: 3
+  title: '**GET /policies/{policyId}**'
+  type: section
+  content: "Retrieves a stored policy definition.\n\n**Query Parameters:**\n- `version`\
+    \ (optional): Specific version to retrieve\n- `includeMetadata` (optional): Include\
+    \ full metadata\n- `format` (optional): Response format (json, yaml, rego)\n\n\
+    **Response:**\n```typescript\ninterface GetPolicyResponse {\n  policy: PolicyDefinition;\n\
+    \  metadata: PolicyMetadata;\n  usage: PolicyUsageStats;\n  cultural: CulturalAssessment;\n\
+    }\n\ninterface PolicyUsageStats {\n  totalValidations: number;\n  successRate:\
+    \ number;\n  averageExecutionTime: number;\n  lastUsed: string;\n  popularityScore:\
+    \ number;\n}\n```"
+- level: 2
+  title: 🔍 Audit Trail API
+  type: section
+  content: ''
+- level: 3
+  title: '**GET /audit/trail**'
+  type: section
+  content: "Retrieves comprehensive audit trail records.\n\n**Query Parameters:**\n\
+    - `startDate`: ISO 8601 timestamp\n- `endDate`: ISO 8601 timestamp  \n- `eventType`:\
+    \ Filter by audit event type\n- `nodeId`: Filter by source node\n- `limit`: Maximum\
+    \ records to return\n- `offset`: Pagination offset\n\n**Response:**\n```typescript\n\
+    interface AuditTrailResponse {\n  entries: AuditEntry[];\n  pagination: PaginationInfo;\n\
+    \  summary: AuditSummary;\n}\n\ninterface PaginationInfo {\n  total: number;\n\
+    \  limit: number;\n  offset: number;\n  hasMore: boolean;\n  nextOffset?: number;\n\
+    }\n\ninterface AuditSummary {\n  totalEvents: number;\n  eventsByType: Record<AuditEventType,\
+    \ number>;\n  complianceRate: number;\n  culturalSensitivityScore: number;\n}\n\
+    ```"
+- level: 2
+  title: 🌍 Cultural Assessment API
+  type: section
+  content: ''
+- level: 3
+  title: '**POST /cultural/assess**'
+  type: section
+  content: "Performs specialized cultural sensitivity assessment.\n\n**Request Body:**\n\
+    ```typescript\ninterface CulturalAssessmentRequest {\n  content: any;\n  contentType:\
+    \ ContentType;\n  culturalContext: CulturalContext;\n  assessmentLevel: AssessmentLevel;\n\
+    \  guidelines: CulturalGuideline[];\n}\n\nenum ContentType {\n  TEXT = \"text\"\
+    ,\n  IMAGE = \"image\",\n  AUDIO = \"audio\",\n  VIDEO = \"video\",\n  CODE =\
+    \ \"code\",\n  CONFIGURATION = \"configuration\",\n  METADATA = \"metadata\"\n\
+    }\n\nenum AssessmentLevel {\n  BASIC = \"basic\",\n  INTERMEDIATE = \"intermediate\"\
+    ,\n  COMPREHENSIVE = \"comprehensive\",\n  EXPERT = \"expert\"\n}\n```\n\n**Response:**\n\
+    ```typescript\ninterface CulturalAssessmentResponse {\n  assessmentId: string;\n\
+    \  overallScore: number; // 0-100\n  sensitivityAnalysis: SensitivityAnalysis;\n\
+    \  biasDetection: BiasDetection;\n  recommendations: CulturalRecommendation[];\n\
+    \  riskFactors: RiskFactor[];\n}\n\ninterface SensitivityAnalysis {\n  culturalReferences:\
+    \ CulturalReference[];\n  appropriationRisks: AppropriationRisk[];\n  respectfulnessScore:\
+    \ number; // 0-100\n  authenticityScore: number; // 0-100\n}\n\ninterface BiasDetection\
+    \ {\n  detectedBiases: DetectedBias[];\n  inclusivityScore: number; // 0-100\n\
+    \  representationBalance: RepresentationBalance;\n  languageSensitivity: LanguageSensitivity;\n\
+    }\n```"
+- level: 2
+  title: 📊 Health and Monitoring API
+  type: section
+  content: ''
+- level: 3
+  title: '**GET /health**'
+  type: section
+  content: "Comprehensive node health check and status information.\n\n**Response:**\n\
+    ```typescript\ninterface HealthResponse {\n  status: HealthStatus;\n  timestamp:\
+    \ string;\n  version: string;\n  uptime: number; // seconds\n  components: ComponentHealth[];\n\
+    \  metrics: HealthMetrics;\n  cultural: CulturalHealthMetrics;\n}\n\nenum HealthStatus\
+    \ {\n  HEALTHY = \"healthy\",\n  DEGRADED = \"degraded\",\n  UNHEALTHY = \"unhealthy\"\
+    ,\n  CRITICAL = \"critical\"\n}\n\ninterface ComponentHealth {\n  component: string;\n\
+    \  status: HealthStatus;\n  lastCheck: string;\n  details?: any;\n  dependencies:\
+    \ string[];\n}\n\ninterface HealthMetrics {\n  requestsPerSecond: number;\n  averageResponseTime:\
+    \ number;\n  errorRate: number;\n  memoryUsage: number;\n  cpuUsage: number;\n\
+    \  activeJobs: number;\n  queueLength: number;\n}\n\ninterface CulturalHealthMetrics\
+    \ {\n  culturalAssessmentsToday: number;\n  sensitivityAccuracy: number;\n  biasDetectionRate:\
+    \ number;\n  communityFeedbackScore: number;\n  traditionalKnowledgeRespectScore:\
+    \ number;\n}\n```"
+- level: 2
+  title: 🔐 Authentication and Authorization
+  type: section
+  content: ''
+- level: 3
+  title: '**Authentication Methods**'
+  type: section
+  content: "```typescript\ninterface AuthenticationConfig {\n  supportedMethods: AuthMethod[];\n\
+    \  tokenValidation: TokenValidation;\n  culturalPermissions: CulturalPermission[];\n\
+    }\n\nenum AuthMethod {\n  JWT = \"jwt\",\n  MUTUAL_TLS = \"mutual_tls\",\n  API_KEY\
+    \ = \"api_key\",\n  OAUTH2 = \"oauth2\",\n  HIEROS_IDENTITY = \"hieros_identity\"\
+    \n}\n\ninterface CulturalPermission {\n  tradition: CulturalTradition;\n  requiredCertifications:\
+    \ string[];\n  communityEndorsement: boolean;\n  respectLevel: RespectLevel;\n\
+    }\n\nenum RespectLevel {\n  OBSERVER = \"observer\",\n  LEARNER = \"learner\"\
+    ,\n  PRACTITIONER = \"practitioner\",\n  ELDER = \"elder\",\n  KEEPER = \"keeper\"\
+    \n}\n```"
+- level: 3
+  title: '**Authorization Model**'
+  type: section
+  content: "```typescript\ninterface AuthorizationPolicy {\n  resource: string;\n\
+    \  actions: Action[];\n  conditions: Condition[];\n  culturalRequirements: CulturalRequirement[];\n\
+    }\n\nenum Action {\n  CREATE = \"create\",\n  READ = \"read\",\n  UPDATE = \"\
+    update\",\n  DELETE = \"delete\",\n  VALIDATE = \"validate\",\n  AUDIT = \"audit\"\
+    ,\n  CULTURAL_ASSESS = \"cultural_assess\"\n}\n\ninterface CulturalRequirement\
+    \ {\n  tradition: CulturalTradition;\n  minimumRespectLevel: RespectLevel;\n \
+    \ communityConsent: boolean;\n  elderApproval: boolean;\n  benefitSharing: boolean;\n\
+    }\n```"
+- level: 2
+  title: 🚀 Performance and Scaling
+  type: section
+  content: ''
+- level: 3
+  title: '**Rate Limiting**'
+  type: section
+  content: "```typescript\ninterface RateLimitConfig {\n  requestsPerMinute: number;\n\
+    \  burstSize: number;\n  culturalPriority: CulturalPriority;\n  priorityQueuing:\
+    \ boolean;\n}\n\nenum CulturalPriority {\n  SACRED_CONTENT = \"sacred_content\"\
+    ,\n  TRADITIONAL_KNOWLEDGE = \"traditional_knowledge\",\n  COMMUNITY_GUIDANCE\
+    \ = \"community_guidance\",\n  STANDARD = \"standard\",\n  COMMERCIAL = \"commercial\"\
+    \n}\n```"
+- level: 3
+  title: '**Caching Strategy**'
+  type: section
+  content: "```typescript\ninterface CacheConfiguration {\n  policyCache: CacheConfig;\n\
+    \  resultCache: CacheConfig;\n  culturalDataCache: CacheConfig;\n}\n\ninterface\
+    \ CacheConfig {\n  ttl: number; // seconds\n  maxSize: number; // entries\n  invalidationRules:\
+    \ InvalidationRule[];\n  culturalSensitivity: boolean;\n}\n```\n\n---\n\n**API\
+    \ Status**: ✅ **Complete KLF API Specification**  \n**Cultural Integration**:\
+    \ Comprehensive cultural sensitivity and tradition respect throughout API  \n\
+    **Implementation Ready**: Production-grade REST API with performance optimization\
+    \  \n**HIEROS Compliance**: Full integration of Seven Sacred Intentions in all\
+    \ endpoints"

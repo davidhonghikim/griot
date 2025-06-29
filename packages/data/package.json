@@ -8,5 +8,10 @@
   "scripts": {
     "build": "echo 'Data package - no build needed'",
     "clean": "echo 'Data package - no clean needed'"
+  },
+  "dependencies": {
+    "openai": "^4.104.0",
+    "weaviate-ts-client": "^1.6.0",
+    "yaml": "^2.3.4"
   }
-} 
+}

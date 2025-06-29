@@ -1,0 +1,67 @@
+metadata:
+  original_file: 05_Tohunga_Code_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Tohunga Class: Code Examples'
+  description: TypeScript code examples for interacting with the Tohunga Node Class
+    via KLF.
+sections:
+- level: 1
+  title: Tohunga Class Code Examples
+  type: section
+  content: This section provides conceptual TypeScript examples for interacting with
+    the Tohunga node using the KLF.
+- level: 2
+  title: 1. Registering a New Data Source
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\
+    \ // Assuming an SDK exists\n\nasync function registerDataSource(client: KLFClient)\
+    \ {\n    console.log(\"Registering a new GitHub API data source...\");\n\n   \
+    \ const requestMessage = createMessage()\n        .from('did:kos:my-node:456')\n\
+    \        .to('did:kos:tohunga:xyz') // Target Tohunga node\n        .type(MessageType.TASK_REQUEST)\n\
+    \        .payload({\n            task_name: 'register_data_source',\n        \
+    \    params: {\n                source_name: 'GitHub Public Events API',\n   \
+    \             source_type: 'http_api',\n                connection_config: {\n\
+    \                    base_url: 'https://api.github.com'\n                }\n \
+    \           }\n        })\n        .build();\n    \n    const response = await\
+    \ client.sendMessage(requestMessage);\n\n    if (response.type === MessageType.TASK_RESPONSE\
+    \ && response.payload.status === 'completed') {\n        console.log('Data source\
+    \ registered successfully!');\n        console.log('New Source ID:', response.payload.result.source_id);\n\
+    \        return response.payload.result.source_id;\n    } else {\n        console.error('Failed\
+    \ to register data source:', response.payload.error);\n        return null;\n\
+    \    }\n}\n```"
+- level: 2
+  title: 2. Running a Data Acquisition Job
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \nasync function runAcquisitionJob(client: KLFClient, sourceId: string) {\n  \
+    \  console.log(`Starting acquisition job for source ${sourceId}...`);\n\n    const\
+    \ requestMessage = createMessage()\n        .from('did:kos:my-node:456')\n   \
+    \     .to('did:kos:tohunga:xyz')\n        .type(MessageType.TASK_REQUEST)\n  \
+    \      .payload({\n            task_name: 'run_acquisition_job',\n           \
+    \ params: {\n                source_id: sourceId,\n                request_params:\
+    \ {\n                    path\": \"/events\",\n                    \"query_params\"\
+    : { \"per_page\": 5 }\n                },\n                pipeline_steps: [\n\
+    \                    {\n                        step_module: \"json_schema\",\n\
+    \                        definition: {\n                            type: \"array\"\
+    ,\n                            items: {\n                                type:\
+    \ \"object\",\n                                properties: {\n               \
+    \                     id: { type: \"string\" },\n                            \
+    \        type: { type: \"string\" }\n                                },\n    \
+    \                            required: [\"id\", \"type\"]\n                  \
+    \          }\n                        }\n                    }\n             \
+    \   ],\n                output_config\": {\n                    format: \"json_lines\"\
+    ,\n                    destination: {\n                        type: \"klf_stream\"\
+    ,\n                        target_did\": \"did:kos:my-node:456\" // Stream results\
+    \ back to me\n                    }\n                }\n            }\n      \
+    \  })\n        .build();\n\n    // Listen for progress and final response\n  \
+    \  client.onMessage((message) => {\n        if (message.payload.task_name !==\
+    \ 'run_acquisition_job') return;\n\n        if (message.type === MessageType.TASK_PROGRESS)\
+    \ {\n            console.log(`[ACQUISITION] ${message.payload.progress}%: ${message.payload.message}`);\n\
+    \        } else if (message.type === MessageType.TASK_RESPONSE) {\n          \
+    \  if (message.payload.status === 'completed') {\n                console.log('Acquisition\
+    \ job successful!');\n                console.log('Final Asset URI:', message.payload.result.result_uri);\n\
+    \            } else {\n                console.error('Acquisition job failed:');\n\
+    \                console.error(message.payload.error.message);\n            }\n\
+    \        }\n    });\n\n    await client.sendMessage(requestMessage);\n}\n```"

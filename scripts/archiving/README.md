@@ -85,14 +85,14 @@ This directory contains scripts for managing archives across the kOS project, in
 ### **Agent System Files**
 - Format: `[YYYY-MM-DD]_[system_name]_[description].md`
 - Examples:
-  - `2025-06-29_comprehensive_project_analysis.md`
-  - `2025-06-29_agent_workflow.md`
-  - `2025-06-29_performance_metrics.json`
+  - `[TIMESTAMP]_comprehensive_project_analysis.md`
+  - `[TIMESTAMP]_agent_workflow.md`
+  - `[TIMESTAMP]_performance_metrics.json`
 
 ### **Archive Files**
 - Format: `archive-[YYYY-MM-DD_HH-MM-SS].tar.gz`
 - Examples:
-  - `archive-2025-06-29_14-30-00.tar.gz`
+  - `archive-[TIMESTAMP]_14-30-00.tar.gz`
 
 ## **Maintenance**
 

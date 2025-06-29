@@ -1,0 +1,76 @@
+metadata:
+  original_file: 03_Tohunga_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Tohunga Class: KLF Message API'
+  description: KLF Message API specification for the Tohunga Node Class's services.
+sections:
+- level: 1
+  title: Tohunga Class KLF Message API
+  type: section
+  content: Communication with the Tohunga node is handled via the asynchronous, job-based
+    KLF protocol.
+- level: 3
+  title: 1. Manage DataSources
+  type: section
+  content: ''
+- level: 4
+  title: '**Request: `register_data_source`**'
+  type: section
+  content: "-   **Message Type**: `TASK_REQUEST`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"register_data_source\",\n      \"params\": {\n\
+    \        \"source_name\": \"GitHub Public API\",\n        \"source_type\": \"\
+    http_api\",\n        \"connection_config\": {\n          \"base_url\": \"https://api.github.com\"\
+    \n        }\n      }\n    }\n    ```\n-   **Response (Success)**: `TASK_RESPONSE`\
+    \ with `status: \"completed\"` and `result: { \"source_id\": \"...\" }`."
+- level: 4
+  title: '**Request: `get_data_source`**'
+  type: section
+  content: '-   **Message Type**: `DATA_QUERY`
+
+    -   **Payload**: `{ "query_name": "get_data_source", "params": { "source_id":
+    "..." } }`
+
+    -   **Response (Success)**: `DATA_RESULT` with `result: { ...DataSource object...
+    }`.'
+- level: 3
+  title: 2. Manage AcquisitionJobs
+  type: section
+  content: This service runs a data acquisition and transformation pipeline.
+- level: 4
+  title: '**Request: `run_acquisition_job`**'
+  type: section
+  content: "-   **Message Type**: `TASK_REQUEST`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_acquisition_job\",\n      \"params\": {\n \
+    \       \"source_id\": \"string (uuid of the DataSource to use)\",\n        \"\
+    request_params\": {\n          \"path\": \"/events\"\n        },\n        \"pipeline_steps\"\
+    : [\n          {\n            \"step_module\": \"json_schema\",\n            \"\
+    definition\": { \"type\": \"object\", ... }\n          }\n        ],\n       \
+    \ \"output_config\": { ... }\n      }\n    }\n    ```"
+- level: 4
+  title: '**Progress Updates**'
+  type: section
+  content: "-   **Message Type**: `TASK_PROGRESS`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_acquisition_job\",\n      \"job_id\": \"string\
+    \ (uuid of the running job)\",\n      \"status\": \"running\",\n      \"progress\"\
+    : \"number (0-100)\",\n      \"message\": \"string (e.g., 'Fetching data from\
+    \ source...', 'Executing validation step...', 'Writing to output...')\"\n    }\n\
+    \    ```"
+- level: 4
+  title: '**Response: Success**'
+  type: section
+  content: "-   **Message Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_acquisition_job\",\n      \"job_id\": \"string\
+    \ (uuid of the job)\",\n      \"status\": \"completed\",\n      \"result\": {\n\
+    \        \"result_uri\": \"s3://my-data-assets/...\",\n        \"records_processed\"\
+    : 1000\n      }\n    }\n    ```"
+- level: 4
+  title: '**Response: Error**'
+  type: section
+  content: "-   **Message Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_acquisition_job\",\n      \"job_id\": \"string\
+    \ (uuid of the job)\",\n      \"status\": \"failed\",\n      \"error\": {\n  \
+    \      \"code\": \"string (e.g., 'SOURCE_UNREACHABLE', 'VALIDATION_FAILED', 'OUTPUT_WRITE_ERROR')\"\
+    ,\n        \"message\": \"string (Detailed error message from the failed pipeline\
+    \ step)\"\n      }\n    }\n    ```"

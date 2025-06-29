@@ -1,0 +1,83 @@
+title: Junzi Dispute Resolution Process
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.449277'
+original_format: markdown
+content_type: api_specification
+word_count: 427
+line_count: 68
+
+---
+
+# JUNZI Dispute Resolution Process Design
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Purpose:** To ensure that all entities affected by JUNZI outputs (e.g., contradiction flags, risk scores, public alerts) have a clear, fair, and auditable path for challenging, clarifying, or appealing system findings.
+
+---
+
+## Dispute Resolution Lifecycle:
+
+### 📥 Stage 1: Dispute Submission
+| Component | Details |
+|---|---|
+| Endpoint | `/junzi/api/v1/disputes/` |
+| Required Fields | Entity ID, Dispute Type, Description, Supporting Evidence, Contact Information |
+| Optional | Request for expedited review (with justification) |
+
+### 🚥 Stage 2: Initial Triage by JUNZI Moderation Agents
+| Action | Timeline |
+|---|---|
+| Validate Submission | Within 48 hours |
+| Categorize Dispute | Factual Error, Contextual Misclassification, Bias Concern, Data Integrity Issue |
+| Respond to Entity | Acknowledgement with expected timeline |
+
+### 🔎 Stage 3: Investigation Phase
+| Responsible Party | Scope |
+|---|---|
+| JUNZI Internal Review Team | Examine source data, model output, bias audit logs, provenance metadata |
+| Optional Consultation | External data providers, cross-node verification (YachayNode for history, OracleNode for pattern context) |
+
+### 🏛️ Stage 4: Escalation (If Required)
+| Trigger | Destination |
+|---|---|
+| High-risk cases, unresolved disputes, or bias allegations | Community Feedback Council (CFC) or Ethical Governance Board (EGB) |
+
+### 📝 Stage 5: Ruling & Resolution
+| Outcome Types | Details |
+|---|---|
+| Dispute Upheld | Correct the affected JUNZI output, issue public correction, notify downstream nodes (Griot, Oracle, Yachay) |
+| Dispute Dismissed | Provide formal justification with full evidence audit trail |
+| Partial Resolution | Apply clarification labels, contextual notes, or update entity profile with explanatory metadata |
+
+### 📢 Stage 6: Transparency and Public Notification
+| Scenario | Action |
+|---|---|
+| Any Dispute Affecting Public Records | Public-facing log entry with resolution summary and reasoning |
+| High-Profile Cases | Optional press release or special notice through CommunicatorNode channels |
+
+---
+
+## Response Time Standards:
+| Dispute Level | Target Resolution Time |
+|---|---|
+| Low Severity | 7 business days |
+| Medium Severity | 14 business days |
+| High Severity / Public Figures | 3 business days (expedited review) |
+
+---
+
+## Governance & Oversight:
+- All dispute decisions logged in **VaultNode** for tamper-proof audit trails.
+- Quarterly random sample audits by the **Ethical Governance Board (EGB)**.
+- Annual public report summarizing number and types of disputes received, resolved, and escalated.
+
+---
+
+**This document now defines the canonical Dispute Resolution Process for JUNZI operations within the kOS ecosystem until formally revised.**
+
+

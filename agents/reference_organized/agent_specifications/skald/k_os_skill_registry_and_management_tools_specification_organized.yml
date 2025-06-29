@@ -1,0 +1,159 @@
+title: K Os Skill Registry And Management Tools Specification
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.314248'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 774
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: true
+has_testing: true
+has_security: true
+has_rag: true
+has_ethics: true
+original_filename: k_os_skill_registry_and_management_tools_specification.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/k_os_skill_registry_and_management_tools_specification.yml
+category: agent_specifications/skald
+
+---
+
+title: K Os Skill Registry And Management Tools Specification
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.233729'
+original_format: markdown
+content_type: api_specification
+word_count: 744
+line_count: 116
+
+---
+
+# kOS Skill Registry and Management Tools Specification
+
+## Overview
+
+The **Skill Registry and Management Tools** are responsible for cataloging, versioning, validating, and exposing all executable skills within the kOS ecosystem. This ensures that all recipes, agents, and orchestration processes have a standardized, reliable interface for skill discovery and execution.
+
+The Skill Registry acts as the **source of truth** for all available AI capabilities, whether they run on local tools, external APIs, or internal models.
+
+---
+
+## Core Responsibilities
+
+| Responsibility | Description |
+|---|---|
+| **Skill Registration** | Allow developers and agents to register new skills into the system. |
+| **Skill Versioning** | Maintain version history for each skill definition. |
+| **Skill Discovery API** | Provide a searchable, queryable interface for agents and recipes to find available skills. |
+| **Skill Metadata Management** | Store descriptions, input/output schemas, adapter mappings, and performance tags for each skill. |
+| **Skill Validation & Testing** | Verify that new skills meet required schema, dependency, and runtime constraints before activation. |
+| **Tagging & Classification** | Organize skills by Node Class responsibility, domain, adapter dependency, and use case. |
+| **Skill Deprecation Handling** | Mark outdated skills and provide migration paths for recipes that depend on them. |
+
+---
+
+## Skill Metadata Schema
+
+| Field | Description |
+|---|---|
+| **skill_name** | Unique identifier for the skill. |
+| **version** | Semantic version (e.g., 1.2.0). |
+| **author** | Agent or user who created the skill. |
+| **description** | Human-readable summary of skill function. |
+| **input_schema** | Required inputs, data types, and formats. |
+| **output_schema** | Expected outputs and data types. |
+| **adapter_dependency** | Which adapter(s) this skill depends on. |
+| **node_class_alignment** | Which Node Class is primarily responsible for this skill. |
+| **tags** | Searchable tags (e.g., summarization, classification, translation). |
+| **test_status** | Pass/Fail result from last validation run. |
+| **last_updated** | Timestamp of last edit or version bump. |
+
+---
+
+## Skill Lifecycle Workflow
+
+1. **Skill Creation:** Developer or agent defines a new skill module.
+2. **Validation Run:** Skill Registry runs automated schema and execution checks.
+3. **Metadata Entry:** Skill metadata (inputs, outputs, Node Class, etc.) gets stored.
+4. **Versioning:** Existing skills updated using semantic version control.
+5. **Publishing:** Skill becomes available for recipes and agents.
+6. **Monitoring:** Usage metrics (success rates, error frequency) tracked by Meta-Learning Layer.
+7. **Deprecation (if needed):** Obsolete skills flagged with migration advice.
+
+---
+
+## Skill Registry API Endpoints (Example)
+
+| Endpoint | Function |
+|---|---|
+| `GET /skills` | List all skills |
+| `GET /skills/{skill_name}` | Get detailed metadata for a specific skill |
+| `POST /skills/register` | Register a new skill |
+| `PUT /skills/{skill_name}/update` | Update existing skill metadata |
+| `DELETE /skills/{skill_name}` | Mark skill as deprecated |
+| `GET /skills/search?tag={tag}` | Search skills by tag or capability |
+
+---
+
+## CLI Tools
+
+| Command | Description |
+|---|---|
+| `kos-skill register` | Register a new skill from CLI. |
+| `kos-skill test` | Run validation tests on a local skill file. |
+| `kos-skill list` | Show all installed skills. |
+| `kos-skill search --tag {tag}` | Search skills by tag. |
+| `kos-skill inspect {skill_name}` | View detailed skill metadata. |
+| `kos-skill deprecate {skill_name}` | Mark a skill as deprecated. |
+
+---
+
+## Skill Validation Criteria
+
+| Check | Description |
+|---|---|
+| Schema Compliance | Input and output definitions match registry standards. |
+| Adapter Availability | Required adapters are present and active. |
+| Execution Test | Skill executes without critical errors in sandbox environment. |
+| Node Class Tagging | Each skill must map to at least one official Node Class. |
+| Ethical Safety Check | For user-facing or external-output skills, pass through ethics filter (Junzi). |
+
+---
+
+## Skill Classification Examples
+
+| Skill Name | Node Class Alignment | Tags |
+|---|---|---|
+| summarize_text | Skald | summarization, NLP |
+| ethical_check | Junzi | governance, safety, compliance |
+| run_vector_search | GAL | RAG, semantic, knowledge |
+| detect_user_tone | Dere | sentiment, emotion, interaction |
+| check_api_auth | Vigil | security, authentication |
+
+---
+
+## Next Steps for Development
+
+- Build Skill Registry backend (file-based or DB-backed for Phase 1).
+- Develop Skill Registry API endpoints.
+- Create CLI Skill Management Toolset.
+- Integrate Skill Registry into Orchestration Engine lookup flow.
+- Link Meta-Learning Layer for usage tracking and performance scoring.
+
+---
+
+**End of Document**
+
+
+

@@ -1,0 +1,365 @@
+metadata:
+  original_file: 04_Amauta_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+sections:
+- level: 1
+  title: '**4. Amauta Node Database Schema**'
+  type: section
+  content: ''
+- level: 2
+  title: 4.1. Introduction
+  type: section
+  content: 'The Amauta Node requires a sophisticated data architecture to support
+    its generative teaching, simulation management, and learning analytics functions.
+    The database design implements a multi-layered approach optimized for educational
+    content generation, learner progress tracking, and performance analytics.
+
+
+    **Database Technologies**:
+
+    - **Content Generation**: PostgreSQL for structured training data and simulation
+    definitions
+
+    - **Learning Analytics**: ClickHouse for high-frequency performance metrics and
+    learning analytics
+
+    - **Real-time Coordination**: Redis for active simulation sessions and real-time
+    collaboration
+
+    - **Knowledge Graphs**: Neo4j for modeling learning relationships and competency
+    networks'
+- level: 2
+  title: 4.2. Core Educational Data Layer - PostgreSQL
+  type: section
+  content: ''
+- level: 3
+  title: 4.2.1. `training_datasets` Table
+  type: section
+  content: "**Purpose**: Master catalog of all training datasets and their metadata\n\
+    \n```sql\nCREATE TABLE training_datasets (\n    dataset_id UUID PRIMARY KEY DEFAULT\
+    \ gen_random_uuid(),\n    name VARCHAR(255) NOT NULL,\n    description TEXT,\n\
+    \    dataset_type VARCHAR(50) NOT NULL CHECK (dataset_type IN ('analytical_scenarios',\
+    \ 'ethical_dilemmas', 'coordination_challenges', 'creative_problems', 'performance_benchmarks',\
+    \ 'adversarial_cases')),\n    generation_method JSONB NOT NULL,\n    quality_metrics\
+    \ JSONB,\n    target_capabilities TEXT[],\n    source_accords TEXT[],\n    source_memories\
+    \ TEXT[],\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n\
+    \    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    created_by\
+    \ VARCHAR(100),\n    version INTEGER DEFAULT 1,\n    validation_status VARCHAR(20)\
+    \ DEFAULT 'pending' CHECK (validation_status IN ('pending', 'validated', 'rejected')),\n\
+    \    usage_count INTEGER DEFAULT 0,\n    quality_score DECIMAL(3,2) CHECK (quality_score\
+    \ >= 0 AND quality_score <= 1)\n);\n\nCREATE INDEX idx_training_datasets_type\
+    \ ON training_datasets(dataset_type);\nCREATE INDEX idx_training_datasets_created_at\
+    \ ON training_datasets(created_at);\nCREATE INDEX idx_training_datasets_quality_score\
+    \ ON training_datasets(quality_score);\nCREATE INDEX idx_training_datasets_validation_status\
+    \ ON training_datasets(validation_status);\nCREATE INDEX idx_training_datasets_target_capabilities\
+    \ ON training_datasets USING GIN(target_capabilities);\n```"
+- level: 3
+  title: 4.2.2. `training_content` Table
+  type: section
+  content: "**Purpose**: Individual training items within datasets\n\n```sql\nCREATE\
+    \ TABLE training_content (\n    content_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n\
+    \    dataset_id UUID NOT NULL REFERENCES training_datasets(dataset_id) ON DELETE\
+    \ CASCADE,\n    title VARCHAR(255),\n    content_data JSONB NOT NULL,\n    difficulty_level\
+    \ DECIMAL(3,2) CHECK (difficulty_level >= 0 AND difficulty_level <= 1),\n    complexity_metrics\
+    \ JSONB,\n    learning_objectives TEXT[],\n    success_criteria JSONB,\n    estimated_duration\
+    \ INTEGER, -- in minutes\n    prerequisites TEXT[],\n    tags TEXT[],\n    variation_source\
+    \ UUID REFERENCES training_content(content_id),\n    variation_parameters JSONB,\n\
+    \    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    validation_results\
+    \ JSONB,\n    usage_statistics JSONB DEFAULT '{\"attempts\": 0, \"completions\"\
+    : 0, \"success_rate\": 0}'::jsonb\n);\n\nCREATE INDEX idx_training_content_dataset\
+    \ ON training_content(dataset_id);\nCREATE INDEX idx_training_content_difficulty\
+    \ ON training_content(difficulty_level);\nCREATE INDEX idx_training_content_tags\
+    \ ON training_content USING GIN(tags);\nCREATE INDEX idx_training_content_objectives\
+    \ ON training_content USING GIN(learning_objectives);\n```"
+- level: 3
+  title: 4.2.3. `simulation_environments` Table
+  type: section
+  content: "**Purpose**: Simulation environment definitions and configurations\n\n\
+    ```sql\nCREATE TABLE simulation_environments (\n    environment_id UUID PRIMARY\
+    \ KEY DEFAULT gen_random_uuid(),\n    name VARCHAR(255) NOT NULL,\n    description\
+    \ TEXT,\n    environment_type VARCHAR(50) NOT NULL CHECK (environment_type IN\
+    \ ('network_coordination', 'ethical_decision_making', 'resource_optimization',\
+    \ 'conflict_resolution', 'creative_collaboration', 'emergency_response')),\n \
+    \   complexity_level VARCHAR(20) CHECK (complexity_level IN ('basic', 'intermediate',\
+    \ 'advanced', 'expert')),\n    max_participants INTEGER DEFAULT 1,\n    estimated_duration\
+    \ INTEGER, -- in minutes\n    environment_config JSONB NOT NULL,\n    participant_roles\
+    \ JSONB,\n    success_criteria JSONB,\n    learning_objectives TEXT[],\n    prerequisites\
+    \ TEXT[],\n    resources_required JSONB,\n    created_at TIMESTAMP WITH TIME ZONE\
+    \ DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT\
+    \ CURRENT_TIMESTAMP,\n    created_by VARCHAR(100),\n    version INTEGER DEFAULT\
+    \ 1,\n    active_status BOOLEAN DEFAULT true,\n    usage_count INTEGER DEFAULT\
+    \ 0\n);\n\nCREATE INDEX idx_simulation_environments_type ON simulation_environments(environment_type);\n\
+    CREATE INDEX idx_simulation_environments_complexity ON simulation_environments(complexity_level);\n\
+    CREATE INDEX idx_simulation_environments_active ON simulation_environments(active_status);\n\
+    CREATE INDEX idx_simulation_environments_objectives ON simulation_environments\
+    \ USING GIN(learning_objectives);\n```"
+- level: 3
+  title: 4.2.4. `learner_profiles` Table
+  type: section
+  content: "**Purpose**: Comprehensive profiles of learning entities and their progress\n\
+    \n```sql\nCREATE TABLE learner_profiles (\n    profile_id UUID PRIMARY KEY DEFAULT\
+    \ gen_random_uuid(),\n    learner_id VARCHAR(100) NOT NULL UNIQUE, -- Node ID\n\
+    \    learner_type VARCHAR(50) NOT NULL,\n    current_capabilities JSONB,\n   \
+    \ learning_style JSONB,\n    performance_metrics JSONB,\n    learning_goals JSONB,\n\
+    \    preferences JSONB,\n    constraints JSONB, -- time, resource, etc.\n    created_at\
+    \ TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP\
+    \ WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    last_activity TIMESTAMP WITH\
+    \ TIME ZONE,\n    profile_version INTEGER DEFAULT 1\n);\n\nCREATE INDEX idx_learner_profiles_learner_id\
+    \ ON learner_profiles(learner_id);\nCREATE INDEX idx_learner_profiles_type ON\
+    \ learner_profiles(learner_type);\nCREATE INDEX idx_learner_profiles_last_activity\
+    \ ON learner_profiles(last_activity);\n```"
+- level: 3
+  title: 4.2.5. `learning_sessions` Table
+  type: section
+  content: "**Purpose**: Records of individual learning sessions and outcomes\n\n\
+    ```sql\nCREATE TABLE learning_sessions (\n    session_id UUID PRIMARY KEY DEFAULT\
+    \ gen_random_uuid(),\n    learner_id VARCHAR(100) NOT NULL,\n    session_type\
+    \ VARCHAR(50) NOT NULL CHECK (session_type IN ('training', 'simulation', 'assessment',\
+    \ 'practice')),\n    content_id UUID REFERENCES training_content(content_id),\n\
+    \    environment_id UUID REFERENCES simulation_environments(environment_id),\n\
+    \    session_config JSONB,\n    start_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n\
+    \    end_time TIMESTAMP WITH TIME ZONE,\n    duration INTEGER, -- in seconds\n\
+    \    completion_status VARCHAR(20) CHECK (completion_status IN ('in_progress',\
+    \ 'completed', 'abandoned', 'failed')),\n    performance_data JSONB,\n    learning_outcomes\
+    \ JSONB,\n    feedback JSONB,\n    session_metadata JSONB,\n    \n    CONSTRAINT\
+    \ chk_session_times CHECK (end_time IS NULL OR end_time >= start_time)\n);\n\n\
+    CREATE INDEX idx_learning_sessions_learner ON learning_sessions(learner_id);\n\
+    CREATE INDEX idx_learning_sessions_type ON learning_sessions(session_type);\n\
+    CREATE INDEX idx_learning_sessions_start_time ON learning_sessions(start_time);\n\
+    CREATE INDEX idx_learning_sessions_status ON learning_sessions(completion_status);\n\
+    ```"
+- level: 3
+  title: 4.2.6. `assessment_results` Table
+  type: section
+  content: "**Purpose**: Detailed assessment and evaluation results\n\n```sql\nCREATE\
+    \ TABLE assessment_results (\n    assessment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n\
+    \    learner_id VARCHAR(100) NOT NULL,\n    session_id UUID REFERENCES learning_sessions(session_id),\n\
+    \    assessment_type VARCHAR(50) NOT NULL,\n    assessment_scope JSONB,\n    assessment_criteria\
+    \ JSONB,\n    results JSONB NOT NULL,\n    skill_assessments JSONB,\n    improvement_recommendations\
+    \ JSONB,\n    benchmark_comparisons JSONB,\n    confidence_level DECIMAL(3,2)\
+    \ CHECK (confidence_level >= 0 AND confidence_level <= 1),\n    assessor VARCHAR(100),\
+    \ -- System or human assessor\n    assessment_timestamp TIMESTAMP WITH TIME ZONE\
+    \ DEFAULT CURRENT_TIMESTAMP,\n    review_status VARCHAR(20) DEFAULT 'final' CHECK\
+    \ (review_status IN ('draft', 'final', 'reviewed'))\n);\n\nCREATE INDEX idx_assessment_results_learner\
+    \ ON assessment_results(learner_id);\nCREATE INDEX idx_assessment_results_type\
+    \ ON assessment_results(assessment_type);\nCREATE INDEX idx_assessment_results_timestamp\
+    \ ON assessment_results(assessment_timestamp);\n```"
+- level: 2
+  title: 4.3. Learning Analytics Layer - ClickHouse
+  type: section
+  content: ''
+- level: 3
+  title: 4.3.1. `learning_events` Table
+  type: section
+  content: "**Purpose**: High-frequency learning event tracking for analytics\n\n\
+    ```sql\nCREATE TABLE learning_events (\n    timestamp DateTime64(3),\n    event_id\
+    \ String,\n    learner_id String,\n    session_id String,\n    event_type Enum8('session_start'\
+    \ = 1, 'content_access' = 2, 'interaction' = 3, 'assessment_submit' = 4, 'session_end'\
+    \ = 5, 'error' = 6),\n    event_data String, -- JSON string\n    performance_metrics\
+    \ String, -- JSON string\n    duration_ms UInt64,\n    success_indicator Bool,\n\
+    \    difficulty_level Float64,\n    learning_objective String,\n    content_type\
+    \ String\n) ENGINE = MergeTree()\nPARTITION BY toYYYYMM(timestamp)\nORDER BY (timestamp,\
+    \ learner_id, session_id);\n```"
+- level: 3
+  title: 4.3.2. `performance_metrics` Table
+  type: section
+  content: "**Purpose**: Aggregated performance metrics for analysis\n\n```sql\nCREATE\
+    \ TABLE performance_metrics (\n    timestamp DateTime64(3),\n    learner_id String,\n\
+    \    metric_type Enum8('accuracy' = 1, 'speed' = 2, 'completion_rate' = 3, 'retention'\
+    \ = 4, 'engagement' = 5, 'improvement' = 6),\n    metric_value Float64,\n    metric_context\
+    \ String, -- JSON string with context\n    skill_category String,\n    session_type\
+    \ String,\n    content_difficulty Float64,\n    baseline_value Float64,\n    improvement_rate\
+    \ Float64\n) ENGINE = MergeTree()\nPARTITION BY toYYYYMM(timestamp)\nORDER BY\
+    \ (timestamp, learner_id, metric_type);\n```"
+- level: 3
+  title: 4.3.3. `content_effectiveness` Table
+  type: section
+  content: "**Purpose**: Analytics on training content effectiveness\n\n```sql\nCREATE\
+    \ TABLE content_effectiveness (\n    timestamp DateTime64(3),\n    content_id\
+    \ String,\n    dataset_id String,\n    usage_count UInt32,\n    success_rate Float64,\n\
+    \    average_completion_time UInt32,\n    difficulty_perception Float64,\n   \
+    \ learner_satisfaction Float64,\n    learning_objective_achievement Float64,\n\
+    \    retention_rate Float64,\n    improvement_correlation Float64\n) ENGINE =\
+    \ MergeTree()\nPARTITION BY toYYYYMM(timestamp)\nORDER BY (timestamp, content_id);\n\
+    ```"
+- level: 2
+  title: 4.4. Real-time Coordination Layer - Redis
+  type: section
+  content: ''
+- level: 3
+  title: 4.4.1. Active Simulation Sessions
+  type: section
+  content: "**Key Pattern**: `simulation:active:[sessionId]`\n```redis\nHSET simulation:active:sim-001\n\
+    \  sessionId \"sim-001\"\n  environmentId \"env-001\"\n  participants '[\"learner1\"\
+    , \"learner2\", \"learner3\"]'\n  currentState '{\"phase\": \"coordination\",\
+    \ \"challenge\": \"resource_allocation\"}'\n  startTime \"2024-06-25T20:00:00Z\"\
+    \n  lastUpdate \"2024-06-25T20:15:00Z\"\n  config '{\"duration\": 3600, \"adaptive\"\
+    : true}'\n```\n\n**Key Pattern**: `simulation:participants:[sessionId]`\n```redis\n\
+    SADD simulation:participants:sim-001 \"learner1\"\nSADD simulation:participants:sim-001\
+    \ \"learner2\" \nSADD simulation:participants:sim-001 \"learner3\"\n```"
+- level: 3
+  title: 4.4.2. Real-time Learning Progress
+  type: section
+  content: "**Key Pattern**: `learning:progress:[learnerId]`\n```redis\nHSET learning:progress:learner1\n\
+    \  currentSession \"session-123\"\n  currentObjective \"ethical_reasoning_improvement\"\
+    \n  progressPercentage \"75\"\n  lastActivity \"2024-06-25T20:15:00Z\"\n  streakDays\
+    \ \"7\"\n  todayActivities \"3\"\n```"
+- level: 3
+  title: 4.4.3. Content Generation Queue
+  type: section
+  content: '**Key Pattern**: `generation:queue:[priority]`
+
+    ```redis
+
+    LPUSH generation:queue:high ''{"requestId": "req-001", "type": "variation", "urgency":
+    "high"}''
+
+    LPUSH generation:queue:normal ''{"requestId": "req-002", "type": "new_content",
+    "urgency": "normal"}''
+
+    ```'
+- level: 2
+  title: 4.5. Learning Relationships Layer - Neo4j
+  type: section
+  content: ''
+- level: 3
+  title: 4.5.1. Competency Networks
+  type: section
+  content: "**Node Types and Relationships**:\n```cypher\n// Core node types\nCREATE\
+    \ CONSTRAINT ON (l:Learner) ASSERT l.learnerId IS UNIQUE;\nCREATE CONSTRAINT ON\
+    \ (s:Skill) ASSERT s.skillId IS UNIQUE;\nCREATE CONSTRAINT ON (c:Content) ASSERT\
+    \ c.contentId IS UNIQUE;\nCREATE CONSTRAINT ON (o:Objective) ASSERT o.objectiveId\
+    \ IS UNIQUE;\n\n// Learner skill relationships\nCREATE (:Learner {learnerId: 'learner1',\
+    \ type: 'analytical_node'});\nCREATE (:Skill {skillId: 'ethical_reasoning', category:\
+    \ 'decision_making'});\n\nMATCH (l:Learner {learnerId: 'learner1'}), (s:Skill\
+    \ {skillId: 'ethical_reasoning'})\nCREATE (l)-[:HAS_SKILL {\n    proficiencyLevel:\
+    \ 0.75,\n    lastAssessed: datetime(),\n    growthRate: 0.15,\n    confidenceLevel:\
+    \ 0.85\n}]->(s);\n```"
+- level: 3
+  title: 4.5.2. Learning Path Networks
+  type: section
+  content: "```cypher\n// Learning progression relationships\nCREATE (:Content {contentId:\
+    \ 'content-001', type: 'basic_ethics', difficulty: 0.3});\nCREATE (:Content {contentId:\
+    \ 'content-002', type: 'complex_ethics', difficulty: 0.7});\n\nMATCH (c1:Content\
+    \ {contentId: 'content-001'}), (c2:Content {contentId: 'content-002'})\nCREATE\
+    \ (c1)-[:PREREQUISITE_FOR {\n    strength: 0.9,\n    optionalBypass: false,\n\
+    \    averageTransitionTime: 14\n}]->(c2);\n```"
+- level: 3
+  title: 4.5.3. Learner Interaction Networks
+  type: section
+  content: "```cypher\n// Collaborative learning relationships\nMATCH (l1:Learner\
+    \ {learnerId: 'learner1'}), (l2:Learner {learnerId: 'learner2'})\nCREATE (l1)-[:COLLABORATED_WITH\
+    \ {\n    sessionCount: 5,\n    avgSynergy: 0.82,\n    lastCollaboration: datetime(),\n\
+    \    complementarySkills: ['analysis', 'creativity']\n}]->(l2);\n```"
+- level: 2
+  title: 4.6. Data Integration and Synchronization
+  type: section
+  content: ''
+- level: 3
+  title: 4.6.1. Cross-Database Synchronization
+  type: section
+  content: "**PostgreSQL to ClickHouse Pipeline**:\n```sql\n-- Trigger function for\
+    \ real-time analytics sync\nCREATE OR REPLACE FUNCTION sync_to_analytics()\nRETURNS\
+    \ TRIGGER AS $$\nBEGIN\n    -- Insert learning event to ClickHouse via external\
+    \ data wrapper\n    PERFORM clickhouse_insert('learning_events', NEW.session_id,\
+    \ NEW.learner_id, NEW.event_data);\n    RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\
+    \nCREATE TRIGGER learning_session_analytics_sync\n    AFTER INSERT ON learning_sessions\n\
+    \    FOR EACH ROW EXECUTE FUNCTION sync_to_analytics();\n```\n\n**Redis to PostgreSQL\
+    \ Sync**:\n```javascript\n// Periodic sync of Redis session data to PostgreSQL\n\
+    const syncSessionData = async () => {\n    const activeSessions = await redis.keys('simulation:active:*');\n\
+    \    \n    for (const sessionKey of activeSessions) {\n        const sessionData\
+    \ = await redis.hgetall(sessionKey);\n        await postgres.query(`\n       \
+    \     INSERT INTO learning_sessions (session_id, learner_id, session_type, session_config,\
+    \ start_time)\n            VALUES ($1, $2, $3, $4, $5)\n            ON CONFLICT\
+    \ (session_id) DO UPDATE SET\n                session_config = EXCLUDED.session_config,\n\
+    \                updated_at = CURRENT_TIMESTAMP\n        `, [sessionData.sessionId,\
+    \ sessionData.learnerId, 'simulation', sessionData.config, sessionData.startTime]);\n\
+    \    }\n};\n```"
+- level: 3
+  title: 4.6.2. Data Consistency Protocols
+  type: section
+  content: "**Consistency Rules**:\n1. **Session Integrity**: All active sessions\
+    \ in Redis must have corresponding records in PostgreSQL\n2. **Assessment Completeness**:\
+    \ All assessments must reference valid learning sessions\n3. **Content Validation**:\
+    \ Training content must pass quality validation before use\n4. **Learner Profile\
+    \ Coherence**: Profile updates must be atomic across all systems\n5. **Analytics\
+    \ Accuracy**: ClickHouse metrics must be derivable from PostgreSQL source data\n\
+    \n**Validation Procedures**:\n```sql\n-- Daily consistency check\nWITH redis_sessions\
+    \ AS (\n    SELECT session_id FROM redis_session_sync_table\n),\npostgres_sessions\
+    \ AS (\n    SELECT session_id FROM learning_sessions \n    WHERE start_time >=\
+    \ CURRENT_DATE\n)\nSELECT r.session_id as orphaned_redis_session\nFROM redis_sessions\
+    \ r\nLEFT JOIN postgres_sessions p ON r.session_id = p.session_id\nWHERE p.session_id\
+    \ IS NULL;\n```"
+- level: 2
+  title: 4.7. Performance Optimization
+  type: section
+  content: ''
+- level: 3
+  title: 4.7.1. Query Optimization Strategies
+  type: section
+  content: '**PostgreSQL Optimization**:
+
+    - Partitioning large tables by date (learning_sessions, assessment_results)
+
+    - Materialized views for complex learner analytics queries
+
+    - Connection pooling for high-frequency read operations
+
+    - Read replicas for analytics queries
+
+
+    **ClickHouse Optimization**:
+
+    - Optimal partition keys based on query patterns
+
+    - Materialized views for pre-computed aggregations
+
+    - Proper data types for compression efficiency
+
+    - Sampling for large-scale pattern analysis
+
+
+    **Redis Optimization**:
+
+    - Cluster mode for horizontal scaling
+
+    - Pipeline operations for bulk updates
+
+    - Appropriate expiration times for temporary data
+
+    - Memory optimization for frequently accessed data'
+- level: 3
+  title: 4.7.2. Monitoring and Performance Metrics
+  type: section
+  content: '**Database Performance Metrics**:
+
+    - Query response times across all systems
+
+    - Connection pool utilization
+
+    - Cache hit rates and memory usage
+
+    - Data synchronization lag between systems
+
+
+    **Learning System Metrics**:
+
+    - Content generation response times
+
+    - Simulation environment startup latency
+
+    - Assessment processing duration
+
+    - Real-time collaboration responsiveness
+
+
+    **Alert Conditions**:
+
+    - Learning session creation failures
+
+    - Assessment result inconsistencies
+
+    - Content generation quality drops below threshold
+
+    - Simulation environment crashes or hangs'

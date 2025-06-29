@@ -1,0 +1,43 @@
+metadata:
+  original_file: 04_Skald_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Skald Class: Database Schema'
+  description: PostgreSQL database schema for the Skald Node Class.
+sections:
+- level: 1
+  title: Skald Class Database Schema
+  type: section
+  content: "The Skald node's database manages topics and subscriptions. For persistent\
+    \ topics, it also stores the message log.\n\n```sql\n-- Enables UUID generation,\
+    \ if not already enabled\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\n\n--\
+    \ Table to store topic metadata.\nCREATE TABLE topics (\n    -- The unique name\
+    \ of the topic. Primary key.\n    topic_name VARCHAR(255) PRIMARY KEY,\n\n   \
+    \ -- Whether messages on this topic should be persisted.\n    is_persistent BOOLEAN\
+    \ NOT NULL DEFAULT FALSE,\n\n    -- The DID of the node that created the topic.\n\
+    \    owner_did VARCHAR(255) NOT NULL,\n\n    -- A JSONB blob for Access Control\
+    \ Lists (ACLs).\n    acl JSONB,\n\n    -- Timestamp of when the topic was created.\n\
+    \    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n    \n    -- Timestamp\
+    \ of the last message published to this topic.\n    last_published_at TIMESTAMP\
+    \ WITH TIME ZONE\n);\n\n-- Table to manage subscriptions.\nCREATE TABLE subscriptions\
+    \ (\n    -- A unique identifier for each subscription.\n    subscription_id UUID\
+    \ PRIMARY KEY DEFAULT uuid_generate_v4(),\n\n    -- The topic being subscribed\
+    \ to. Foreign key to the topics table.\n    topic_name VARCHAR(255) NOT NULL REFERENCES\
+    \ topics(topic_name) ON DELETE CASCADE,\n\n    -- The DID of the subscribing node.\n\
+    \    subscriber_did VARCHAR(255) NOT NULL,\n\n    -- Whether the subscription\
+    \ is currently active.\n    is_active BOOLEAN NOT NULL DEFAULT TRUE,\n\n    --\
+    \ Timestamp of when the subscription was created.\n    created_at TIMESTAMP WITH\
+    \ TIME ZONE DEFAULT NOW(),\n\n    -- Ensure a node can only subscribe to a topic\
+    \ once.\n    UNIQUE (topic_name, subscriber_did)\n);\n\nCREATE INDEX idx_subscriptions_topic_name\
+    \ ON subscriptions (topic_name);\nCREATE INDEX idx_subscriptions_subscriber_did\
+    \ ON subscriptions (subscriber_did);\n\n-- Table to store messages for persistent\
+    \ topics. This is the message log.\nCREATE TABLE event_messages (\n    -- A unique,\
+    \ sequential identifier for messages.\n    message_id BIGSERIAL PRIMARY KEY,\n\
+    \n    -- The topic the message was published to. Foreign key to the topics table.\n\
+    \    topic_name VARCHAR(255) NOT NULL REFERENCES topics(topic_name) ON DELETE\
+    \ CASCADE,\n\n    -- The full event message payload.\n    event_data JSONB NOT\
+    \ NULL,\n\n    -- Timestamp when the message was received by the Skald node. Indexed\
+    \ for replay.\n    published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\n\
+    CREATE INDEX idx_event_messages_topic_name_published_at ON event_messages (topic_name,\
+    \ published_at);\n```"

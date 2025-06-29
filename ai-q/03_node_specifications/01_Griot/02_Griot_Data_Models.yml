@@ -1,0 +1,40 @@
+metadata:
+  original_file: 02_Griot_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Griot Class: Data Models'
+  description: Data models for the Griot Node Class, including NodePackage and InstallationJob.
+sections:
+- level: 2
+  title: 4. Data Models
+  type: section
+  content: These are the core data structures used by the Griot node's services. They
+    are defined with explicit types to guide implementation.
+- level: 3
+  title: 4.1. NodePackage
+  type: section
+  content: "Represents a distributable, verifiable artifact containing a kOS node's\
+    \ code and metadata. This is the \"digital gene sequence\" for a node.\n\n```json\n\
+    {\n  \"package_id\": \"string (sha256 hash of the artifact)\",\n  \"manifest\"\
+    : {\n    \"node_class\": \"string (e.g., 'Tohunga', 'Musa')\",\n    \"version\"\
+    : \"string (semver, e.g., '1.2.1')\",\n    \"author_did\": \"string (did:kos:...)\
+    \ (The DID of the package creator)\",\n    \"dependencies\": {\n      \"system\"\
+    : [\"string (e.g., 'docker>=20.10')\"],\n      \"kos_nodes\": [\"string (e.g.,\
+    \ 'hakim@^1.0.0')\"]\n    },\n    \"source_url\": \"string (URL to the source\
+    \ code repository)\",\n    \"signature\": \"string (ed25519 signature of the manifest\
+    \ content by the author)\"\n  },\n  \"artifact_url\": \"string (URL to the .tar.gz\
+    \ artifact, e.g., 'ipfs://...')\",\n  \"created_at\": \"string (ISO 8601 timestamp)\"\
+    \n}\n```"
+- level: 3
+  title: 4.2. InstallationJob
+  type: section
+  content: "Represents a task for the Differentiation Service to install a `NodePackage`\
+    \ on the local or a remote system.\n\n```json\n{\n  \"job_id\": \"string (uuid)\"\
+    ,\n  \"package_id\": \"string (sha256 hash, foreign key to NodePackage)\",\n \
+    \ \"target_node_id\": \"string (did:kos:... of the node performing the installation)\"\
+    ,\n  \"status\": \"pending | running | streaming_logs | completed | failed\",\n\
+    \  \"status_message\": \"string (Human-readable status)\",\n  \"logs\": [\"string\
+    \ (Log entries from the installation process)\"],\n  \"created_at\": \"string\
+    \ (ISO 8601 timestamp)\",\n  \"completed_at\": \"string (ISO 8601 timestamp, optional)\"\
+    \n}\n```"

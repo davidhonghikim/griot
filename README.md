@@ -14,13 +14,13 @@
 pwd  # Should show: /Users/danger/CascadeProjects/griot-node
 
 # 2. Read project overview (ESSENTIAL)
-cat agents/00_PROJECT_OVERVIEW.md
+cat agents/[TIMESTAMP]00_PROJECT_OVERVIEW.md
 
 # 3. Check system status
 npm run build
 
-# 4. Review current work
-cat agents/Next_Agent_Brief.md | head -50
+# 4. Review handoff document for next agent
+cat agents/[TIMESTAMP]_LATEST_HANDOFF.md
 ```
 
 ### **For Developers**
@@ -37,7 +37,7 @@ npx tsx src/examples/basic-system.ts
 
 ## 🎯 **Current Status (Core Specification: 100% Complete)**
 
-The foundational engineering specifications for the core kOS node classes are now **100% complete**. This project has successfully transformed the high-level `ai-q` concepts into a complete set of buildable blueprints.
+The foundational engineering specifications for the core kOS node classes are not **100% complete**. This project has successfully transformed the high-level `ai-q` concepts into a complete set of buildable blueprints.
 
 ### **✅ COMPLETED**
 - **Core Infrastructure**: KLF protocol implementation in TypeScript.
@@ -88,16 +88,16 @@ ai-q/
 ### **Agent Coordination & Workflow**
 The `agents/` directory contains the mandatory workflow and historical logs for all agent activity. The process is designed to be simple, auditable, and consistent.
 
--   `agents/00_AGENT_WORKFLOW.md`: **The Rulebook.** All agents MUST follow the process defined in this file.
--   `agents/handoff/LATEST_HANDOFF.md`: **The Current Task.** The single source of truth for the next agent's mission.
--   `agents/01_AGENT_CHANGELOG.md`: **The Project Journal.** A running log of all actions, findings, and decisions made by every agent.
+-   `agents/[TIMESTAMP]_00_AGENT_WORKFLOW.md`: **The Rulebook.** All agents MUST follow the process defined in this file.
+-   `agents/handoff/[TIMESTAMP]_LATEST_HANDOFF.md`: **The Current Task.** The single source of truth for the next agent's mission.
+-   `agents/[TIMESTAMP]_01_AGENT_CHANGELOG.md`: **The Project Journal.** A running log of all actions, findings, and decisions made by every agent.
 
 ```
 agents/
-├── 00_AGENT_WORKFLOW.md       # MANDATORY: The rules for all agents.
-├── 01_AGENT_CHANGELOG.md      # The running history of the project.
+├── [TIMESTAMP]_00_AGENT_WORKFLOW.md       # MANDATORY: The rules for all agents.
+├── [TIMESTAMP]_01_AGENT_CHANGELOG.md      # The running history of the project.
 └── handoff/
-    ├── LATEST_HANDOFF.md      # The official task for the NEXT agent.
+    ├── [TIMESTAMP]_LATEST_HANDOFF.md      # The official task for the NEXT agent.
     └── archive/               # Historical handoff documents.
 ```
 
@@ -156,13 +156,13 @@ All work follows established patterns:
 
 ## 🔄 **Development Workflow**
 
-The development workflow is now enforced by the rules in `agents/00_AGENT_WORKFLOW.md`.
+The development workflow is now enforced by the rules in `agents/[TIMESTAMP]_00_AGENT_WORKFLOW.md`.
 
 ### **For Agents**
-1.  **Onboard**: Read `agents/00_AGENT_WORKFLOW.md` and `agents/handoff/LATEST_HANDOFF.md`.
+1.  **Onboard**: Read `agents/[TIMESTAMP]_00_AGENT_SYSTEM_PROMPT.md` and `agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.md` and `agents/bootstrap/[TIMESTAMP]_02_PROJECT_CONTEXT.json` and `agents/bootstrap/[TIMESTAMP]_03_AGENT_RULES.md` and `agents/handoff/[TIMESTAMP]_LATEST_HANDOFF.md`
 2.  **Execute**: Perform the task defined in the handoff, following the established quality standards.
-3.  **Log**: Document all actions, findings, and errors in `agents/01_AGENT_CHANGELOG.md`.
-4.  **Handoff**: Follow the procedure in the workflow to archive the old handoff and create a new one.
+3.  **Log**: Document all actions, findings, and errors in `agents/changelog/[TIMESTAMP]_01_AGENT_CHANGELOG.md`.
+4.  **Handoff**: Follow the procedure in the workflow to archive the old handoff first and then create a new one. Do not overwrite the old handoff before archiving it!
 
 ### **For Implementation**
 1. **Select a node class from `ai-q/03_node_specifications/`.**

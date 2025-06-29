@@ -1,0 +1,154 @@
+metadata:
+  original_file: 00_Client_Overview_and_Architecture.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 01_Griot-Seed_Client_Implementation_Spec
+  version: 1.0
+  status: PROPOSED
+sections:
+- level: 1
+  title: '**Griot-Seed Client: Implementation Specification**'
+  type: section
+  content: ''
+- level: 2
+  title: 1. Overview & Mission
+  type: section
+  content: 'This document provides the complete technical specification for a Frontend
+    Agent to build the **Griot-Seed Client**. The client will be a sophisticated,
+    web-based graphical user interface (GUI) for interacting with the `@griot-seed/griot-kitchen`
+    orchestration engine.
+
+
+    The primary mission is to create a feature-rich, responsive, and intuitive interface
+    that allows a user to:
+
+    - Manage and browse recipes and artifacts.
+
+    - Configure and monitor external services (like A1111, ComfyUI).
+
+    - Execute generative art workflows (recipes) through a powerful and dynamic "Studio"
+    interface.
+
+    - View the outputs and history of generative jobs.'
+- level: 2
+  title: 2. Core Architecture & Technology Stack
+  type: section
+  content: '- **Framework:** React (using Vite for tooling).
+
+    - **Language:** TypeScript.
+
+    - **State Management:** Use a modern, atom-based state manager - Jotai. Do not
+    use Redux.
+
+    - **Styling:** Use a modern component library like **Shadcn/UI** built on Tailwind
+    CSS to ensure a clean, consistent, and highly customizable look and feel.
+
+    - **Communication Protocol:** All communication with the backend **must** be via
+    RESTful API calls to the `griot-kitchen` server.'
+- level: 2
+  title: 3. Backend API Contract (`griot-kitchen`)
+  type: section
+  content: The client will be built against the following API endpoints. The Frontend
+    Agent is responsible for creating the necessary client-side functions to interact
+    with this contract.
+- level: 4
+  title: '**Configuration & Status**'
+  type: section
+  content: "- **`GET /v1/config`**\n  - **Description:** Fetches the current configuration\
+    \ of all connected services.\n  - **Response Body:**\n    ```json\n    {\n   \
+    \   \"services\": [\n        {\n          \"name\": \"a1111\",\n          \"url\"\
+    : \"http://192.168.1.180:7860\",\n          \"status\": \"connected\"\n      \
+    \  },\n        {\n          \"name\": \"comfyui\",\n          \"url\": \"http://127.0.0.1:8188\"\
+    ,\n          \"status\": \"disconnected\"\n        }\n      ]\n    }\n    ```\n\
+    - **`PUT /v1/config`**\n  - **Description:** Updates the configuration for one\
+    \ or more services.\n  - **Request Body:**\n    ```json\n    {\n      \"services\"\
+    : [\n        { \"name\": \"a1111\", \"url\": \"http://192.168.1.180:7860\" }\n\
+    \      ]\n    }\n    ```"
+- level: 4
+  title: '**Recipes**'
+  type: section
+  content: "- **`GET /v1/recipes`**\n  - **Description:** Fetches a list of all available\
+    \ recipes.\n- **`GET /v1/recipes/{id}`**\n  - **Description:** Fetches the detailed\
+    \ definition of a single recipe.\n- **`POST /v1/recipes/{id}/run`**\n  - **Description:**\
+    \ Executes a recipe.\n  - **Request Body (Overrides):**\n    ```json\n    {\n\
+    \      \"params\": {\n        \"prompt\": \"a new prompt to override the recipe\
+    \ default\",\n        \"steps\": 30\n      }\n    }\n    ```\n  - **Response Body:**\n\
+    \    ```json\n    { \"job_id\": \"uuid-string-12345\" }\n    ```"
+- level: 4
+  title: '**Jobs & Artifacts**'
+  type: section
+  content: "- **`GET /v1/jobs/{job_id}`**\n  - **Description:** Fetches the status\
+    \ and results of a specific job.\n  - **Response Body:**\n    ```json\n    {\n\
+    \      \"job_id\": \"uuid-string-12345\",\n      \"status\": \"completed\", //\
+    \ pending, running, completed, failed\n      \"created_at\": \"iso_timestamp\"\
+    ,\n      \"completed_at\": \"iso_timestamp\",\n      \"artifacts\": [\n      \
+    \  {\n          \"artifact_id\": \"uuid-artifact-67890\",\n          \"type\"\
+    : \"image\",\n          \"url\": \"/api/v1/artifacts/uuid-artifact-67890/content\"\
+    \n        }\n      ]\n    }\n    ```\n- **`GET /v1/artifacts/{artifact_id}/content`**\n\
+    \  - **Description:** Fetches the raw binary content of an artifact (e.g., the\
+    \ PNG image)."
+- level: 2
+  title: 4. Component Implementation Breakdown
+  type: section
+  content: ''
+- level: 3
+  title: '**4.1. Main Application Layout**'
+  type: section
+  content: 'A three-panel layout: a collapsible sidebar for navigation, a central
+    content area, and a footer for global status.'
+- level: 3
+  title: '**4.2. `ServiceStatusManager` (Footer Component)**'
+  type: section
+  content: "- **Purpose:** Displays the real-time connection status of all external\
+    \ services.\n- **Functionality:**\n  - Fetches data from `GET /v1/config` on an\
+    \ interval (e.g., every 15 seconds).\n  - Displays a list of services (A1111,\
+    \ ComfyUI, etc.) with a colored dot (green for connected, red for disconnected).\n\
+    \  - Clicking a service opens a modal to edit its URL and port."
+- level: 3
+  title: '**4.3. `RecipeStudio` (Primary View)**'
+  type: section
+  content: "- **Purpose:** The main workspace for configuring and running a generative\
+    \ job. This is the most complex component.\n- **Functionality:**\n  - When a user\
+    \ selects a Recipe, this view renders a dynamic form based on the recipe's parameters.\n\
+    \  - **You must implement the following UI controls:**\n    - **`TextField` (for\
+    \ `string`):** Use for `prompt`.\n    - **`TextArea` (for long `string`):** Use\
+    \ for `negative_prompt`.\n    - **`Slider` (for `integer` ranges):** Use for `steps`,\
+    \ `cfg_scale`. Must have min/max/step attributes.\n    - **`Dropdown` (for `enum`):**\
+    \ Use for `sampler_name`, `model_checkpoint`, `loras`, `embeddings`. The list\
+    \ of options for these dropdowns will be fetched from a new API endpoint `GET\
+    \ /v1/services/{service_name}/options`.\n    - **`BooleanField` (Switch/Checkbox):**\
+    \ For boolean flags like `restore_faces`.\n  - The form should be pre-filled with\
+    \ the default values from the selected Recipe.\n  - A \"Run\" button will trigger\
+    \ a `POST /v1/recipes/{id}/run` call, passing any user-modified parameters as\
+    \ overrides.\n  - A \"Job Status\" panel within this view should poll the `GET\
+    \ /v1/jobs/{job_id}` endpoint after a run is initiated."
+- level: 3
+  title: '**4.4. `ArtifactViewer`**'
+  type: section
+  content: "- **Purpose:** Displays the results of a completed job.\n- **Functionality:**\n\
+    \  - Renders images directly in the browser using the artifact's content URL.\n\
+    \  - For non-image artifacts (like JSON metadata), it should display a formatted\
+    \ code block.\n  - Provides a \"Download\" button."
+- level: 3
+  title: '**4.5. `Settings` View**'
+  type: section
+  content: "- **Purpose:** A dedicated page for managing service configurations.\n\
+    - **Functionality:**\n  - Provides a table of all services from `GET /v1/config`.\n\
+    \  - Allows users to add, edit, and remove service configurations.\n  - Editing\
+    \ must include fields for: `name`, `url` (e.g., `192.168.1.180`), `port` (e.g.,\
+    \ `7860`), and an `enabled` toggle.\n  - A \"Save\" button triggers `PUT /v1/config`."
+- level: 2
+  title: 5. Security & Data Handling
+  type: section
+  content: '- All user input must be sanitized before being sent to the backend.
+
+    - The application should never store private keys or secrets. All configuration
+    is handled server-side.
+
+    - Use secure, `httpOnly` cookies for any future session management.
+
+
+    This specification provides a clear and comprehensive plan. The Frontend Agent
+    is expected to build these components to a high standard of quality, ensuring
+    the user experience is as robust and well-designed as the backend architecture.'

@@ -1,0 +1,252 @@
+title: "kOS Knowledge & Agent System - Comprehensive Restructuring Analysis"
+
+current_state_analysis:
+  critical_issues_identified:
+    - issue: "Inconsistent Naming"
+      impact: "Poor navigation, sorting issues"
+      solution: "Standardized lowercase with consistent numbering"
+    - issue: "Monolithic Files"
+      impact: "Hard to maintain, poor modularity"
+      solution: "Break into focused, atomic components"
+    - issue: "No Database Integration"
+      impact: "Manual file management, no semantic queries"
+      solution: "Hybrid database + file system"
+    - issue: "Limited AI Integration"
+      impact: "Missing embeddings, training data, model ops"
+      solution: "Full AI-native architecture"
+    - issue: "Documentation Sprawl"
+      impact: "/ai-q has incomplete, disorganized docs"
+      solution: "Modular AKU-based documentation"
+
+proposed_unified_architecture:
+  core_principle: "Database-First, File-Backed Hybrid System"
+  primary_storage: ["Weaviate (vector)", "Neo4j (graph)", "PostgreSQL (metadata)"]
+  file_system: "Auto-generated views for editing and exports"
+  documentation_viewer: "Direct database integration with real-time updates"
+
+new_directory_structure:
+  griot_node:
+    ai_q: "Enhanced AI-Q knowledge system (restructured)"
+    agents: "Enhanced agent system"
+    data: "AI-native data layer"
+  
+  ai_q_structure:
+    "00_index.json": "Machine-readable knowledge catalog"
+    "01_foundation": "Core philosophy & architecture"
+    "02_protocols": "Communication specifications"
+    "03_nodes": "Complete 13 kOS Starseed Archetypes (modular)"
+    "04_capabilities": "Modular capability library"
+    "05_implementation": "Technical specs (modular)"
+    "06_tools": "Knowledge tools"
+  
+  foundation_files:
+    - "00_index.md - Foundation overview"
+    - "01_vision.md - kOS vision (small, focused)"
+    - "02_principles.md - Architecture principles"
+    - "03_taxonomy.md - Node classification"
+    - "04_composition_rules.md - Knowledge composition rules"
+  
+  protocol_files:
+    - "00_index.md - Protocol catalog"
+    - "01_klf_core.md - Kind Link Framework core"
+    - "02_discovery.md - Node discovery protocol"
+    - "03_authentication.md - Identity & security"
+    - "04_message_formats.md - Standard message types"
+  
+  nodes_structure:
+    "00_index.md": "Complete node catalog with cultural attributions"
+    "01_griot": "Griot - Primal Starseed (West African)"
+    "02_tohunga": "Tohunga - Sensory Starseed (Māori)"
+    "03_ronin": "Ronin - Nomadic Starseed (Japanese)"
+    "04_musa": "Musa - Guardian Starseed (Korean)"
+    "05_hakim": "Hakim - Healer Starseed (Arabic/Persian)"
+    "06_skald": "Skald - Creative Starseed (Old Norse)"
+    "07_oracle": "Oracle - Foresight Starseed (Cross-cultural)"
+    "08_junzi": "Junzi - Integrity Starseed (Chinese)"
+    "09_yachay": "Yachay - Memory Starseed (Quechua)"
+    "10_sachem": "Sachem - Consensus Starseed (Native American)"
+    "11_archon": "Archon - Orchestrator Starseed (Ancient Greek)"
+    "12_amauta": "Amauta - Teacher Starseed (Inca)"
+    "13_mzee": "Mzee - Awareness Starseed (Swahili)"
+  
+  griot_node_structure:
+    "00_overview.md": "Cultural archetype & biological function"
+    "01_architecture.md": "Core architecture"
+    "02_capabilities.md": "Zygote capabilities (replication/differentiation)"
+    "03_api_spec.md": "KLF API specification"
+    "04_data_models.md": "Data structures"
+    "05_examples.md": "Code examples"
+  
+  capabilities_structure:
+    "00_index.md": "Capability catalog"
+    "01_communication": "Communication capabilities"
+    "02_content": "Content & media capabilities"
+    "03_security": "Security capabilities"
+    "other_capability_domains": "Additional capability domains"
+  
+  communication_capabilities:
+    "00_index.md": "Communication overview"
+    "01_message_parsing.md": "Single capability focus"
+    "02_language_processing.md": "Language processing"
+    "03_conversation_mgmt.md": "Conversation management"
+  
+  implementation_structure:
+    "00_index.md": "Implementation catalog"
+    "01_backend_arch.md": "Backend architecture"
+    "02_frontend_arch.md": "Frontend architecture"
+    "03_sdk_spec.md": "SDK requirements"
+    "04_testing_framework.md": "Testing specifications"
+  
+  tools_structure:
+    "db_schema": "Database schemas"
+    "migration": "Knowledge migration scripts"
+    "export": "Export utilities"
+
+agents_structure:
+  "00_core": "Core agent system"
+  "01_memory": "AI-native memory system"
+  "02_state": "Machine-readable state"
+  "03_workflows": "Workflow management"
+  "04_automation": "AI-enhanced automation"
+  "05_templates": "Templates & schemas"
+  "06_reference": "Reference materials"
+
+core_agent_files:
+  - "00_index.md - Agent system overview"
+  - "01_workflow.md - Core workflow (modular)"
+  - "02_system_prompt.md - System prompt"
+  - "03_project_overview.md - Project context"
+  - "04_bootstrap_guide.md - Bootstrap instructions"
+
+memory_system:
+  "00_index.md": "Memory system overview"
+  "01_vector_store": "Weaviate integration"
+  "02_knowledge_graph": "Neo4j integration"
+  "03_training_data": "AI training data"
+  "04_model_ops": "ML operations"
+
+vector_store_structure:
+  "schemas": "AKU schemas"
+  "api": "Vector API wrappers"
+  "ingestion": "Data pipeline"
+  "monitoring": "Health & metrics"
+
+knowledge_graph_structure:
+  "schemas": "Graph models"
+  "queries": "Common queries"
+  "composition": "Dynamic composition"
+
+training_data_structure:
+  "conversations": "Agent conversations"
+  "solutions": "Successful patterns"
+  "failures": "Learning from errors"
+  "embeddings": "Pre-computed embeddings"
+
+model_ops_structure:
+  "training": "Model training scripts"
+  "evaluation": "Model evaluation"
+  "deployment": "Model deployment"
+  "monitoring": "Model performance"
+
+state_files:
+  "project_manifest.json": "Project ground truth"
+  "aku_registry.json": "Knowledge registry"
+  "agent_capabilities.json": "Agent skill matrix"
+  "training_metrics.json": "ML training metrics"
+
+workflows_structure:
+  "handoffs": "Agent handoff system"
+  "changelogs": "Historical tracking"
+  "plans": "Implementation plans"
+  "performance": "Performance analytics"
+
+automation_structure:
+  "bootstrap": "Intelligent context loading"
+  "knowledge_ops": "Knowledge operations"
+  "model_ops": "ML operations automation"
+  "monitoring": "System monitoring"
+
+templates_structure:
+  "aku_templates": "AKU creation templates"
+  "json_schemas": "Data validation schemas"
+  "prompt_templates": "AI prompt templates"
+
+reference_structure:
+  "vector": "Vector system reference"
+  "kitchen": "Kitchen brigade reference"
+  "kai_cd": "Previous project reference"
+
+data_layer_structure:
+  "01_documents": "Large document storage (MongoDB)"
+  "02_media": "Media asset storage (S3/MinIO)"
+  "03_training": "ML training datasets"
+  "04_knowledge_base": "Structured knowledge"
+  "05_models": "AI models"
+  "06_exports": "Generated exports"
+
+documents_structure:
+  "markdown_corpus": "Full markdown documents (~2000+ files)"
+  "chunked_content": "Processed chunks for embedding"
+  "media_metadata": "Media file references and metadata"
+  "version_history": "Document version tracking"
+
+media_structure:
+  "images": "Images, diagrams, screenshots"
+  "videos": "Video content and demos"
+  "audio": "Audio files, recordings"
+  "documents": "PDFs, presentations, large files"
+  "archives": "Compressed historical data"
+
+training_structure:
+  "conversations": "Agent conversation logs"
+  "code_solutions": "Successful code patterns"
+  "documentation": "Documentation patterns"
+  "embeddings": "Pre-computed embeddings"
+
+knowledge_base_structure:
+  "akus": "Atomic Knowledge Units"
+  "capabilities": "Capability definitions"
+  "patterns": "Solution patterns"
+  "relationships": "Knowledge relationships"
+
+models_structure:
+  "embeddings": "Embedding models"
+  "classification": "Classification models"
+  "generation": "Generation models"
+  "evaluation": "Model evaluation data"
+
+exports_structure:
+  "documentation": "Auto-generated docs"
+  "schemas": "Schema exports"
+  "media_bundles": "Packaged media content"
+  "reports": "Analytics reports"
+
+database_first_architecture:
+  hybrid_storage_strategy: "Multi-tier storage architecture for ~2000+ large markdown files + media"
+  
+  primary_storage_tiers:
+    - "MongoDB (Document Store): Full markdown content, large text, CRUD operations"
+    - "Weaviate (Vector Store): Chunked embeddings, semantic search"
+    - "Neo4j (Graph DB): Knowledge relationships, dependencies"
+    - "PostgreSQL (Metadata): Versioning, audit trail, structured data"
+    - "Object Storage (S3/MinIO): Media files, large assets, backups"
+  
+  content_processing_pipeline:
+    - "Chunking Engine: Split large docs into searchable segments"
+    - "Embedding Generator: Create vectors for semantic search"
+    - "Relationship Mapper: Build knowledge graph connections"
+    - "Media Processor: Handle images, videos, audio, diagrams"
+  
+  file_system_interface:
+    - "Auto-generated markdown exports for editing"
+    - "Real-time bi-directional sync with databases"
+    - "Git-trackable changes with conflict resolution"
+    - "Media asset management and CDN integration"
+
+hybrid_workflow:
+  description: "Hybrid Workflow for Large Content & Media"
+  steps:
+    - "MongoDB as Document Store: Full markdown content, large text files, CRUD operations"
+    - "Weaviate for Semantic Search: Chunked embeddings from large documents"
+    - "Object Storage for Media: S3/MinIO for images, videos, audio, large assets"
+    - "File System Interface: Auto-generated markdown exports for editing" 

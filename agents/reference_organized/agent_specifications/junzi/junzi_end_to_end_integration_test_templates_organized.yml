@@ -1,0 +1,121 @@
+title: Junzi End To End Integration Test Templates
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.552109'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 515
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: false
+has_testing: true
+has_security: false
+has_rag: true
+has_ethics: false
+original_filename: junzi_end_to_end_integration_test_templates.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/junzi/junzi_end_to_end_integration_test_templates.yml
+category: agent_specifications/junzi
+
+---
+
+title: Junzi End To End Integration Test Templates
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.520311'
+original_format: markdown
+content_type: api_specification
+word_count: 486
+line_count: 79
+
+---
+
+# JUNZI End-to-End Integration Test Templates
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** E2E Testing Framework
+
+---
+
+## 🎯 Purpose:
+To define full system integration test scenarios that validate data flow across ingestion, processing, contradiction detection, risk scoring, API exposure, and frontend UI rendering for JUNZI.
+
+---
+
+## ✅ Test Environment Requirements:
+
+| Component | Requirement |
+|---|---|
+| Database | PostgreSQL test instance |
+| Backend | JUNZI API running in staging mode |
+| Frontend | Localhost or staging instance of Next.js frontend |
+| Monitoring | Logging enabled for all agents during test runs |
+| Test Data | Populate via JUNZI Test Seeder |
+
+---
+
+## ✅ Test Case Categories:
+
+### 1. Data Ingestion to Public API Verification
+| Test Case | Steps |
+|---|---|
+| **E2E-001**: Contradiction Detection Flow | Ingest synthetic contradiction input → Run ContradictionScannerAgent → Verify API `/entities/{id}/contradictions` reflects result |
+| **E2E-002**: Risk Scoring Flow | Trigger action inputs → Run RiskProfilerAgent → Check `/risk_scores/` API reflects updated score |
+| **E2E-003**: Promise Tracking Flow | Ingest new promise statement → Run PromiseTrackerAgent → Confirm in `/promises/{entity_id}` API output |
+
+---
+
+### 2. Frontend Data Rendering
+| Test Case | Steps |
+|---|---|
+| **E2E-004**: Entity Profile Page | Hit `/entities/{id}/profile` → Load Entity Profile UI → Confirm data accuracy and UI rendering |
+| **E2E-005**: Contradiction Feed Display | Load Contradictions Feed UI → Verify filters and pagination work with API |
+| **E2E-006**: Risk Leaderboard | Load Leaderboard UI → Validate ranking matches backend API |
+| **E2E-007**: Public Alerts Dashboard | Trigger new alert → Confirm UI reflects real-time data within 5 seconds |
+
+---
+
+### 3. Dispute Submission and Resolution Path
+| Test Case | Steps |
+|---|---|
+| **E2E-008**: User Dispute Flow | Submit test dispute → Verify backend creates dispute record → Simulate dispute resolution → Confirm API reflects outcome |
+
+---
+
+### 4. Bias Audit & Integrity Tests
+| Test Case | Steps |
+|---|---|
+| **E2E-009**: Bias Audit Enforcement | Push biased synthetic input → Run BiasAuditAgent → Confirm audit flags the bias |
+| **E2E-010**: Source Attribution Check | Submit data with invalid source → Expect source verification failure at SourceAttributionAgent stage |
+
+---
+
+### 5. System Resilience Checks (Optional for MVP)
+| Test Case | Steps |
+|---|---|
+| **E2E-011**: Agent Crash Recovery | Simulate agent failure → Confirm auto-restart or alert triggers |
+| **E2E-012**: API Load Spike | Run 1000+ concurrent API calls → Monitor for rate limiting and error handling |
+
+---
+
+## ✅ Test Execution Tools:
+| Type | Tools |
+|---|---|
+| API Tests | Postman, pytest + HTTPX, or Newman |
+| Frontend E2E | Cypress or Playwright |
+| Load Tests | Locust or k6 |
+
+---
+
+**This document now defines the canonical End-to-End Integration Test Template Suite for JUNZI QA teams within the kOS ecosystem until formally revised.**
+

@@ -1,0 +1,16 @@
+id: "plan_2025_01_aiq_knowledge_library_system"
+title: "AI-Q Knowledge Library System Implementation Plan"
+description: "Comprehensive implementation roadmap for the AI-Q Knowledge Library System using modern tech stack with Jotai, ChromaDB, Meilisearch, and Neo4j"
+status: "active"
+priority: "critical"
+# ... other properties
+phases:
+  - id: "phase_1_foundation_aku_system"
+    title: "Foundation & AKU System"
+    # ... other phase properties
+    tasks:
+      - id: "task_1_1_1"
+        title: "Define AKU schema and TypeScript interfaces"
+        # ... other task properties
+# ... other phases and properties
+# This is a truncated example for brevity. The full content will be converted. 

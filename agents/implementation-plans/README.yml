@@ -1,0 +1,172 @@
+title: "Implementation Plans"
+version: "1.0"
+status: "OPTIMIZED FOR AI PROCESSING"
+description: "This directory contains implementation plans for kOS project features, optimized for AI processing with JSON configuration."
+
+quick_access:
+  title: "Quick Access"
+  files:
+    - "Configuration: implementation_plans.json - Complete plans configuration"
+    - "Schema: plan-schema.json - Plan schema definitions"
+    - "Active Plans: active/ - Currently active implementation plans"
+    - "Backlog: backlog/ - Planned but not yet active"
+    - "Templates: ../templates/plan-template.yml - Plan creation templates"
+
+current_active_plans:
+  title: "Current Active Plans"
+  rag_and_storage_systems:
+    title: "RAG and Storage Systems Implementation"
+    status: "Active"
+    priority: "High"
+    progress: "Phase 1 Task 1.1 completed (PersonaVectorizationService)"
+    next: "Database schema design and migration scripts"
+    key_tasks:
+      - "✅ Create PersonaVectorizationService"
+      - "🔄 Design Database Schema (MongoDB + Neo4j)"
+      - "⏳ Create Migration Scripts"
+      - "⏳ Extend RAG Operations"
+
+plan_structure:
+  title: "Plan Structure"
+  description: "Each plan follows this structure"
+  json_structure: |
+    {
+      "id": "plan-id",
+      "title": "Plan Title",
+      "status": "active|backlog|completed",
+      "priority": "high|medium|low",
+      "phases": [
+        {
+          "id": "phase-id",
+          "name": "Phase Name",
+          "tasks": [
+            {
+              "id": "task-id",
+              "name": "Task Name",
+              "objective": "Task objective",
+              "files_to_create": ["file1.ts", "file2.yaml"],
+              "success_criteria": ["criteria1", "criteria2"],
+              "status": "pending|in_progress|completed|blocked"
+            }
+          ]
+        }
+      ]
+    }
+
+format_strategy:
+  title: "Format Strategy"
+  formats:
+    - "JSON: Structured plan data (implementation_plans.json, plan-schema.json)"
+    - "YAML: Detailed plan documentation (active/plan-name.yml)"
+    - "Templates: Plan creation templates (templates/plan-template.yml)"
+
+usage:
+  title: "Usage"
+  commands:
+    - command: "cat agents/implementation-plans/implementation_plans.json"
+      description: "To view all plans"
+    - command: "cat agents/implementation-plans/plan-schema.json"
+      description: "To view plan schema"
+    - command: "cat agents/implementation-plans/active/rag-storage-implementation.yml"
+      description: "To view active plan details"
+    - command: "# Use template in agents/templates/plan-template.yml"
+      description: "To create a new plan"
+    - command: "# Update agents/implementation-plans/implementation_plans.json"
+      description: "Update plans configuration"
+
+plan_lifecycle:
+  title: "Plan Lifecycle"
+  stages:
+    - "Backlog: Plan created, not yet active"
+    - "Active: Plan in progress with assigned resources"
+    - "Completed: All tasks finished, plan archived"
+    - "Blocked: Plan paused due to dependencies or issues"
+
+success_metrics:
+  title: "Success Metrics"
+  metrics:
+    - "Performance Targets: Time and efficiency goals"
+    - "Quality Targets: Success rate and coverage goals"
+    - "Dependencies: Required systems and resources"
+    - "Risks: Potential issues and mitigation strategies"
+
+note: "All plans are tracked in the JSON configuration for AI processing, with detailed documentation in YAML format."
+
+plan_lifecycle_detailed:
+  title: "Plan Lifecycle"
+  description: "This directory manages the lifecycle of implementation plans for the project. All plans follow a strict backlog -> active -> archive workflow."
+  
+  stages:
+    backlog:
+      title: "backlog/"
+      description: "Contains all approved but not-yet-started implementation plans"
+      to_create_new_plan: "Do NOT create directories manually. Use the helper script to ensure correct date formatting."
+      command: "./agents/shared/scripts/create-plan-dir.sh 'your-plan-name'"
+      result: "This will create a new directory like backlog/2025-07-01_your-plan-name/. Add your plan.yml and other assets there."
+    
+    active:
+      title: "active/"
+      description: "Contains the one plan that is currently in progress"
+      to_start_work: "Move the plan's entire directory from backlog/ to active/."
+      command: "mv agents/implementation-plans/backlog/[date_plan-name] agents/implementation-plans/active/"
+      note: "There should only ever be one plan directory in active/."
+    
+    archive:
+      title: "archive/"
+      description: "Contains all completed, abandoned, or superseded implementation plans"
+      to_finish_work: "Move the plan's entire directory from active/ to archive/."
+      purpose: "This directory serves as a historical record. Per user instruction, it is a 'dirty quick zip system' and should not be deleted."
+
+archive_policy:
+  title: "Archive Policy"
+  note: "All plan archives are stored in agents/implementation-plans/archive/, organized by year and month. Do not use the centralized agents/archive/ directory for plan archives."
+  
+  current_month_access:
+    title: "Current Month Access"
+    location: "Root of implementation-plans directory"
+    purpose: "Easy access to recent plans"
+    naming: "[YYYY-MM-DD]_[plan_name].yml or .json"
+  
+  monthly_archiving:
+    title: "Monthly Archiving"
+    trigger: "Monthly (or manual when needed)"
+    destination: "archive/[YYYY]/[MM]/"
+    benefits:
+      - "Keeps root directory clean"
+      - "Maintains chronological organization"
+      - "Preserves historical context"
+  
+  archive_structure:
+    title: "Archive Structure"
+    structure: |
+      archive/
+      └── [YEAR]/
+          ├── [01]/  # January
+          ├── [02]/  # February
+          ├── ...
+          └── [12]/  # December
+  
+  archive_process:
+    title: "Archive Process"
+    steps:
+      - "Monthly: Move all files from previous month to archive"
+      - "Update Index: Maintain references in 00_Plans_Index.yml"
+      - "Preserve Context: Keep metadata and cross-references intact"
+  
+  automated_archiving:
+    title: "Automated Archiving"
+    script_location: "scripts/archiving/archive_monthly.sh"
+    usage:
+      - command: "./scripts/archiving/archive_monthly.sh"
+        description: "Archive all systems"
+      - command: "./scripts/archiving/archive_monthly.sh agents/implementation-plans"
+        description: "Archive specific system"
+    features:
+      - "Archives files from previous months only"
+      - "Maintains current month files in root directory"
+      - "Creates proper year/month directory structure"
+      - "Handles both .yml and .json files"
+
+current_plan_pointer:
+  title: "Current Plan Pointer"
+  description: "The active/current-plan.yml is a symbolic link that should always point to the plan.yml file inside the directory within active/. It must be updated whenever a new plan is moved to active." 

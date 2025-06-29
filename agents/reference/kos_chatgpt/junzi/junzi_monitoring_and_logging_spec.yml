@@ -1,0 +1,101 @@
+title: Junzi Monitoring And Logging Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.668291'
+original_format: markdown
+content_type: api_specification
+word_count: 513
+line_count: 86
+
+---
+
+# JUNZI Monitoring and Logging Specification
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** Operational Monitoring and Logging Framework
+
+---
+
+## 🎯 Purpose:
+To define how JUNZI services, agents, and APIs will be monitored in real-time and how all system activities will be logged for observability, auditing, and anomaly detection.
+
+---
+
+## ✅ Monitoring Stack:
+
+| Layer | Tool/Framework |
+|---|---|
+| Metrics Collection | Prometheus |
+| Visualization | Grafana Dashboards |
+| Log Aggregation | ELK Stack (Elasticsearch, Logstash, Kibana) or Loki (if using Grafana Cloud) |
+| Alerting | Prometheus Alertmanager or Grafana Alerts |
+| Agent Health Monitoring | Custom heartbeat checkers per JUNZI Agent |
+
+---
+
+## ✅ Monitoring Metrics:
+
+| Metric | Description |
+|---|---|
+| API Latency | Track average and 95th percentile API response times |
+| Error Rates | 4xx and 5xx error codes per endpoint |
+| Contradiction Detection Rate | Number of contradictions flagged per time period |
+| Risk Score Drift | Changes in risk scoring patterns over time |
+| Bias Audit Failure Rate | Number of bias audit flags per deployment |
+| Data Ingestion Volume | Number of new data points processed per hour |
+| User Report Volume | Number of incoming user-submitted reports |
+| Queue Backlog | Pending jobs in contradiction scanning pipeline |
+
+---
+
+## ✅ Logging Standards:
+
+| Standard | Implementation |
+|---|---|
+| Format | JSON structured logs |
+| Log Levels | DEBUG, INFO, WARN, ERROR, CRITICAL |
+| Trace IDs | Unique request/operation IDs for tracing end-to-end flows |
+| Redaction | No PII logged unless explicitly permitted and encrypted |
+| Persistence | All logs stored for 180 days minimum in VaultNode-controlled storage |
+| Agent-Specific Prefix | Every log line should include agent and node identifiers (e.g., `[JUNZI-RiskProfilerAgent]`) |
+
+---
+
+## ✅ Alerting Rules:
+
+| Alert Condition | Trigger Threshold |
+|---|---|
+| High API Error Rate | >5% 5xx errors over 5 minutes |
+| Bias Audit Spike | >10 failed bias audits in 30 minutes |
+| Agent Crash | Missed heartbeat for any agent for >60 seconds |
+| Data Ingestion Failure | No new data processed in >30 minutes |
+| Risk Score Anomaly | Risk score distribution deviates >3σ from historical norm |
+
+---
+
+## ✅ Dashboard Views:
+
+| Dashboard | Focus |
+|---|---|
+| System Health | Node uptime, container statuses, API availability |
+| Agent Performance | Job durations, queue backlog, error counts per agent |
+| Public API Usage | API request volumes, rate limits, top endpoints by traffic |
+| Risk Metrics | Entity risk distribution, risk score change frequency |
+| Contradiction Trends | Detected contradictions over time by jurisdiction |
+
+---
+
+## ✅ Compliance:
+- All logging and monitoring data governed by HIEROS data protection policies.
+- Sensitive data logs encrypted at rest.
+- Access to production logs limited to authorized roles with audit trail.
+
+---
+
+**This document now serves as the canonical Monitoring and Logging Spec for JUNZI operations within the kOS ecosystem until formally revised.**
+
+

@@ -1,0 +1,140 @@
+title: Skald Admin Control Panel
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.646139'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 610
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: true
+has_testing: true
+has_security: true
+has_rag: true
+has_ethics: true
+original_filename: skald_admin_control_panel.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/skald/skald_admin_control_panel.yml
+category: agent_specifications/skald
+
+---
+
+title: Skald Admin Control Panel
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.863350'
+original_format: markdown
+content_type: api_specification
+word_count: 584
+line_count: 97
+
+---
+
+# Skald Module Specification: Admin Control Panel (ACP)
+
+## Module Name
+**Skald Admin Control Panel (ACP)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Admin Control Panel (ACP) is the primary web-based or CLI-accessible administrative interface for managing, configuring, and monitoring all Skald system components, workflows, nodes, users, and runtime states. It acts as the operational nerve center for Skald system operators and administrators.
+
+## Purpose
+To provide authorized administrators with a comprehensive interface for controlling Skald deployment health, configuration, runtime behavior, resource usage, and operational policies.
+
+## Functional Requirements
+
+### 1. System Management Features
+- **Module Control:** Start, stop, restart, or reload individual Skald modules.
+- **Workflow Supervision:** View, pause, resume, or terminate active workflows.
+- **Node Management:** View status of nodes, bring nodes online/offline, view node metrics.
+- **User Session Management:** List and terminate active user sessions.
+
+### 2. Configuration Management
+- **Runtime Config Editor:** Modify runtime parameters (e.g., thread counts, timeout values).
+- **Persistent Config Storage:** Save and reload configuration sets.
+- **Profile Management:** Manage environment-specific config profiles (e.g., Dev, Test, Production).
+
+### 3. Monitoring Dashboards
+- **Live Workflow Dashboard:** Visualize currently running workflows and their state transitions.
+- **Resource Utilization Monitor:** Display live system resource stats per node/module.
+- **Error and Alert Center:** Centralize active system errors and alerts from EHR and SHM.
+
+### 4. User Access Management
+- **Role Management:** Grant/revoke admin roles (integrates with URGE module).
+- **Activity Logs:** View admin action history.
+- **Permission Audits:** Review current admin-level access rights.
+
+### 5. Security Controls
+- **Session Timeout Settings:** Configure ACP UI/CLI session lifetimes.
+- **Multi-Factor Authentication Support:** Optional MFA for admin login.
+- **IP Whitelisting/Blacklisting:** Restrict ACP access to trusted networks.
+
+### 6. Extensibility and Plugins
+- **Custom Admin Modules:** Allow developers to add new panels or CLI commands.
+- **External Monitoring Integration:** Export ACP metrics to third-party NOC tools.
+- **WebSocket and API Hooks:** For real-time dashboard updates and API-driven control.
+
+## Non-Functional Requirements
+- **UI Latency:** Sub-300ms dashboard refresh rate.
+- **Availability:** 99.999% uptime.
+- **Scalability:** Support large deployments with thousands of concurrent workflows.
+- **Security:** Enforce encrypted connections (TLS) and role-based access control.
+
+## Data Flow Diagram (Textual)
+1. **Admin User Action (Web UI or CLI)** → 2. **Access Control Check (AAL)** → 3. **Command Dispatcher** → 4. **Target Module or Node** → 5. **Response Back to ACP UI/CLI**
+
+## Interfaces
+- **Input Interfaces:** Web Browser (HTTP/S), CLI tools, REST API (optional remote admin calls).
+- **Output Interfaces:** All Skald runtime modules, Logging, Event Bus, Notification Systems.
+
+## Configuration Options
+- **UI Theme:** Light/Dark/Custom.
+- **Default Dashboard Widgets:** Configurable per admin role.
+- **Session Timeout:** Default 30 minutes.
+- **External Auth Provider Support:** LDAP, SSO, etc.
+
+## Example Use Cases
+- Restarting the Skald Sentiment Engine during off-peak hours.
+- Reviewing system-wide workflow throughput from a central dashboard.
+- Updating runtime timeout settings without restarting the entire system.
+- Terminating stuck user sessions.
+
+## Testing and Validation Plan
+- UI/UX usability testing.
+- CLI command unit tests.
+- Permission escalation and security bypass testing.
+- Load testing with multiple concurrent admin users.
+
+## Dependencies
+- **kOS Event Bus**
+- **Skald Access Control and Authentication Layer (AAL)**
+- **Skald Error Handling and Recovery Engine (EHR)**
+- **Skald System Health Monitor (SHM)**
+- **Skald Workflow Orchestrator (SWO)**
+
+## Future Enhancements
+- Mobile-optimized admin dashboard.
+- AI-driven predictive admin alerts.
+- Admin action scripting for repeatable operational tasks.
+- Real-time visual workflow flowchart mapping.
+
+---
+
+**Next module:** `skald_user_and_role_governance_engine.md`
+
+Let me know when you want me to continue.
+
+
+

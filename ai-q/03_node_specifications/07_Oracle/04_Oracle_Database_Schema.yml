@@ -1,0 +1,46 @@
+metadata:
+  original_file: 04_Oracle_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Oracle Class: Database Schema'
+  description: PostgreSQL database schema for the Oracle Node Class.
+sections:
+- level: 1
+  title: Oracle Class Database Schema
+  type: section
+  content: "The Oracle node's database manages the state of complex query jobs and\
+    \ caches results and knowledge to optimize performance.\n\n```sql\n-- Enables\
+    \ UUID generation, if not already enabled\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"\
+    ;\n\n-- Table to manage the state of asynchronous query jobs.\nCREATE TABLE query_jobs\
+    \ (\n    -- A unique identifier for each query job.\n    job_id UUID PRIMARY KEY\
+    \ DEFAULT uuid_generate_v4(),\n\n    -- The current status of the job (e.g., 'pending',\
+    \ 'executing', 'completed'). Indexed.\n    status VARCHAR(50) NOT NULL,\n\n  \
+    \  -- The full query string submitted by the user.\n    query_string TEXT NOT\
+    \ NULL,\n\n    -- The DID of the entity that requested the query.\n    requester_did\
+    \ VARCHAR(255) NOT NULL,\n\n    -- Timestamp of when the job was created.\n  \
+    \  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n\n    -- Timestamp of when\
+    \ the job was completed or failed.\n    completed_at TIMESTAMP WITH TIME ZONE\n\
+    );\n\nCREATE INDEX idx_query_jobs_status ON query_jobs (status);\nCREATE INDEX\
+    \ idx_query_jobs_requester_did ON query_jobs (requester_did);\n\n\n-- Table to\
+    \ cache the results of expensive queries.\nCREATE TABLE query_result_cache (\n\
+    \    -- A hash of the canonical query string, used as a key.\n    query_hash CHAR(64)\
+    \ PRIMARY KEY, -- SHA-256\n\n    -- The full, rich response object, including\
+    \ results and explanation.\n    response_payload JSONB NOT NULL,\n\n    -- Timestamp\
+    \ of when this cache entry was created.\n    cached_at TIMESTAMP WITH TIME ZONE\
+    \ DEFAULT NOW(),\n\n    -- How long this cache entry is considered valid, in seconds.\n\
+    \    ttl_seconds INTEGER NOT NULL,\n\n    -- The number of times this cache entry\
+    \ has been accessed.\n    hit_count INTEGER DEFAULT 0\n);\n\n-- Table to store\
+    \ nodes of the fused knowledge graph.\nCREATE TABLE knowledge_graph_nodes (\n\
+    \    node_uri VARCHAR(255) PRIMARY KEY, -- e.g., 'did:kos:griot:123' or 'kos:entry/article/abc-123'\n\
+    \    node_type VARCHAR(100) NOT NULL, -- e.g., 'GriotNode', 'Article'\n    properties\
+    \ JSONB,\n    last_updated TIMESTAMP WITH TIME ZONE\n);\n\n-- Table to store relationships\
+    \ (edges) between nodes in the knowledge graph.\nCREATE TABLE knowledge_graph_edges\
+    \ (\n    edge_id BIGSERIAL PRIMARY KEY,\n    source_node_uri VARCHAR(255) NOT\
+    \ NULL REFERENCES knowledge_graph_nodes(node_uri) ON DELETE CASCADE,\n    target_node_uri\
+    \ VARCHAR(255) NOT NULL REFERENCES knowledge_graph_nodes(node_uri) ON DELETE CASCADE,\n\
+    \    relationship_type VARCHAR(100) NOT NULL, -- e.g., 'authored', 'cites'\n \
+    \   properties JSONB,\n    last_updated TIMESTAMP WITH TIME ZONE\n);\n\nCREATE\
+    \ INDEX idx_knowledge_graph_edges_source ON knowledge_graph_edges (source_node_uri);\n\
+    CREATE INDEX idx_knowledge_graph_edges_target ON knowledge_graph_edges (target_node_uri);\n\
+    ```"

@@ -1,0 +1,427 @@
+metadata:
+  original_file: 01_Architecture.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Sachem Class: Architecture'
+  description: Universal adapter architecture for distributed consensus, governance,
+    and coordination across any consensus protocol, decision-making framework, or
+    collaborative ecosystem.
+  version: 2.0.0
+sections:
+- level: 1
+  title: Sachem Class Universal Adapter Architecture
+  type: section
+  content: ''
+- level: 2
+  title: 🏗️ System Architecture Overview
+  type: section
+  content: 'The Sachem node implements a **comprehensive universal consensus and governance
+    framework** designed to adapt to any consensus protocol, decision-making system,
+    governance model, or collaborative framework. As a core component of the universal
+    adapter library, Sachem provides AI agents with complete knowledge necessary to
+    dynamically learn and implement any consensus mechanism, governance pattern, or
+    coordination strategy across any organizational or technological ecosystem.
+
+
+    ```
+
+    ┌─────────────────────────────────────────────────────────────────────────────────────┐
+
+    │                         SACHEM UNIVERSAL ADAPTER ARCHITECTURE                      │
+
+    ├─────────────────────────────────────────────────────────────────────────────────────┤
+
+    │  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐  ┌─────────────┐
+    │
+
+    │  │ Universal         │  │ Consensus         │  │ Governance        │  │ Decision    │
+    │
+
+    │  │ Consensus Engine  │  │ Protocol          │  │ Framework         │  │ Support     │
+    │
+
+    │  │                   │  │ Adapter           │  │ Matrix            │  │ System      │
+    │
+
+    │  └───────────────────┘  └───────────────────┘  └───────────────────┘  └─────────────┘
+    │
+
+    ├─────────────────────────────────────────────────────────────────────────────────────┤
+
+    │  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐  ┌─────────────┐
+    │
+
+    │  │ Multi-Protocol    │  │ Reputation        │  │ Voting            │  │ Conflict    │
+    │
+
+    │  │ Coordination      │  │ Management        │  │ & Election        │  │ Resolution  │
+    │
+
+    │  │ Layer             │  │ System            │  │ Engine            │  │ Framework   │
+    │
+
+    │  └───────────────────┘  └───────────────────┘  └───────────────────┘  └─────────────┘
+    │
+
+    ├─────────────────────────────────────────────────────────────────────────────────────┤
+
+    │  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐  ┌─────────────┐
+    │
+
+    │  │ Policy            │  │ Compliance        │  │ Performance       │  │ Cultural    │
+    │
+
+    │  │ Engine            │  │ & Audit           │  │ Optimization      │  │ Adaptation  │
+    │
+
+    │  │                   │  │ System            │  │ Matrix            │  │ Framework   │
+    │
+
+    │  └───────────────────┘  └───────────────────┘  └───────────────────┘  └─────────────┘
+    │
+
+    ├─────────────────────────────────────────────────────────────────────────────────────┤
+
+    │  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐  ┌─────────────┐
+    │
+
+    │  │ Intelligent       │  │ Stakeholder       │  │ Communication     │  │ Integration
+    │ │
+
+    │  │ Facilitation      │  │ Management        │  │ & Notification    │  │ Bridge      │
+    │
+
+    │  │ System            │  │ Engine            │  │ Framework         │  │             │
+    │
+
+    │  └───────────────────┘  └───────────────────┘  └───────────────────┘  └─────────────┘
+    │
+
+    ├─────────────────────────────────────────────────────────────────────────────────────┤
+
+    │                      Universal Adapter Foundation Layer                             │
+
+    └─────────────────────────────────────────────────────────────────────────────────────┘
+
+    ```'
+- level: 2
+  title: 1. Universal Consensus Engine
+  type: section
+  content: ''
+- level: 3
+  title: 1.1. Comprehensive Consensus Protocol Adapter Framework
+  type: section
+  content: "**Purpose**: Provides complete abstraction enabling any AI agent to implement\
+    \ any consensus mechanism across any distributed system or organizational context\n\
+    \n```typescript\ninterface UniversalConsensusAdapter {\n  protocolType: ConsensusProtocolType;\n\
+    \  participantManager: ParticipantManager;\n  proposalEngine: ProposalEngine;\n\
+    \  votingSystem: VotingSystem;\n  consensusValidator: ConsensusValidator;\n  reputationEngine:\
+    \ ReputationEngine;\n  auditTrail: AuditTrail;\n  recoveryManager: RecoveryManager;\n\
+    }\n\nenum ConsensusProtocolType {\n  // Classical Consensus Protocols\n  RAFT\
+    \ = \"raft\",\n  PAXOS = \"paxos\",\n  PBFT = \"pbft\",\n  TENDERMINT = \"tendermint\"\
+    ,\n  HOTSTUFF = \"hotstuff\",\n  \n  // Blockchain Consensus\n  PROOF_OF_WORK\
+    \ = \"proof_of_work\",\n  PROOF_OF_STAKE = \"proof_of_stake\",\n  DELEGATED_PROOF_OF_STAKE\
+    \ = \"delegated_proof_of_stake\",\n  PROOF_OF_AUTHORITY = \"proof_of_authority\"\
+    ,\n  PROOF_OF_HISTORY = \"proof_of_history\",\n  PRACTICAL_BYZANTINE_FAULT_TOLERANCE\
+    \ = \"practical_byzantine_fault_tolerance\",\n  \n  // DAG-Based Consensus\n \
+    \ HASHGRAPH = \"hashgraph\",\n  AVALANCHE = \"avalanche\",\n  PHANTOM = \"phantom\"\
+    ,\n  SPECTRE = \"spectre\",\n  \n  // Hybrid Consensus\n  CASPER = \"casper\"\
+    ,\n  OUROBOROS = \"ouroboros\",\n  ALGORAND = \"algorand\",\n  \n  // Social Consensus\n\
+    \  LIQUID_DEMOCRACY = \"liquid_democracy\",\n  QUADRATIC_VOTING = \"quadratic_voting\"\
+    ,\n  CONVICTION_VOTING = \"conviction_voting\",\n  FUTARCHY = \"futarchy\",\n\
+    \  \n  // Organizational Consensus\n  MAJORITY_VOTE = \"majority_vote\",\n  SUPERMAJORITY\
+    \ = \"supermajority\",\n  UNANIMOUS_CONSENT = \"unanimous_consent\",\n  WEIGHTED_VOTING\
+    \ = \"weighted_voting\",\n  RANKED_CHOICE_VOTING = \"ranked_choice_voting\",\n\
+    \  APPROVAL_VOTING = \"approval_voting\",\n  \n  // Deliberative Consensus\n \
+    \ DELPHI_METHOD = \"delphi_method\",\n  NOMINAL_GROUP_TECHNIQUE = \"nominal_group_technique\"\
+    ,\n  CONSENSUS_DECISION_MAKING = \"consensus_decision_making\",\n  SOCIOCRACY\
+    \ = \"sociocracy\",\n  HOLACRACY = \"holacracy\",\n  \n  // AI-Specific Consensus\n\
+    \  NEURAL_CONSENSUS = \"neural_consensus\",\n  SWARM_INTELLIGENCE = \"swarm_intelligence\"\
+    ,\n  COLLECTIVE_INTELLIGENCE = \"collective_intelligence\",\n  FEDERATED_LEARNING_CONSENSUS\
+    \ = \"federated_learning_consensus\",\n  \n  // Custom Consensus\n  CUSTOM_CONSENSUS\
+    \ = \"custom_consensus\"\n}\n\ninterface ParticipantManager {\n  participantRegistry:\
+    \ ParticipantRegistry;\n  roleManager: RoleManager;\n  accessController: AccessController;\n\
+    \  activityMonitor: ActivityMonitor;\n  \n  async registerParticipant(participant:\
+    \ ParticipantProfile): Promise<RegistrationResult>;\n  async assignRole(participantId:\
+    \ string, role: ConsensusRole): Promise<RoleAssignment>;\n  async validateParticipant(participantId:\
+    \ string): Promise<ValidationResult>;\n  async monitorActivity(participantId:\
+    \ string): Promise<ActivityMetrics>;\n}\n\nenum ConsensusRole {\n  // Core Consensus\
+    \ Roles\n  PROPOSER = \"proposer\",\n  VALIDATOR = \"validator\",\n  VOTER = \"\
+    voter\",\n  OBSERVER = \"observer\",\n  \n  // Leadership Roles\n  LEADER = \"\
+    leader\",\n  COORDINATOR = \"coordinator\",\n  FACILITATOR = \"facilitator\",\n\
+    \  MODERATOR = \"moderator\",\n  \n  // Specialized Roles\n  EXPERT = \"expert\"\
+    ,\n  STAKEHOLDER = \"stakeholder\",\n  REPRESENTATIVE = \"representative\",\n\
+    \  DELEGATE = \"delegate\",\n  \n  // Technical Roles\n  MINER = \"miner\",\n\
+    \  STAKER = \"staker\",\n  VERIFIER = \"verifier\",\n  AUDITOR = \"auditor\",\n\
+    \  \n  // Administrative Roles\n  ADMINISTRATOR = \"administrator\",\n  GOVERNANCE_MEMBER\
+    \ = \"governance_member\",\n  POLICY_MAKER = \"policy_maker\",\n  \n  // Custom\
+    \ Roles\n  CUSTOM_ROLE = \"custom_role\"\n}\n```"
+- level: 3
+  title: 1.2. Advanced Governance Framework Matrix
+  type: section
+  content: "```typescript\ninterface GovernanceFrameworkMatrix {\n  governanceModels:\
+    \ Map<GovernanceModel, GovernanceImplementation>;\n  policyEngines: PolicyEngine[];\n\
+    \  complianceManagers: ComplianceManager[];\n  auditSystems: AuditSystem[];\n\
+    \  \n  async implementGovernanceModel(model: GovernanceModel, parameters: GovernanceParameters):\
+    \ Promise<GovernanceImplementation>;\n  async enforcePolicy(policy: GovernancePolicy,\
+    \ context: GovernanceContext): Promise<PolicyResult>;\n  async auditCompliance(scope:\
+    \ AuditScope): Promise<ComplianceReport>;\n  async adaptGovernance(feedback: GovernanceFeedback):\
+    \ Promise<AdaptationResult>;\n}\n\nenum GovernanceModel {\n  // Democratic Models\n\
+    \  DIRECT_DEMOCRACY = \"direct_democracy\",\n  REPRESENTATIVE_DEMOCRACY = \"representative_democracy\"\
+    ,\n  LIQUID_DEMOCRACY = \"liquid_democracy\",\n  DELIBERATIVE_DEMOCRACY = \"deliberative_democracy\"\
+    ,\n  \n  // Hierarchical Models\n  TRADITIONAL_HIERARCHY = \"traditional_hierarchy\"\
+    ,\n  MATRIX_ORGANIZATION = \"matrix_organization\",\n  FLAT_ORGANIZATION = \"\
+    flat_organization\",\n  NETWORK_ORGANIZATION = \"network_organization\",\n  \n\
+    \  // Collaborative Models\n  CONSENSUS_GOVERNANCE = \"consensus_governance\"\
+    ,\n  SOCIOCRACY = \"sociocracy\",\n  HOLACRACY = \"holacracy\",\n  TEAL_ORGANIZATION\
+    \ = \"teal_organization\",\n  \n  // Market-Based Models\n  MARKET_GOVERNANCE\
+    \ = \"market_governance\",\n  AUCTION_BASED = \"auction_based\",\n  PREDICTION_MARKETS\
+    \ = \"prediction_markets\",\n  FUTARCHY = \"futarchy\",\n  \n  // Technical Models\n\
+    \  MERITOCRACY = \"meritocracy\",\n  TECHNOCRACY = \"technocracy\",\n  ALGORITHMIC_GOVERNANCE\
+    \ = \"algorithmic_governance\",\n  AI_ASSISTED_GOVERNANCE = \"ai_assisted_governance\"\
+    ,\n  \n  // Federated Models\n  FEDERALISM = \"federalism\",\n  SUBSIDIARITY =\
+    \ \"subsidiarity\",\n  MULTI_LEVEL_GOVERNANCE = \"multi_level_governance\",\n\
+    \  POLYCENTRIC_GOVERNANCE = \"polycentric_governance\",\n  \n  // Adaptive Models\n\
+    \  EVOLUTIONARY_GOVERNANCE = \"evolutionary_governance\",\n  SWARM_GOVERNANCE\
+    \ = \"swarm_governance\",\n  STIGMERGIC_GOVERNANCE = \"stigmergic_governance\"\
+    ,\n  EMERGENT_GOVERNANCE = \"emergent_governance\",\n  \n  // Cultural Models\n\
+    \  INDIGENOUS_GOVERNANCE = \"indigenous_governance\",\n  TRADITIONAL_COUNCIL =\
+    \ \"traditional_council\",\n  ELDER_COUNCIL = \"elder_council\",\n  CEREMONIAL_GOVERNANCE\
+    \ = \"ceremonial_governance\",\n  \n  // Custom Models\n  CUSTOM_GOVERNANCE =\
+    \ \"custom_governance\"\n}\n\ninterface PolicyEngine {\n  policyType: PolicyType;\n\
+    \  ruleProcessor: RuleProcessor;\n  constraintValidator: ConstraintValidator;\n\
+    \  effectivenessAnalyzer: EffectivenessAnalyzer;\n  \n  async createPolicy(specification:\
+    \ PolicySpecification): Promise<GovernancePolicy>;\n  async evaluatePolicy(policy:\
+    \ GovernancePolicy, context: PolicyContext): Promise<PolicyEvaluation>;\n  async\
+    \ enforcePolicy(policy: GovernancePolicy, action: ProposedAction): Promise<EnforcementResult>;\n\
+    \  async updatePolicy(policy: GovernancePolicy, changes: PolicyChange[]): Promise<UpdateResult>;\n\
+    }\n\nenum PolicyType {\n  // Access Policies\n  ACCESS_CONTROL = \"access_control\"\
+    ,\n  AUTHORIZATION = \"authorization\",\n  PERMISSION_MANAGEMENT = \"permission_management\"\
+    ,\n  ROLE_BASED_ACCESS = \"role_based_access\",\n  \n  // Decision Policies\n\
+    \  VOTING_RULES = \"voting_rules\",\n  QUORUM_REQUIREMENTS = \"quorum_requirements\"\
+    ,\n  CONSENSUS_THRESHOLDS = \"consensus_thresholds\",\n  DECISION_AUTHORITY =\
+    \ \"decision_authority\",\n  \n  // Resource Policies\n  RESOURCE_ALLOCATION =\
+    \ \"resource_allocation\",\n  BUDGET_CONTROL = \"budget_control\",\n  CAPACITY_MANAGEMENT\
+    \ = \"capacity_management\",\n  UTILIZATION_LIMITS = \"utilization_limits\",\n\
+    \  \n  // Behavioral Policies\n  CODE_OF_CONDUCT = \"code_of_conduct\",\n  ETHICAL_GUIDELINES\
+    \ = \"ethical_guidelines\",\n  CONFLICT_OF_INTEREST = \"conflict_of_interest\"\
+    ,\n  PARTICIPATION_RULES = \"participation_rules\",\n  \n  // Operational Policies\n\
+    \  WORKFLOW_RULES = \"workflow_rules\",\n  APPROVAL_PROCESSES = \"approval_processes\"\
+    ,\n  ESCALATION_PROCEDURES = \"escalation_procedures\",\n  EMERGENCY_PROTOCOLS\
+    \ = \"emergency_protocols\",\n  \n  // Compliance Policies\n  REGULATORY_COMPLIANCE\
+    \ = \"regulatory_compliance\",\n  INDUSTRY_STANDARDS = \"industry_standards\"\
+    ,\n  CERTIFICATION_REQUIREMENTS = \"certification_requirements\",\n  AUDIT_PROCEDURES\
+    \ = \"audit_procedures\",\n  \n  // Security Policies\n  SECURITY_PROTOCOLS =\
+    \ \"security_protocols\",\n  DATA_PROTECTION = \"data_protection\",\n  PRIVACY_RULES\
+    \ = \"privacy_rules\",\n  INCIDENT_RESPONSE = \"incident_response\",\n  \n  //\
+    \ Custom Policies\n  CUSTOM_POLICY = \"custom_policy\"\n}\n```\n\nThis enhanced\
+    \ architecture transforms Sachem from a basic consensus system into a comprehensive\
+    \ universal adapter capable of handling any governance framework, decision-making\
+    \ process, or coordination challenge that an AI agent might encounter in any domain\
+    \ or culture. The specification continues with detailed implementations for voting\
+    \ systems, reputation management, conflict resolution, stakeholder engagement,\
+    \ and cultural adaptation mechanisms."
+- level: 2
+  title: 1.2. Core Principles
+  type: section
+  content: '-   **Facilitation over Dictatorship**: Sachem does not decide what is
+    true. It provides a structured forum and a set of tools for the agent collective
+    to come to an agreement.
+
+    -   **Reputation as a First-Class Citizen**: The trustworthiness of a node is
+    a quantifiable metric that directly impacts the weight of its claims and votes.
+    Reputation is earned, dynamic, and vital for a healthy information ecosystem.
+
+    -   **Provable Consensus**: All consensus events (called "Accords") are cryptographically
+    signed, auditable, and stored as immutable records in the Yachay node.
+
+    -   **Dynamic Quorum**: The threshold for reaching consensus is not fixed. It
+    can change based on the importance of the claim and the current stability of the
+    network.'
+- level: 2
+  title: 1.3. System Components Overview
+  type: section
+  content: '1.  **Claim Intake Processor**: Receives `CONSENSUS_PROPOSE_CLAIM` messages
+    from other nodes. It validates the claim''s structure, logs it, and opens a new
+    "Debate" period.
+
+    2.  **Debate Manager**: Orchestrates the process for a given claim. It sets the
+    voting period duration, notifies relevant nodes (based on expertise tags), and
+    collects incoming votes (`CONSENSUS_VOTE_CAST`).
+
+    3.  **Voting Engine**: The core logic for tallying votes. It weighs each vote
+    based on the casting node''s current Reputation Score.
+
+    4.  **Reputation Ledger**: A service that manages the reputation scores for all
+    nodes in the system. It adjusts scores based on behavior (e.g., making claims
+    that achieve consensus increases reputation; making claims that are rejected decreases
+    it).
+
+    5.  **Accord Finalizer**: When a Debate period ends, this component tallies the
+    weighted votes. If consensus is reached, it creates a formal `Accord` document.
+    If it fails, it records the failure.
+
+    6.  **Yachay Archiver**: Responsible for sending all `Accord` documents and Debate
+    records to the Yachay node for long-term, immutable storage.'
+- level: 2
+  title: '1.4. The Consensus Lifecycle: From Claim to Accord'
+  type: section
+  content: "1.  **Claim Proposal**: A node (e.g., Hakim) analyzes data and forms a\
+    \ conclusion. It sends a `CONSENSUS_PROPOSE_CLAIM` message to Sachem. The claim\
+    \ is now in a `PENDING` state.\n2.  **Debate Initiation**: Sachem's Debate Manager\
+    \ opens a voting window (e.g., 60 seconds). It notifies other nodes that a new\
+    \ claim is open for debate.\n3.  **Voting**: Other nodes evaluate the claim and\
+    \ its evidence. They cast their votes (`FOR`, `AGAINST`, `ABSTAIN`) by sending\
+    \ `CONSENSUS_VOTE_CAST` messages. The Voting Engine collects these, weighting\
+    \ each one by the voter's reputation.\n4.  **Tally & Finalization**: When the\
+    \ window closes, the Accord Finalizer tallies the weighted votes.\n    -   **If\
+    \ `FOR > AGAINST` by a required margin (the dynamic quorum)**: The claim is accepted.\
+    \ An `Accord` is created and the claim's status becomes `ACCEPTED`.\n    -   **If\
+    \ `AGAINST > FOR`**: The claim is rejected. The status becomes `REJECTED`.\n5.\
+    \  **Reputation Adjustment**: The Reputation Ledger adjusts the reputation of\
+    \ the proposing node and all voting nodes based on the outcome. Proposers of accepted\
+    \ claims gain reputation; proposers of rejected claims lose it. Voters who were\
+    \ on the \"winning\" side gain a small amount of reputation.\n6.  **Archiving**:\
+    \ The final `Accord` (or the record of failure) and the entire debate history\
+    \ are sent to Yachay via a `YACHAY_STORE_REQUEST` for permanent storage.\n\n---"
+- level: 2
+  title: '**2. Production-Ready Implementation Architecture**'
+  type: section
+  content: ''
+- level: 3
+  title: '**2.1. Core Service Interfaces (TypeScript)**'
+  type: section
+  content: "These interfaces define the contracts for the core services within the\
+    \ Sachem node, promoting modularity and clean separation of concerns.\n\n```typescript\n\
+    // /griot-node/src/nodes/sachem/interfaces.ts\n\nimport { Claim, Vote, Accord,\
+    \ ReputationScore } from './types';\n\n/**\n * Orchestrates the end-to-end consensus\
+    \ process for a single claim.\n */\nexport interface IDebateManager {\n  /**\n\
+    \   * Initiates a new debate for a given claim.\n   * @param claim - The claim\
+    \ to be debated.\n   * @returns The unique ID of the newly created debate.\n \
+    \  */\n  initiateDebate(claim: Claim): Promise<string>;\n\n  /**\n   * Casts a\
+    \ vote in an ongoing debate.\n   * @param debateId - The ID of the debate.\n \
+    \  * @param vote - The vote being cast.\n   * @returns A confirmation that the\
+    \ vote was accepted.\n   */\n  castVote(debateId: string, vote: Vote): Promise<boolean>;\n\
+    \n  /**\n   * Finalizes a debate, tallies votes, and generates an Accord.\n  \
+    \ * @param debateId - The ID of the debate to finalize.\n   * @returns The resulting\
+    \ Accord or a record of failure.\n   */\n  finalizeDebate(debateId: string): Promise<Accord>;\n\
+    }\n\n/**\n * Manages the reputation scores of all nodes in the ecosystem.\n */\n\
+    export interface IReputationLedger {\n  /**\n   * Retrieves the current reputation\
+    \ score for a given node.\n   * @param nodeId - The DID of the node.\n   * @returns\
+    \ The node's current ReputationScore.\n   */\n  getScore(nodeId: string): Promise<ReputationScore>;\n\
+    \n  /**\n   * Adjusts reputation scores based on the outcome of a debate.\n  \
+    \ * @param accord - The final Accord of the debate.\n   * @returns A record of\
+    \ the reputation changes applied.\n   */\n  adjustScoresFromAccord(accord: Accord):\
+    \ Promise<Record<string, number>>;\n}\n```"
+- level: 3
+  title: '**2.2. Dynamic Quorum Engine**'
+  type: section
+  content: 'The Dynamic Quorum Engine calculates the consensus threshold required
+    for a claim to be accepted. This prevents a simple 51% majority from always winning
+    and adds nuance to the consensus process.
+
+
+    **Factors Influencing Quorum**:
+
+    -   **Claim Criticality**: Claims tagged as `CRITICAL` (e.g., a security patch
+    proposal) require a higher quorum (e.g., 75% weighted vote share) than `ROUTINE`
+    claims (e.g., 60%).
+
+    -   **Network Stability**: If the network is experiencing high volatility (many
+    conflicting claims being proposed), the quorum threshold automatically increases
+    to ensure only high-confidence claims pass.
+
+    -   **Voter Turnout**: A minimum number of nodes (a percentage of the total active
+    nodes) must participate in the vote for the result to be considered valid, regardless
+    of the weighted score.
+
+    -   **Reputation Distribution**: If the voting pool has a very high standard deviation
+    in reputation, the quorum margin may be adjusted to prevent a few high-reputation
+    nodes from dominating the outcome.'
+- level: 3
+  title: '**2.3. Reputation Ledger & Scoring Algorithm**'
+  type: section
+  content: "The Reputation Ledger is the backbone of trust in the kOS ecosystem.\n\
+    \n**Scoring Algorithm**:\nA node's reputation score is a value between 0 and 1,\
+    \ calculated using a decaying average formula.\n\n*R_new = (1 - α) * R_old + α\
+    \ * E*\n\nWhere:\n-   `R_new`: The new reputation score.\n-   `R_old`: The previous\
+    \ reputation score.\n-   `α (alpha)`: A learning rate parameter (e.g., 0.1), which\
+    \ determines how much weight is given to the new event.\n-   `E (Event Score)`:\
+    \ A score from 0 to 1 based on the outcome of a consensus event.\n    -   Proposed\
+    \ a claim that was `ACCEPTED`: `E = 1.0`\n    -   Voted with the majority on an\
+    \ `ACCEPTED` claim: `E = 0.7`\n    -   Voted against the majority on an `ACCEPTED`\
+    \ claim: `E = 0.3`\n    -   Proposed a claim that was `REJECTED`: `E = 0.0`\n\n\
+    **Behavioral Adjustments**:\n-   **Malicious Activity**: Nodes caught spamming\
+    \ the network with frivolous claims or engaging in Sybil-like attacks have their\
+    \ reputation immediately and drastically reduced by a moderator node (Archon).\n\
+    -   **Inactivity**: A node's reputation score slowly decays over time if it does\
+    \ not participate in debates, encouraging active engagement.\n\n---"
+- level: 2
+  title: '**3. Comprehensive Error Handling**'
+  type: section
+  content: '| Error Code                | Description                                                |
+    Recovery Strategy                                                                                                           |
+
+    | ------------------------- | ----------------------------------------------------------
+    | ---------------------------------------------------------------------------------------------------------------------------
+    |
+
+    | `ERR_CLAIM_INVALID`       | A proposed claim is structurally invalid or missing
+    data.  | Reject the claim immediately with a `YACHAY_API_ERROR` and log the invalid
+    claim. Do not initiate a debate.               |
+
+    | `ERR_VOTE_CLOSED`         | A vote is received after the debate window has closed.     |
+    Reject the vote. The late vote is logged but does not affect the outcome.                                                   |
+
+    | `ERR_ALREADY_VOTED`       | A node attempts to vote more than once in the same
+    debate. | Reject the duplicate vote. Log the attempt as potential malicious behavior.                                                 |
+
+    | `ERR_INSUFFICIENT_QUORUM` | A debate ends without the minimum required voter
+    turnout.  | The claim automatically fails. The outcome is recorded as `FAILED_QUORUM`.
+    No reputation is lost for the proposer.           |
+
+    | `ERR_LEDGER_UNAVAILABLE`  | The reputation ledger service is unreachable.              |
+    Defer reputation updates. The consensus process can continue, but reputation adjustments
+    are queued and applied once the ledger is back online. |
+
+
+    ---'
+- level: 2
+  title: '**4. Performance & Scalability**'
+  type: section
+  content: '-   **Asynchronous Processing**: All KLF message handling is asynchronous.
+    A new claim proposal does not block the processing of votes for another claim.
+
+    -   **State Management**: The state of each ongoing debate is held in a high-speed,
+    in-memory cache (e.g., Redis). This allows for rapid vote tallying.
+
+    -   **Scalable Ledger**: The Reputation Ledger can be backed by a distributed
+    database (like CockroachDB or TiDB) to ensure high availability and horizontal
+    scalability as the number of nodes grows.
+
+    -   **Batched Archiving**: Records of finalized debates are sent to the Yachay
+    node in batches to reduce network overhead.
+
+
+    ---'
+- level: 2
+  title: '**5. Security & HIEROS Compliance**'
+  type: section
+  content: '-   **Vote Integrity**: All `CONSENSUS_VOTE_CAST` messages are cryptographically
+    signed by the originating node''s private key. The Voting Engine verifies this
+    signature before accepting the vote, preventing vote spoofing.
+
+    -   **Claim Provenance**: The initial `CONSENSUS_PROPOSE_CLAIM` message must also
+    be signed, providing a non-repudiable link between a node and the claims it makes.
+    This enforces accountability, aligning with the HIEROS principle of "Honor All
+    Beings".
+
+    -   **Sybil Attack Resistance**: The reputation system is the primary defense
+    against Sybil attacks. New nodes start with a low reputation and must earn trust
+    over time, making it economically and practically difficult for a single actor
+    to create many nodes to sway a vote.
+
+    -   **Censorship Resistance**: Sachem is a distributed system. As long as a node
+    can communicate with one Sachem instance, its claim or vote can be entered into
+    the network, preventing a single point of failure or censorship.'

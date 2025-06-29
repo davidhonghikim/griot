@@ -1,0 +1,38 @@
+title: Next Agent Handoff
+version: '1.0'
+content:
+- '# **NEXT AGENT HANDOFF**'
+- '---'
+utc: '2025-06-28T20:50:00Z'
+from_agent: GPT-4
+previous_handoff: agents/handoff/archive/2025-06-28_GPT4_Asset-Indexer-Completion.md
+1_current_project_status:
+  title: 1. Current Project Status
+  content:
+  - The kOS project now has a universal, chunked asset indexing system for all asset
+    types (skills, recipes, scripts, configs, personas). The system supports dynamic
+    loading, efficient bootstrap, and is ready for persona-driven agent bootstrapping.
+    All code and documentation are up to date. Only asset types with files present
+    are indexed; empty directories are skipped.
+2_your_directive:
+  title: 2. Your Directive
+  content:
+  - '**Implement persona-driven default asset loading and tag-based selection logic.**'
+  items:
+  - Extend the agent bootstrap process to allow each persona to specify which asset
+    types, categories, and tags to load by default.
+  - Update the loader to support persona configuration files (e.g., `personas/default_persona.yaml`)
+    that define default asset loading preferences.
+  - Ensure agents can dynamically select and load only the relevant chunks for their
+    persona and task.
+  - Document the persona selection and loading process for future agents.
+  - (Optional) Add example persona files and test cases.
+3_context__history:
+  title: 3. Context & History
+  content: []
+  items:
+  - Universal asset indexer and chunked JSON indexes are in place.
+  - Bootstrap and dynamic loading APIs are available.
+  - Persona support is ready for logic implementation.
+  - See `agents/01_AGENT_CHANGELOG.md` for a full session log and technical details
+    for 2025-06-28.

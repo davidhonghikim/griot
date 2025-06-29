@@ -1,0 +1,50 @@
+metadata:
+  original_file: 05_Musa_Code_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Musa Class: Code Examples'
+  description: TypeScript code examples for interacting with the Musa Node Class via
+    KLF.
+sections:
+- level: 1
+  title: Musa Class Code Examples
+  type: section
+  content: This section provides conceptual TypeScript examples for using the Musa
+    node's security primitives.
+- level: 2
+  title: 1. Validating a Credential to Get a Principal
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \nasync function authenticateAndGetPrincipal(client: KLFClient, credentialToken:\
+    \ string) {\n    console.log(\"Attempting to validate credential...\");\n\n  \
+    \  const requestMessage = createMessage()\n        .from('did:kos:my-app:123')\n\
+    \        .to('did:kos:musa:abc') // Target Musa node\n        .type(MessageType.TASK_REQUEST)\n\
+    \        .payload({\n            task_name: 'validate_credential',\n         \
+    \   params: {\n                credential\": {\n                    \"type\":\
+    \ \"oidc_id_token\",\n                    \"value\": credentialToken\n       \
+    \         }\n            }\n        })\n        .build();\n    \n    const response\
+    \ = await client.sendMessage(requestMessage);\n\n    if (response.type === MessageType.TASK_RESPONSE\
+    \ && response.payload.status === 'completed') {\n        console.log('Authentication\
+    \ successful!');\n        const principal = response.payload.result;\n       \
+    \ console.log('Received Principal:', JSON.stringify(principal, null, 2));\n  \
+    \      return principal;\n    } else {\n        console.error('Authentication\
+    \ failed:', response.payload.error.message);\n        return null;\n    }\n}\n\
+    ```"
+- level: 2
+  title: 2. Checking Permissions for an Action
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \nasync function checkWritePermission(client: KLFClient, principal: any, documentId:\
+    \ string) {\n    console.log(`Checking if principal ${principal.principal_id}\
+    \ can write to ${documentId}...`);\n\n    const queryMessage = createMessage()\n\
+    \        .from('did:kos:my-app:123')\n        .to('did:kos:musa:abc') // Target\
+    \ Musa node\n        .type(MessageType.DATA_QUERY)\n        .payload({\n     \
+    \       query_name: 'check_permission',\n            params: {\n             \
+    \   principal: principal,\n                action: 'write',\n                resource:\
+    \ `did:kos:document:${documentId}`\n            }\n        })\n        .build();\n\
+    \    \n    const response = await client.sendMessage(queryMessage);\n\n    if\
+    \ (response.type === MessageType.DATA_RESULT) {\n        const { allowed } = response.payload.result;\n\
+    \        console.log('Permission check result:', allowed);\n        return allowed;\n\
+    \    } else {\n        console.error('Permission check failed to execute.');\n\
+    \        return false;\n    }\n}\n```"

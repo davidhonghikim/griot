@@ -1,0 +1,140 @@
+title: Skald Access Control And Authentication Layer
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.770909'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 661
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: true
+has_testing: true
+has_security: true
+has_rag: false
+has_ethics: false
+original_filename: skald_access_control_and_authentication_layer.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/skald/skald_access_control_and_authentication_layer.yml
+category: agent_specifications/skald
+
+---
+
+title: Skald Access Control And Authentication Layer
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.871222'
+original_format: markdown
+content_type: api_specification
+word_count: 633
+line_count: 97
+
+---
+
+# Skald Module Specification: Access Control and Authentication Layer (AAL)
+
+## Module Name
+**Skald Access Control and Authentication Layer (AAL)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Access Control and Authentication Layer (AAL) provides security mechanisms for authenticating users, services, and external systems, as well as enforcing authorization policies for all Skald API endpoints, WebSocket connections, CLI tools, and internal module access.
+
+## Purpose
+To ensure that only authorized and authenticated clients and users can access Skald resources, workflows, and runtime modules while providing flexible, scalable, and auditable identity management and access control policies.
+
+## Functional Requirements
+
+### 1. Authentication Methods
+- **API Key Authentication:** Support for static API keys per user, app, or system.
+- **OAuth2 / JWT Token Support:** Industry-standard token-based authentication.
+- **Session-Based Auth:** For WebSocket and CLI session management.
+- **HMAC Signature Validation:** For external webhook source verification.
+
+### 2. Authorization and Access Control
+- **Role-Based Access Control (RBAC):** Define user roles (Admin, Developer, Viewer, etc.) with granular permissions.
+- **Per-Endpoint Permission Settings:** Control access to individual API routes.
+- **Module-Level Access Control:** Restrict internal Skald module access based on calling entity.
+- **Workflow-Level Access Policies:** Prevent unauthorized workflow submissions or modifications.
+
+### 3. Token and Key Management
+- **Token Expiry and Revocation:** Support expiration times and revocation mechanisms for tokens and keys.
+- **API Key Rotation:** Allow safe key updates without service disruption.
+- **Multi-Tenant Support:** Isolate keys and access scopes per tenant or project.
+
+### 4. Audit and Logging
+- **Authentication Logs:** Record all login, token usage, and failed authentication attempts.
+- **Authorization Denial Logs:** Capture all access denial events.
+- **Access Pattern Analytics:** Generate usage reports per user, key, or role.
+
+### 5. Rate Limiting and Abuse Protection
+- **Per-User Rate Limits:** Define max request rates per key or token.
+- **IP Whitelisting/Blacklisting:** Optional network-level restrictions.
+- **Anomaly Detection Hooks:** Support future AI-driven abuse prevention.
+
+## Non-Functional Requirements
+- **Latency:** Auth check under 50ms per request.
+- **Reliability:** 99.999% availability of authentication services.
+- **Extensibility:** Support for plugin-based auth providers (LDAP, SSO, etc.).
+- **Scalability:** Handle millions of tokens and keys at scale.
+
+## Data Flow Diagram (Textual)
+1. **Incoming Request (API/WS/CLI)** → 2. **Authentication Validator** → 3. **Authorization Checker** → 4. **Access Granted or Denied** → 5. **Log Event** → 6. **Forward to Target Module or Reject**
+
+## Interfaces
+- **Input Interfaces:** All Skald-facing external and internal modules.
+- **Output Interfaces:** Skald API Gateway (SAG), Skald Runtime Modules, Logging and Monitoring Systems.
+
+## Configuration Options
+- **Token Expiry Time:** Default: 1 hour.
+- **Default Roles and Permissions:** Predefined per deployment.
+- **API Rate Limits:** Per user, app, or endpoint.
+- **Auth Backend Type:** (In-memory, Database, External IAM)
+
+## Example Use Cases
+- Authenticating external apps using OAuth2 tokens.
+- Restricting narrative generation APIs to Admin users only.
+- Blocking unauthorized WebSocket connections.
+- Rotating API keys for security compliance.
+
+## Extensibility Hooks
+- **Custom Auth Providers:** Support third-party authentication sources.
+- **External SSO Integration:** (e.g., Google OAuth, Microsoft Azure AD).
+- **Dynamic Policy Engine:** Allow runtime rule updates for fine-grained access control.
+
+## Testing and Validation Plan
+- Unit tests for each auth method.
+- Penetration testing for auth bypass attempts.
+- Load testing with high token validation volume.
+- Expiry and revocation validation tests.
+
+## Dependencies
+- **kOS Event Bus**
+- **Skald API Gateway (SAG)**
+- **Logging and Metrics Services**
+- **User Management Service (optional external or internal)**
+
+## Future Enhancements
+- Federated identity management across kOS Node Classes.
+- AI-driven risk-based authentication.
+- API key self-service portal for developers.
+- Biometric or multi-factor auth for sensitive actions.
+
+---
+
+✅ **Skald Phase 6 module specifications are now complete.**
+
+Let me know if you want me to package and list all Phase 6 docs for download, or if you want to start Phase 7.
+
+
+

@@ -1,0 +1,95 @@
+title: Junzi Phase 3 Feature Roadmap
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.561640'
+original_format: markdown
+content_type: api_specification
+word_count: 475
+line_count: 80
+
+---
+
+# JUNZI Phase 3 Feature Roadmap
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** Strategic Product Expansion Plan
+
+---
+
+## 🎯 Phase 3 Strategic Vision:
+To transform JUNZI from a single-platform civic integrity tool into a decentralized, multi-node, federated trust infrastructure that can scale globally while preserving nonpartisanship and ethical integrity.
+
+---
+
+## ✅ Major Phase 3 Features:
+
+### 1. Decentralized Node Hosting (Federation Model)
+| Feature | Description |
+|---|---|
+| Federated JUNZI Nodes | Allow universities, NGOs, or media organizations to host their own validated JUNZI nodes |
+| Consensus-Based Source Validation | Nodes vote on source reliability scoring updates |
+| Distributed Data Redundancy | Data mirrored across participating nodes for censorship resistance |
+
+---
+
+### 2. Advanced ML-Based Relationship Mapping
+| Feature | Description |
+|---|---|
+| Dynamic Relationship Graph | Visualize political, financial, and social networks between entities |
+| Influence Score Engine | Quantify and visualize influence networks |
+| Conflict of Interest Detection | Algorithmic scanning for interlinked contradictions, funding patterns, and affiliations |
+
+---
+
+### 3. Public Watchlist System
+| Feature | Description |
+|---|---|
+| Custom Watchlists | Let users build and share custom watchlists of entities |
+| Public Subscription Feeds | Subscribe to risk updates or contradiction alerts for any watchlist |
+| Jurisdictional or Topic Tags | Tag entities with issues (e.g., "Climate Policy", "Campaign Finance") for tracking |
+
+---
+
+### 4. Historical Ethics Scorecard
+| Feature | Description |
+|---|---|
+| Longitudinal Risk Profiles | Multi-year historical ethics scoring for any entity |
+| Ethics Trajectory Graphs | Visualizations of integrity trend over time |
+| Major Event Annotations | Timeline annotations for critical historical events affecting scores |
+
+---
+
+### 5. Community Voting and Fact-Checking Layer
+| Feature | Description |
+|---|---|
+| Crowd Fact-Check Portal | Public users can fact-check individual contradiction reports |
+| Weighted Trust Voting | Users with better track records have more fact-check weighting |
+| Dispute Escalation Voting | Allow users to vote to escalate low-confidence contradictions for human review |
+
+---
+
+### 6. API Marketplace and Third-Party Apps
+| Feature | Description |
+|---|---|
+| Developer SDK | Open SDK for building JUNZI data visualizations and apps |
+| Verified App Marketplace | Let third-party developers publish apps/widgets that extend JUNZI capabilities |
+| Premium API Tier | Optional subscription model for high-volume users (journalists, analysts) |
+
+---
+
+### 7. Multilingual Support and International Expansion
+| Feature | Description |
+|---|---|
+| Language Packs | Full support for multiple languages (starting with Spanish, French, Mandarin) |
+| Jurisdictional Expansion Modules | Support non-U.S. governance models and data schemas |
+| International Bias Audits | Localized bias audit parameters for each supported region |
+
+---
+
+**This document now serves as the canonical Phase 3 Feature Roadmap for JUNZI within the kOS ecosystem until formally revised.**
+
+

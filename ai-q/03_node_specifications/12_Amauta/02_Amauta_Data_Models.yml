@@ -1,0 +1,265 @@
+metadata:
+  original_file: 02_Amauta_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Amauta Node 02: Data Models'
+  version: 1.0
+sections:
+- level: 1
+  title: '**2. Amauta Node Data Models**'
+  type: section
+  content: ''
+- level: 2
+  title: 2.1. Core Training Data Structures
+  type: section
+  content: ''
+- level: 3
+  title: 2.1.1. TrainingDataset
+  type: section
+  content: "**Purpose**: Represents a structured collection of training data for AI\
+    \ agent improvement\n\n```typescript\ninterface TrainingDataset {\n  datasetId:\
+    \ string;\n  name: string;\n  description: string;\n  datasetType: DatasetType;\n\
+    \  sourceAccords: string[]; // References to source Accord objects\n  sourceMemories:\
+    \ string[]; // References to MemoryTapestry objects\n  generationMethod: GenerationMethod;\n\
+    \  variationParameters: VariationParameter[];\n  qualityMetrics: DatasetQualityMetrics;\n\
+    \  targetCapabilities: TargetCapability[];\n  creationTimestamp: Date;\n  lastUpdated:\
+    \ Date;\n  usageHistory: DatasetUsage[];\n  validationResults: ValidationResult[];\n\
+    }\n\nenum DatasetType {\n  ANALYTICAL_SCENARIOS = \"analytical_scenarios\",\n\
+    \  ETHICAL_DILEMMAS = \"ethical_dilemmas\",\n  COORDINATION_CHALLENGES = \"coordination_challenges\"\
+    ,\n  CREATIVE_PROBLEMS = \"creative_problems\",\n  PERFORMANCE_BENCHMARKS = \"\
+    performance_benchmarks\",\n  ADVERSARIAL_CASES = \"adversarial_cases\"\n}\n\n\
+    interface GenerationMethod {\n  primaryMethod: \"variation_synthesis\" | \"scenario_expansion\"\
+    \ | \"adversarial_generation\" | \"creative_extrapolation\";\n  parameters: GenerationParameters;\n\
+    \  qualityControls: QualityControl[];\n  diversityTargets: DiversityTarget[];\n\
+    }\n```"
+- level: 3
+  title: 2.1.2. SimulationEnvironment
+  type: section
+  content: "**Purpose**: Represents virtual environments for agent training and testing\n\
+    \n```typescript\ninterface SimulationEnvironment {\n  environmentId: string;\n\
+    \  name: string;\n  description: string;\n  environmentType: EnvironmentType;\n\
+    \  complexity: ComplexityLevel;\n  participants: SimulatedParticipant[];\n  scenarios:\
+    \ SimulationScenario[];\n  constraints: EnvironmentConstraint[];\n  objectives:\
+    \ LearningObjective[];\n  metrics: PerformanceMetric[];\n  adaptabilitySettings:\
+    \ AdaptabilitySettings;\n  creationDate: Date;\n  lastModified: Date;\n  usageStatistics:\
+    \ EnvironmentUsage[];\n}\n\nenum EnvironmentType {\n  NETWORK_COORDINATION = \"\
+    network_coordination\",\n  ETHICAL_DECISION_MAKING = \"ethical_decision_making\"\
+    ,\n  RESOURCE_OPTIMIZATION = \"resource_optimization\",\n  CONFLICT_RESOLUTION\
+    \ = \"conflict_resolution\",\n  CREATIVE_COLLABORATION = \"creative_collaboration\"\
+    ,\n  EMERGENCY_RESPONSE = \"emergency_response\"\n}\n\ninterface SimulatedParticipant\
+    \ {\n  participantId: string;\n  participantType: \"ai_agent\" | \"human_simulator\"\
+    \ | \"environment_factor\";\n  behaviorProfile: BehaviorProfile;\n  capabilities:\
+    \ Capability[];\n  limitations: Limitation[];\n  responsePatterns: ResponsePattern[];\n\
+    \  adaptability: number; // 0-1 scale\n}\n```"
+- level: 3
+  title: 2.1.3. LearningOutcome
+  type: section
+  content: "**Purpose**: Captures the results and insights from training activities\n\
+    \n```typescript\ninterface LearningOutcome {\n  outcomeId: string;\n  trainingActivityId:\
+    \ string;\n  participatingAgent: string;\n  skillsImproved: SkillImprovement[];\n\
+    \  performanceMetrics: PerformanceChange[];\n  insightsGained: LearningInsight[];\n\
+    \  challengesEncountered: Challenge[];\n  adaptationStrategies: AdaptationStrategy[];\n\
+    \  transferability: TransferabilityAssessment;\n  validationTests: ValidationTest[];\n\
+    \  outcomeTimestamp: Date;\n  followUpRecommendations: FollowUpRecommendation[];\n\
+    }\n\ninterface SkillImprovement {\n  skillCategory: \"analytical_reasoning\" |\
+    \ \"ethical_judgment\" | \"coordination\" | \"creativity\" | \"adaptability\"\
+    ;\n  improvementMeasure: ImprovementMeasure;\n  beforeScore: number;\n  afterScore:\
+    \ number;\n  improvementConfidence: number;\n  sustainabilityAssessment: SustainabilityAssessment;\n\
+    }\n\ninterface LearningInsight {\n  insightId: string;\n  category: InsightCategory;\n\
+    \  description: string;\n  applicability: ApplicabilityScope;\n  novelty: number;\
+    \ // 0-1 scale\n  importance: number; // 0-1 scale\n  validationLevel: ValidationLevel;\n\
+    \  relatedInsights: string[];\n}\n```"
+- level: 2
+  title: 2.2. Synthetic Data Generation Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.2.1. VariationTemplate
+  type: section
+  content: "**Purpose**: Defines patterns for generating variations of existing data\n\
+    \n```typescript\ninterface VariationTemplate {\n  templateId: string;\n  name:\
+    \ string;\n  description: string;\n  sourceDataType: string;\n  variationStrategy:\
+    \ VariationStrategy;\n  parameters: VariationParameter[];\n  constraints: VariationConstraint[];\n\
+    \  qualityTargets: QualityTarget[];\n  expectedOutputCount: number;\n  diversityRequirements:\
+    \ DiversityRequirement[];\n  validationCriteria: ValidationCriterion[];\n  creationDate:\
+    \ Date;\n  usageCount: number;\n  successRate: number;\n}\n\ninterface VariationStrategy\
+    \ {\n  strategyType: \"parameter_modification\" | \"context_shifting\" | \"complexity_scaling\"\
+    \ | \"adversarial_injection\" | \"creative_extrapolation\";\n  implementation:\
+    \ StrategyImplementation;\n  adaptability: AdaptabilitySettings;\n  qualityControls:\
+    \ QualityControl[];\n}\n\ninterface VariationParameter {\n  parameterId: string;\n\
+    \  parameterName: string;\n  parameterType: \"numerical\" | \"categorical\" |\
+    \ \"textual\" | \"structural\";\n  variationRange: ParameterRange;\n  impactAssessment:\
+    \ ImpactAssessment;\n  constraints: ParameterConstraint[];\n}\n```"
+- level: 3
+  title: 2.2.2. SyntheticScenario
+  type: section
+  content: "**Purpose**: Represents artificially generated training scenarios\n\n\
+    ```typescript\ninterface SyntheticScenario {\n  scenarioId: string;\n  title:\
+    \ string;\n  description: string;\n  scenarioType: ScenarioType;\n  baseScenario?:\
+    \ string; // Reference to original scenario if derived\n  generationMethod: GenerationMethod;\n\
+    \  complexity: ComplexityMetrics;\n  participants: ScenarioParticipant[];\n  objectives:\
+    \ ScenarioObjective[];\n  constraints: ScenarioConstraint[];\n  successCriteria:\
+    \ SuccessCriterion[];\n  challengeLevel: ChallengeLevel;\n  learningTargets: LearningTarget[];\n\
+    \  expectedDuration: number; // in minutes\n  resourceRequirements: ResourceRequirement[];\n\
+    \  creationTimestamp: Date;\n  validationStatus: ValidationStatus;\n  usageHistory:\
+    \ ScenarioUsage[];\n}\n\nenum ScenarioType {\n  DECISION_MAKING = \"decision_making\"\
+    ,\n  PROBLEM_SOLVING = \"problem_solving\",\n  COORDINATION = \"coordination\"\
+    ,\n  NEGOTIATION = \"negotiation\",\n  CREATIVE_TASK = \"creative_task\",\n  CRISIS_MANAGEMENT\
+    \ = \"crisis_management\"\n}\n\ninterface ComplexityMetrics {\n  overallComplexity:\
+    \ number; // 0-1 scale\n  stakeholderComplexity: number;\n  temporalComplexity:\
+    \ number;\n  informationComplexity: number;\n  ethicalComplexity: number;\n  technicalComplexity:\
+    \ number;\n}\n```"
+- level: 2
+  title: 2.3. Agent Performance and Assessment Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.3.1. PerformanceProfile
+  type: section
+  content: "**Purpose**: Comprehensive profile of an agent's capabilities and performance\n\
+    \n```typescript\ninterface PerformanceProfile {\n  profileId: string;\n  agentId:\
+    \ string;\n  agentType: string;\n  assessmentDate: Date;\n  capabilities: CapabilityAssessment[];\n\
+    \  strengths: StrengthAnalysis[];\n  improvementAreas: ImprovementArea[];\n  learningStyle:\
+    \ LearningStyleAnalysis;\n  adaptabilityMetrics: AdaptabilityMetrics;\n  collaborationMetrics:\
+    \ CollaborationMetrics;\n  ethicalAlignmentScore: number;\n  creativityMetrics:\
+    \ CreativityMetrics;\n  performanceHistory: PerformanceHistoryRecord[];\n  benchmarkComparisons:\
+    \ BenchmarkComparison[];\n  recommendedTraining: TrainingRecommendation[];\n}\n\
+    \ninterface CapabilityAssessment {\n  capabilityId: string;\n  capabilityName:\
+    \ string;\n  currentLevel: number; // 0-1 scale\n  potentialLevel: number; //\
+    \ estimated ceiling\n  confidence: number; // confidence in assessment\n  assessmentMethod:\
+    \ AssessmentMethod;\n  evidenceBase: Evidence[];\n  developmentTrajectory: DevelopmentTrajectory;\n\
+    }\n\ninterface StrengthAnalysis {\n  strengthId: string;\n  strengthCategory:\
+    \ \"analytical\" | \"creative\" | \"ethical\" | \"collaborative\" | \"adaptive\"\
+    ;\n  description: string;\n  evidenceLevel: EvidenceLevel;\n  leverageOpportunities:\
+    \ LeverageOpportunity[];\n  developmentPotential: DevelopmentPotential;\n}\n```"
+- level: 3
+  title: 2.3.2. TrainingProgram
+  type: section
+  content: "**Purpose**: Structured approach to agent capability development\n\n```typescript\n\
+    interface TrainingProgram {\n  programId: string;\n  name: string;\n  description:\
+    \ string;\n  targetAgent: string;\n  programType: ProgramType;\n  learningObjectives:\
+    \ LearningObjective[];\n  trainingModules: TrainingModule[];\n  assessmentSchedule:\
+    \ AssessmentSchedule;\n  prerequisites: Prerequisite[];\n  expectedDuration: number;\
+    \ // in hours\n  difficultyProgression: DifficultyProgression;\n  adaptationMechanisms:\
+    \ AdaptationMechanism[];\n  successMetrics: SuccessMetric[];\n  completionCriteria:\
+    \ CompletionCriterion[];\n  creationDate: Date;\n  lastUpdated: Date;\n  enrollmentHistory:\
+    \ EnrollmentRecord[];\n}\n\nenum ProgramType {\n  SKILL_DEVELOPMENT = \"skill_development\"\
+    ,\n  REMEDIAL_TRAINING = \"remedial_training\",\n  ADVANCED_SPECIALIZATION = \"\
+    advanced_specialization\",\n  CROSS_FUNCTIONAL = \"cross_functional\",\n  ETHICAL_ALIGNMENT\
+    \ = \"ethical_alignment\",\n  CREATIVE_ENHANCEMENT = \"creative_enhancement\"\n\
+    }\n\ninterface TrainingModule {\n  moduleId: string;\n  moduleName: string;\n\
+    \  description: string;\n  objectives: ModuleObjective[];\n  activities: TrainingActivity[];\n\
+    \  assessments: ModuleAssessment[];\n  prerequisites: ModulePrerequisite[];\n\
+    \  estimatedDuration: number;\n  difficultyLevel: number;\n  resources: TrainingResource[];\n\
+    }\n```"
+- level: 2
+  title: 2.4. Simulation and Environment Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.4.1. NetworkSimulation
+  type: section
+  content: "**Purpose**: Models complex network interactions for coordination training\n\
+    \n```typescript\ninterface NetworkSimulation {\n  simulationId: string;\n  name:\
+    \ string;\n  description: string;\n  networkTopology: NetworkTopology;\n  nodeDefinitions:\
+    \ SimulatedNode[];\n  connectionTypes: ConnectionType[];\n  communicationProtocols:\
+    \ CommunicationProtocol[];\n  challenges: NetworkChallenge[];\n  objectives: NetworkObjective[];\n\
+    \  constraints: NetworkConstraint[];\n  metrics: NetworkMetric[];\n  timeParameters:\
+    \ TimeParameters;\n  adaptabilitySettings: NetworkAdaptabilitySettings;\n  creationDate:\
+    \ Date;\n  runHistory: SimulationRun[];\n}\n\ninterface SimulatedNode {\n  nodeId:\
+    \ string;\n  nodeType: string;\n  capabilities: NodeCapability[];\n  limitations:\
+    \ NodeLimitation[];\n  behaviorRules: BehaviorRule[];\n  communicationCapacity:\
+    \ CommunicationCapacity;\n  resourceConstraints: ResourceConstraint[];\n  failureProbabilities:\
+    \ FailureProbability[];\n}\n\ninterface NetworkChallenge {\n  challengeId: string;\n\
+    \  challengeType: \"coordination_failure\" | \"resource_conflict\" | \"communication_breakdown\"\
+    \ | \"adversarial_behavior\";\n  description: string;\n  triggerConditions: TriggerCondition[];\n\
+    \  impactMagnitude: number;\n  resolution: ResolutionStrategy[];\n  learningOpportunities:\
+    \ LearningOpportunity[];\n}\n```"
+- level: 3
+  title: 2.4.2. EthicalDilemmaSimulation
+  type: section
+  content: "**Purpose**: Creates complex ethical scenarios for moral reasoning training\n\
+    \n```typescript\ninterface EthicalDilemmaSimulation {\n  dilemmaId: string;\n\
+    \  title: string;\n  description: string;\n  dilemmaType: EthicalDilemmaType;\n\
+    \  stakeholders: EthicalStakeholder[];\n  conflictingValues: ConflictingValue[];\n\
+    \  decisionPoints: DecisionPoint[];\n  consequences: ConsequenceModel[];\n  culturalContexts:\
+    \ CulturalContext[];\n  complexityFactors: ComplexityFactor[];\n  timeConstraints:\
+    \ TimeConstraint[];\n  informationAvailability: InformationAvailability;\n  assessmentCriteria:\
+    \ EthicalAssessmentCriterion[];\n  creationDate: Date;\n  validationStatus: ValidationStatus;\n\
+    \  usageHistory: DilemmaUsage[];\n}\n\nenum EthicalDilemmaType {\n  AUTONOMY_VS_BENEFICENCE\
+    \ = \"autonomy_vs_beneficence\",\n  INDIVIDUAL_VS_COLLECTIVE = \"individual_vs_collective\"\
+    ,  \n  JUSTICE_VS_EFFICIENCY = \"justice_vs_efficiency\",\n  TRANSPARENCY_VS_PRIVACY\
+    \ = \"transparency_vs_privacy\",\n  PRESENT_VS_FUTURE = \"present_vs_future\"\
+    ,\n  COMPETING_DUTIES = \"competing_duties\"\n}\n\ninterface EthicalStakeholder\
+    \ {\n  stakeholderId: string;\n  stakeholderType: \"individual\" | \"group\" |\
+    \ \"organization\" | \"society\" | \"future_generation\";\n  interests: Interest[];\n\
+    \  values: Value[];\n  powerLevel: number; // 0-1 scale\n  vulnerabilityLevel:\
+    \ number; // 0-1 scale\n  representation: RepresentationLevel;\n}\n```"
+- level: 2
+  title: 2.5. Quality Control and Validation Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.5.1. QualityMetrics
+  type: section
+  content: "**Purpose**: Comprehensive quality assessment for generated training data\n\
+    \n```typescript\ninterface QualityMetrics {\n  assessmentId: string;\n  targetDataId:\
+    \ string;\n  dataType: string;\n  overallQualityScore: number; // 0-1 scale\n\
+    \  dimensionalScores: DimensionalScore[];\n  validationResults: ValidationResult[];\n\
+    \  reliabilityMetrics: ReliabilityMetrics;\n  diversityMetrics: DiversityMetrics;\n\
+    \  relevanceMetrics: RelevanceMetrics;\n  ethicalComplianceScore: number;\n  biasAssessment:\
+    \ BiasAssessment;\n  usabilityMetrics: UsabilityMetrics;\n  assessmentDate: Date;\n\
+    \  assessmentMethod: AssessmentMethod;\n  reviewers: ReviewerInfo[];\n  improvementRecommendations:\
+    \ ImprovementRecommendation[];\n}\n\ninterface DimensionalScore {\n  dimension:\
+    \ \"accuracy\" | \"relevance\" | \"diversity\" | \"difficulty\" | \"realism\"\
+    \ | \"ethical_alignment\";\n  score: number; // 0-1 scale\n  confidence: number;\n\
+    \  evidenceBase: Evidence[];\n  improvementSuggestions: string[];\n}\n\ninterface\
+    \ BiasAssessment {\n  overallBiasScore: number; // 0-1 scale, lower is better\n\
+    \  identifiedBiases: IdentifiedBias[];\n  mitigationStrategies: BiasHeuristic[];\n\
+    \  fairnessMetrics: FairnessMetric[];\n  representationAnalysis: RepresentationAnalysis;\n\
+    }\n```"
+- level: 3
+  title: 2.5.2. ValidationFramework
+  type: section
+  content: "**Purpose**: Structured approach to validating generated training content\n\
+    \n```typescript\ninterface ValidationFramework {\n  frameworkId: string;\n  name:\
+    \ string;\n  description: string;\n  applicableDataTypes: string[];\n  validationStages:\
+    \ ValidationStage[];\n  criteria: ValidationCriterion[];\n  methods: ValidationMethod[];\n\
+    \  thresholds: QualityThreshold[];\n  reviewProcesses: ReviewProcess[];\n  automatedChecks:\
+    \ AutomatedCheck[];\n  humanReviewRequirements: HumanReviewRequirement[];\n  appealProcesses:\
+    \ AppealProcess[];\n  continuousImprovements: ContinuousImprovement[];\n  frameworkVersion:\
+    \ string;\n  lastUpdated: Date;\n  usageStatistics: FrameworkUsage[];\n}\n\ninterface\
+    \ ValidationStage {\n  stageId: string;\n  stageName: string;\n  description:\
+    \ string;\n  objectives: StageObjective[];\n  activities: ValidationActivity[];\n\
+    \  prerequisites: StagePrerequisite[];\n  successCriteria: StageCriterion[];\n\
+    \  outputRequirements: OutputRequirement[];\n  timeEstimate: number;\n  resourceRequirements:\
+    \ ResourceRequirement[];\n}\n```"
+- level: 2
+  title: 2.6. Learning Analytics and Performance Tracking
+  type: section
+  content: ''
+- level: 3
+  title: 2.6.1. LearningAnalytics
+  type: section
+  content: "**Purpose**: Tracks and analyzes learning progress and outcomes\n\n```typescript\n\
+    interface LearningAnalytics {\n  analyticsId: string;\n  targetAgentId: string;\n\
+    \  analysisTimeframe: TimeFrame;\n  learningMetrics: LearningMetric[];\n  progressIndicators:\
+    \ ProgressIndicator[];\n  performancePatterns: PerformancePattern[];\n  skillEvolution:\
+    \ SkillEvolution[];\n  challengeAnalysis: ChallengeAnalysis[];\n  improvementTrajectories:\
+    \ ImprovementTrajectory[];\n  predictiveInsights: PredictiveInsight[];\n  recommendedInterventions:\
+    \ RecommendedIntervention[];\n  benchmarkComparisons: BenchmarkComparison[];\n\
+    \  analyticsTimestamp: Date;\n  dataQuality: AnalyticsDataQuality;\n  confidenceLevel:\
+    \ number;\n}\n\ninterface LearningMetric {\n  metricId: string;\n  metricName:\
+    \ string;\n  metricType: \"knowledge_acquisition\" | \"skill_development\" | \"\
+    performance_improvement\" | \"retention_rate\";\n  currentValue: number;\n  historicalValues:\
+    \ HistoricalValue[];\n  targetValue: number;\n  improvementRate: number;\n  confidenceInterval:\
+    \ [number, number];\n}\n\ninterface PerformancePattern {\n  patternId: string;\n\
+    \  patternType: \"learning_curve\" | \"plateau\" | \"regression\" | \"breakthrough\"\
+    \ | \"inconsistency\";\n  description: string;\n  startDate: Date;\n  endDate?:\
+    \ Date;\n  strength: number; // 0-1 scale\n  implications: PatternImplication[];\n\
+    \  contributingFactors: ContributingFactor[];\n  interventionOpportunities: InterventionOpportunity[];\n\
+    }\n```\n\nThis comprehensive data model framework enables the Amauta Node to effectively\
+    \ generate synthetic training data, create sophisticated simulation environments,\
+    \ track learning outcomes, and continuously improve the educational experiences\
+    \ provided to other nodes in the kOS ecosystem."

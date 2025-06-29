@@ -1,0 +1,108 @@
+title: K Os Documentation Master Index
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.073995'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 574
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: true
+has_testing: true
+has_security: true
+has_rag: true
+has_ethics: true
+original_filename: k_os_documentation_master_index.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/k_os_documentation_master_index.yml
+category: agent_specifications/junzi
+
+---
+
+title: K Os Documentation Master Index
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.178537'
+original_format: markdown
+content_type: api_specification
+word_count: 547
+line_count: 65
+
+---
+
+# kOS Documentation Master Index
+
+This is the **full and definitive index** for all kOS (Kind Operating System) documentation. It covers **all planned, in-progress, and completed documents**. This index supersedes all previous lists and will be the single source of truth for tracking documentation progress.
+
+---
+
+## ✅ Completed Documents (Already in Canvas)
+
+| Doc # | Title                                            | Status        |
+|------ |------------------------------------------------- |-------------- |
+| 01    | kOS Ecosystem Overview                           | ✅ Complete   |
+| 02    | kOS Modular Building Blocks And Cellular Design | ✅ Complete   |
+| 03    | kOS Agent Framework                              | ✅ Complete   |
+
+---
+
+## 🛠️ In-Progress / Next Up (High Priority)
+
+| Planned Doc # | Title                                         | Purpose                                           |
+|-------------- |--------------------------------------------- |------------------------------------------------- |
+| 04           | kOS Agent Deployment Pipelines                 | CI/CD, deployment flow, runtime management       |
+| 05           | kOS Skill Registry Specification               | Skill packaging, discovery, loading              |
+| 06           | kOS Communication Bus Detailed Spec            | Full messaging/pubsub inter-agent comms layer    |
+| 07           | kOS Contextual Trigger Engine                  | Event trigger/activation systems                 |
+| 08           | kOS Ethical Audit and Compliance Layer         | Logging, ethics filters, review layers           |
+| 09           | kOS Skill Execution Sandbox                    | Runtime isolation, security, error handling      |
+| 10           | kOS Agent Orchestration and Scheduling Layer   | Task queueing, priority, resource allocation     |
+| 11           | kOS Data Persistence and Storage Specification | Databases, local storage, decentralized state    |
+| 12           | kOS Node Class Manifest                        | Full definition of the 13 official Node Classes  |
+| 13           | kOS Game Engine Layer Overview                 | Automation and deployment scaffold for kOS       |
+| 14           | kOS Contribution and Module Standards          | Developer rules for building modules and plugins |
+
+---
+
+## 📚 Future / Extended Documentation (Optional but Planned)
+
+| Future Doc # | Title                                            | Notes                                           |
+|------------- |------------------------------------------------ |----------------------------------------------- |
+| 15           | kOS Security and Zero Trust Layer               | Encryption, authentication, security policies   |
+| 16           | kOS API Gateway and External Integration Layer | API spec, webhooks, external app access        |
+| 17           | kOS Deployment Topologies and Node Scaling     | On-prem, cloud, P2P deployment configurations   |
+| 18           | kOS User Management and Personalization Engine | User data models, settings, profiles            |
+| 19           | kOS Logging, Metrics, and Telemetry Framework  | Full observability suite spec                  |
+| 20           | kOS HIEROS Ethical Alignment Protocol          | Detailed ethical reasoning model               |
+| 21           | kOS JUNZI Pre-Action Filter Engine             | Fine-grain ethical pre-checks                  |
+| 22           | kOS Testing, CI, and QA Framework              | Unit, integration, and regression testing flow  |
+| 23           | kOS Multi-Agent Orchestrator Spec              | For agent-to-agent job management              |
+| 24           | kOS Fault Tolerance and Self-Healing Systems   | Recovery, retries, health checks               |
+| 25           | kOS Upgrade and Migration Guide                | Backward compatibility, upgrade procedures     |
+| 26           | kOS Deployment Installer Script and Config     | Automated installer tooling                    |
+| 27           | kOS Scenario Templates and User Stories        | Example use cases and workflow walkthroughs    |
+
+---
+
+## ✅ Naming and Formatting Rules
+
+- All documents start with `kOS` prefix.
+- File format: Markdown `.md`.
+- One file per major subsystem, with clear sequential numbering.
+- Saved in Canvas for individual download.
+
+---
+
+**Last Updated:** 2025-06-27
+
+
+

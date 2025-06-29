@@ -1,0 +1,156 @@
+title: K Os Knowledge And Memory Storage System Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:19.908203'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 970
+has_code_blocks: true
+has_api_specs: true
+has_architecture: true
+has_deployment: false
+has_testing: false
+has_security: true
+has_rag: true
+has_ethics: true
+original_filename: k_os_knowledge_and_memory_storage_system_spec.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/RAG/k_os_knowledge_and_memory_storage_system_spec.yml
+category: agent_specifications/griot
+
+---
+
+title: K Os Knowledge And Memory Storage System Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.008895'
+original_format: markdown
+content_type: api_specification
+word_count: 940
+line_count: 113
+
+---
+
+---
+
+## title: "kOS Knowledge and Memory Storage System Specification" description: "Full specification for storage, indexing, vector memory, graph state, and data interoperability across AKUs, Skills, Recipes, Prompts, Workflows, Artifacts, Logs, and other persistent project elements, mapped to kOS Node Classes." type: "technical-specification" status: "planning" priority: "critical" created: "2025-06-28T00:00:00Z" version: "1.0.0" tags: ["kOS", "memory-system", "vector", "graph", "AKU", "skills", "recipes", "logs", "prompts", "artifacts", "node-classes"]
+
+# ✅ Overview
+
+This document defines the **complete technical specification** for **kOS Knowledge and Memory Storage Systems**, covering **all project data types**: AKUs, Skills, Recipes, Prompts, Artifacts, Workflows, Agent Logs, Execution Plans, Handoffs, and Chat Histories.
+
+It maps each data type to its appropriate **kOS Node Class ownership**, defines **storage format**, **indexing strategy**, **vectorization policy**, **graph state integration**, and **cross-agent accessibility patterns**.
+
+---
+
+## ✅ Node Class Responsibility Mapping
+
+| Data Type                         | Primary Node Class          | Description                                                     |
+| --------------------------------- | --------------------------- | --------------------------------------------------------------- |
+| AKUs (Atomic Knowledge Units)     | **Yachay**                  | Core semantic knowledge elements (facts, concepts, patterns)    |
+| Skills                            | **Griot**                   | Code, functions, API calls, and reusable agent capabilities     |
+| Recipes                           | **Griot / Tohunga**         | Multi-step process patterns and workflows                       |
+| Prompts                           | **Skald**                   | All system, task, and instruction prompts                       |
+| Workflows / Execution Plans       | **Tohunga**                 | Orchestrated task sequences and execution logic                 |
+| Artifacts (Generated Outputs)     | **Griot**                   | All AI-generated outputs (documents, diagrams, code, etc)       |
+| Agent Logs (Changelogs, Findings) | **Skald**                   | Agent-generated project history logs                            |
+| Metrics / Performance             | **Hakim**                   | Agent performance scores, task success rates, error counts      |
+| Project State Graph               | **Ronin / Archon / Sachem** | Global dependency graph, project structure, and state snapshots |
+| Security / Audit Logs             | **Musa**                    | Access logs, drift detection, validation records                |
+| Ethics/Intent Logs                | **Junzi**                   | Agent ethical decisions, intent resolutions                     |
+| Governance Decisions              | **Sachem**                  | Consensus records, approval workflows                           |
+| Training Data / Examples          | **Amauta**                  | Example tasks, tutorials, knowledge seeds                       |
+| Meta-Cognition / Drift Scores     | **Mzee / Oracle**           | Drift detection reports, self-check outcomes                    |
+
+---
+
+## ✅ Storage & Indexing Architecture
+
+| Layer                   | Technology                                     | Purpose                                             |
+| ----------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| **Object Storage**      | Filesystem + S3 + Backblaze                    | Long-term file and artifact storage                 |
+| **Metadata Store**      | PostgreSQL or DuckDB                           | Fast, relational querying of metadata across types  |
+| **Vector Store**        | Weaviate (Primary)                             | Vector embeddings and semantic search               |
+| **Graph Database**      | Neo4j                                          | Dependency graph for nodes, AKUs, agents, and tasks |
+| **Browser Local State** | IndexedDB + Jotai                              | UI and frontend agent cache                         |
+| **Time-Series Metrics** | JSON NDJSON (short-term), TimescaleDB (future) | Metrics rollup and analysis                         |
+
+---
+
+## ✅ Data Object Format Standards (Machine-Friendly)
+
+| Data Type   | Format        | Required Fields                                                                     |
+| ----------- | ------------- | ----------------------------------------------------------------------------------- |
+| AKUs        | JSON/NDJSON   | `aku_id`, `content`, `tags`, `vector`, `timestamp`, `agent_id`                      |
+| Skills      | JSON          | `skill_id`, `code_snippet`, `language`, `description`, `vector`, `created_by_agent` |
+| Recipes     | JSON          | `recipe_id`, `steps`, `associated_skills`, `tags`, `vector`                         |
+| Prompts     | JSON          | `prompt_id`, `prompt_type`, `content`, `version`, `vector`                          |
+| Workflows   | JSON          | `workflow_id`, `execution_steps`, `related_recipes`, `vector`                       |
+| Artifacts   | JSON + Binary | `artifact_id`, `source_agent`, `generation_task_id`, `file_path`, `vector`          |
+| Agent Logs  | NDJSON        | `log_id`, `agent_id`, `timestamp`, `event_type`, `summary`, `vector` (optional)     |
+| Metrics     | JSON          | `agent_id`, `task_id`, `scores`, `errors`, `duration`, `timestamp`                  |
+| Graph Nodes | JSON          | Node Type, Links, Metadata                                                          |
+| Ethics Logs | JSON          | `decision_id`, `agent_id`, `ethical_rule`, `decision_result`, `timestamp`           |
+
+---
+
+## ✅ Data Flow Between Nodes
+
+```
+Agent Runs → Griot generates skills/artifacts → Tohunga plans workflow → Yachay updates AKU library → Skald documents → Hakim logs metrics → Musa audits → Junzi records ethical impact → Sachem logs governance → Ronin updates project state graph → Archon coordinates dependencies → Mzee monitors drift → Amauta logs training samples → Full system evolves
+```
+
+---
+
+## ✅ Query & Access Patterns (For Agents)
+
+| Use Case                                                          | Mechanism                                                                |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Semantic Search (e.g., "show me related AKUs for this task")      | Vector KNN + Metadata filters in Weaviate                                |
+| Retrieve all Skills for a Node                                    | Metadata query by `node_type`                                            |
+| Graph Traversal (e.g., "what does this task depend on?")          | Cypher query in Neo4j                                                    |
+| Time-based Metrics                                                | Time range query in TimescaleDB or JSON logs                             |
+| Cross-Type Query (e.g., "all artifacts created from this recipe") | Metadata filter on `source_recipe_id` across Artifact and Recipe classes |
+| Drift Detection                                                   | Compare vector distance or structural changes in graph state             |
+
+---
+
+## ✅ API Contracts (Agent-Facing)
+
+| Endpoint / Module  | Purpose                                           |
+| ------------------ | ------------------------------------------------- |
+| `/vector/upsert`   | Add or update vectorized object (AKU, Skill, etc) |
+| `/vector/query`    | Search by vector or hybrid filter                 |
+| `/graph/query`     | Cypher-based dependency search                    |
+| `/metrics/log`     | Submit performance metrics                        |
+| `/artifact/upload` | Store generated artifacts                         |
+| `/aku/get`         | Retrieve AKU by ID or tag                         |
+| `/skill/list`      | List skills by tag or node class                  |
+| `/recipe/search`   | Find recipes by semantic similarity               |
+
+---
+
+## ✅ Next Steps
+
+1. Generate JSON Schemas for all data types
+2. Build Weaviate class definitions for each entity (AKU, Skill, Recipe, etc)
+3. Write initial API wrapper modules for vector, graph, and metrics layers
+4. Create example data population scripts
+5. Write user and agent-facing documentation
+
+---
+
+**Plan ID:** kos\_2025\_06\_knowledge\_memory\_storage\_system\
+**Created by:** ChatGPT + User Collaboration\
+**Last Updated:** 2025-06-28T00:00:00Z
+
+
+

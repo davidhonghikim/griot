@@ -6,23 +6,31 @@ This directory contains all agent-related systems for the kOS project, optimized
 
 ## Quick Onboarding
 
-For new agents, run this single command to load all essential context:
+**IMPORTANT**: This README is the **single entry point** for all agents. Read this file first, then load the specific files you need.
+
+For new agents, start with this command to load all essential context:
 
 ```bash
-cat agents/README.md && echo "\n---" && cat agents/bootstrap/00_AGENT_WORKFLOW.md && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
+cat agents/README.md && echo "\n---" && cat agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.yml && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
 ```
 
+**Workflow**:
+1. **Start here**: Read `agents/README.md` (this file) for overview and structure
+2. **Load workflow**: Read `agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.yml` for mandatory procedures
+3. **Get directive**: Read `agents/handoff/LATEST_HANDOFF.md` for your specific mission
+4. **Access other files**: Load additional files as needed based on your mission
+
 ## Directory Structure
+LOG FILES USE [TIMESTAMP]_FILENAME.ext format. Keep the timestamp in the filename as variable since it changes but there should only be one file like it in that directory as the current file. Others are archived. Don't hardcode the timestamp in the filename in this file.
 
 ```
 agents/
 ├── README.md                    # This file - single entry point
 ├── bootstrap/                   # Core agent workflow and identity
-│   ├── 00_AGENT_WORKFLOW.md    # Mandatory workflow process
-│   ├── changelog.json          # Complete session history (chronological)
-│   ├── project_context.json    # Project state and architecture
-│   ├── 01_AGENT_CHANGELOG.md   # Session logging (JSON reference)
-│   ├── 02_SYSTEM_PROMPT.md     # Agent identity and principles
+│   ├── [TIMESTAMP]_00_AGENT_WORKFLOW.yml   # Mandatory workflow process
+│   ├── [TIMESTAMP]_01_SYSTEM_PROMPT.yml    # Agent identity and principles
+│   ├── [TIMESTAMP]_02_AGENT_RULES.yml      # Agent rules and guidelines
+│   ├── [TIMESTAMP]_03_PROJECT_CONTEXT.yml  # Project state and architecture
 │   └── archive/                # Historical workflow versions
 ├── config/                     # System-level JSON/YAML configurations
 │   ├── system_config.json      # Core system configuration
@@ -33,11 +41,11 @@ agents/
 │   ├── changelog_config.yml    # Changelog configuration
 │   └── README.md               # Config documentation
 ├── handoff/                    # Agent handoff system (Markdown)
-│   ├── LATEST_HANDOFF.md       # Current handoff directive
+│   ├── [TIMESTAMP]_LATEST_HANDOFF.md       # Current handoff directive
 │   └── archive/                # Historical handoffs
 ├── analysis/                   # Project analysis and insights (Markdown)
 │   ├── 00_Analysis_Index.md    # Analysis index
-│   ├── 2025-06-29_comprehensive_project_analysis.md
+│   ├── [TIMESTAMP]_comprehensive_project_analysis.md
 │   └── archive/                # Historical analyses
 ├── performance/                # Performance tracking system
 │   ├── performance_metrics.json # Performance system configuration
@@ -73,7 +81,7 @@ agents/
 - **Performance metrics**: Performance data in performance/
 - **Implementation plans**: Plan data in implementation-plans/
 - **Project context**: Project state in bootstrap/
-- **Changelog**: Session history in bootstrap/
+- **Changelog**: Session history in changelog/
 
 ### Markdown for Narrative Content
 - **Handoffs**: Agent handoff directives and context
@@ -124,17 +132,20 @@ agents/
 ## Usage Guidelines
 
 ### For AI Agents
-1. **Start with**: `agents/README.md` for overview
-2. **Load workflow**: `agents/bootstrap/00_AGENT_WORKFLOW.md`
-3. **Check handoff**: `agents/handoff/LATEST_HANDOFF.md`
-4. **Access system configs**: `agents/config/` for system configurations
-5. **Check changelog**: `agents/bootstrap/changelog.json` for session history
-6. **Check project context**: `agents/bootstrap/project_context.json` for project state
-7. **Follow format**: JSON for data, Markdown for narrative
+**MANDATORY WORKFLOW**:
+1. **Start with**: `agents/README.md` (this file) - Single entry point for all agents
+2. **Load workflow**: `agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.yml` - Mandatory procedures
+3. **Get directive**: `agents/handoff/[TIMESTAMP]_LATEST_HANDOFF.md` - Your specific mission
+4. **Access system configs**: `agents/config/` - System configurations as needed
+5. **Check changelog**: `agents/changelog/[TIMESTAMP]_changelog.yml` - Session history
+6. **Check project context**: `agents/bootstrap/[TIMESTAMP]_PROJECT_CONTEXT.yml` - Project state
+7. **Follow format**: YAML for data, Markdown for narrative
+
+**IMPORTANT**: Always start with README.md. This file contains the overview and tells you which other files to load.
 
 ### For Human Developers
-1. **Quick start**: Read `agents/README.md`
-2. **Workflow**: Follow `agents/bootstrap/00_AGENT_WORKFLOW.md`
+1. **Quick start**: Read `agents/README.md` (this file) first
+2. **Workflow**: Follow `agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.yml`
 3. **System configs**: Edit files in `agents/config/`
 4. **Documentation**: Update markdown files as needed
 5. **Scripts**: Use automation scripts in `agents/scripts/`
@@ -144,23 +155,8 @@ agents/
 - **Monthly archiving**: First day of each month
 - **Per-system archives**: Each system has its own archive directory
 - **Time-based structure**: `archive/YYYY/MM/` format
-- **Timestamp naming**: Use timestamps for better organization
-- **Automation**: `scripts/archiving/archive_monthly.sh`
-
-## Maintenance
-
-### Regular Tasks
-- **Monthly**: Archive old files using archive script
-- **Weekly**: Update performance metrics
-- **Daily**: Update changelog with session entries
-- **As needed**: Update configurations and documentation
-
-### Quality Standards
-- **Format adherence**: 100% compliance with format strategy
-- **Documentation**: All systems must have README files
-- **Consistency**: Naming conventions and structure standards
-- **Performance**: Context window efficiency targets
-
----
-
-**Note**: This directory is optimized for both AI agents and human developers, providing efficient access to all agent-related systems while maintaining complete functionality and clear organization.
+- **ISO 8601 Timestamp naming**: ONLY files that are constantly created and archived need timestamp prefixes
+- **Files that NEED timestamps**: Performance files, active implementation plans, analysis reports, changelog entries, handoffs
+- **Files that DON'T need timestamps**: Static config files, templates, reference documentation, current working files
+- **Working files**: Current files use descriptive names (e.g., `[TIMESTAMP]_changelog.yml`, `[TIMESTAMP]_LATEST_HANDOFF.md`)
+- **Archived files**: Historical files use full ISO 8601 timestamps in names: `[TIMESTAMP]_Description.ext`

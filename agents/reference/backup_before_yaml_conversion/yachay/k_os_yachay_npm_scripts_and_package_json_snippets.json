@@ -1,0 +1,36 @@
+{
+  "name": "kos-yachay",
+  "version": "1.0.0",
+  "description": "kOS Yachay Memory Starseed Documentation System",
+  "type": "module",
+  "scripts": {
+    "yachay:validate": "node ./scripts/validate-docs.js",
+    "yachay:manifest": "node ./scripts/generate-manifest.js",
+    "yachay:prune": "node ./scripts/prune-archives.js",
+    "yachay:export": "node ./scripts/export-for-db.js",
+    "yachay:ci": "node ./scripts/yachay-ci-cd.js",
+    "yachay:hook:install": "node ./scripts/install-yachay-hook.js"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "gray-matter": "^4.0.3",
+    "fs-extra": "^11.1.1",
+    "fast-glob": "^3.3.1"
+  },
+  "keywords": ["kOS", "Yachay", "AI", "memory", "documentation", "validation", "pruning"],
+  "author": "kOS Dev Team",
+  "license": "MIT"
+}
+
+// ---
+// ✅ Drop this inside your project root as `package.json` or merge into existing package.json
+// ✅ Now you can run:
+// npm run yachay:validate
+// npm run yachay:manifest
+// npm run yachay:prune
+// npm run yachay:export
+// npm run yachay:ci
+// npm run yachay:hook:install
+
+// ---
+// Optional Next Step: Generate missing JSON Schemas for "analysis", "system_manifest", and any others you want.

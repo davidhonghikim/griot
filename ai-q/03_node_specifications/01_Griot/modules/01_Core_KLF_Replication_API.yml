@@ -1,0 +1,252 @@
+metadata:
+  original_file: 01_Core_KLF_Replication_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: Griot Core KLF Replication API
+  description: Essential replication operations and basic request/response patterns
+    for the Griot Node Class KLF Message API.
+  version: 1.0.0
+  module_type: core_api
+  parent_architecture: ../01_Griot_Architecture.md
+sections:
+- level: 1
+  title: Griot Core KLF Replication API Module
+  type: section
+  content: ''
+- level: 2
+  title: Overview
+  type: section
+  content: This module defines the **foundational KLF API operations** for the Griot
+    node class, providing essential replication operations and basic request/response
+    patterns. The Griot Class API is job-based, where clients submit requests to package
+    a node's configuration and code into distributable artifacts across any platform
+    or protocol.
+- level: 2
+  title: Core TypeScript Interfaces
+  type: section
+  content: ''
+- level: 3
+  title: Primary Request Interface
+  type: section
+  content: "```typescript\ninterface GriotReplicationRequest {\n  task_name: \"replicate_node\"\
+    ;\n  params: {\n    // Core identification\n    source_node_did: string;\n   \
+    \ target_version: string;\n    \n    // Basic distribution configuration\n   \
+    \ distribution_options: {\n      protocol: DistributionProtocol;\n      compression_level?:\
+    \ number; // 1-9\n      encryption_enabled?: boolean;\n      redundancy_factor?:\
+    \ number; // for multi-protocol\n    };\n    \n    // Quality and validation options\n\
+    \    validation_level: ValidationLevel;\n    include_tests?: boolean;\n    include_documentation?:\
+    \ boolean;\n    \n    // Basic request metadata\n    priority?: RequestPriority;\n\
+    \    timeout_seconds?: number;\n  };\n}\n\nenum DistributionProtocol {\n  // Primary\
+    \ protocols\n  IPFS = \"ipfs\",\n  HTTPS = \"https\",\n  P2P = \"p2p\",\n  MULTI\
+    \ = \"multi\",\n  \n  // Secondary protocols  \n  BITTORRENT = \"bittorrent\"\
+    ,\n  HYPERCORE = \"hypercore\",\n  DAT = \"dat\",\n  \n  // Cloud storage\n  AWS_S3\
+    \ = \"aws_s3\",\n  AZURE_BLOB = \"azure_blob\",\n  GOOGLE_CLOUD = \"google_cloud\"\
+    ,\n  \n  // Package registries\n  NPM_REGISTRY = \"npm_registry\",\n  DOCKER_REGISTRY\
+    \ = \"docker_registry\",\n  PYPI = \"pypi\",\n  MAVEN_CENTRAL = \"maven_central\"\
+    ,\n  \n  // Custom protocols\n  CUSTOM = \"custom\"\n}\n\nenum ValidationLevel\
+    \ {\n  BASIC = \"basic\",\n  COMPREHENSIVE = \"comprehensive\", \n  SECURE = \"\
+    secure\",\n  ENTERPRISE = \"enterprise\"\n}\n\nenum RequestPriority {\n  LOW =\
+    \ \"low\",\n  NORMAL = \"normal\",\n  HIGH = \"high\",\n  CRITICAL = \"critical\"\
+    \n}\n```"
+- level: 3
+  title: Progress Tracking Interface
+  type: section
+  content: "```typescript\ninterface GriotReplicationProgress {\n  task_name: \"replicate_node\"\
+    ;\n  job_id: string;\n  status: ReplicationStatus;\n  progress: number; // 0-100\n\
+    \  \n  // Phase information\n  current_phase: ReplicationPhase;\n  phases_completed:\
+    \ ReplicationPhase[];\n  estimated_completion?: string; // ISO 8601 timestamp\n\
+    \  \n  // Status message\n  message: string;\n  sub_messages?: string[];\n  \n\
+    \  // Basic resource tracking\n  resource_usage?: {\n    cpu_percent?: number;\n\
+    \    memory_mb?: number;\n    disk_mb?: number;\n  };\n  \n  // Checkpoint for\
+    \ resumability\n  last_checkpoint?: string;\n}\n\nenum ReplicationStatus {\n \
+    \ QUEUED = \"queued\",\n  RUNNING = \"running\", \n  PAUSED = \"paused\",\n  COMPLETED\
+    \ = \"completed\",\n  FAILED = \"failed\",\n  CANCELLED = \"cancelled\"\n}\n\n\
+    enum ReplicationPhase {\n  VALIDATION = \"validation\",\n  SOURCE_ACQUISITION\
+    \ = \"source_acquisition\", \n  DEPENDENCY_RESOLUTION = \"dependency_resolution\"\
+    ,\n  COMPILATION = \"compilation\",\n  PACKAGING = \"packaging\",\n  SECURITY_SCANNING\
+    \ = \"security_scanning\",\n  DISTRIBUTION_PREPARATION = \"distribution_preparation\"\
+    ,\n  UPLOAD = \"upload\",\n  VERIFICATION = \"verification\"\n}\n```"
+- level: 3
+  title: Success Response Interface
+  type: section
+  content: "```typescript\ninterface GriotReplicationSuccess {\n  task_name: \"replicate_node\"\
+    ;\n  job_id: string;\n  status: \"completed\";\n  completion_timestamp: string;\
+    \ // ISO 8601\n  total_duration_seconds: number;\n  \n  result: {\n    // Primary\
+    \ artifact information\n    artifact_uri: string;\n    artifact_hash: string;\n\
+    \    artifact_size_bytes: number;\n    \n    // Alternative distribution endpoints\n\
+    \    alternative_uris?: string[];\n    \n    // Basic manifest information\n \
+    \   manifest: ReplicationManifest;\n    \n    // Performance metrics\n    performance_metrics:\
+    \ {\n      replication_duration_seconds: number;\n      compression_ratio?: number;\n\
+    \      validation_duration_seconds: number;\n      upload_duration_seconds: number;\n\
+    \    };\n    \n    // Verification results\n    verification: {\n      integrity_verified:\
+    \ boolean;\n      signature_verified?: boolean;\n      hieros_compliance_verified:\
+    \ boolean;\n      security_scan_passed: boolean;\n    };\n  };\n}\n\ninterface\
+    \ ReplicationManifest {\n  // Basic artifact info\n  name: string;\n  version:\
+    \ string;\n  description: string;\n  \n  // Source information\n  source_node_did:\
+    \ string;\n  source_version: string;\n  source_hash: string;\n  \n  // Quality\
+    \ metrics\n  quality_score?: number; // 0-1\n  test_coverage?: number; // 0-1\n\
+    \  \n  // Metadata\n  creation_timestamp: string;\n  creator_organization?: string;\n\
+    \  license?: string;\n  tags?: string[];\n}\n```"
+- level: 3
+  title: Basic Error Interface
+  type: section
+  content: "```typescript\ninterface GriotReplicationError {\n  task_name: \"replicate_node\"\
+    ;\n  job_id: string;\n  status: \"failed\";\n  failure_timestamp: string;\n  \n\
+    \  error: {\n    // Primary error information\n    code: BasicErrorCode;\n   \
+    \ message: string;\n    severity: ErrorSeverity;\n    \n    // Context\n    phase?:\
+    \ ReplicationPhase;\n    retryable: boolean;\n    retry_after_seconds?: number;\n\
+    \  };\n}\n\nenum BasicErrorCode {\n  // Source errors\n  SOURCE_NOT_FOUND = \"\
+    source_not_found\",\n  SOURCE_ACCESS_DENIED = \"source_access_denied\",\n  SOURCE_CORRUPTED\
+    \ = \"source_corrupted\",\n  \n  // Processing errors\n  COMPILATION_FAILED =\
+    \ \"compilation_failed\",\n  PACKAGING_FAILED = \"packaging_failed\",\n  \n  //\
+    \ Resource errors\n  INSUFFICIENT_RESOURCES = \"insufficient_resources\",\n  TIMEOUT_EXCEEDED\
+    \ = \"timeout_exceeded\",\n  \n  // Network errors\n  UPLOAD_FAILED = \"upload_failed\"\
+    ,\n  NETWORK_ERROR = \"network_error\",\n  \n  // System errors\n  INTERNAL_ERROR\
+    \ = \"internal_error\"\n}\n\nenum ErrorSeverity {\n  LOW = \"low\",\n  MEDIUM\
+    \ = \"medium\", \n  HIGH = \"high\",\n  CRITICAL = \"critical\"\n}\n```"
+- level: 2
+  title: Core API Operations
+  type: section
+  content: ''
+- level: 3
+  title: 1. Replicate Node Operation
+  type: section
+  content: "**Purpose**: Request packaging of a specified source node into a distributable\
+    \ artifact.\n\n**Request Format**:\n```json\n{\n  \"task_name\": \"replicate_node\"\
+    ,\n  \"params\": {\n    \"source_node_did\": \"did:kos:my-node-to-replicate:123\"\
+    ,\n    \"target_version\": \"1.1.0\",\n    \"distribution_options\": {\n     \
+    \ \"protocol\": \"ipfs\"\n    }\n  }\n}\n```\n\n**Implementation Requirements**:\n\
+    - Validate source node DID format and accessibility\n- Support all major distribution\
+    \ protocols\n- Implement basic compression and packaging\n- Provide real-time\
+    \ progress updates\n- Generate comprehensive manifest information"
+- level: 3
+  title: 2. Progress Monitoring
+  type: section
+  content: "**Purpose**: Provide real-time status updates during replication operations.\n\
+    \n**Progress Update Format**:\n```json\n{\n  \"task_name\": \"replicate_node\"\
+    ,\n  \"job_id\": \"uuid-string\",\n  \"status\": \"running\",\n  \"progress\"\
+    : 45,\n  \"current_phase\": \"packaging\",\n  \"message\": \"Packaging artifact...\"\
+    \n}\n```\n\n**Implementation Requirements**:\n- Send progress updates at regular\
+    \ intervals (recommended: every 5-10 seconds)\n- Include meaningful phase information\
+    \ and messages\n- Track resource utilization for optimization\n- Support resumable\
+    \ operations via checkpoints"
+- level: 3
+  title: 3. Result Delivery
+  type: section
+  content: "**Purpose**: Return comprehensive results upon successful completion.\n\
+    \n**Success Response Format**:\n```json\n{\n  \"task_name\": \"replicate_node\"\
+    ,\n  \"job_id\": \"uuid-string\", \n  \"status\": \"completed\",\n  \"result\"\
+    : {\n    \"artifact_uri\": \"ipfs://Qm...\",\n    \"artifact_hash\": \"sha256:...\"\
+    ,\n    \"manifest\": {\n      \"name\": \"my-node\",\n      \"version\": \"1.1.0\"\
+    ,\n      \"description\": \"Node description\"\n    }\n  }\n}\n```"
+- level: 2
+  title: Implementation Patterns
+  type: section
+  content: ''
+- level: 3
+  title: Request Validation Pattern
+  type: section
+  content: "```typescript\nasync function validateReplicationRequest(request: GriotReplicationRequest):\
+    \ Promise<ValidationResult> {\n  const errors: string[] = [];\n  \n  // Validate\
+    \ DID format\n  if (!isValidDID(request.params.source_node_did)) {\n    errors.push(\"\
+    Invalid source node DID format\");\n  }\n  \n  // Validate version format\n  if\
+    \ (!isValidSemVer(request.params.target_version)) {\n    errors.push(\"Invalid\
+    \ semantic version format\");\n  }\n  \n  // Validate distribution protocol\n\
+    \  if (!Object.values(DistributionProtocol).includes(request.params.distribution_options.protocol))\
+    \ {\n    errors.push(\"Unsupported distribution protocol\");\n  }\n  \n  return\
+    \ {\n    valid: errors.length === 0,\n    errors\n  };\n}\n```"
+- level: 3
+  title: Progress Reporting Pattern
+  type: section
+  content: "```typescript\nclass ReplicationProgressReporter {\n  private jobId: string;\n\
+    \  private progressCallback: (progress: GriotReplicationProgress) => void;\n \
+    \ \n  constructor(jobId: string, callback: (progress: GriotReplicationProgress)\
+    \ => void) {\n    this.jobId = jobId;\n    this.progressCallback = callback;\n\
+    \  }\n  \n  reportPhaseStart(phase: ReplicationPhase, message: string): void {\n\
+    \    this.progressCallback({\n      task_name: \"replicate_node\",\n      job_id:\
+    \ this.jobId,\n      status: ReplicationStatus.RUNNING,\n      progress: this.calculatePhaseProgress(phase),\n\
+    \      current_phase: phase,\n      message\n    });\n  }\n  \n  private calculatePhaseProgress(phase:\
+    \ ReplicationPhase): number {\n    const phaseWeights = {\n      [ReplicationPhase.VALIDATION]:\
+    \ 5,\n      [ReplicationPhase.SOURCE_ACQUISITION]: 10,\n      [ReplicationPhase.DEPENDENCY_RESOLUTION]:\
+    \ 15,\n      [ReplicationPhase.COMPILATION]: 20,\n      [ReplicationPhase.PACKAGING]:\
+    \ 20,\n      [ReplicationPhase.SECURITY_SCANNING]: 10,\n      [ReplicationPhase.DISTRIBUTION_PREPARATION]:\
+    \ 10,\n      [ReplicationPhase.UPLOAD]: 8,\n      [ReplicationPhase.VERIFICATION]:\
+    \ 2\n    };\n    \n    // Calculate cumulative progress based on completed phases\n\
+    \    let totalProgress = 0;\n    const phases = Object.values(ReplicationPhase);\n\
+    \    \n    for (const p of phases) {\n      if (p === phase) break;\n      totalProgress\
+    \ += phaseWeights[p];\n    }\n    \n    return totalProgress;\n  }\n}\n```"
+- level: 2
+  title: Quality Standards
+  type: section
+  content: '- **Protocol Universality**: Support for 15+ distribution protocols
+
+    - **Real-time Monitoring**: Progress updates every 5-10 seconds maximum
+
+    - **HIEROS Compliance**: Cultural validation integrated into all operations
+
+    - **Error Resilience**: Graceful handling of network, resource, and system errors
+
+    - **Performance Optimization**: Efficient resource utilization and caching'
+- level: 2
+  title: Integration Points
+  type: section
+  content: ''
+- level: 3
+  title: With Advanced Configuration Module
+  type: section
+  content: '- Receives complex configuration parameters
+
+    - Delegates advanced validation to configuration module
+
+    - Coordinates resource allocation decisions'
+- level: 3
+  title: With Progress Status Management Module
+  type: section
+  content: '- Provides basic progress events
+
+    - Receives detailed monitoring configuration
+
+    - Integrates with comprehensive status tracking'
+- level: 3
+  title: With Error Handling Module
+  type: section
+  content: '- Reports basic errors for advanced classification
+
+    - Receives recovery strategies and suggested actions
+
+    - Coordinates retry operations and fallback mechanisms'
+- level: 2
+  title: Cultural Validation Framework
+  type: section
+  content: "```typescript\ninterface HIEROSValidation {\n  validateCulturalAppropriateness(sourceNode:\
+    \ string): Promise<ValidationResult>;\n  validateKnowledgePermissions(content:\
+    \ NodeContent): Promise<PermissionResult>;\n  validateRespectfulUsage(context:\
+    \ ReplicationContext): Promise<RespectResult>;\n}\n\nasync function validateHIEROSCompliance(request:\
+    \ GriotReplicationRequest): Promise<boolean> {\n  const validator = new HIEROSValidator();\n\
+    \  \n  // Check cultural appropriateness of source\n  const culturalCheck = await\
+    \ validator.validateCulturalAppropriateness(\n    request.params.source_node_did\n\
+    \  );\n  \n  if (!culturalCheck.appropriate) {\n    throw new Error(`HIEROS compliance\
+    \ violation: ${culturalCheck.reason}`);\n  }\n  \n  return true;\n}\n```"
+- level: 2
+  title: Production Implementation Notes
+  type: section
+  content: 'This module provides the **essential foundation** for all Griot replication
+    operations. Key implementation considerations:
+
+
+    - **Scalability**: Design for high-throughput, concurrent replication requests
+
+    - **Reliability**: Implement robust retry logic and graceful degradation
+
+    - **Security**: Validate all inputs and implement secure communication protocols
+
+    - **Monitoring**: Comprehensive logging and metrics collection for operational
+    visibility
+
+    - **Cultural Sensitivity**: Mandatory HIEROS compliance validation for all operations
+
+
+    The Core Replication API serves as the primary interface for AI agents to interact
+    with Griot nodes, providing the essential building blocks for artifact generation
+    and distribution across any platform or ecosystem.'

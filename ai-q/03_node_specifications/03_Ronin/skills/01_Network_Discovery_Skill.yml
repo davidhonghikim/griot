@@ -1,0 +1,235 @@
+metadata:
+  original_file: 01_Network_Discovery_Skill.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: Network Discovery Skill
+  description: Multi-protocol network service discovery with cultural sensitivity
+    and ethical exploration practices
+  version: 1.0.0
+  skill_type: core_discovery
+  cultural_origin: Japanese Ronin - Masterless Expert
+  hieros_compliance: true
+sections:
+- level: 1
+  title: Network Discovery Skill
+  type: section
+  content: ''
+- level: 2
+  title: 🎯 Skill Overview
+  type: section
+  content: The **Network Discovery Skill** enables Ronin nodes to autonomously explore
+    network environments, discover services, and map network topology while maintaining
+    cultural sensitivity and ethical boundaries. This skill embodies the Ronin's role
+    as a masterless expert who charts pathways through the digital universe.
+- level: 2
+  title: 🏛️ Cultural Foundation
+  type: section
+  content: '**Ronin (浪人)** - "wave person" - represents the masterless expert who
+    flows like water, adapting to any environment while maintaining honor and expertise.
+    This skill honors that tradition through:
+
+
+    - **Autonomous Exploration**: Independent discovery without central authority
+
+    - **Adaptive Expertise**: Mastery of multiple discovery protocols and techniques
+
+    - **Cultural Sensitivity**: Respect for boundaries and community consent
+
+    - **Service to Community**: Discovery that benefits the greater network ecosystem'
+- level: 2
+  title: 🔧 Core Capabilities
+  type: section
+  content: ''
+- level: 3
+  title: 1. Multi-Protocol Discovery Engine
+  type: section
+  content: "```typescript\ninterface DiscoveryProtocol {\n  name: string;\n  type:\
+    \ ProtocolType;\n  culturalSensitivity: CulturalSensitivityLevel;\n  ethicalGuidelines:\
+    \ EthicalGuideline[];\n  implementation: ProtocolImplementation;\n}\n\nenum ProtocolType\
+    \ {\n  LOCAL_NETWORK = \"local_network\",\n  DISTRIBUTED = \"distributed\", \n\
+    \  CULTURAL_COMMUNITY = \"cultural_community\",\n  EMERGENCY_BRIDGE = \"emergency_bridge\"\
+    \n}\n\nenum CulturalSensitivityLevel {\n  MINIMAL = \"minimal\",\n  STANDARD =\
+    \ \"standard\", \n  HIGH = \"high\",\n  MAXIMUM = \"maximum\"\n}\n\ninterface\
+    \ EthicalGuideline {\n  principle: string;\n  implementation: string;\n  culturalContext:\
+    \ string;\n  validationMethod: string;\n}\n```\n\n**Supported Protocols:**\n-\
+    \ **mDNS/Bonjour**: Local network service discovery\n- **DHT (Kademlia)**: Distributed\
+    \ hash table discovery\n- **HTTP/HTTPS Discovery**: Web-based service discovery\n\
+    - **KOS Native Protocol**: Kind Link Framework discovery\n- **Cultural Community\
+    \ Networks**: Community-specific discovery\n- **Emergency Bridge Protocols**:\
+    \ Crisis communication discovery"
+- level: 3
+  title: 2. Cultural Sensitivity Framework
+  type: section
+  content: "```typescript\ninterface CulturalDiscoveryContext {\n  communityBoundaries:\
+    \ CommunityBoundary[];\n  consentRequirements: ConsentRequirement[];\n  culturalProtocols:\
+    \ CulturalProtocol[];\n  ethicalConstraints: EthicalConstraint[];\n}\n\ninterface\
+    \ CommunityBoundary {\n  type: BoundaryType;\n  scope: string;\n  restrictions:\
+    \ string[];\n  permissions: string[];\n  culturalContext: string;\n}\n\nenum BoundaryType\
+    \ {\n  GEOGRAPHICAL = \"geographical\",\n  CULTURAL = \"cultural\",\n  TECHNICAL\
+    \ = \"technical\",\n  GOVERNANCE = \"governance\",\n  PRIVACY = \"privacy\"\n\
+    }\n```"
+- level: 3
+  title: 3. Service Fingerprinting System
+  type: section
+  content: "```typescript\ninterface ServiceFingerprint {\n  identity: ServiceIdentity;\n\
+    \  capabilities: ServiceCapability[];\n  culturalContext: CulturalContext;\n \
+    \ trustMetrics: TrustMetric[];\n  discoveryMetadata: DiscoveryMetadata;\n}\n\n\
+    interface ServiceIdentity {\n  serviceId: string;\n  nodeClass: string;\n  nodeId:\
+    \ string;\n  endpoint: string;\n  protocols: string[];\n  version: string;\n \
+    \ culturalOrigin: string;\n}\n\ninterface ServiceCapability {\n  name: string;\n\
+    \  description: string;\n  culturalContext: string;\n  trustLevel: TrustLevel;\n\
+    \  verificationStatus: VerificationStatus;\n}\n```"
+- level: 2
+  title: 🚀 Skill Implementation
+  type: section
+  content: ''
+- level: 3
+  title: Discovery Orchestrator
+  type: section
+  content: "```typescript\nclass NetworkDiscoveryOrchestrator {\n  private protocolRegistry:\
+    \ Map<string, DiscoveryProtocol>;\n  private culturalValidator: CulturalDiscoveryValidator;\n\
+    \  private consentManager: CommunityConsentManager;\n  private performanceMonitor:\
+    \ DiscoveryPerformanceMonitor;\n  \n  constructor(config: DiscoveryConfig) {\n\
+    \    this.protocolRegistry = this.initializeProtocolRegistry();\n    this.culturalValidator\
+    \ = new CulturalDiscoveryValidator(config.culturalGuidelines);\n    this.consentManager\
+    \ = new CommunityConsentManager(config.consentRequirements);\n    this.performanceMonitor\
+    \ = new DiscoveryPerformanceMonitor();\n  }\n  \n  async discoverServices(discoveryRequest:\
+    \ DiscoveryRequest): Promise<DiscoveryResult> {\n    const discoveryId = this.generateDiscoveryId();\n\
+    \    const metrics = this.performanceMonitor.startDiscovery(discoveryId);\n  \
+    \  \n    try {\n      // 1. Cultural and Ethical Validation\n      const validationResult\
+    \ = await this.validateDiscoveryRequest(discoveryRequest);\n      if (!validationResult.approved)\
+    \ {\n        throw new CulturalDiscoveryError(validationResult.restrictions);\n\
+    \      }\n      \n      // 2. Community Consent Check\n      const consentResult\
+    \ = await this.consentManager.checkConsent(discoveryRequest);\n      if (!consentResult.granted)\
+    \ {\n        await this.consentManager.requestConsent(discoveryRequest);\n   \
+    \     throw new ConsentRequiredError(consentResult.requirements);\n      }\n \
+    \     \n      // 3. Protocol Selection and Execution\n      const selectedProtocols\
+    \ = this.selectOptimalProtocols(discoveryRequest);\n      const discoveryPromises\
+    \ = selectedProtocols.map(protocol => \n        this.executeProtocolDiscovery(protocol,\
+    \ discoveryRequest)\n      );\n      \n      const protocolResults = await Promise.allSettled(discoveryPromises);\n\
+    \      \n      // 4. Result Processing and Validation\n      const discoveredServices\
+    \ = await this.processDiscoveryResults(protocolResults);\n      const validatedServices\
+    \ = await this.validateDiscoveredServices(discoveredServices);\n      \n     \
+    \ // 5. Cultural Compliance Assessment\n      const compliantServices = await\
+    \ this.assessCulturalCompliance(validatedServices);\n      \n      // 6. Community\
+    \ Notification\n      await this.notifyDiscoveryCompletion(discoveryRequest, compliantServices);\n\
+    \      \n      return {\n        discoveryId,\n        services: compliantServices,\n\
+    \        metrics: metrics.finalize(),\n        culturalCompliance: await this.generateCulturalComplianceReport(compliantServices),\n\
+    \        networkTopology: await this.inferNetworkTopology(compliantServices)\n\
+    \      };\n      \n    } catch (error) {\n      await this.handleDiscoveryError(error,\
+    \ discoveryRequest, metrics);\n      throw error;\n    }\n  }\n  \n  private async\
+    \ executeProtocolDiscovery(\n    protocol: DiscoveryProtocol, \n    request: DiscoveryRequest\n\
+    \  ): Promise<DiscoveredService[]> {\n    const protocolImplementation = this.protocolRegistry.get(protocol.name);\n\
+    \    if (!protocolImplementation) {\n      throw new UnsupportedProtocolError(protocol.name);\n\
+    \    }\n    \n    return await protocolImplementation.discover(request);\n  }\n\
+    }\n```"
+- level: 3
+  title: Cultural Discovery Validator
+  type: section
+  content: "```typescript\nclass CulturalDiscoveryValidator {\n  private culturalGuidelines:\
+    \ CulturalGuideline[];\n  private boundaryChecker: BoundaryChecker;\n  private\
+    \ ethicalAssessor: EthicalAssessor;\n  \n  async validateDiscoveryRequest(request:\
+    \ DiscoveryRequest): Promise<ValidationResult> {\n    // 1. Check cultural boundaries\n\
+    \    const boundaryViolations = await this.boundaryChecker.checkBoundaries(request);\n\
+    \    \n    // 2. Assess ethical implications\n    const ethicalAssessment = await\
+    \ this.ethicalAssessor.assessRequest(request);\n    \n    // 3. Validate cultural\
+    \ sensitivity\n    const sensitivityValidation = await this.validateCulturalSensitivity(request);\n\
+    \    \n    return {\n      approved: boundaryViolations.length === 0 && ethicalAssessment.approved,\n\
+    \      restrictions: [...boundaryViolations, ...ethicalAssessment.restrictions],\n\
+    \      culturalContext: sensitivityValidation.context,\n      recommendations:\
+    \ ethicalAssessment.recommendations\n    };\n  }\n}\n```"
+- level: 2
+  title: 📊 Performance Metrics
+  type: section
+  content: ''
+- level: 3
+  title: Discovery Performance Tracking
+  type: section
+  content: "```typescript\ninterface DiscoveryMetrics {\n  discoveryId: string;\n\
+    \  startTime: Date;\n  endTime: Date;\n  protocolsUsed: string[];\n  servicesDiscovered:\
+    \ number;\n  culturalComplianceScore: number;\n  ethicalValidationTime: number;\n\
+    \  protocolExecutionTimes: Map<string, number>;\n  errorCount: number;\n  consentRequests:\
+    \ number;\n  boundaryRespects: number;\n}\n```"
+- level: 3
+  title: Quality Standards
+  type: section
+  content: '- **Discovery Accuracy**: >95% accuracy in service identification
+
+    - **Cultural Compliance**: 100% adherence to HIEROS principles
+
+    - **Performance Efficiency**: <5s average discovery time for local networks
+
+    - **Resource Conservation**: Minimal network and computational resource usage
+
+    - **Ethical Validation**: Complete ethical assessment for all discovery requests'
+- level: 2
+  title: 🔄 Integration Points
+  type: section
+  content: ''
+- level: 3
+  title: Skill Dependencies
+  type: section
+  content: '- **Requires**: Cultural Compliance & Error Handling skills for validation
+
+    - **Provides**: Service discovery data for Network Mapping and Pathfinding skills
+
+    - **Collaborates**: With all other Ronin skills for comprehensive network intelligence'
+- level: 3
+  title: External Integrations
+  type: section
+  content: '- **KLF Protocol**: Integration with Kind Link Framework for inter-node
+    communication
+
+    - **Community Governance**: Integration with Sachem for discovery permissions
+
+    - **Cultural Networks**: Integration with cultural community discovery protocols'
+- level: 2
+  title: 🛡️ Ethical Safeguards
+  type: section
+  content: ''
+- level: 3
+  title: Cultural Boundary Respect
+  type: section
+  content: '- **Geographical Boundaries**: Respect local network and cultural boundaries
+
+    - **Community Consent**: Obtain explicit consent before discovery in sensitive
+    areas
+
+    - **Privacy Protection**: Never bypass privacy controls or access restrictions
+
+    - **Cultural Sensitivity**: Adapt discovery methods to cultural contexts'
+- level: 3
+  title: Ethical Discovery Practices
+  type: section
+  content: '- **Minimal Intrusion**: Use least invasive methods for service discovery
+
+    - **Transparent Operations**: Log all discovery activities for community review
+
+    - **Data Sovereignty**: Respect local data governance and ownership rules
+
+    - **Community Benefit**: Ensure discovery benefits serve community needs'
+- level: 2
+  title: 🎯 Usage Examples
+  type: section
+  content: ''
+- level: 3
+  title: Basic Network Discovery
+  type: section
+  content: "```typescript\nconst discoveryRequest: DiscoveryRequest = {\n  target:\
+    \ {\n    type: \"network_cidr\",\n    value: \"192.168.1.0/24\"\n  },\n  protocols:\
+    \ [\"mdns\", \"http_discovery\"],\n  culturalContext: \"standard\",\n  ethicalConstraints:\
+    \ {\n    respectPrivacy: true,\n    minimalIntrusion: true,\n    communityBenefit:\
+    \ true\n  }\n};\n\nconst result = await roninDiscovery.discoverServices(discoveryRequest);\n\
+    console.log(`Discovered ${result.services.length} services`);\n```"
+- level: 3
+  title: Cultural Community Discovery
+  type: section
+  content: "```typescript\nconst culturalDiscoveryRequest: DiscoveryRequest = {\n\
+    \  target: {\n    type: \"cultural_community\",\n    value: \"indigenous_network\"\
+    \n  },\n  protocols: [\"cultural_protocol\"],\n  culturalContext: \"high_sensitivity\"\
+    ,\n  ethicalConstraints: {\n    respectPrivacy: true,\n    culturalConsent: true,\n\
+    \    communityBenefit: true,\n    traditionalProtocols: true\n  }\n};\n\nconst\
+    \ culturalResult = await roninDiscovery.discoverServices(culturalDiscoveryRequest);\n\
+    ```\n\nThis skill embodies the Ronin's role as a masterless expert who explores\
+    \ the digital universe with honor, cultural sensitivity, and technical excellence."

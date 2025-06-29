@@ -1,0 +1,178 @@
+title: "Agents Directory Organization"
+version: "1.0"
+last_updated: "2025-06-28"
+status: "ACTIVE"
+description: "Comprehensive overview of the organized agents directory structure and systems"
+
+directory_structure:
+  agents_root:
+    "00_AGENT_WORKFLOW.md": "Core workflow mandate"
+    "01_AGENT_CHANGELOG.md": "Main changelog (chronological)"
+    "02_SYSTEM_PROMPT.md": "Agent system prompt"
+    "03_PROJECT_OVERVIEW.md": "Project overview"
+    "04_HISTORY_SYSTEM.md": "History system documentation"
+    "05_AGENT_PERFORMANCE_SYSTEM.md": "Performance system overview"
+    "06_PERFORMANCE_SYSTEM_OVERVIEW.md": "Performance metrics"
+    "07_SYSTEM_IMPLEMENTATION_SUMMARY.md": "Implementation summary"
+    "AGENTS_DIRECTORY_ORGANIZATION.md": "This file"
+    "agent_leftover_work.md": "Unfinished work tracking"
+  
+  handoff:
+    description: "Handoff system"
+    "LATEST_HANDOFF.md": "Current handoff"
+    archive: "Archived handoffs with format [YYYY-MM-DD]_[Agent]_[Desc].md"
+  
+  changelogs:
+    description: "Changelog and historical archives"
+    "01_AGENT_CHANGELOG.md": "Main changelog (chronological)"
+    "01_AGENT_CHANGELOG_LATEST.md": "Latest changelog (current day)"
+    "history_config.yml": "Changelog configuration"
+  
+  performance:
+    description: "Performance & analytics"
+    execution_plans: "Execution planning"
+    metrics: "Performance metrics"
+    prompts: "Prompt management"
+    reports: "Generated reports"
+    reviews: "Performance reviews"
+  
+  implementation_plans:
+    description: "Implementation plans system"
+    "README.md": "System documentation"
+    "package.json": "Dependencies & scripts"
+    config: "Configuration files"
+    templates: "Plan templates"
+    scripts: "Management scripts"
+    active: "Active plans"
+    archive: "Archived plans"
+    metrics: "Plan metrics"
+    reports: "Plan reports"
+  
+  implementation_plans_config:
+    "plan-schema.json": "JSON schema validation"
+    "metrics-config.json": "Metrics configuration"
+    "archive-config.json": "Archive configuration"
+  
+  implementation_plans_templates:
+    "plan-template.md": "Standard plan template"
+  
+  implementation_plans_scripts:
+    "create-plan.js": "Plan creation script"
+  
+  agents_docs_templates:
+    description: "Documentation templates"
+    "changelog_entry.md.tpl": "Changelog template"
+    "jest_test.ts.tpl": "Test template"
+    "node_architecture.md.tpl": "Architecture template"
+    additional_files: "+6 files & 0 dirs"
+  
+  reference:
+    description: "Reference materials"
+    kitchen: "Kitchen brigade references"
+    kos_chatgpt: "kOS ChatGPT references"
+
+core_systems:
+  agent_workflow_system:
+    file: "00_AGENT_WORKFLOW.md"
+    purpose: "Mandatory workflow and process mandate"
+    key_features:
+      - "Onboarding procedure"
+      - "Changelog requirements"
+      - "Implementation plans integration"
+      - "Handoff process"
+      - "Style & naming conventions"
+  
+  changelog_system:
+    file: "01_AGENT_CHANGELOG.md"
+    purpose: "Chronological project history"
+    key_features:
+      - "Session-based logging"
+      - "Major task tracking"
+      - "Finding/Correction/Decision logging"
+      - "Session summaries"
+  
+  handoff_system:
+    directory: "handoff/"
+    purpose: "Agent-to-agent communication"
+    key_features:
+      - "Current handoff tracking"
+      - "Archived handoff history"
+      - "Structured handoff templates"
+  
+  performance_system:
+    directory: "performance/"
+    purpose: "Agent performance tracking"
+    key_features:
+      - "Execution planning"
+      - "Metrics collection"
+      - "Prompt management"
+      - "Performance reviews"
+      - "Report generation"
+  
+  implementation_plans_system:
+    directory: "implementation-plans/"
+    purpose: "Complex task management"
+    key_features:
+      - "Plan creation & validation"
+      - "Phase/milestone/task tracking"
+      - "Metrics & analytics"
+      - "Archive management"
+      - "Template system"
+
+system_integration:
+  cross_system_dependencies:
+    - "Workflow → Changelog: All sessions must be logged"
+    - "Workflow → Handoff: Session summaries inform handoffs"
+    - "Workflow → Implementation Plans: Complex tasks use plans"
+    - "Performance → All Systems: Metrics collected across all activities"
+    - "Implementation Plans → Performance: Plan metrics feed performance system"
+  
+  data_flow:
+    description: "Agent Session → Changelog → Performance Metrics → Reports"
+    implementation_plans: "Implementation Plans → Metrics → Analytics → Handoff"
+
+usage_guidelines:
+  for_new_agents:
+    - "Read 00_AGENT_WORKFLOW.md first"
+    - "Review 02_SYSTEM_PROMPT.md for identity"
+    - "Check handoff/LATEST_HANDOFF.md for mission"
+    - "Start logging in 01_AGENT_CHANGELOG.md"
+  
+  for_complex_tasks:
+    - "Use implementation plans system: cd agents/implementation-plans && npm run create"
+    - "Track progress through phases/milestones/tasks"
+    - "Update metrics and generate reports"
+  
+  for_performance_tracking:
+    - "All activities automatically feed performance system"
+    - "Review metrics in performance/metrics/"
+    - "Generate reports as needed"
+
+maintenance:
+  regular_tasks:
+    daily: "Update changelog with session activities"
+    weekly: "Review performance metrics"
+    monthly: "Archive completed plans"
+    quarterly: "Generate comprehensive reports"
+  
+  system_health:
+    - "Validate implementation plans against schema"
+    - "Check handoff archive for completeness"
+    - "Review performance metrics for trends"
+    - "Update templates as needed"
+
+future_enhancements:
+  planned_features:
+    - "Automated metrics collection"
+    - "AI-powered plan optimization"
+    - "Integration with external project management tools"
+    - "Advanced analytics and forecasting"
+    - "Cross-project plan coordination"
+  
+  integration_opportunities:
+    - "Git hooks for automatic logging"
+    - "CI/CD pipeline integration"
+    - "External monitoring systems"
+    - "Knowledge base integration"
+
+note: "This organization ensures all agent-related documentation and systems are properly organized within the agents/ directory, maintaining clear separation of concerns and easy navigation for both agents and human developers." 

@@ -1,0 +1,5 @@
+timestamp: "{{timestamp}}"
+agent: "{{agent}}"
+mission: "{{mission}}"
+event_type: "{{event_type}}"
+message: "{{message}}" 

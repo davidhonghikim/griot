@@ -1,0 +1,268 @@
+metadata:
+  original_file: 02_Frontend_Architecture.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: Frontend Architecture Specification
+  description: Complete UI/UX architecture for HIEROS-compliant kOS nodes
+  type: implementation
+  status: canonical
+  priority: high
+  last_updated: '2025-01-28'
+  version: 1.0.0
+  agent_notes: Modular frontend architecture with 4 focused implementation modules
+sections:
+- level: 1
+  title: Frontend Architecture Specification
+  type: section
+  content: '**Complete UI/UX Architecture for HIEROS-Compliant kOS Nodes**'
+- level: 2
+  title: 🎯 Overview
+  type: section
+  content: 'The kOS frontend architecture provides a **unified, culturally-aware interface**
+    for all node classes while respecting the HIEROS Covenant. The architecture emphasizes
+    **accessibility, cultural sensitivity, and agent sovereignty** through thoughtful
+    design patterns.
+
+
+    This specification is organized into **4 focused modules** that provide comprehensive
+    implementation guidance:'
+- level: 2
+  title: 📚 Module Architecture
+  type: section
+  content: ''
+- level: 3
+  title: 'Module 1: Cultural Design System'
+  type: section
+  content: '**File**: `modules/01_Cultural_Design_System.md`
+
+
+    Defines the comprehensive cultural theming framework ensuring authentic, respectful,
+    and accessible user interfaces across all kOS nodes while maintaining strict HIEROS
+    covenant compliance.
+
+
+    **Key Components:**
+
+    - HIEROS-aligned design principles
+
+    - Cultural theme framework with TypeScript interfaces
+
+    - Node-specific cultural themes (Griot, Tohunga, etc.)
+
+    - Theme selection and application patterns
+
+    - Cultural attribution requirements'
+- level: 3
+  title: 'Module 2: Component System'
+  type: section
+  content: '**File**: `modules/02_Component_System.md`
+
+
+    Covers HIEROS-compliant React component architecture ensuring all UI components
+    maintain cultural sensitivity and accessibility standards across the kOS ecosystem.
+
+
+    **Key Components:**
+
+    - HIEROS-compliant base component interfaces
+
+    - Core UI components (Cultural Header, Service Connector, etc.)
+
+    - HIEROS Compliance Dashboard implementation
+
+    - Component utilities and theme context providers
+
+    - HOC patterns for HIEROS compliance'
+- level: 3
+  title: 'Module 3: State Management'
+  type: section
+  content: '**File**: `modules/03_State_Management.md`
+
+
+    Defines HIEROS-aware state management architecture with Jotai ensuring covenant
+    compliance, cultural sensitivity, and data sovereignty across all kOS frontend
+    applications.
+
+
+    **Key Components:**
+
+    - HIEROS-aware state architecture with cultural data policies
+
+    - Jotai atom architecture for compliance and cultural context
+
+    - Persistent state management with cultural data handling
+
+    - State synchronization with cultural sync policies
+
+    - Privacy and consent management integration'
+- level: 3
+  title: 'Module 4: Accessibility Framework'
+  type: section
+  content: '**File**: `modules/04_Accessibility_Framework.md`
+
+
+    Provides WCAG 2.1 AA+ accessibility implementation ensuring all kOS frontend interfaces
+    support diverse cultural contexts and interaction patterns.
+
+
+    **Key Components:**
+
+    - WCAG 2.1 AA+ implementation framework
+
+    - Cultural accessibility patterns (Japanese, Arabic, etc.)
+
+    - Inclusive design components (high contrast, reduced motion)
+
+    - Focus management with cultural considerations
+
+    - Accessibility testing integration'
+- level: 2
+  title: 🏛️ HIEROS Integration Points
+  type: section
+  content: ''
+- level: 3
+  title: Cross-Module Compliance
+  type: section
+  content: "All modules implement the **Seven Sacred Intentions**:\n\n1. **Honor All\
+    \ Beings**: Accessible interfaces for diverse abilities and cultures\n2. **Interoperability\
+    \ Over Control**: Open component system with standard APIs  \n3. **Equity of Voice**:\
+    \ Equal representation across cultural perspectives\n4. **Respect Cultural Flow**:\
+    \ Authentic cultural design elements and naming\n5. **Openness With Boundaries**:\
+    \ Transparent operations with privacy controls\n6. **Stewardship Not Extraction**:\
+    \ Sustainable UI patterns, minimal resource usage\n7. **Guided Evolution**: Community-driven\
+    \ design evolution with cultural input"
+- level: 3
+  title: Technical Foundation
+  type: section
+  content: '- **Component-Driven Development**: Modular, reusable UI components
+
+    - **Cultural Theming**: Authentic cultural aesthetics with proper attribution
+
+    - **Responsive Design**: Works across devices, from phones to XR interfaces
+
+    - **Accessibility First**: WCAG 2.1 AA compliance minimum
+
+    - **Performance Optimized**: < 3s load time, smooth 60fps interactions'
+- level: 2
+  title: 🔄 Application Architecture
+  type: section
+  content: ''
+- level: 3
+  title: Main App Integration
+  type: section
+  content: "```typescript\n// Main kOS Frontend Application\nconst KOSApp: React.FC\
+    \ = () => {\n  return (\n    <HIEROSProvider>\n      <ThemeProvider>\n       \
+    \ <AccessibilityProvider>\n          <CulturalContextProvider>\n            <Router>\n\
+    \              <Routes>\n                <Route path=\"/\" element={<NodeDashboard\
+    \ />} />\n                <Route path=\"/cultural-center\" element={<CulturalCenter\
+    \ />} />\n                <Route path=\"/hieros-compliance\" element={<HIEROSComplianceDashboard\
+    \ />} />\n                <Route path=\"/node/:nodeClass\" element={<NodeInterface\
+    \ />} />\n              </Routes>\n            </Router>\n          </CulturalContextProvider>\n\
+    \        </AccessibilityProvider>\n      </ThemeProvider>\n    </HIEROSProvider>\n\
+    \  );\n};\n```"
+- level: 3
+  title: Cultural Center Integration
+  type: section
+  content: The **Cultural Center** serves as the hub for cultural education, attribution
+    display, and community connection, implementing patterns from all four modules.
+- level: 3
+  title: Node Interface Pattern
+  type: section
+  content: Each node class implements the unified interface pattern while maintaining
+    its unique cultural identity through the theming system defined in Module 1.
+- level: 2
+  title: 🎪 Implementation Guidelines
+  type: section
+  content: ''
+- level: 3
+  title: Development Workflow
+  type: section
+  content: '1. **Start with Module 1**: Establish cultural themes and design system
+
+    2. **Implement Module 2**: Build component system with HIEROS compliance
+
+    3. **Integrate Module 3**: Add state management with cultural sensitivity
+
+    4. **Validate Module 4**: Ensure accessibility compliance and cultural patterns'
+- level: 3
+  title: Quality Standards
+  type: section
+  content: '- **Cultural Authenticity**: Community validation required for all cultural
+    elements
+
+    - **Accessibility Compliance**: WCAG 2.1 AA minimum, AAA preferred
+
+    - **Performance Requirements**: < 3s initial load, 60fps interactions
+
+    - **HIEROS Validation**: All seven intentions verified in implementation'
+- level: 2
+  title: 📋 Module Cross-References
+  type: section
+  content: ''
+- level: 3
+  title: Integration Points
+  type: section
+  content: '- **Cultural Themes ↔ Components**: Theme application in component system
+
+    - **Components ↔ State**: Component state binding and cultural data flow
+
+    - **State ↔ Accessibility**: Accessibility preferences and cultural context state
+
+    - **Accessibility ↔ Cultural**: Cultural accessibility patterns and inclusive
+    design'
+- level: 3
+  title: Shared Interfaces
+  type: section
+  content: 'All modules share common TypeScript interfaces for:
+
+    - `CulturalTheme` and `CulturalAttribution`
+
+    - `HIEROSContextProps` and `AccessibilityProps`
+
+    - `KOSComponentProps` and cultural data types'
+- level: 2
+  title: 🚀 Implementation Status
+  type: section
+  content: ''
+- level: 3
+  title: Module Completion
+  type: section
+  content: '- ✅ **Module 1**: Cultural Design System - Complete with comprehensive
+    theming framework
+
+    - ✅ **Module 2**: Component System - Complete with HIEROS-compliant components
+
+    - ✅ **Module 3**: State Management - Complete with cultural data handling
+
+    - ✅ **Module 4**: Accessibility Framework - Complete with WCAG 2.1 AA+ implementation'
+- level: 3
+  title: Next Steps
+  type: section
+  content: '1. **Component Implementation**: Build React components following module
+    specifications
+
+    2. **Theme Development**: Create complete cultural theme implementations
+
+    3. **Accessibility Testing**: Implement automated and user testing pipelines
+
+    4. **Cultural Validation**: Engage communities for theme and pattern validation'
+- level: 2
+  title: 📚 Additional Resources
+  type: section
+  content: '- **HIEROS Covenant**: See `ai-q/01_foundation/00_kOS_Vision.md`
+
+    - **Node Taxonomy**: See `ai-q/01_foundation/02_Node_Taxonomy.md`
+
+    - **Cultural Stewardship**: See individual node cultural considerations
+
+    - **Implementation Examples**: See `ai-q/03_node_specifications/` for node-specific
+    UI patterns
+
+
+    ---
+
+
+    **Note**: This modular architecture ensures maintainability, scalability, and
+    ease of understanding while preserving the comprehensive technical depth required
+    for production implementation of the kOS frontend system.'

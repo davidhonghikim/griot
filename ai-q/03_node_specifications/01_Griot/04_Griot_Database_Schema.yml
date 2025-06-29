@@ -1,0 +1,51 @@
+metadata:
+  original_file: 04_Griot_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Griot Class: Database Schema'
+  description: PostgreSQL database schema for the Griot Node Class.
+sections:
+- level: 2
+  title: 6. Database Schema
+  type: section
+  content: "The Griot node requires a persistent storage layer to manage its state.\
+    \ The following schema is designed for a PostgreSQL database, utilizing `JSONB`\
+    \ for flexible metadata storage.\n\n```sql\n-- Enables UUID generation\nCREATE\
+    \ EXTENSION IF NOT EXISTS \"uuid-ossp\";\n\n-- Table to store metadata about each\
+    \ distributable node package.\n-- This acts as the central registry of all \"\
+    genetic code\" available to the ecosystem.\nCREATE TABLE packages (\n    -- The\
+    \ primary key is the SHA-256 hash of the node artifact (.tar.gz).\n    -- This\
+    \ ensures content-addressable, immutable storage.\n    package_id VARCHAR(64)\
+    \ PRIMARY KEY,\n\n    -- A JSONB blob containing all package metadata, including\
+    \ version, author,\n    -- dependencies, and the cryptographic signature of the\
+    \ manifest.\n    -- Indexed for efficient querying of manifest properties.\n \
+    \   manifest JSONB NOT NULL,\n\n    -- The URL where the actual .tar.gz artifact\
+    \ can be retrieved from.\n    -- This could be an IPFS, HTTP, or other URI.\n\
+    \    artifact_url TEXT NOT NULL,\n\n    -- The Decentralized Identifier (DID)\
+    \ of the entity that created and signed the package.\n    author_did VARCHAR(255)\
+    \ NOT NULL,\n\n    -- The cryptographic signature of the manifest, used to verify\
+    \ authenticity and integrity.\n    signature TEXT NOT NULL,\n\n    -- Timestamp\
+    \ of when the package was first registered.\n    created_at TIMESTAMP WITH TIME\
+    \ ZONE DEFAULT NOW()\n);\n\n-- Create a GIN index on the manifest for fast lookups\
+    \ within the JSONB data.\n-- This allows for efficient queries like finding all\
+    \ packages by a certain author\n-- or all packages for a specific node class.\n\
+    CREATE INDEX idx_packages_manifest ON packages USING GIN (manifest);\n\n\n-- Table\
+    \ to track the status of node installation jobs.\n-- This provides an auditable\
+    \ log of all \"differentiation\" processes initiated by this Griot.\nCREATE TABLE\
+    \ installations (\n    -- A unique identifier for each installation job.\n   \
+    \ job_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n\n    -- Foreign key referencing\
+    \ the package being installed.\n    -- Ensures that an installation job is always\
+    \ linked to a valid package.\n    package_id VARCHAR(64) NOT NULL REFERENCES packages(package_id),\n\
+    \n    -- The DID of the node that initiated this installation job.\n    target_node_id\
+    \ VARCHAR(255) NOT NULL,\n\n    -- The current status of the job (e.g., pending,\
+    \ running, completed, failed).\n    -- Indexed for quick filtering of jobs by\
+    \ their state.\n    status VARCHAR(50) NOT NULL,\n\n    -- A human-readable message\
+    \ providing more context on the current status.\n    status_message TEXT,\n\n\
+    \    -- An array of log messages captured during the installation process.\n \
+    \   -- Useful for debugging failed installations.\n    logs TEXT[],\n\n    --\
+    \ Timestamp of when the job was created.\n    created_at TIMESTAMP WITH TIME ZONE\
+    \ DEFAULT NOW(),\n\n    -- Timestamp of when the job was completed or failed.\n\
+    \    completed_at TIMESTAMP WITH TIME ZONE\n);\n\n-- Create an index on the status\
+    \ column for efficient querying of jobs by their state.\nCREATE INDEX idx_installations_status\
+    \ ON installations (status);\n```"

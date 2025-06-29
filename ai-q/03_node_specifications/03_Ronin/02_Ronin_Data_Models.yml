@@ -1,0 +1,36 @@
+metadata:
+  original_file: 02_Ronin_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Ronin Class: Data Models'
+  description: Data models for the Ronin Node Class, including DiscoveryJob and DiscoveredService.
+sections:
+- level: 1
+  title: Ronin Class Data Models
+  type: section
+  content: ''
+- level: 3
+  title: 1. DiscoveryJob
+  type: section
+  content: "Represents an asynchronous task for the Ronin's Discovery Engine.\n\n\
+    ```json\n{\n  \"job_id\": \"string (uuid)\",\n  \"status\": \"pending | running\
+    \ | completed | failed\",\n  \"params\": {\n    \"target\": {\n      \"type\"\
+    : \"network_cidr | domain | did\",\n      \"value\": \"192.168.1.0/24\"\n    },\n\
+    \    \"protocols\": [\"mdns\", \"http-api\"],\n    \"depth\": \"number (integer,\
+    \ e.g., 1 for initial scan)\"\n  },\n  \"results\": [\n    // Array of DiscoveredService\
+    \ objects\n  ],\n  \"created_at\": \"string (iso_8601_timestamp)\",\n  \"completed_at\"\
+    : \"string (iso_8601_timestamp, optional)\"\n}\n```"
+- level: 3
+  title: 2. DiscoveredService
+  type: section
+  content: "A structured representation of a service found on the network. This is\
+    \ the primary data asset produced by a Ronin node.\n\n```json\n{\n  \"service_id\"\
+    : \"string (did:kos:service:...)\",\n  \"endpoint\": \"string (URL, e.g., https://griot.example.com:30437)\"\
+    ,\n  \"node_class\": \"string (e.g., 'Griot', 'Tohunga')\",\n  \"node_id\": \"\
+    string (did of the node hosting the service)\",\n  \"capabilities\": [\"string\"\
+    ],\n  \"protocols\": [\"klf/1.0\", \"http/1.1\"],\n  \"discovery_metadata\": {\n\
+    \    \"discovery_method\": \"string (e.g., 'mdns_advertisement', 'http_probe')\"\
+    ,\n    \"response_time_ms\": \"number\",\n    \"last_seen\": \"string (iso_8601_timestamp)\"\
+    \n  },\n  \"hieros_compliance\": {\n    \"verified\": \"boolean\",\n    \"codex_hash\"\
+    : \"string (sha256)\"\n  }\n}\n```"

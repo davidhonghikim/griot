@@ -1,0 +1,85 @@
+metadata:
+  original_file: 04_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Yachay Node 04: Database Schema'
+  version: 1.0
+sections:
+- level: 1
+  title: '**4. Yachay Node Database Schema**'
+  type: section
+  content: ''
+- level: 2
+  title: 4.1. Introduction
+  type: section
+  content: 'This document defines the database schema for the Yachay Node. The persistence
+    layer is comprised of two distinct stores to align with the architectural design:
+    a high-speed **Working Memory Store (WMS)** for `MemoryFragment` objects and a
+    durable **Long-Term Storage (LTS)** for `MemoryTapestry` objects.
+
+
+    -   **WMS Technology**: Redis (or a compatible in-memory key-value store).
+
+    -   **LTS Technology**: MongoDB (or a compatible document-oriented database).'
+- level: 2
+  title: 4.2. Working Memory Store (WMS) Schema - Redis
+  type: section
+  content: The WMS holds `MemoryFragment` objects for rapid access and processing
+    by the Consolidation Daemon.
+- level: 3
+  title: 4.2.1. `fragment:[fragmentId]`
+  type: section
+  content: "-   **Type**: `HASH`\n-   **Description**: Stores a single `MemoryFragment`\
+    \ object. The fields of the hash map directly to the keys of the `MemoryFragment`\
+    \ interface.\n-   **Key**: `fragment:<UUID>`\n-   **Fields**:\n    -   `fragmentId`:\
+    \ The UUID of the fragment.\n    -   `tapestryId`: (Optional) The suggested tapestry\
+    \ ID.\n    -   `sourceNodeId`: The ID of the originating node.\n    -   `timestamp`:\
+    \ The ISO 8601 timestamp string.\n    -   `content`: A JSON string representation\
+    \ of the fragment's content.\n    -   `tags`: A comma-separated string of tags."
+- level: 3
+  title: 4.2.2. `fragments_by_timestamp`
+  type: section
+  content: '-   **Type**: `SORTED SET`
+
+    -   **Description**: An index that allows the Consolidation Daemon to efficiently
+    retrieve fragments in chronological order.
+
+    -   **Key**: `fragments_by_timestamp`
+
+    -   **Score**: The Unix timestamp (as an integer).
+
+    -   **Value**: The `fragmentId`.'
+- level: 2
+  title: 4.3. Long-Term Storage (LTS) Schema - MongoDB
+  type: section
+  content: The LTS archives the fully consolidated `MemoryTapestry` documents for
+    long-term retention and complex querying.
+- level: 3
+  title: 4.3.1. `tapestries` Collection
+  type: section
+  content: "This is the primary collection for storing `MemoryTapestry` objects.\n\
+    \n-   **Document Structure**: The structure of the documents in this collection\
+    \ directly maps to the `MemoryTapestry` interface defined in `02_Data_Models.md`.\n\
+    \n    ```json\n    {\n      \"_id\": \"<ObjectId>\",\n      \"tapestryId\": \"\
+    <UUID>\",\n      \"title\": \"<String>\",\n      \"narrative\": \"<String>\",\n\
+    \      \"fragmentIds\": [\"<UUID>\", \"<UUID>\", ...],\n      \"creationTimestamp\"\
+    : \"<ISODate>\",\n      \"lastAccessedTimestamp\": \"<ISODate>\",\n      \"metadata\"\
+    : {\n        \"confidenceScore\": \"<Number>\",\n        \"accessFrequency\":\
+    \ \"<Number>\"\n      },\n      \"relatedTapestryIds\": [\"<UUID>\", \"<UUID>\"\
+    , ...]\n    }\n    ```"
+- level: 3
+  title: 4.3.2. Indexes on `tapestries` Collection
+  type: section
+  content: "To ensure efficient query performance, the following indexes **MUST**\
+    \ be created on the `tapestries` collection:\n\n1.  **Primary ID Index**:\n  \
+    \  -   **Field**: `tapestryId`\n    -   **Type**: `UNIQUE`\n    -   **Purpose**:\
+    \ Ensures uniqueness and provides fast lookup by the primary `tapestryId`.\n\n\
+    2.  **Temporal Index**:\n    -   **Field**: `creationTimestamp`\n    -   **Type**:\
+    \ `DESCENDING`\n    -   **Purpose**: Optimizes queries based on date ranges.\n\
+    \n3.  **Narrative Full-Text Index**:\n    -   **Field**: `narrative`\n    -  \
+    \ **Type**: `TEXT`\n    -   **Purpose**: Enables efficient natural language searches\
+    \ on the generated summary of the memory.\n\n4.  **Metadata Index**:\n    -  \
+    \ **Fields**: `metadata.confidenceScore`, `metadata.accessFrequency`\n    -  \
+    \ **Type**: `COMPOUND`\n    -   **Purpose**: Facilitates queries that filter or\
+    \ sort based on metadata attributes."

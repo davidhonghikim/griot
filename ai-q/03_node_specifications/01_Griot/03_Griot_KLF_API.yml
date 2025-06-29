@@ -1,0 +1,346 @@
+metadata:
+  original_file: 03_Griot_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Griot Class: KLF Message API'
+  description: KLF Message API specification for the Griot Node Class's lifecycle
+    services.
+sections:
+- level: 1
+  title: Griot Class KLF Message API
+  type: section
+  content: The Griot Class API is job-based. Clients submit a request to package a
+    node's configuration and code into a distributable artifact.
+- level: 2
+  title: 1. Core API Operations
+  type: section
+  content: ''
+- level: 3
+  title: '1.1. **Request: `replicate_node`**'
+  type: section
+  content: "-   **Description**: Requests that the Griot node package a specified\
+    \ source node into a distributable artifact.\n-   **Message Type**: `TASK_REQUEST`\n\
+    -   **Payload**:\n    ```json\n    {\n      \"task_name\": \"replicate_node\"\
+    ,\n      \"params\": {\n        \"source_node_did\": \"did:kos:my-node-to-replicate:123\"\
+    ,\n        \"target_version\": \"1.1.0\",\n        \"distribution_options\": {\n\
+    \            \"protocol\": \"ipfs\"\n        }\n      }\n    }\n    ```"
+- level: 3
+  title: 1.2. **Progress Updates**
+  type: section
+  content: "-   **Message Type**: `TASK_PROGRESS`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"replicate_node\",\n      \"job_id\": \"string (uuid\
+    \ of the running job)\",\n      \"status\": \"running\",\n      \"progress\":\
+    \ \"number (0-100)\",\n      \"message\": \"string (e.g., 'Cloning source repository...',\
+    \ 'Packaging artifact...')\"\n    }\n    ```"
+- level: 3
+  title: '1.3. **Response: Success**'
+  type: section
+  content: "-   **Message Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"replicate_node\",\n      \"job_id\": \"string (uuid\
+    \ of the job)\",\n      \"status\": \"completed\",\n      \"result\": {\n    \
+    \    \"artifact_uri\": \"string (e.g., 'ipfs://Qm...', 'https://.../artifact.tar.gz')\"\
+    ,\n        \"artifact_hash\": \"string (sha256)\",\n        \"manifest\": {\n\
+    \            // ... copy of the artifact's manifest.json ...\n        }\n    \
+    \  }\n    }\n    ```"
+- level: 3
+  title: '1.4. **Response: Error**'
+  type: section
+  content: "-   **Message Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"replicate_node\",\n      \"job_id\": \"string (uuid\
+    \ of the job)\",\n      \"status\": \"failed\",\n      \"error\": {\n        \"\
+    code\": \"string (e.g., 'SOURCE_NOT_FOUND', 'PACKAGING_FAILED')\",\n        \"\
+    message\": \"string (Detailed error message)\"\n      }\n    }\n    ```"
+- level: 2
+  title: 2. Comprehensive API Specification
+  type: section
+  content: ''
+- level: 3
+  title: 2.1. Advanced Replication Request
+  type: section
+  content: "**Enhanced Request Format**:\n```typescript\ninterface ReplicationRequest\
+    \ {\n  task_name: \"replicate_node\";\n  params: {\n    // Core identification\n\
+    \    source_node_did: string;\n    target_version: string;\n    \n    // Distribution\
+    \ configuration\n    distribution_options: {\n      protocol: \"ipfs\" | \"https\"\
+    \ | \"p2p\" | \"multi\";\n      compression_level?: number; // 1-9\n      encryption_enabled?:\
+    \ boolean;\n      redundancy_factor?: number; // for multi-protocol\n    };\n\
+    \    \n    // Quality and validation options\n    validation_level: \"basic\"\
+    \ | \"comprehensive\" | \"secure\";\n    include_tests?: boolean;\n    include_documentation?:\
+    \ boolean;\n    \n    // Performance optimization\n    parallel_processing?: boolean;\n\
+    \    cache_dependencies?: boolean;\n    optimize_for?: \"size\" | \"speed\" |\
+    \ \"reliability\";\n    \n    // Security options\n    signature_required: boolean;\n\
+    \    audit_trail?: boolean;\n    access_restrictions?: AccessRestriction[];\n\
+    \    \n    // Metadata and context\n    replication_context?: ReplicationContext;\n\
+    \    priority?: \"low\" | \"normal\" | \"high\" | \"critical\";\n    timeout_seconds?:\
+    \ number;\n  };\n}\n\ninterface AccessRestriction {\n  type: \"geographic\" |\
+    \ \"organizational\" | \"time_based\" | \"capability\";\n  constraints: Record<string,\
+    \ any>;\n}\n\ninterface ReplicationContext {\n  requesting_organization?: string;\n\
+    \  deployment_environment?: \"development\" | \"staging\" | \"production\";\n\
+    \  intended_usage?: string;\n  compliance_requirements?: string[];\n}\n```"
+- level: 3
+  title: 2.2. Detailed Progress Tracking
+  type: section
+  content: "**Enhanced Progress Format**:\n```typescript\ninterface ReplicationProgress\
+    \ {\n  task_name: \"replicate_node\";\n  job_id: string;\n  status: \"queued\"\
+    \ | \"running\" | \"paused\" | \"completed\" | \"failed\" | \"cancelled\";\n \
+    \ progress: number; // 0-100\n  \n  // Detailed phase information\n  current_phase:\
+    \ ReplicationPhase;\n  phases_completed: ReplicationPhase[];\n  estimated_completion:\
+    \ string; // ISO 8601 timestamp\n  \n  // Resource utilization\n  resource_usage:\
+    \ {\n    cpu_percent: number;\n    memory_mb: number;\n    disk_mb: number;\n\
+    \    network_mbps: number;\n  };\n  \n  // Quality metrics\n  quality_metrics:\
+    \ {\n    integrity_checks_passed: number;\n    security_scans_completed: number;\n\
+    \    dependency_conflicts_resolved: number;\n  };\n  \n  // Detailed message with\
+    \ context\n  message: string;\n  sub_messages?: string[];\n  \n  // Error information\
+    \ (if applicable)\n  warnings?: Warning[];\n  last_checkpoint?: string; // For\
+    \ resumability\n}\n\nenum ReplicationPhase {\n  VALIDATION = \"validation\",\n\
+    \  SOURCE_ACQUISITION = \"source_acquisition\",\n  DEPENDENCY_RESOLUTION = \"\
+    dependency_resolution\",\n  COMPILATION = \"compilation\",\n  PACKAGING = \"packaging\"\
+    ,\n  SECURITY_SCANNING = \"security_scanning\",\n  INTEGRITY_VERIFICATION = \"\
+    integrity_verification\",\n  SIGNATURE_GENERATION = \"signature_generation\",\n\
+    \  DISTRIBUTION_PREPARATION = \"distribution_preparation\",\n  UPLOAD = \"upload\"\
+    ,\n  VERIFICATION = \"verification\"\n}\n```"
+- level: 3
+  title: 2.3. Comprehensive Success Response
+  type: section
+  content: "**Enhanced Success Format**:\n```typescript\ninterface ReplicationSuccess\
+    \ {\n  task_name: \"replicate_node\";\n  job_id: string;\n  status: \"completed\"\
+    ;\n  completion_timestamp: string; // ISO 8601\n  total_duration_seconds: number;\n\
+    \  \n  result: {\n    // Primary artifact information\n    artifact_uri: string;\n\
+    \    artifact_hash: string;\n    artifact_size_bytes: number;\n    \n    // Alternative\
+    \ distribution endpoints\n    alternative_uris?: string[];\n    \n    // Comprehensive\
+    \ manifest\n    manifest: {\n      // Basic artifact info\n      name: string;\n\
+    \      version: string;\n      description: string;\n      \n      // Source information\n\
+    \      source_node_did: string;\n      source_version: string;\n      source_hash:\
+    \ string;\n      \n      // Dependencies\n      dependencies: Dependency[];\n\
+    \      system_requirements: SystemRequirement[];\n      \n      // Security and\
+    \ compliance\n      signatures: Signature[];\n      security_scan_results: SecurityScanResult;\n\
+    \      compliance_certifications: ComplianceCertification[];\n      \n      //\
+    \ Quality metrics\n      quality_score: number; // 0-1\n      test_coverage: number;\
+    \ // 0-1\n      documentation_completeness: number; // 0-1\n      \n      // Deployment\
+    \ information\n      supported_platforms: Platform[];\n      deployment_instructions:\
+    \ DeploymentInstruction[];\n      \n      // Metadata\n      creation_timestamp:\
+    \ string;\n      creator_organization: string;\n      license: string;\n     \
+    \ tags: string[];\n    };\n    \n    // Performance metrics\n    performance_metrics:\
+    \ {\n      replication_duration_seconds: number;\n      compression_ratio: number;\n\
+    \      validation_duration_seconds: number;\n      upload_duration_seconds: number;\n\
+    \    };\n    \n    // Verification information\n    verification: {\n      integrity_verified:\
+    \ boolean;\n      signature_verified: boolean;\n      hieros_compliance_verified:\
+    \ boolean;\n      security_scan_passed: boolean;\n    };\n  };\n}\n\ninterface\
+    \ Dependency {\n  name: string;\n  version: string;\n  source: string;\n  integrity_hash:\
+    \ string;\n  optional: boolean;\n}\n\ninterface SecurityScanResult {\n  scan_timestamp:\
+    \ string;\n  scanner_version: string;\n  vulnerabilities_found: Vulnerability[];\n\
+    \  overall_security_score: number; // 0-1\n  scan_duration_seconds: number;\n\
+    }\n\ninterface Vulnerability {\n  id: string;\n  severity: \"low\" | \"medium\"\
+    \ | \"high\" | \"critical\";\n  description: string;\n  affected_component: string;\n\
+    \  remediation: string;\n}\n```"
+- level: 2
+  title: 3. Advanced Error Handling
+  type: section
+  content: ''
+- level: 3
+  title: 3.1. Comprehensive Error Classification
+  type: section
+  content: "**Enhanced Error Response**:\n```typescript\ninterface ReplicationError\
+    \ {\n  task_name: \"replicate_node\";\n  job_id: string;\n  status: \"failed\"\
+    ;\n  failure_timestamp: string;\n  \n  error: {\n    // Primary error information\n\
+    \    code: ReplicationErrorCode;\n    message: string;\n    category: ErrorCategory;\n\
+    \    severity: \"low\" | \"medium\" | \"high\" | \"critical\";\n    \n    // Detailed\
+    \ context\n    phase: ReplicationPhase;\n    context: ErrorContext;\n    \n  \
+    \  // Recovery information\n    retryable: boolean;\n    retry_after_seconds?:\
+    \ number;\n    suggested_actions: SuggestedAction[];\n    \n    // Technical details\n\
+    \    technical_details: {\n      stack_trace?: string;\n      system_state: SystemState;\n\
+    \      resource_constraints?: ResourceConstraint[];\n    };\n    \n    // Impact\
+    \ assessment\n    impact: {\n      data_loss_risk: \"none\" | \"low\" | \"medium\"\
+    \ | \"high\";\n      security_implications: string[];\n      downstream_effects:\
+    \ string[];\n    };\n  };\n  \n  // Partial results (if any)\n  partial_results?:\
+    \ {\n    completed_phases: ReplicationPhase[];\n    recoverable_state: RecoverableState;\n\
+    \    cleanup_required: CleanupRequirement[];\n  };\n}\n\nenum ReplicationErrorCode\
+    \ {\n  // Source errors\n  SOURCE_NOT_FOUND = \"source_not_found\",\n  SOURCE_ACCESS_DENIED\
+    \ = \"source_access_denied\",\n  SOURCE_CORRUPTED = \"source_corrupted\",\n  SOURCE_VERSION_MISMATCH\
+    \ = \"source_version_mismatch\",\n  HIEROS_COMPLIANCE_VIOLATION = \"hieros_compliance_violation\"\
+    ,\n  \n  // Dependency errors\n  DEPENDENCY_NOT_FOUND = \"dependency_not_found\"\
+    ,\n  DEPENDENCY_VERSION_CONFLICT = \"dependency_version_conflict\",\n  DEPENDENCY_SECURITY_VIOLATION\
+    \ = \"dependency_security_violation\",\n  DEPENDENCY_LICENSE_INCOMPATIBLE = \"\
+    dependency_license_incompatible\",\n  \n  // Processing errors\n  COMPILATION_FAILED\
+    \ = \"compilation_failed\",\n  PACKAGING_FAILED = \"packaging_failed\",\n  COMPRESSION_FAILED\
+    \ = \"compression_failed\",\n  SIGNATURE_FAILED = \"signature_failed\",\n  \n\
+    \  // Validation errors\n  INTEGRITY_CHECK_FAILED = \"integrity_check_failed\"\
+    ,\n  SECURITY_SCAN_FAILED = \"security_scan_failed\",\n  QUALITY_THRESHOLD_NOT_MET\
+    \ = \"quality_threshold_not_met\",\n  MANIFEST_VALIDATION_FAILED = \"manifest_validation_failed\"\
+    ,\n  \n  // Resource errors\n  INSUFFICIENT_DISK_SPACE = \"insufficient_disk_space\"\
+    ,\n  INSUFFICIENT_MEMORY = \"insufficient_memory\",\n  CPU_LIMIT_EXCEEDED = \"\
+    cpu_limit_exceeded\",\n  NETWORK_BANDWIDTH_EXCEEDED = \"network_bandwidth_exceeded\"\
+    ,\n  \n  // Distribution errors\n  UPLOAD_FAILED = \"upload_failed\",\n  NETWORK_TIMEOUT\
+    \ = \"network_timeout\",\n  STORAGE_QUOTA_EXCEEDED = \"storage_quota_exceeded\"\
+    ,\n  PROTOCOL_NOT_SUPPORTED = \"protocol_not_supported\",\n  \n  // System errors\n\
+    \  WORKSPACE_CREATION_FAILED = \"workspace_creation_failed\",\n  PERMISSION_DENIED\
+    \ = \"permission_denied\",\n  CONCURRENT_OPERATION_CONFLICT = \"concurrent_operation_conflict\"\
+    ,\n  INTERNAL_SERVICE_ERROR = \"internal_service_error\"\n}\n\nenum ErrorCategory\
+    \ {\n  TRANSIENT = \"transient\", // Retry likely to succeed\n  CONFIGURATION\
+    \ = \"configuration\", // User needs to fix configuration\n  SECURITY = \"security\"\
+    , // Security policy violation\n  RESOURCE = \"resource\", // Resource constraints\n\
+    \  SYSTEM = \"system\", // Internal system error\n  DATA = \"data\" // Data corruption\
+    \ or inconsistency\n}\n```"
+- level: 3
+  title: 3.2. Error Recovery Strategies
+  type: section
+  content: "**Recovery Action Framework**:\n```typescript\ninterface SuggestedAction\
+    \ {\n  action_type: ActionType;\n  description: string;\n  priority: number; //\
+    \ 1-10, higher is more important\n  estimated_effort: \"low\" | \"medium\" | \"\
+    high\";\n  automated: boolean;\n  \n  // Action-specific parameters\n  parameters?:\
+    \ Record<string, any>;\n  \n  // Prerequisites\n  prerequisites?: string[];\n\
+    \  \n  // Expected outcome\n  expected_resolution: string;\n  success_probability:\
+    \ number; // 0-1\n}\n\nenum ActionType {\n  RETRY_WITH_BACKOFF = \"retry_with_backoff\"\
+    ,\n  MODIFY_PARAMETERS = \"modify_parameters\",\n  UPDATE_DEPENDENCIES = \"update_dependencies\"\
+    ,\n  INCREASE_RESOURCES = \"increase_resources\",\n  CONTACT_ADMINISTRATOR = \"\
+    contact_administrator\",\n  USE_ALTERNATIVE_SOURCE = \"use_alternative_source\"\
+    ,\n  MANUAL_INTERVENTION = \"manual_intervention\",\n  ESCALATE_TO_SUPPORT = \"\
+    escalate_to_support\"\n}\n```"
+- level: 2
+  title: 4. Advanced API Operations
+  type: section
+  content: ''
+- level: 3
+  title: 4.1. Node Installation API
+  type: section
+  content: "**Installation Request**:\n```typescript\ninterface InstallationRequest\
+    \ {\n  task_name: \"install_node\";\n  params: {\n    // Artifact identification\n\
+    \    artifact_uri: string;\n    expected_hash?: string;\n    \n    // Installation\
+    \ configuration\n    installation_path?: string;\n    configuration_overrides?:\
+    \ Record<string, any>;\n    \n    // Environment configuration\n    target_environment:\
+    \ {\n      platform: Platform;\n      resource_constraints: ResourceConstraint[];\n\
+    \      security_requirements: SecurityRequirement[];\n    };\n    \n    // Installation\
+    \ options\n    options: {\n      verify_signatures: boolean;\n      run_tests:\
+    \ boolean;\n      backup_existing: boolean;\n      rollback_on_failure: boolean;\n\
+    \      \n      // Post-installation actions\n      auto_start: boolean;\n    \
+    \  register_with_network: boolean;\n      configure_monitoring: boolean;\n   \
+    \ };\n    \n    // Operational parameters\n    timeout_seconds?: number;\n   \
+    \ priority?: \"low\" | \"normal\" | \"high\";\n    notification_webhooks?: string[];\n\
+    \  };\n}\n```\n\n**Installation Progress**:\n```typescript\ninterface InstallationProgress\
+    \ {\n  task_name: \"install_node\";\n  job_id: string;\n  status: \"running\"\
+    \ | \"completed\" | \"failed\";\n  progress: number;\n  \n  current_phase: InstallationPhase;\n\
+    \  phases_completed: InstallationPhase[];\n  \n  // Installation-specific metrics\n\
+    \  installation_metrics: {\n    download_progress: number; // 0-100\n    verification_progress:\
+    \ number; // 0-100\n    configuration_progress: number; // 0-100\n    startup_progress:\
+    \ number; // 0-100\n  };\n  \n  // System impact\n  system_impact: {\n    disk_space_used:\
+    \ number; // bytes\n    services_modified: string[];\n    configuration_changes:\
+    \ ConfigChange[];\n  };\n  \n  message: string;\n  estimated_completion: string;\n\
+    }\n\nenum InstallationPhase {\n  DOWNLOAD = \"download\",\n  VERIFICATION = \"\
+    verification\",\n  DEPENDENCY_INSTALLATION = \"dependency_installation\",\n  CONFIGURATION\
+    \ = \"configuration\",\n  DEPLOYMENT = \"deployment\",\n  TESTING = \"testing\"\
+    ,\n  STARTUP = \"startup\",\n  REGISTRATION = \"registration\",\n  HEALTH_CHECK\
+    \ = \"health_check\"\n}\n```"
+- level: 3
+  title: 4.2. Node Lifecycle Management
+  type: section
+  content: "**Health Check API**:\n```typescript\ninterface HealthCheckRequest {\n\
+    \  task_name: \"health_check\";\n  params: {\n    target_node_did: string;\n \
+    \   check_depth: \"basic\" | \"comprehensive\" | \"full_diagnostic\";\n    include_performance_metrics:\
+    \ boolean;\n    timeout_seconds?: number;\n  };\n}\n\ninterface HealthCheckResponse\
+    \ {\n  task_name: \"health_check\";\n  job_id: string;\n  status: \"completed\"\
+    ;\n  \n  result: {\n    overall_health: \"healthy\" | \"degraded\" | \"unhealthy\"\
+    \ | \"critical\";\n    health_score: number; // 0-1\n    \n    // Component health\n\
+    \    components: ComponentHealth[];\n    \n    // Performance metrics\n    performance:\
+    \ {\n      response_time_ms: number;\n      throughput_rps: number;\n      error_rate:\
+    \ number;\n      resource_utilization: ResourceUtilization;\n    };\n    \n  \
+    \  // Issues and recommendations\n    issues: HealthIssue[];\n    recommendations:\
+    \ HealthRecommendation[];\n    \n    // Diagnostic information\n    diagnostics:\
+    \ {\n      last_startup: string;\n      uptime_seconds: number;\n      version:\
+    \ string;\n      configuration_hash: string;\n    };\n  };\n}\n```"
+- level: 2
+  title: 5. Performance Optimization Patterns
+  type: section
+  content: ''
+- level: 3
+  title: 5.1. Batch Processing API
+  type: section
+  content: "**Batch Replication Request**:\n```typescript\ninterface BatchReplicationRequest\
+    \ {\n  task_name: \"batch_replicate\";\n  params: {\n    replications: ReplicationRequest[];\n\
+    \    \n    // Batch configuration\n    batch_options: {\n      max_concurrent:\
+    \ number;\n      failure_strategy: \"stop_on_first\" | \"continue_on_failure\"\
+    \ | \"adaptive\";\n      priority_ordering: \"fifo\" | \"size_ascending\" | \"\
+    size_descending\" | \"custom\";\n      \n      // Optimization options\n     \
+    \ share_dependencies: boolean;\n      parallel_uploads: boolean;\n      compression_sharing:\
+    \ boolean;\n    };\n    \n    // Monitoring and reporting\n    progress_frequency_seconds:\
+    \ number;\n    intermediate_notifications: boolean;\n    consolidate_results:\
+    \ boolean;\n  };\n}\n\ninterface BatchReplicationProgress {\n  task_name: \"batch_replicate\"\
+    ;\n  job_id: string;\n  status: \"running\" | \"completed\" | \"partial_failure\"\
+    \ | \"failed\";\n  \n  // Overall progress\n  overall_progress: number; // 0-100\n\
+    \  completed_count: number;\n  failed_count: number;\n  remaining_count: number;\n\
+    \  \n  // Individual job status\n  job_statuses: IndividualJobStatus[];\n  \n\
+    \  // Batch metrics\n  batch_metrics: {\n    total_size_bytes: number;\n    processed_size_bytes:\
+    \ number;\n    avg_processing_time_seconds: number;\n    throughput_bytes_per_second:\
+    \ number;\n  };\n  \n  // Resource utilization\n  resource_efficiency: {\n   \
+    \ dependency_reuse_rate: number;\n    cache_hit_rate: number;\n    compression_savings:\
+    \ number;\n  };\n}\n```"
+- level: 3
+  title: 5.2. Caching and Optimization APIs
+  type: section
+  content: "**Cache Management**:\n```typescript\ninterface CacheManagementRequest\
+    \ {\n  task_name: \"manage_cache\";\n  params: {\n    operation: \"warm\" | \"\
+    invalidate\" | \"optimize\" | \"status\";\n    \n    // Operation-specific parameters\n\
+    \    cache_targets?: string[]; // DIDs or patterns\n    optimization_strategy?:\
+    \ \"size\" | \"access_frequency\" | \"hybrid\";\n    \n    // Warming parameters\n\
+    \    warming_criteria?: {\n      popular_artifacts: boolean;\n      recent_artifacts:\
+    \ boolean;\n      predicted_demand: boolean;\n    };\n  };\n}\n\ninterface CacheStatusResponse\
+    \ {\n  task_name: \"manage_cache\";\n  status: \"completed\";\n  \n  result: {\n\
+    \    cache_statistics: {\n      total_size_bytes: number;\n      item_count: number;\n\
+    \      hit_rate: number;\n      miss_rate: number;\n      eviction_count: number;\n\
+    \    };\n    \n    // Performance metrics\n    performance_impact: {\n      avg_cache_hit_time_ms:\
+    \ number;\n      avg_cache_miss_time_ms: number;\n      cache_efficiency_score:\
+    \ number;\n    };\n    \n    // Optimization recommendations\n    recommendations:\
+    \ CacheOptimizationRecommendation[];\n    \n    // Cache entries summary\n   \
+    \ top_accessed_items: CacheItem[];\n    largest_items: CacheItem[];\n    oldest_items:\
+    \ CacheItem[];\n  };\n}\n```"
+- level: 2
+  title: 6. Real-World Usage Examples
+  type: section
+  content: ''
+- level: 3
+  title: 6.1. Production Deployment Scenario
+  type: section
+  content: "```typescript\n// Example: Enterprise-grade replication with full validation\n\
+    const enterpriseReplicationRequest = {\n  task_name: \"replicate_node\",\n  params:\
+    \ {\n    source_node_did: \"did:kos:analytics-engine:v2.1.0\",\n    target_version:\
+    \ \"2.1.0-enterprise\",\n    \n    distribution_options: {\n      protocol: \"\
+    multi\",\n      compression_level: 6,\n      encryption_enabled: true,\n     \
+    \ redundancy_factor: 3\n    },\n    \n    validation_level: \"secure\",\n    include_tests:\
+    \ true,\n    include_documentation: true,\n    \n    parallel_processing: true,\n\
+    \    cache_dependencies: true,\n    optimize_for: \"reliability\",\n    \n   \
+    \ signature_required: true,\n    audit_trail: true,\n    access_restrictions:\
+    \ [\n      {\n        type: \"organizational\",\n        constraints: { allowed_organizations:\
+    \ [\"enterprise-customer-123\"] }\n      },\n      {\n        type: \"geographic\"\
+    ,\n        constraints: { allowed_regions: [\"us-east\", \"eu-west\"] }\n    \
+    \  }\n    ],\n    \n    replication_context: {\n      requesting_organization:\
+    \ \"enterprise-customer-123\",\n      deployment_environment: \"production\",\n\
+    \      intended_usage: \"high-frequency analytics processing\",\n      compliance_requirements:\
+    \ [\"SOC2\", \"GDPR\", \"HIPAA\"]\n    },\n    \n    priority: \"high\",\n   \
+    \ timeout_seconds: 1800\n  }\n};\n\n// Handle the response with comprehensive\
+    \ error handling\nasync function handleEnterpriseReplication(request: ReplicationRequest)\
+    \ {\n  try {\n    const response = await griotClient.sendMessage(request);\n \
+    \   \n    if (response.status === \"completed\") {\n      // Verify enterprise\
+    \ requirements\n      await verifyEnterpriseCompliance(response.result);\n   \
+    \   \n      // Deploy to production infrastructure\n      await deployToProduction(response.result.artifact_uri);\n\
+    \      \n      // Set up monitoring\n      await configureMonitoring(response.result.manifest);\n\
+    \      \n    } else if (response.status === \"failed\") {\n      // Enterprise-specific\
+    \ error handling\n      await handleEnterpriseError(response.error);\n    }\n\
+    \    \n  } catch (error) {\n    await escalateToEnterpriseSupport(error);\n  }\n\
+    }\n```"
+- level: 3
+  title: 6.2. Development Environment Scenario
+  type: section
+  content: "```typescript\n// Example: Rapid development iteration\nconst developmentReplicationRequest\
+    \ = {\n  task_name: \"replicate_node\",\n  params: {\n    source_node_did: \"\
+    did:kos:test-service:latest\",\n    target_version: \"dev-build-\" + Date.now(),\n\
+    \    \n    distribution_options: {\n      protocol: \"https\",\n      compression_level:\
+    \ 1, // Fast compression\n      encryption_enabled: false\n    },\n    \n    validation_level:\
+    \ \"basic\",\n    include_tests: false,\n    include_documentation: false,\n \
+    \   \n    parallel_processing: true,\n    cache_dependencies: true,\n    optimize_for:\
+    \ \"speed\",\n    \n    signature_required: false,\n    audit_trail: false,\n\
+    \    \n    replication_context: {\n      deployment_environment: \"development\"\
+    ,\n      intended_usage: \"rapid prototyping\"\n    },\n    \n    priority: \"\
+    normal\",\n    timeout_seconds: 300\n  }\n};\n```\n\nThis comprehensive enhancement\
+    \ transforms the basic Griot KLF API into a production-ready specification with\
+    \ detailed error handling, advanced features, performance optimization patterns,\
+    \ and real-world usage examples. Developers now have complete guidance for implementing\
+    \ robust, scalable Griot node interactions."

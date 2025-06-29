@@ -1,0 +1,329 @@
+name: document_validation
+description: "Comprehensive validation system for document creation, ensuring compliance with all kOS documentation standards"
+version: "1.0.0"
+node_class: "Yachay"
+cultural_origin: "Quechua Tradition"
+tier: "governance"
+
+# Validation functionality
+functions:
+  - name: validate_document_path
+    description: "Validate that a document path follows kOS directory structure rules"
+    parameters:
+      type: object
+      properties:
+        path:
+          type: string
+          description: "Proposed document path"
+        document_type:
+          type: string
+          enum: ["analysis", "handoff", "changelog", "implementation_plan", "specification", "overview"]
+          description: "Type of document being created"
+      required: ["path", "document_type"]
+
+  - name: validate_naming_convention
+    description: "Validate that document names follow proper naming conventions"
+    parameters:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: "Proposed filename"
+        document_type:
+          type: string
+          enum: ["analysis", "handoff", "changelog", "implementation_plan", "specification", "overview"]
+          description: "Type of document"
+        agent:
+          type: string
+          description: "Agent creating the document"
+      required: ["filename", "document_type"]
+
+  - name: validate_frontmatter
+    description: "Validate that markdown documents have proper frontmatter"
+    parameters:
+      type: object
+      properties:
+        content:
+          type: string
+          description: "Document content to validate"
+        document_type:
+          type: string
+          enum: ["analysis", "handoff", "changelog", "implementation_plan", "specification", "overview"]
+          description: "Type of document"
+        required_fields:
+          type: array
+          items:
+            type: string
+          description: "Required frontmatter fields"
+      required: ["content", "document_type"]
+
+  - name: validate_content_structure
+    description: "Validate that document content follows proper structure"
+    parameters:
+      type: object
+      properties:
+        content:
+          type: string
+          description: "Document content to validate"
+        document_type:
+          type: string
+          enum: ["analysis", "handoff", "changelog", "implementation_plan", "specification", "overview"]
+          description: "Type of document"
+      required: ["content", "document_type"]
+
+  - name: validate_cultural_sensitivity
+    description: "Validate that document content respects cultural principles"
+    parameters:
+      type: object
+      properties:
+        content:
+          type: string
+          description: "Document content to validate"
+        cultural_context:
+          type: string
+          description: "Cultural context for validation"
+      required: ["content"]
+
+  - name: validate_duplicate_content
+    description: "Validate that content is not a duplicate of existing documents"
+    parameters:
+      type: object
+      properties:
+        content:
+          type: string
+          description: "Document content to check"
+        similarity_threshold:
+          type: number
+          default: 0.8
+          description: "Similarity threshold for duplicate detection"
+        exclude_document_id:
+          type: string
+          description: "Document ID to exclude from duplicate check"
+      required: ["content"]
+
+# Validation rules and standards
+validation_rules:
+  path_validation:
+    allowed_directories:
+      - "agents/"
+      - "ai-q/"
+      - "packages/"
+      - "apps/"
+      - "scripts/"
+      - "tests/"
+    
+    document_type_mapping:
+      analysis:
+        allowed_paths: ["agents/analysis/"]
+        naming_pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z_.*\\.md$"
+      
+      handoff:
+        allowed_paths: ["agents/handoff/"]
+        naming_pattern: "^LATEST_HANDOFF\\.md$|^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z_.*\\.md$"
+      
+      changelog:
+        allowed_paths: ["agents/changelog/"]
+        naming_pattern: "^changelog\\.json$|^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z_.*\\.json$"
+      
+      implementation_plan:
+        allowed_paths: ["agents/implementation-plans/active/"]
+        naming_pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z_.*\\.md$"
+      
+      specification:
+        allowed_paths: ["ai-q/03_node_specifications/"]
+        naming_pattern: "^\\d{2}_.*\\.md$"
+      
+      overview:
+        allowed_paths: ["ai-q/"]
+        naming_pattern: "^.*\\.md$"
+
+  frontmatter_validation:
+    required_fields:
+      analysis:
+        - "title"
+        - "version"
+        - "status"
+        - "priority"
+        - "last_updated"
+        - "agent"
+        - "analysis_type"
+      
+      handoff:
+        - "title"
+        - "version"
+        - "status"
+        - "priority"
+        - "last_updated"
+        - "agent"
+      
+      implementation_plan:
+        - "title"
+        - "version"
+        - "status"
+        - "priority"
+        - "last_updated"
+        - "agent"
+      
+      specification:
+        - "title"
+        - "version"
+        - "status"
+        - "priority"
+        - "last_updated"
+      
+      overview:
+        - "title"
+        - "version"
+        - "status"
+        - "priority"
+        - "last_updated"
+
+    field_validation:
+      version:
+        pattern: "^\\d+\\.\\d+(\\.\\d+)?$"
+        message: "Version must follow semantic versioning (e.g., 1.0, 1.0.0)"
+      
+      status:
+        allowed_values: ["draft", "active", "archived"]
+        message: "Status must be one of: draft, active, archived"
+      
+      priority:
+        allowed_values: ["critical", "high", "medium", "low"]
+        message: "Priority must be one of: critical, high, medium, low"
+
+  content_structure_validation:
+    markdown_rules:
+      - rule: "require_headers"
+        description: "Documents must have proper header hierarchy"
+        pattern: "^#{1,6}\\s+"
+      
+      - rule: "require_code_fencing"
+        description: "Code blocks must be properly fenced"
+        pattern: "```[\\w]*\\n[\\s\\S]*?```"
+      
+      - rule: "require_list_formatting"
+        description: "Lists must be properly formatted"
+        pattern: "^[\\s]*[-*+]\\s+"
+      
+      - rule: "require_link_formatting"
+        description: "Links must be properly formatted"
+        pattern: "\\[([^\\]]+)\\]\\(([^)]+)\\)"
+
+    document_type_structure:
+      analysis:
+        required_sections:
+          - "Analysis Content"
+          - "Key Findings"
+          - "Recommendations"
+          - "Next Steps"
+      
+      handoff:
+        required_sections:
+          - "Current Project Status"
+          - "Your Directive"
+          - "Accomplishments"
+          - "Next Steps"
+          - "Context & History"
+      
+      implementation_plan:
+        required_sections:
+          - "Overview"
+          - "Objectives"
+          - "Implementation Steps"
+          - "Success Criteria"
+          - "Risks & Mitigation"
+
+  cultural_sensitivity_validation:
+    quechua_principles:
+      - principle: "Yachay (Knowledge)"
+        description: "Respect for knowledge as sacred"
+        validation: "Content must acknowledge knowledge sources and cultural origins"
+      
+      - principle: "Ayni (Reciprocity)"
+        description: "Knowledge sharing follows reciprocal principles"
+        validation: "Content must demonstrate mutual benefit and respect"
+      
+      - principle: "Pachamama (Earth Mother)"
+        description: "Knowledge is connected to natural cycles"
+        validation: "Content must show awareness of environmental and cyclical contexts"
+      
+      - principle: "Sumak Kawsay (Good Living)"
+        description: "Knowledge serves collective well-being"
+        validation: "Content must contribute to collective benefit"
+
+    cultural_attribution:
+      - rule: "proper_attribution"
+        description: "Cultural elements must be properly attributed"
+        pattern: "Respectfully inspired by|Cultural origin|Traditional wisdom"
+      
+      - rule: "community_engagement"
+        description: "Content must acknowledge community engagement"
+        pattern: "Community consultation|Cultural advisors|Expert review"
+      
+      - rule: "ongoing_relationships"
+        description: "Content must demonstrate ongoing cultural relationships"
+        pattern: "Long-term partnership|Ongoing consultation|Community benefit"
+
+# Error handling and reporting
+error_handling:
+  validation_levels:
+    - level: "error"
+      description: "Critical validation failure - document creation blocked"
+      examples:
+        - "Path not in allowed directories"
+        - "Missing required frontmatter"
+        - "Invalid naming convention"
+    
+    - level: "warning"
+      description: "Non-critical validation issue - document creation allowed with warning"
+      examples:
+        - "Potential duplicate content"
+        - "Missing optional frontmatter"
+        - "Cultural sensitivity concerns"
+    
+    - level: "info"
+      description: "Informational validation message"
+      examples:
+        - "Document successfully validated"
+        - "Cultural principles respected"
+        - "Standards compliance confirmed"
+
+  error_messages:
+    path_validation:
+      invalid_directory: "Path '{path}' is not in allowed directories: {allowed_dirs}"
+      invalid_naming: "Filename '{filename}' does not match naming pattern for type '{type}'"
+    
+    frontmatter_validation:
+      missing_field: "Required frontmatter field '{field}' is missing"
+      invalid_value: "Frontmatter field '{field}' has invalid value '{value}'"
+      invalid_format: "Frontmatter field '{field}' has invalid format"
+    
+    content_validation:
+      missing_section: "Required section '{section}' is missing"
+      invalid_structure: "Document structure does not follow required format"
+      cultural_concern: "Content may not fully respect cultural principles"
+
+# Performance and optimization
+performance:
+  validation_timeout: 30
+  max_content_size: "10MB"
+  cache_size: 1000
+  parallel_validation: true
+
+# Integration points
+integrations:
+  - name: "documentation_registry"
+    description: "Integration with documentation registry for validation"
+    permissions: ["read", "write"]
+
+  - name: "vector_database"
+    description: "Vector database for duplicate detection"
+    permissions: ["read", "search"]
+
+  - name: "file_system"
+    description: "File system for path validation"
+    permissions: ["read"]
+
+  - name: "markdown_processor"
+    description: "Markdown processor for content validation"
+    permissions: ["read", "validate"] 

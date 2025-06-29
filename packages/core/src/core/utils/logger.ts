@@ -3,7 +3,7 @@
  * Structured logging for the Griot framework
  */
 
-import { getEnvironmentConfig } from '../config/environment.js';
+import { getEnvironmentConfig } from '../../config/environment.js';
 
 const env = getEnvironmentConfig();
 
@@ -34,5 +34,8 @@ export function createLogger(name: string) {
     },
   };
 }
+
+// Create a default logger instance
+const baseLogger = createLogger('griot-core');
 
 export { baseLogger as logger }; 

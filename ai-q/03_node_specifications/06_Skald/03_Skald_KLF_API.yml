@@ -1,0 +1,62 @@
+metadata:
+  original_file: 03_Skald_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Skald Class: KLF Message API'
+  description: KLF Message API specification for the Skald Node Class's pub/sub services.
+sections:
+- level: 1
+  title: Skald Class KLF Message API
+  type: section
+  content: The Skald Class API exposes its pub/sub capabilities via simple, command-oriented
+    KLF messages.
+- level: 3
+  title: 1. Publishing
+  type: section
+  content: ''
+- level: 4
+  title: '**Request: `publish_event`**'
+  type: section
+  content: "-   **Description**: Publishes an event to a specific topic.\n-   **Message\
+    \ Type**: `EVENT`\n-   **Payload**:\n    ```json\n    {\n      \"topic_name\"\
+    : \"kos:system:node_health_alerts\",\n      \"payload\": {\n        \"node_did\"\
+    : \"did:kos:griot:123\",\n        \"status\": \"Warning\",\n        \"metric\"\
+    : \"cpu_usage_percent\",\n        \"value\": 95\n      }\n    }\n    ```\n-  \
+    \ **Response**: No direct response is expected for publishes (fire-and-forget).\
+    \ The Skald node handles delivery asynchronously. An error may be returned if\
+    \ the topic is restricted and the publisher lacks permission."
+- level: 3
+  title: 2. Subscribing & Unsubscribing
+  type: section
+  content: ''
+- level: 4
+  title: '**Request: `subscribe`**'
+  type: section
+  content: "-   **Description**: Subscribes the sending node to a topic.\n-   **Message\
+    \ Type**: `CONTROL_COMMAND`\n-   **Payload**:\n    ```json\n    {\n      \"command_name\"\
+    : \"subscribe\",\n      \"params\": {\n        \"topic_name\": \"kos:system:node_health_alerts\"\
+    \n      }\n    }\n    ```\n-   **Response**: A `TASK_RESPONSE` indicating success\
+    \ or failure of the subscription command."
+- level: 4
+  title: '**Request: `unsubscribe`**'
+  type: section
+  content: "-   **Description**: Unsubscribes the sending node from a topic.\n-  \
+    \ **Message Type**: `CONTROL_COMMAND`\n-   **Payload**:\n    ```json\n    {\n\
+    \      \"command_name\": \"unsubscribe\",\n      \"params\": {\n        \"topic_name\"\
+    : \"kos:system:node_health_alerts\"\n      }\n    }\n    ```\n-   **Response**:\
+    \ A `TASK_RESPONSE` indicating success or failure."
+- level: 3
+  title: 3. Receiving Events
+  type: section
+  content: ''
+- level: 4
+  title: '**Inbound Message: `event_delivery`**'
+  type: section
+  content: "-   **Description**: A message sent *from* the Skald node *to* a subscriber.\n\
+    -   **Message Type**: `EVENT`\n-   **Payload**:\n    ```json\n    {\n      \"\
+    event_id\": \"...\",\n      \"topic_name\": \"kos:system:node_health_alerts\"\
+    ,\n      \"publisher_did\": \"did:kos:hakim:xyz\",\n      \"published_at\": \"\
+    ...\",\n      \"payload\": {\n        \"node_did\": \"did:kos:griot:123\",\n \
+    \       \"status\": \"Warning\",\n        \"metric\": \"cpu_usage_percent\",\n\
+    \        \"value\": 95\n      }\n    }\n    ```"

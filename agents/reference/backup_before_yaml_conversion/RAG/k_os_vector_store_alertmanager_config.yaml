@@ -1,0 +1,30 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'default'
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 1h
+
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: 'devops@kosproject.local'
+        from: 'alertmanager@kos.local'
+        smarthost: 'smtp.kos.local:587'
+        auth_username: 'alertmanager'
+        auth_password: 'YOUR_SMTP_PASSWORD'
+        require_tls: true
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname']
+
+# Note:
+# Replace email and SMTP settings with your real mail server details.
+# For local testing, use a fake SMTP relay like MailHog or Papercut.

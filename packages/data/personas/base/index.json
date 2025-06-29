@@ -1,6 +1,6 @@
 [
   {
-    "id": "hakim-core-dangermouse-a1c08235-5d79-484e-8183-39402ed9a1db",
+    "id": "hakim-core-dangermouse-f2b095a9-14ca-4188-a14a-43fa70b525c5",
     "name": "Hakim",
     "base": "hakim",
     "variant": "core",
@@ -10,10 +10,10 @@
       "core",
       "essential"
     ],
-    "uuid": "a1c08235-5d79-484e-8183-39402ed9a1db"
+    "uuid": "f2b095a9-14ca-4188-a14a-43fa70b525c5"
   },
   {
-    "id": "mzee-core-dangermouse-f5d6a7ad-4359-4230-bb0c-74c902bbfd69",
+    "id": "mzee-core-dangermouse-d4c381c7-d50e-4a9e-98c9-d1c085291b4f",
     "name": "Mzee",
     "base": "mzee",
     "variant": "core",
@@ -23,10 +23,10 @@
       "core",
       "essential"
     ],
-    "uuid": "f5d6a7ad-4359-4230-bb0c-74c902bbfd69"
+    "uuid": "d4c381c7-d50e-4a9e-98c9-d1c085291b4f"
   },
   {
-    "id": "archon-core-dangermouse-2376498f-bd5c-4872-b8aa-70b2ad46729e",
+    "id": "archon-core-dangermouse-6aac4a2a-384e-4896-a281-9f5cd505c6d7",
     "name": "Archon",
     "base": "archon",
     "variant": "core",
@@ -36,10 +36,10 @@
       "core",
       "essential"
     ],
-    "uuid": "2376498f-bd5c-4872-b8aa-70b2ad46729e"
+    "uuid": "6aac4a2a-384e-4896-a281-9f5cd505c6d7"
   },
   {
-    "id": "amauta-core-dangermouse-45a9a714-16f9-40b7-a246-8416593249cb",
+    "id": "amauta-core-dangermouse-235f30d2-5413-4f77-8f2f-b59d0a8b0366",
     "name": "Amauta",
     "base": "amauta",
     "variant": "core",
@@ -49,10 +49,10 @@
       "core",
       "essential"
     ],
-    "uuid": "45a9a714-16f9-40b7-a246-8416593249cb"
+    "uuid": "235f30d2-5413-4f77-8f2f-b59d0a8b0366"
   },
   {
-    "id": "musa-core-dangermouse-7d075339-d14d-4c7c-8077-526442e76e52",
+    "id": "musa-core-dangermouse-254afe56-b94c-4f2d-855d-c564d898b5af",
     "name": "Musa",
     "base": "musa",
     "variant": "core",
@@ -62,10 +62,10 @@
       "core",
       "essential"
     ],
-    "uuid": "7d075339-d14d-4c7c-8077-526442e76e52"
+    "uuid": "254afe56-b94c-4f2d-855d-c564d898b5af"
   },
   {
-    "id": "tohunga-core-dangermouse-96c98f72-8537-4777-bed2-89008899cf6b",
+    "id": "tohunga-core-dangermouse-e2f7cf48-b3f5-4241-aec8-e181c6ad31f1",
     "name": "Tohunga",
     "base": "tohunga",
     "variant": "core",
@@ -75,10 +75,10 @@
       "core",
       "essential"
     ],
-    "uuid": "96c98f72-8537-4777-bed2-89008899cf6b"
+    "uuid": "e2f7cf48-b3f5-4241-aec8-e181c6ad31f1"
   },
   {
-    "id": "skald-core-dangermouse-053a403d-1367-4061-be47-cfb4407c82d1",
+    "id": "skald-core-dangermouse-aaad47a8-a11a-4e2f-a9cd-14b6e7d08221",
     "name": "Skald",
     "base": "skald",
     "variant": "core",
@@ -88,10 +88,10 @@
       "core",
       "essential"
     ],
-    "uuid": "053a403d-1367-4061-be47-cfb4407c82d1"
+    "uuid": "aaad47a8-a11a-4e2f-a9cd-14b6e7d08221"
   },
   {
-    "id": "junzi-core-dangermouse-5e878526-0d53-4654-bcb3-a21d90c80ecb",
+    "id": "junzi-core-dangermouse-1caf614d-f987-42ce-84ab-25fe9dff79f3",
     "name": "Junzi",
     "base": "junzi",
     "variant": "core",
@@ -101,10 +101,10 @@
       "core",
       "essential"
     ],
-    "uuid": "5e878526-0d53-4654-bcb3-a21d90c80ecb"
+    "uuid": "1caf614d-f987-42ce-84ab-25fe9dff79f3"
   },
   {
-    "id": "ronin-core-dangermouse-eb59df6e-0a6f-4c33-8d9e-397c66597e67",
+    "id": "ronin-core-dangermouse-056601a1-a8d1-4228-8e3c-bafab38e2f2e",
     "name": "Ronin",
     "base": "ronin",
     "variant": "core",
@@ -114,10 +114,10 @@
       "core",
       "essential"
     ],
-    "uuid": "eb59df6e-0a6f-4c33-8d9e-397c66597e67"
+    "uuid": "056601a1-a8d1-4228-8e3c-bafab38e2f2e"
   },
   {
-    "id": "yachay-core-dangermouse-f6891e4d-2a50-4ecf-acec-6f5d4ec25f92",
+    "id": "yachay-core-dangermouse-943d7a9d-a7c5-43f7-aaae-c92aca9881d4",
     "name": "Yachay",
     "base": "yachay",
     "variant": "core",
@@ -127,10 +127,10 @@
       "core",
       "essential"
     ],
-    "uuid": "f6891e4d-2a50-4ecf-acec-6f5d4ec25f92"
+    "uuid": "943d7a9d-a7c5-43f7-aaae-c92aca9881d4"
   },
   {
-    "id": "sachem-core-dangermouse-995c18fd-8bd1-4a2d-b454-0ae4d845fef2",
+    "id": "sachem-core-dangermouse-166dd687-f0e6-406a-84a2-8494286e2249",
     "name": "Sachem",
     "base": "sachem",
     "variant": "core",
@@ -140,10 +140,10 @@
       "core",
       "essential"
     ],
-    "uuid": "995c18fd-8bd1-4a2d-b454-0ae4d845fef2"
+    "uuid": "166dd687-f0e6-406a-84a2-8494286e2249"
   },
   {
-    "id": "griot-core-dangermouse-bfb7f081-d7d5-4cdb-acfc-6d13f40bf774",
+    "id": "griot-core-dangermouse-b82c4707-8c7d-4bb3-9608-7c33a924806f",
     "name": "Griot",
     "base": "griot",
     "variant": "core",
@@ -153,10 +153,10 @@
       "core",
       "essential"
     ],
-    "uuid": "bfb7f081-d7d5-4cdb-acfc-6d13f40bf774"
+    "uuid": "b82c4707-8c7d-4bb3-9608-7c33a924806f"
   },
   {
-    "id": "oracle-core-dangermouse-d9ddf3a6-4bb8-4eab-9c66-a4b2212ed96a",
+    "id": "oracle-core-dangermouse-ca32832a-deb8-494d-8a6a-38c9cc3e87e9",
     "name": "Oracle",
     "base": "oracle",
     "variant": "core",
@@ -166,6 +166,6 @@
       "core",
       "essential"
     ],
-    "uuid": "d9ddf3a6-4bb8-4eab-9c66-a4b2212ed96a"
+    "uuid": "ca32832a-deb8-494d-8a6a-38c9cc3e87e9"
   }
 ]

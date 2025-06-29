@@ -1,0 +1,41 @@
+metadata:
+  original_file: 04_Ronin_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Ronin Class: Database Schema'
+  description: PostgreSQL database schema for the Ronin Node Class.
+sections:
+- level: 1
+  title: Ronin Class Database Schema
+  type: section
+  content: "The Ronin node requires a persistent storage layer to manage its state,\
+    \ primarily for tracking discovery jobs and the services they find.\n\n```sql\n\
+    -- Enables UUID generation, if not already enabled\nCREATE EXTENSION IF NOT EXISTS\
+    \ \"uuid-ossp\";\n\n-- Table to store the state of asynchronous discovery jobs.\n\
+    CREATE TABLE discovery_jobs (\n    -- A unique identifier for each discovery job.\n\
+    \    job_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n\n    -- The current\
+    \ status of the job (e.g., pending, running, completed, failed).\n    -- Indexed\
+    \ for quick filtering.\n    status VARCHAR(50) NOT NULL,\n\n    -- A JSONB blob\
+    \ containing the parameters the job was started with.\n    params JSONB NOT NULL,\n\
+    \n    -- Timestamp of when the job was created.\n    created_at TIMESTAMP WITH\
+    \ TIME ZONE DEFAULT NOW(),\n\n    -- Timestamp of when the job was completed or\
+    \ failed.\n    completed_at TIMESTAMP WITH TIME ZONE\n);\n\nCREATE INDEX idx_discovery_jobs_status\
+    \ ON discovery_jobs (status);\n\n\n-- Table to store information about services\
+    \ discovered on the network.\n-- This acts as the Ronin's \"map\" of the known\
+    \ kOS ecosystem.\nCREATE TABLE discovered_services (\n    -- A unique, node-specific\
+    \ identifier for the discovered service.\n    service_id VARCHAR(255) PRIMARY\
+    \ KEY, -- e.g., did:kos:service:...\n\n    -- The DID of the node hosting the\
+    \ service.\n    node_id VARCHAR(255) NOT NULL,\n\n    -- The class or archetype\
+    \ of the node (e.g., 'Griot', 'Tohunga').\n    node_class VARCHAR(100) NOT NULL,\n\
+    \n    -- The primary network endpoint for the service.\n    endpoint TEXT NOT\
+    \ NULL,\n    \n    -- A JSONB array listing the capabilities offered by the service.\n\
+    \    -- Indexed for efficient querying of services by their capabilities.\n  \
+    \  capabilities JSONB,\n\n    -- A JSONB blob containing additional metadata from\
+    \ the discovery process.\n    discovery_metadata JSONB,\n\n    -- Timestamp of\
+    \ when the service was last seen or verified.\n    last_seen TIMESTAMP WITH TIME\
+    \ ZONE NOT NULL\n);\n\n-- Create a GIN index on the capabilities for fast lookups.\n\
+    CREATE INDEX idx_discovered_services_capabilities ON discovered_services USING\
+    \ GIN (capabilities);\n\n-- Index on node_class for quick filtering of services\
+    \ by their class.\nCREATE INDEX idx_discovered_services_node_class ON discovered_services\
+    \ (node_class);\n```"

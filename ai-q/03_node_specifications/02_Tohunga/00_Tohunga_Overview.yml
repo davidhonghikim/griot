@@ -1,0 +1,84 @@
+metadata:
+  original_file: 00_Tohunga_Overview.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Tohunga Class: Overview'
+  description: High-level overview, cultural context, and HIEROS compliance for the
+    Tohunga Node Class, the sensory organ of kOS.
+sections:
+- level: 1
+  title: Tohunga Class Specification
+  type: section
+  content: ''
+- level: 2
+  title: '🎯 Overview: The Sensory Organ'
+  type: section
+  content: 'The Tohunga node is a **Foundation Tier starseed** in the kOS ecosystem.
+    Inspired by the Māori *tohunga* as a master of a specific domain, its function
+    is to act as a generic and extensible **data acquisition and validation framework**.
+
+
+    Functionally, it is the primary **sensory organ** for a kOS federation. It provides
+    a standardized pipeline for ingesting data from any external source (e.g., a public
+    API, a database, a data stream), applying a series of validation, cleaning, and
+    transformation steps, and outputting a trusted, structured data asset. It is how
+    the kOS safely "senses" the outside world.
+
+
+    Its core purpose is to be a universal adapter, not a knowledge curator. Any other
+    node can use the Tohunga framework to define and execute its own data ingestion
+    pipelines, turning raw, untrusted external data into verifiable, structured information
+    assets.'
+- level: 2
+  title: 🏛️ HIEROS Covenant Compliance
+  type: section
+  content: ''
+- level: 3
+  title: Cultural Attribution Framework
+  type: section
+  content: '-   **Tradition**: Māori *tohunga* - expert practitioners and masters
+    of a specific craft.
+
+    -   **Cultural Context**: A tohunga is a master of a specific set of processes
+    and tools to achieve a result (e.g., a master carver knows the tools and processes
+    for turning wood into art). They are masters of the *how*, not the *what*. This
+    specification honors the Tohunga as a master of process.
+
+    -   **Attribution**: "Respectfully inspired by the Māori tohunga tradition of
+    **mastering a process to transform raw material into a valued product.**" This
+    philosophy guides the node''s function as a generic data transformation pipeline.'
+- level: 3
+  title: Seven HIEROS Intentions - Detailed Implementation
+  type: section
+  content: '1.  **Honor All Beings**: The framework provides robust tools for provenance
+    tracking, allowing the source of all data to be honored and attributed correctly.
+    Every data asset produced by a Tohunga pipeline includes detailed metadata about
+    its origin and transformation history.
+
+    2.  **Interoperability Over Control**: The node uses a plugin-based architecture
+    for data sources, validation steps, and output formats, allowing for maximum interoperability.
+    Connectors for standard protocols (HTTP, SQL) and formats (JSON, CSV, XML) are
+    provided by default.
+
+    3.  **Equity of Voice**: The validation and transformation rules are defined in
+    transparent, auditable formats (like JSON Schema or Rego policies), ensuring they
+    are applied consistently and without bias to all data flowing through a given
+    pipeline.
+
+    4.  **Respect Data Flow**: Provides tools for handling data with specific access
+    requirements or licenses, ensuring those constraints are passed along with the
+    processed data. The system can tag data assets with sensitivity labels that other
+    nodes can interpret.
+
+    5.  **Openness With Boundaries**: The pipeline process is transparent and auditable.
+    However, it can operate on encrypted data and pass it through without decrypting
+    it, respecting data privacy and confidentiality boundaries.
+
+    6.  **Stewardship Not Extraction**: The node acts as a service provider, transforming
+    data on behalf of other nodes. It does not claim ownership of the data or its
+    insights; it is a steward of the transformation process itself.
+
+    7.  **Guided Evolution**: By analyzing which data sources and validation steps
+    are most common, the framework can be optimized to better serve the ecosystem''s
+    needs. Popular community-contributed plugins can be integrated into the core distribution.'

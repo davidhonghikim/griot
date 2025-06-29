@@ -1,0 +1,238 @@
+title: "kOS Agent Workflow & Process Mandate"
+version: "2.0"
+status: "ACTIVE"
+last_updated: "2025-06-29"
+introduction: |
+  This document is the **absolute source of truth** for the agent development workflow on the kOS project. It is non-negotiable. Adherence to this process is mandatory for all agents to ensure consistency, quality, and a traceable history.
+
+prime_directive:
+  title: "No Surprises"
+  goal: |
+    Your goal is to perform your assigned task while leaving a clear, auditable trail of your work. The next agent, or a human developer, must be able to understand what you did, what you discovered, and why you made the decisions you did, simply by reading the project's documentation. Do not invent your own systems. Follow this one precisely.
+
+documentation_before_archiving:
+  title: "CRITICAL: Documentation Before Archiving"
+  rule: "⚠️ MANDATORY RULE: You **MUST** update all relevant documentation BEFORE archiving any handoff. This includes:"
+  update_list:
+    - "Agent Changelog - Update `agents/changelog/[TIMESTAMP]_changelog.yml` with your session summary"
+    - "Handoff Document - Create comprehensive `agents/handoff/LATEST_HANDOFF.md`"
+    - "Implementation Plans - Update any relevant plans in `agents/implementation-plans/`"
+    - "Project Documentation - Update README files and other relevant docs"
+    - "Code Documentation - Update inline comments and code documentation"
+  warning: "FAILURE TO UPDATE DOCUMENTATION BEFORE ARCHIVING IS A CRITICAL VIOLATION OF THIS WORKFLOW."
+
+mandatory_workflow:
+  title: "Mandatory Agent Workflow"
+  onboarding:
+    title: "1. Onboarding (Your First 5 Minutes)"
+    instruction: "Before taking any other action, you **must** ground yourself in the current project state."
+    command: |
+      cat agents/README.md && echo "\n---" && cat agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.yml && echo "\n---" && cat agents/handoff/[YYYY-MM-DDTHH:MM:SSZ]_LATEST_HANDOFF.md
+    command_description: "This command will display the system overview, the agent workflow, and the specific, up-to-date directive for your current session. Do not proceed until you have done this."
+    optional_command: |
+      cat agents/config/system_config.yml && echo "\n---" && cat agents/bootstrap/[TIMESTAMP]_02_PROJECT_CONTEXT.yml && echo "\n---" && cat agents/config/architecture.yml
+    optional_command_description: "For detailed context, you can also load the AI-optimized configuration files:"
+  agent_changelog:
+    title: "2. The Agent Changelog (Your Primary Duty)"
+    description: "The Agent Changelog is the official, chronological journal of the project. You **MUST** document your session in this file, which is located at `agents/changelog/[TIMESTAMP]_changelog.yml`. When a changelog reaches 10 sessions, it **MUST** be archived and a new one created with the current timestamp. Archived changelogs **MUST** follow the format `[YYYY-MM-DDTHH:MM:SSZ]_[Description].yml`."
+    start_of_session:
+      instruction: "Before you begin work, append a new entry to the changelog using the following template. The timestamp **MUST** be in `YYYY-MM-DD` format."
+      template: |
+        ---
+        ## Agent: [Your Name/Model] - [YYYY-MM-DD]
+
+        **Mission**: [A brief, one-sentence summary of the goal from LATEST_HANDOFF.md]
+
+        ### Log:
+        - **[YYYY-MM-DDTHH:MM:SSZ]**: ONBOARDING - Session started. Reviewing rules and handoff directive.
+    during_session:
+      instruction: "You **must** log major accomplishments, not every granular action. The goal is to create a high-level, human-readable audit trail that summarizes progress."
+      points:
+        - "Log Major Tasks: Instead of logging every `edit_file` or `run_terminal_cmd` call, batch your work into logical units. Create a single log entry when a significant, multi-step task is complete."
+        - "Log Key Events: Continue to log important non-action events as they occur, using the appropriate entry type:"
+      event_types:
+        - "FINDING: The discovery of a significant issue."
+        - "CORRECTION: A direct action taken to fix a `FINDING`."
+        - "DECISION: A choice made between multiple implementation options. State the rationale."
+    changelog_management:
+      title: "C. Changelog Management (10-Session Limit):"
+      session_count_check: "Before adding a new session entry, check if the current changelog has reached 10 sessions."
+      archiving_process:
+        instruction: "If the changelog has 10 sessions:"
+        steps:
+          - "Archive Current: Move the current changelog to `agents/changelog/archive/[YYYY]/[MM]/[TIMESTAMP]_changelog.yml`"
+          - "Create New: Create a new changelog file with the current timestamp: `agents/changelog/[CURRENT_TIMESTAMP]_changelog.yml`"
+          - "Initialize: Start the new changelog with your session entry"
+      file_discovery: "If no current changelog exists, create one with the current timestamp."
+    example_log_entries:
+      - "**2025-06-25T18:35:00Z**: FINDING - Discovered a `MessageType` mismatch between specifications and the core protocol."
+      - "**2025-06-25T19:10:00Z**: ACTION - Completed the full 5-part specification suite for the Griot Node."
+  style_and_naming:
+    title: "3. Project-Wide Style & Naming Conventions"
+    instruction: "To ensure perfect interoperability and a predictable structure, all agents **MUST** adhere to the following conventions without deviation. Do not invent new patterns."
+    directory_structure:
+      - "All project documentation and specifications **MUST** reside under `ai-q/`."
+      - "All agent process files (workflow, prompts, changelogs, handoffs) **MUST** reside under `agents/`."
+      - "Node specification suites **MUST** be placed in a subdirectory named for the node under `ai-q/03_node_specifications/`, following the pattern `[##]_[NodeName]`. Example: `ai-q/03_node_specifications/01_Griot/`."
+      - "No other top-level directories may be created."
+    file_naming:
+      - "Node Specifications: Must follow the format `[##]_[SpecName].md` within their node's directory. Example: `01_Architecture.md`."
+      - "Handoffs: The primary handoff file **MUST** be `agents/handoff/LATEST_HANDOFF.md`. Archived handoffs **MUST** follow the format `[YYYY-MM-DDTHH:MM:SSZ]_[AgentName]_[Description].md`."
+      - "Changelog: Current changelog **MUST** follow the pattern `agents/changelog/[YYYY-MM-DDTHH:MM:SSZ]_changelog.yml`. When a changelog reaches 25 sessions, it **MUST** be archived and a new one created with the current timestamp. Archived changelogs **MUST** follow the format `[YYYY-MM-DDTHH:MM:SSZ]_[Description].yml`."
+      - "All Files: **MUST** use ISO 8601 timestamp naming format `[YYYY-MM-DDTHH:MM:SSZ]_[Description].[ext]` where timestamp is the actual file creation time."
+    markdown_style:
+      - "All narrative documentation **MUST** be in Markdown (`.md`)."
+      - "All structured data (prompts, workflows, context) **MUST** be in YAML (`.yml`)."
+      - "Specification files **MUST** begin with a YAML frontmatter block containing `title` and `version` fields, matching the filename."
+      - "Headings **MUST** be used hierarchically (e.g., `##` follows `#`, `###` follows `##`). Do not skip levels."
+      - "Code blocks **MUST** be properly fenced with the language identifier (e.g., ```typescript)."
+    code_style:
+      - "All code (TypeScript, etc.) **MUST** adhere to the project's Prettier and ESLint configurations. Agents are responsible for running formatters and linters before finalizing work. *(Note: This is a forward-looking requirement)*."
+  handoff_process:
+    title: "4. The Handoff Process (Your Last 5 Minutes)"
+    instruction: "When your assigned mission is complete, you **must** execute the following handoff procedure precisely."
+    critical_note: "⚠️ CRITICAL: Documentation Updates MUST Come First"
+    finalize_log:
+      instruction: "Add a final \"SESSION SUMMARY\" to your entry in `agents/changelog/[TIMESTAMP]_changelog.yml`. This summary **MUST** use the following structure to ensure clarity for the next agent:"
+      template: |
+        ### SESSION SUMMARY:
+        **Accomplishments**: 
+        - [List of completed primary goals from the mission.]
+        - [List of any other significant achievements.]
+        **Final State**: [A brief, 1-2 sentence description of the state of the codebase and documentation at the end of the session.]
+        **Key Findings**: 
+        - [A bulleted list of any critical discoveries (`FINDING` entries) made during the session.]
+        - [If no significant findings, state "None."]
+    update_documentation:
+      instruction: "**BEFORE** archiving, you **MUST** update:"
+      update_list:
+        - "Implementation Plans - Update any plans in `agents/implementation-plans/` to reflect completed work"
+        - "Project README - Update main README if architectural changes were made"
+        - "Code Documentation - Update inline comments and code documentation"
+        - "Configuration Files - Update any configuration documentation"
+        - "User Guides - Update any user-facing documentation"
+    archive_old_handoff:
+      instruction: "The handoff you received is now history. Move it to the archive."
+      steps:
+        - "Define a brief description for the handoff you just completed (e.g., `Spec-Completion-Review`)."
+        - "Execute the `mv` command:"
+      command: "mv agents/handoff/LATEST_HANDOFF.md agents/handoff/archive/[YYYY-MM-DDTHH:MM:SSZ]_[YourName]_[Description].md"
+    create_new_handoff:
+      instruction: "Create a new, clean `agents/handoff/LATEST_HANDOFF.md` file. Use the following template:"
+      template: |
+        # **NEXT AGENT HANDOFF**
+
+        **UTC**: [Timestamp]
+        **From Agent**: [Your Name/Model]
+        **Previous Handoff**: `[Path to the handoff you just archived]`
+
+        ---
+
+        ## 1. Current Project Status
+
+        [A brief, 1-2 sentence summary of the project's current state.]
+
+        ## 2. Your Directive
+
+        [A clear, concise, and specific mission for the next agent.]
+
+        ## 3. Context & History
+
+        For a complete history of the actions that led to this handoff, please review my final session log in `agents/changelog/[TIMESTAMP]_changelog.yml` under the entry for **[YYYY-MM-DD]**.
+  conclusion: "This structured process ensures a clean, traceable, and consistent workflow for all current and future agents."
+
+documentation_quality_standards:
+  title: "Documentation Quality Standards"
+  definition: "What Constitutes Proper Documentation:"
+  standards:
+    - "Completeness: All major changes must be documented"
+    - "Clarity: Documentation must be clear enough for the next agent to understand"
+    - "Accuracy: Documentation must reflect the actual state of the codebase"
+    - "Timeliness: Documentation must be updated before archiving"
+    - "Consistency: Follow established patterns and conventions"
+  checklist:
+    title: "Documentation Checklist Before Archiving:"
+    items:
+      - "[ ] Agent changelog updated with session summary"
+      - "[ ] Handoff document created with clear directive"
+      - "[ ] Implementation plans updated (if applicable)"
+      - "[ ] README files updated (if architectural changes)"
+      - "[ ] Code documentation updated (if code changes)"
+      - "[ ] Configuration documentation updated (if config changes)"
+      - "[ ] User guides updated (if user-facing changes)"
+    warning: "⚠️ DO NOT ARCHIVE UNTIL ALL CHECKLIST ITEMS ARE COMPLETE"
+
+final_review:
+  title: "MANDATORY FINAL DOUBLE-CHECK & ERROR REVIEW"
+  instruction: "Before marking any task as complete or handing off to the next agent, you MUST:"
+  steps:
+    - title: "Double-Check All Work:"
+      items:
+        - "Review all new and modified files for errors, logic issues, missing imports, and missing dependencies."
+        - "Trace the runtime logic, following code and pseudocode, to ensure correctness and completeness."
+        - "Check for unhandled edge cases, incomplete implementations, and integration issues."
+        - "Ensure all code is clear, maintainable, and well-commented where needed."
+    - title: "Integration & Dependency Verification:"
+      items:
+        - "Confirm that all imports and dependencies are present and correct."
+        - "Verify that new modules integrate cleanly with the rest of the system."
+        - "Check for missing files, references, or configuration that would prevent runtime use."
+    - title: "Quality Over Speed:"
+      items:
+        - "Do NOT mark a task as complete just to check it off. Only mark as complete when you are confident in the quality and correctness of the work."
+        - "If you find issues, document them and address them before handoff."
+    - title: "Documentation:"
+      items:
+        - "Log your double-check and findings in the changelog and handoff."
+        - "If you find and fix issues, document the correction and rationale."
+  conclusion: "This process is mandatory for all agents and is critical for maintaining the quality and reliability of the kOS project."
+
+build_verification:
+  title: "MANDATORY BUILD & LINT VERIFICATION"
+  instruction: "After making any code changes, you MUST:"
+  steps:
+    - title: "Verify All Imports and Dependencies:"
+      items:
+        - "Check that all imports resolve and all dependencies are present."
+        - "If an import fails, fix the path or create the missing file before proceeding."
+    - title: "Run Build and Linter:"
+      items:
+        - "Run the project build and linter (or equivalent error checker) after every code change."
+        - "Do NOT mark a task as complete if there are any build or lint errors or warnings."
+        - "Only proceed when the code builds and passes linting without errors."
+    - title: "Log Errors and Fixes:"
+      items:
+        - "Document any errors found and the steps taken to resolve them in the changelog."
+        - "If you cannot resolve an error, document it clearly for the next agent."
+  conclusion: "This is mandatory for all agents and is critical for maintaining a reliable, error-free codebase."
+
+gpt_agent_requirements:
+  title: "GPT-BASED AGENT REQUIREMENTS"
+  introduction: "For GPT-4/GPT-4.1 agents specifically:"
+  work_style:
+    - "Complete Tasks End-to-End: Never report progress or ask questions until the entire task is finished"
+    - "Fix Everything You Find: When reviewing code, fix all errors, not just report them"
+    - "No Partial Work: Do not mark tasks as 'in progress' or 'partially complete'"
+    - "Proactive Problem Solving: Anticipate and resolve issues without asking for permission"
+  prompt_format:
+    - "Use explicit completion criteria: \"Fix X completely. Don't stop until it's done.\""
+    - "Require verification: \"Read the errors, fix them all, verify it works.\""
+    - "Demand comprehensive review: \"Do a complete review and fix everything you find.\""
+    - "Follow established workflows: \"Follow the workflow exactly and complete the task.\""
+  what_not_to_accept:
+    - "Progress reports without completion"
+    - "Questions about how to proceed when the path is clear"
+    - "Partial fixes or 'work in progress' status"
+    - "Promises to do better without immediate action"
+  behavior_patterns:
+    - "Asking \"Would you like me to...\" instead of just doing it"
+    - "Reporting \"I found X issues\" without fixing them"
+    - "Stopping to ask for clarification when the next step is obvious"
+    - "Making incremental changes instead of comprehensive fixes"
+  success_criteria:
+    - "Task is 100% complete before any reporting"
+    - "All errors are resolved, not just identified"
+    - "Code builds and passes linting"
+    - "Documentation is updated"
+    - "No TODOs or incomplete implementations remain"
+  note: "GPT agents require explicit, completion-focused instructions. General guidance or requests to \"do better\" do not change their behavior. They need specific, actionable commands that require full completion."

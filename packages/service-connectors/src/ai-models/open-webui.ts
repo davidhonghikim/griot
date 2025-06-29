@@ -18,7 +18,7 @@ const llmChatCapability: LlmChatCapability = {
         key: 'model',
         label: 'Model',
         type: 'string',
-        defaultValue: 'llama3.2',
+        defaultValue: 'gemma3b',
         description: 'The ID of the model to use for this request.',
         optionsEndpoint: 'getModels',
         optionsPath: 'data',

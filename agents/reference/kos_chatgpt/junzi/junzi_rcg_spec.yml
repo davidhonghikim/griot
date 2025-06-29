@@ -1,0 +1,204 @@
+title: Junzi Rcg Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.660978'
+original_format: markdown
+content_type: api_specification
+word_count: 612
+line_count: 189
+
+---
+
+# JUNZI Phase 5 - Detailed Technical Specification: Research Collaboration Gateway (RCG)
+
+## Module Name:
+
+Research Collaboration Gateway (RCG)
+
+## Module Purpose:
+
+RCG provides secure, controlled, and anonymized data access for external academic, nonprofit, and regulatory researchers interested in analyzing ethical decision system performance, stakeholder sentiment trends, risk management effectiveness, and ethical drift behaviors within JUNZI.
+
+---
+
+## System Architecture
+
+### Research Data Access Pipeline:
+
+1. **Data Anonymization and Redaction Layer:**
+
+   - Strips all PII, site identifiers, and sensitive stakeholder details.
+   - Applies k-anonymity, l-diversity, and differential privacy controls where needed.
+
+2. **Dataset Preparation Engine:**
+
+   - Supports generation of:
+     - Decision outcome datasets
+     - Drift event logs
+     - Stakeholder sentiment summaries
+     - Risk incident logs
+     - Rule evolution history (via IRRL)
+
+3. **Access Control and Approval Workflow:**
+
+   - Researchers submit data access proposals.
+   - Ethics Research Council reviews and approves requests.
+   - Provides time-bound, role-scoped API keys on approval.
+
+4. **API Query Layer:**
+
+   - Supports query endpoints for:
+     - Filtered decision logs
+     - Aggregated risk statistics
+     - Drift trend reports
+     - Sentiment time series
+
+5. **Audit Logging and Monitoring Layer:**
+
+   - Tracks all data access and download events.
+   - Stores logs in EAT for audit purposes.
+
+6. **Data Export Scheduler:**
+
+   - Allows scheduled dataset deliveries for approved projects.
+   - Supports CSV, JSON, Parquet export formats.
+
+---
+
+## Data Models
+
+### Research Access Request Record:
+
+```json
+{
+  "request_id": "uuid",
+  "researcher_id": "uuid",
+  "requested_datasets": ["DecisionOutcomes", "RiskEvents", "SentimentTrends", "EthicalDriftLogs"],
+  "proposal_summary": "string",
+  "status": "Pending | Approved | Rejected | Expired",
+  "approval_expiration": "ISO8601",
+  "created_at": "ISO8601"
+}
+```
+
+### Research Query Log Record:
+
+```json
+{
+  "query_id": "uuid",
+  "researcher_id": "uuid",
+  "dataset": "string",
+  "query_parameters": "JSON",
+  "timestamp": "ISO8601"
+}
+```
+
+---
+
+## API Endpoints
+
+| Endpoint                            | Method | Description                                  |
+| ----------------------------------- | ------ | -------------------------------------------- |
+| /rcg/submit-access-request          | POST   | Allows researchers to request dataset access |
+| /rcg/approve-request/{request\_id}  | POST   | Ethics Council approves a request            |
+| /rcg/query-dataset                  | POST   | Runs approved data queries                   |
+| /rcg/get-query-log/{researcher\_id} | GET    | Returns researcher’s query history           |
+| /rcg/export-dataset/{request\_id}   | POST   | Exports data for offline research use        |
+
+---
+
+## Algorithms and Logic
+
+1. **Differential Privacy Layer:**
+
+   - Adds statistical noise where needed for small cohort datasets.
+
+2. **Role-Based Access Control:**
+
+   - Limits dataset access by researcher role and approval scope.
+
+3. **Rate Limiting and Throttling:**
+
+   - Prevents abuse of query APIs.
+
+---
+
+## Performance Targets
+
+- **Query Response Time:** Under 1 second for standard filtered queries
+- **Export Generation Time:** Under 5 minutes for datasets <1GB
+- **Access Approval Latency:** Under 2 days from submission (process target)
+
+---
+
+## Monitoring and Metrics
+
+- **Number of Active Research Access Grants**
+- **Query Volume Per Researcher**
+- **Export Request Frequency**
+- **Data Leakage Risk Indicators**
+
+Monitoring Tools: Prometheus + Grafana; Research API monitoring dashboards.
+
+---
+
+## Security Considerations
+
+- Strict anonymization and data masking enforcement
+- OAuth 2.0 + API key combo for external access
+- Full audit trails for all researcher activities (logged in EAT)
+- Automatic revocation on expiration or misuse detection
+
+---
+
+## Testing Requirements
+
+- **Unit Tests:**
+
+  - Anonymization filters
+  - Access scope enforcement
+
+- **Integration Tests:**
+
+  - RCG ↔ EAT logging
+  - RCG ↔ IRRL, JEDE, EDM, SFL, RAME data pipelines
+
+- **Load Tests:**
+
+  - High-volume concurrent data queries
+
+- **Privacy Compliance Tests:**
+
+  - Differential privacy guarantee validation
+
+---
+
+## Deployment Profile
+
+- **Language:** Python 3.11 or Node.js 18+
+- **Containerization:** Docker + Kubernetes
+- **Storage:** PostgreSQL for access logs; S3 for dataset exports
+
+---
+
+## Dependencies
+
+- EAT API
+- JEDE API
+- EDM API
+- SFL API
+- RAME API
+- IRRL API
+
+---
+
+## End of Phase 5 Specifications
+
+---
+
+*End of JUNZI Research Collaboration Gateway (RCG) Technical Specification Document.*
+
+

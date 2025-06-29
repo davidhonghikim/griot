@@ -1,0 +1,327 @@
+title: "kOS Project Overview & Documentation System"
+version: "1.0"
+purpose: "Complete project understanding for all AI agents working on kOS"
+status: "MANDATORY READING - All agents must understand this before proceeding"
+original_file: "2025-06-27T07:47:43Z_project_overview.md"
+conversion_date: "2025-06-30T08:25:00Z"
+
+project_essence_and_vision:
+  what_is_kos:
+    description: |
+      kOS (Kindai Operating System) is a universal adapter framework - a comprehensive knowledge library 
+      where AI agents can dynamically learn and adapt to any technology, protocol, or methodology across any domain. 
+      It's not a traditional application but an intelligent orchestration framework that enables AI agents to compose 
+      complex workflows by discovering and utilizing available capabilities.
+  
+  universal_adapter_concept:
+    description: "Think of kOS as a massive cookbook where:"
+    recipes: "Node specifications that teach agents how to use any tool/service/protocol"
+    ingredients: "Available services, databases, protocols, and external systems"
+    chefs: "AI agents that read recipes and combine ingredients to solve problems"
+    kitchen: "The kOS runtime environment that orchestrates everything"
+  
+  core_philosophy:
+    name: "HIEROS Covenant"
+    description: "All work is guided by the HIEROS principles:"
+    principles:
+      honor_all_beings: "Respect previous work, preserve history, acknowledge authorship"
+      interoperability_over_control: "Follow established formats, enable seamless integration"
+      equity_of_voice: "All components treated equally, no favoritism"
+      respect_temporal_flow: "Understand project history, build on previous work"
+      openness_with_boundaries: "Transparent actions within defined project scope"
+      stewardship_not_extraction: "Leave project better than found"
+      guided_evolution: "Small verifiable steps, incorporate feedback immediately"
+
+project_architecture_and_structure:
+  repository_structure:
+    griot_node:
+      description: "Primary development repository"
+      structure:
+        ai_q: "🎯 SOURCE OF TRUTH - All specifications & docs"
+          "01_foundation": "Core principles and architecture"
+          "02_protocols": "Kind Link Framework (KLF) specs"
+          "03_node_specifications": "12 universal adapter nodes"
+          "04_architecture": "System design and patterns"
+          "05_modules": "Reusable capability modules"
+          "06_quality": "Standards and guidelines"
+        agents: "Agent workflow and process management"
+        src: "Implementation code"
+        packages: "Modular packages"
+        docs_viewer: "Documentation interface"
+    
+    kai_cd:
+      description: "Reference-only archived prototype"
+      note: "ARCHIVED - Reference Only, Do Not Copy Code"
+  
+  ai_q_knowledge_library:
+    description: "The `ai-q/` directory is the absolute source of truth. Everything agents need to know is documented here:"
+    
+    foundation_layer:
+      location: "01_foundation/"
+      files:
+        "00_kOS_Vision.md": "Project mission and goals"
+        "01_Architecture_Principles.md": "Core design patterns"
+        "02_Node_Taxonomy.md": "Classification system for all nodes"
+    
+    protocol_layer:
+      location: "02_protocols/"
+      files:
+        "01_Kind_Link_Framework.md": "Inter-node communication protocol"
+        "02_Kind_Link_Framework_Spec.md": "Technical implementation details"
+    
+    node_specifications:
+      location: "03_node_specifications/"
+      description: "13 universal adapter nodes, each with comprehensive specs"
+      structure: "Each node has 5-6 specification files covering architecture, APIs, data models"
+      purpose: "Nodes represent different capability domains (artifact generation, orchestration, security, etc.)"
+    
+    architecture_layer:
+      location: "04_architecture/"
+      description: "System design patterns and integration approaches"
+      files:
+        "02_AI_Orchestration_Framework.md": "Core architectural vision"
+
+the_13_universal_adapter_nodes:
+  description: "Complete Node Ecosystem - Each node is a comprehensive universal adapter covering a specific domain"
+  note: "ai-q/03_node_specifications dir has primary set of class nodes to design around - can stack node classes as needed for special nodes"
+  
+  nodes:
+    griot: "Artifact Generation - Universal adapter for intelligent node creation and replication"
+    tohunga: "Job Orchestration - Universal adapter for workflow management and execution"
+    ronin: "Network Discovery - Universal adapter for service discovery and routing"
+    musa: "Security - Universal adapter for security, authentication, authorization, and protection"
+    hakim: "Health/Wisdom - Universal adapter for diagnostics, monitoring, and repair"
+    skald: "Documentation/Messaging - Universal adapter for content creation sharing, and communication"
+    oracle: "Validation/Reasoning - Universal adapter for logic, validation, and decision-making"
+    junzi: "Ethics/Integrity - Universal adapter for ethical guidance and moral reasoning"
+    yachay: "Knowledge Synthesis - Universal adapter for memory management and data integration"
+    sachem: "Governance/Consensus - Universal adapter for coordination and consensus building"
+    archon: "Command/Coordination - Universal adapter for strategic planning and delegation"
+    amauta: "Education/Learning - Universal adapter for training and knowledge transfer"
+    mzee: "Consciousness/Meta-cognition - Universal adapter for self-awareness and wisdom"
+  
+  node_specification_pattern:
+    description: "Each node follows a consistent 5-6 file structure"
+    note: "Monolithic files should be broken down into smaller modular dirs and files"
+    files:
+      "00_[Node]_Overview.md": "Purpose, capabilities, and use cases"
+      "01_[Node]_Architecture.md": "CORE SPEC - Comprehensive technical architecture"
+      "02_[Node]_Data_Models.md": "Data structures and schemas"
+      "03_[Node]_KLF_API.md": "Kind Link Framework integration"
+      "04_[Node]_Cultural_Considerations.md": "HIEROS compliance and cultural adaptation"
+      "05_[Node]_Examples.md": "Real-world implementation examples"
+
+universal_adapter_framework_principles:
+  what_makes_universal_adapter:
+    description: "Each node specification must provide:"
+    requirements:
+      comprehensive_protocol_coverage: "Extensive enums covering all possible protocols, systems, and methodologies in that domain"
+      multi_dimensional_framework_matrices: "Complex configuration options for any scenario"
+      cultural_adaptation_mechanisms: "Support for diverse cultural contexts and approaches"
+      performance_optimization_systems: "Adaptive algorithms and resource management"
+      security_integration: "Multi-layer protection and compliance frameworks"
+      error_handling_systems: "Comprehensive detection and recovery strategies"
+      real_world_implementation: "Practical examples and architectural guidance"
+  
+  architecture_pattern_example:
+    description: "Universal Adapter Pattern"
+    code_example: |
+      // Universal Adapter Pattern
+      enum [Domain]Protocol {
+        // 50+ comprehensive protocol options
+        PROTOCOL_A = "protocol_a",
+        PROTOCOL_B = "protocol_b",
+        // ... extensive coverage
+      }
+      
+      interface Universal[Domain]Adapter {
+        protocols: [Domain]Protocol[];
+        capabilities: [Domain]Capability[];
+        culturalAdaptation: CulturalFramework;
+        performance: OptimizationMatrix;
+        security: SecurityFramework;
+        errorHandling: ErrorRecoverySystem;
+      }
+  
+  quality_standards:
+    comprehensive_coverage: "30-50+ enums per domain"
+    multi_protocol_support: "Support for any existing or future protocol"
+    cultural_sensitivity: "HIEROS compliance with indigenous knowledge respect"
+    production_ready: "Complete enough to generate working implementations"
+    modular_design: "Composable with other nodes for complex workflows"
+
+documentation_system_and_standards:
+  file_naming_conventions:
+    critical_note: "All file naming must follow exact patterns:"
+    
+    node_specifications:
+      location: "ai-q/03_node_specifications: Primary set of class nodes to design around"
+      format: "`[##]_[NodeName]_[SpecType].md`"
+      example: "`01_Griot_Architecture.md`"
+      requirement: "Node name MUST be included to avoid conflicts"
+    
+    architecture_documents:
+      format: "`[##]_[Descriptive_Name].md`"
+      example: "`02_AI_Orchestration_Framework.md`"
+    
+    agent_process_files:
+      format: "`[##]_[DESCRIPTIVE_NAME].md`"
+      example: "`00_AGENT_WORKFLOW.md`"
+  
+  markdown_standards:
+    yaml_frontmatter: "Required for all specification files"
+    frontmatter_example: |
+      ---
+      title: "Node Architecture"
+      version: "1.0"
+      node_type: "Universal Adapter"
+      ---
+    hierarchical_headings: "Use proper heading levels (##, ###, ####)"
+    code_blocks: "Always specify language (`typescript`, `bash`, etc.)"
+    typescript_interfaces: "Comprehensive enum and interface definitions required"
+  
+  directory_organization_rules:
+    ai_q: "All project documentation and specifications"
+    agents: "All agent process files and workflows"
+    src: "Implementation code only"
+    no_new_directories: "NO NEW TOP-LEVEL DIRECTORIES without explicit approval"
+
+kind_link_framework_klf:
+  description: "Inter-Node Communication Protocol"
+  purpose: "KLF is the universal protocol enabling nodes to discover and communicate with each other"
+  
+  klf_message_interface:
+    code_example: |
+      interface KLFMessage {
+        messageType: MessageType;
+        sourceNode: NodeType;
+        targetNode: NodeType;
+        payload: any;
+        metadata: KLFMetadata;
+      }
+      
+      enum MessageType {
+        CAPABILITY_DISCOVERY = "capability_discovery",
+        SERVICE_REQUEST = "service_request",
+        DATA_EXCHANGE = "data_exchange",
+        STATUS_UPDATE = "status_update",
+        ERROR_REPORT = "error_report"
+      }
+  
+  dynamic_capability_discovery:
+    description: "Nodes can discover and utilize each other's capabilities:"
+    phases:
+      query_phase: "Node broadcasts capability discovery request"
+      response_phase: "Available nodes respond with capability manifests"
+      composition_phase: "Requesting node composes workflow using discovered capabilities"
+      execution_phase: "Orchestrated workflow execution across multiple nodes"
+
+development_workflow_and_agent_process:
+  mandatory_agent_workflow:
+    description: "Every agent MUST follow the process in `agents/00_AGENT_WORKFLOW.md`:"
+    steps:
+      onboarding: "Read system prompt, workflow, architecture, and handoff"
+      documentation: "Log all major actions in `agents/01_AGENT_CHANGELOG_LATEST.md` (see `agents/04_HISTORY_SYSTEM.md`)"
+      work_execution: "Follow small, verifiable steps with proactive error checking"
+      handoff_creation: "Archive previous handoff, create new comprehensive handoff"
+  
+  session_documentation_format:
+    template: |
+      ## Agent: [Name] - [YYYY-MM-DD]
+      **Mission**: [Brief summary from handoff]
+      
+      ### Log:
+      - **[YYYY-MM-DDTHH:MM:SSZ]**: [ACTION/FINDING/DECISION] - [Description]
+      
+      ### SESSION SUMMARY:
+      **Accomplishments**: [List of completed goals]
+      **Final State**: [Project state at session end]
+      **Key Findings**: [Critical discoveries or issues]
+  
+  quality_assurance_process:
+    five_edit_rule: "Stop and review after major changes and large tasks completions"
+    proactive_verification: "Find and fix errors before builds fail"
+    user_verification: "Nothing is 'done' until user confirms success"
+    documentation_update: "All changes must update relevant documentation"
+
+project_phases_and_current_status:
+  development_phases:
+    specification_phase: "Universal adapter node specifications ✅ COMPLETE"
+    implementation_phase: "Core runtime and orchestration engine 🚧 CURRENT"
+    integration_phase: "Service connections and external adapters"
+    optimization_phase: "Performance tuning and scaling"
+    ecosystem_phase: "Community extensions and specialized domains"
+  
+  current_universal_adapter_status:
+    description: "All 12 nodes have comprehensive universal adapter specifications:"
+    specification_completeness: "100% (12/12 nodes)"
+    architecture_depth: "Comprehensive universal adapter pattern"
+    implementation_readiness: "Detailed enough for code generation"
+    cultural_integration: "HIEROS compliant with indigenous knowledge respect"
+
+key_concepts_for_agents:
+  universal_adaptation:
+    description: |
+      The core concept: Any AI agent should be able to read a node specification and immediately 
+      understand how to adapt to any protocol, service, or methodology in that domain. 
+      Specifications are "recipes" that teach adaptation.
+  
+  composable_intelligence:
+    description: "Nodes are designed to work together. A complex task might require:"
+    examples:
+      tohunga: "for orchestration"
+      musa: "for security"
+      ronin: "for service discovery"
+      oracle: "for validation"
+      griot: "for artifact generation"
+  
+  cultural_stewardship:
+    description: "All work must respect cultural origins of concepts:"
+    principles:
+      use_terms_with_understanding: "not aesthetics"
+      attribute_cultural_origins: "clearly"
+      honor_indigenous_knowledge: "systems"
+      avoid_appropriation: "of sacred symbols"
+  
+  source_of_truth_principle:
+    ai_q_authoritative: "All decisions based on documented specifications"
+    no_improvisation: "Follow established patterns and standards"
+    document_everything: "Maintain complete audit trail"
+    preserve_history: "Never delete without archiving"
+
+critical_success_factors:
+  for_agents_working_on_kos:
+    - "Read ai-q/ thoroughly - Understand the complete vision before coding"
+    - "Follow HIEROS principles - Respect, stewardship, and guided evolution"
+    - "Maintain documentation quality - Specifications must enable real implementation"
+    - "Think universally - Every solution should work across any technology stack"
+    - "Preserve project coherence - New work must integrate with existing architecture"
+  
+  what_makes_good_universal_adapter_specifications:
+    - "Exhaustive enum coverage of all protocols in the domain"
+    - "Multi-dimensional configuration for any conceivable scenario"
+    - "Cultural adaptation mechanisms respecting diverse approaches"
+    - "Performance optimization strategies for production deployment"
+    - "Real implementation examples showing practical usage"
+  
+  red_flags_to_avoid:
+    hardcoded_implementations: "Specifications should be tool-agnostic"
+    cultural_appropriation: "Using sacred terms without understanding"
+    breaking_existing_patterns: "Follow established conventions strictly"
+    incomplete_coverage: "Universal adapters must cover the entire domain"
+    documentation_drift: "Keep specifications and reality synchronized"
+
+conclusion:
+  summary: |
+    kOS is building the world's first true universal adapter framework - a system where AI agents can 
+    dynamically learn to use any technology, protocol, or methodology simply by reading comprehensive 
+    "recipes" in the ai-q/ knowledge library.
+  
+  vision: |
+    Every agent working on this project is contributing to a vision of intelligence that can adapt to 
+    anything, work with anyone, and solve problems across any domain while respecting cultural wisdom 
+    and maintaining ethical principles.
+  
+  source_of_truth: "The ai-q/ directory is your source of truth. Master its contents, follow its patterns, and help build the future of universal AI adaptation."
+  
+  final_reminder: "You are not just writing code - you are creating the foundation for truly universal artificial intelligence." 

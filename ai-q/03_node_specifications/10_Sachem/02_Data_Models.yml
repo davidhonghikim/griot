@@ -1,0 +1,156 @@
+metadata:
+  original_file: 02_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Sachem Node 02: Data Models'
+  version: 1.0
+sections:
+- level: 1
+  title: '**2. Sachem Node Data Models**'
+  type: section
+  content: ''
+- level: 2
+  title: 2.1. Introduction
+  type: section
+  content: 'The Sachem Node''s functionality revolves around three core data models:
+    the `Claim`, which represents a statement put forth for consensus; the `Vote`,
+    which represents a node''s stance on a Claim; and the `Accord`, the final, immutable
+    record of a consensus outcome. A fourth model, the `ReputationRecord`, tracks
+    the trustworthiness of each node.'
+- level: 2
+  title: 2.2. Core Data Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.2.1. `Claim`
+  type: section
+  content: "A `Claim` is a testable assertion made by a node, which is then submitted\
+    \ to the network for validation.\n\n-   **Purpose**: To formalize a piece of information\
+    \ or a proposed truth for debate and consensus.\n-   **Lifecycle**: Created by\
+    \ a node, submitted to Sachem, enters a \"Debate\" period, and is ultimately resolved\
+    \ to `ACCEPTED` or `REJECTED`.\n-   **Format**: JSON\n\n**TypeScript Interface\
+    \ Definition:**\n\n```typescript\n/**\n * @interface Claim\n * @description An\
+    \ assertion submitted for consensus.\n */\ninterface Claim {\n  /**\n   * @property\
+    \ {string} claimId - A unique UUID (v4) for the claim.\n   */\n  claimId: string;\n\
+    \n  /**\n   * @property {string} proposingNodeId - The ID of the node that made\
+    \ the claim.\n   */\n  proposingNodeId: string;\n\n  /**\n   * @property {Date}\
+    \ timestamp - The ISO 8601 timestamp of the claim's proposal.\n   */\n  timestamp:\
+    \ Date;\n\n  /**\n   * @property {string} statement - The core assertion being\
+    \ made.\n   */\n  statement: string;\n\n  /**\n   * @property {string[]} evidence_tapestryIds\
+    \ - An array of Yachay `tapestryId`s that support this claim.\n   */\n  evidence_tapestryIds:\
+    \ string[];\n\n  /**\n   * @property {'PENDING' | 'DEBATE' | 'ACCEPTED' | 'REJECTED'}\
+    \ status - The current state of the claim.\n   */\n  status: 'PENDING' | 'DEBATE'\
+    \ | 'ACCEPTED' | 'REJECTED';\n}\n```"
+- level: 3
+  title: 2.2.2. `Vote`
+  type: section
+  content: "A `Vote` is a simple data structure representing a single node's response\
+    \ to a `Claim`.\n\n-   **Purpose**: To record the explicit support, opposition,\
+    \ or abstention of a node regarding a claim.\n-   **Format**: JSON\n\n**TypeScript\
+    \ Interface Definition:**\n\n```typescript\n/**\n * @interface Vote\n * @description\
+    \ A single vote cast by a node on a specific claim.\n */\ninterface Vote {\n \
+    \ /**\n   * @property {string} claimId - The ID of the claim being voted on.\n\
+    \   */\n  claimId: string;\n\n  /**\n   * @property {string} votingNodeId - The\
+    \ ID of the node casting the vote.\n   */\n  votingNodeId: string;\n\n  /**\n\
+    \   * @property {'FOR' | 'AGAINST' | 'ABSTAIN'} choice - The node's decision.\n\
+    \   */\n  choice: 'FOR' | 'AGAINST' | 'ABSTAIN';\n\n  /**\n   * @property {number}\
+    \ reputationWeight - The reputation score of the voting node at the time the vote\
+    \ was cast.\n   */\n  reputationWeight: number;\n}\n```"
+- level: 3
+  title: 2.2.3. `Accord`
+  type: section
+  content: "An `Accord` is the final, immutable document representing the outcome\
+    \ of a consensus process for a specific `Claim`.\n\n-   **Purpose**: To serve\
+    \ as the provable, historical record of a collective decision.\n-   **Lifecycle**:\
+    \ Created by the Accord Finalizer and immediately archived in the Yachay Long-Term\
+    \ Store.\n-   **Format**: JSON\n\n**TypeScript Interface Definition:**\n\n```typescript\n\
+    /**\n * @interface Accord\n * @description The final, immutable record of a consensus\
+    \ outcome.\n */\ninterface Accord {\n  /**\n   * @property {string} accordId -\
+    \ A unique UUID (v4). This is also its `tapestryId` in Yachay.\n   */\n  accordId:\
+    \ string;\n\n  /**\n   * @property {string} claimId - The claim that this accord\
+    \ resolves.\n   */\n  claimId: string;\n\n  /**\n   * @property {'ACCEPTED' |\
+    \ 'REJECTED'} outcome - The final result of the vote.\n   */\n  outcome: 'ACCEPTED'\
+    \ | 'REJECTED';\n\n  /**\n   * @property {Date} finalizationTimestamp - The ISO\
+    \ 8601 timestamp of when the accord was finalized.\n   */\n  finalizationTimestamp:\
+    \ Date;\n  \n  /**\n   * @property {Record<string, Vote>} voteTally - A record\
+    \ of all votes cast.\n   */\n  voteTally: Record<string, Vote>;\n\n  /**\n   *\
+    \ @property {string} signature - A cryptographic signature of the accord's content\
+    \ to ensure immutability.\n   */\n  signature: string;\n}\n```"
+- level: 3
+  title: 2.2.4. `ReputationRecord`
+  type: section
+  content: "- **Purpose**: To maintain a persistent, evolving score of a node's reliability.\n\
+    - **Format**: JSON\n\n```typescript\ninterface ReputationRecord {\n  /**\n   *\
+    \ @property {string} nodeId - The node being scored.\n   */\n  nodeId: string;\n\
+    \n  /**\n   * @property {number} score - A numerical representation of reputation\
+    \ (e.g., 0 to 1).\n   */\n  score: number;\n\n  /**\n   * @property {Date} lastUpdated\
+    \ - The timestamp of the last reputation change.\n   */\n  lastUpdated: Date;\n\
+    }\n```"
+- level: 2
+  title: '**3. `Debate` State Model**'
+  type: section
+  content: "While not a persistent, long-term model like the others, the `Debate`\
+    \ is a critical state object held in-memory (e.g., in Redis) to manage an active\
+    \ consensus process.\n\n-   **Purpose**: To track the real-time state of a claim's\
+    \ debate, including the voting window and collected votes.\n-   **Lifecycle**:\
+    \ Created when a `Claim` is submitted, updated with each `Vote`, and destroyed\
+    \ once the `Accord` is finalized.\n\n**TypeScript Interface Definition:**\n```typescript\n\
+    /**\n * @interface Debate\n * @description Represents the active state of a consensus\
+    \ process for a single claim.\n */\nexport interface Debate {\n  /**\n   * @property\
+    \ {string} debateId - A unique UUID (v4) for this debate session.\n   */\n  debateId:\
+    \ string;\n\n  /**\n   * @property {string} claimId - The ID of the claim being\
+    \ debated.\n   */\n  claimId: string;\n\n  /**\n   * @property {'OPEN' | 'CLOSED'}\
+    \ status - The current status of the debate window.\n   */\n  status: 'OPEN' |\
+    \ 'CLOSED';\n  \n  /**\n   * @property {Date} openingTimestamp - The ISO 8601\
+    \ timestamp when the debate was opened.\n   */\n  openingTimestamp: Date;\n\n\
+    \  /**\n   * @property {Date} closingTimestamp - The ISO 8601 timestamp when the\
+    \ debate window will close.\n   */\n  closingTimestamp: Date;\n\n  /**\n   * @property\
+    \ {Vote[]} votes - An array of all votes cast so far in the debate.\n   */\n \
+    \ votes: Vote[];\n\n  /**\n   * @property {any} dynamicQuorumState - A snapshot\
+    \ of the quorum parameters calculated for this specific debate.\n   */\n  dynamicQuorumState:\
+    \ any;\n}\n```\n\n---"
+- level: 2
+  title: '**4. Data Model JSON Examples**'
+  type: section
+  content: ''
+- level: 3
+  title: '**Example 1: A new `Claim`**'
+  type: section
+  content: "```json\n{\n  \"claimId\": \"c-11223344-aabb-ccdd-eeff-556677889900\"\
+    ,\n  \"proposingNodeId\": \"did:kos:hakim:456\",\n  \"timestamp\": \"2025-02-15T10:00:00Z\"\
+    ,\n  \"claimType\": \"OBSERVATION\",\n  \"criticality\": \"ROUTINE\",\n  \"statement\"\
+    : \"The average network latency between NA-East and EU-West regions has exceeded\
+    \ 150ms over the last hour.\",\n  \"evidenceTapestryIds\": [\n    \"t-abcdef12-3456-7890-fedc-ba9876543210\"\
+    \n  ],\n  \"tags\": [\"network_performance\", \"latency\", \"inter_regional\"\
+    ],\n  \"status\": \"PENDING\"\n}\n```"
+- level: 3
+  title: '**Example 2: A `Vote` cast on the claim**'
+  type: section
+  content: "```json\n{\n  \"claimId\": \"c-11223344-aabb-ccdd-eeff-556677889900\"\
+    ,\n  \"votingNodeId\": \"did:kos:ronin:789\",\n  \"choice\": \"FOR\",\n  \"reputationAtTimeOfVote\"\
+    : 0.85,\n  \"timestamp\": \"2025-02-15T10:05:12Z\",\n  \"justification\": \"My\
+    \ own monitoring data confirms this observation.\",\n  \"signature\": \"...\"\n\
+    }\n```"
+- level: 3
+  title: '**Example 3: A finalized `Accord`**'
+  type: section
+  content: "```json\n{\n  \"accordId\": \"a-fedcba98-7654-3210-abcd-ef1234567890\"\
+    ,\n  \"claimId\": \"c-11223344-aabb-ccdd-eeff-556677889900\",\n  \"proposingNodeId\"\
+    : \"did:kos:hakim:456\",\n  \"statement\": \"The average network latency between\
+    \ NA-East and EU-West regions has exceeded 150ms over the last hour.\",\n  \"\
+    outcome\": \"ACCEPTED\",\n  \"finalizationTimestamp\": \"2025-02-15T10:10:00Z\"\
+    ,\n  \"voteTally\": {\n    \"totalVotes\": 15,\n    \"for\": 12,\n    \"against\"\
+    : 2,\n    \"abstain\": 1,\n    \"weightedFor\": 10.5,\n    \"weightedAgainst\"\
+    : 1.2,\n    \"quorumThreshold\": 0.6\n  },\n  \"votes\": [\n    // Array of all\
+    \ Vote objects...\n  ],\n  \"reputationAdjustments\": {\n    \"did:kos:hakim:456\"\
+    : \"+0.05\",\n    \"did:kos:ronin:789\": \"+0.01\"\n    // ... other adjustments\n\
+    \  },\n  \"accordSignature\": \"...\"\n}\n```"
+- level: 3
+  title: '**Example 4: A `ReputationRecord`**'
+  type: section
+  content: "```json\n{\n  \"nodeId\": \"did:kos:hakim:456\",\n  \"reputationScore\"\
+    : 0.92,\n  \"history\": [\n    {\n      \"timestamp\": \"2025-02-15T10:10:00Z\"\
+    ,\n      \"event\": \"PROPOSED_ACCEPTED_CLAIM\",\n      \"claimId\": \"c-11223344-aabb-ccdd-eeff-556677889900\"\
+    ,\n      \"change\": \"+0.05\"\n    }\n  ],\n  \"lastUpdated\": \"2025-02-15T10:10:00Z\"\
+    \n}\n```"

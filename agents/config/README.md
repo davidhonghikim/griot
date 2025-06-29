@@ -62,9 +62,9 @@ To update configuration:
 Other configurations are located in their respective system directories:
 - **Performance**: `agents/performance/performance_metrics.json`
 - **Implementation Plans**: `agents/implementation-plans/implementation_plans.json`
-- **Project Context**: `agents/bootstrap/project_context.json`
+- **Project Context**: `agents/bootstrap/[TIMESTAMP]_PROJECT_CONTEXT.json`
 - **Plan Schema**: `agents/implementation-plans/plan-schema.json`
-- **Changelog**: `agents/bootstrap/changelog.json`
+- **Changelog**: `agents/changelog/[TIMESTAMP]_changelog.json`
 
 ## Optimization Benefits
 

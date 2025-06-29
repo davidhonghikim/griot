@@ -1,0 +1,45 @@
+title: Next Agent Handoff
+version: '1.0'
+content:
+- '# **NEXT AGENT HANDOFF**'
+- '---'
+utc: '2025-06-28T22:45:00Z'
+from_agent: GPT-4
+previous_handoff: agents/handoff/archive/2025-06-28_GPT4_Persona-Driven-Loading-Completion.md
+1_current_project_status:
+  title: 1. Current Project Status
+  content:
+  - The kOS project now has a complete persona-driven asset loading system that allows
+    each persona to specify which asset types, categories, and tags to load by default.
+    The system enforces file size limits for optimal token usage, includes comprehensive
+    validation, and supports both new and legacy persona formats. All agents are now
+    required to adhere to file size standards and use the code review checklist. The
+    asset indexing system is fully functional with chunked JSON indexes and dynamic
+    loading capabilities.
+2_your_directive:
+  title: 2. Your Directive
+  content:
+  - '**Implement and test the persona-driven asset loading system with real-world
+    scenarios and performance optimization.**'
+  items:
+  - Test the PersonaLoader with various persona configurations and asset combinations
+  - Optimize the asset filtering and loading algorithms for better performance
+  - Implement caching strategies for frequently used personas and assets
+  - Create additional example persona configurations for other node types (Tohunga,
+    Ronin, etc.)
+  - Add integration tests to ensure the system works correctly with the agent bootstrap
+    process
+  - Monitor and optimize memory usage and context window efficiency
+  - (Optional) Implement dynamic persona switching during runtime
+  - (Optional) Add persona composition capabilities for complex multi-persona scenarios
+3_context__history:
+  title: 3. Context & History
+  content: []
+  items:
+  - Persona-driven asset loading system is implemented with PersonaLoader class
+  - File size and modularization standards are established and enforced
+  - Example persona configurations exist for griot-v1 and musa personas
+  - Comprehensive documentation is available for the system
+  - Asset indexing system supports all asset types with chunked JSON indexes
+  - See `agents/01_AGENT_CHANGELOG.md` for a full session log and technical details
+    for 2025-06-28.

@@ -1,0 +1,8 @@
+title: "Implementation Plans - TODO"
+version: "1.0"
+description: "This directory holds implementation plans that are currently in progress or pending action."
+
+structure:
+  title: "Directory Structure"
+  description: "Each plan should be contained within its own subdirectory, named using the [TIMESTAMP]_plan-name format for clear, chronological organization."
+  current_plan_link: "The ../active/[TIMESTAMP]_current-plan.yml file should be a symbolic link pointing to the [TIMESTAMP]_current-plan.yml file of the currently active project within this directory." 

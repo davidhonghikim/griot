@@ -1,0 +1,64 @@
+---
+title: "Network Discovery Skill"
+description: "Generic, node-agnostic skill for multi-protocol network service discovery with cultural and ethical safeguards."
+version: "1.0.0"
+skill_type: "core_networking"
+node_class: "generic"
+hieros_compliance: true
+---
+
+# Network Discovery Skill
+
+## Overview
+This skill enables any node to autonomously discover network services and map network topology using multiple protocols, while respecting cultural, ethical, and privacy boundaries. It is designed to be reusable by all node classes (Ronin, Griot, Yachay, etc.).
+
+## Capabilities
+- Multi-protocol discovery (mDNS, DHT, HTTP/HTTPS, KLF, custom)
+- Cultural and community boundary awareness
+- Consent and privacy compliance
+- Service fingerprinting and capability inference
+- Topology mapping and relationship analysis
+- Minimal-intrusion, ethical scanning
+
+## Interfaces
+```typescript
+interface NetworkDiscoveryRequest {
+  target: {
+    type: "network_cidr" | "domain" | "did" | "cultural_community";
+    value: string;
+  };
+  protocols: string[];
+  culturalContext?: string;
+  ethicalConstraints?: Record<string, boolean>;
+}
+
+interface NetworkDiscoveryResult {
+  discoveryId: string;
+  services: DiscoveredService[];
+  metrics: DiscoveryMetrics;
+  culturalCompliance: any;
+  networkTopology: any;
+}
+```
+
+## Usage Example
+```typescript
+const request: NetworkDiscoveryRequest = {
+  target: { type: "network_cidr", value: "10.0.0.0/16" },
+  protocols: ["mdns", "http_discovery"],
+  culturalContext: "standard",
+  ethicalConstraints: { respectPrivacy: true, minimalIntrusion: true }
+};
+const result = await genericNetworkDiscovery(request);
+```
+
+## Quality & Ethics
+- 100% HIEROS compliance
+- Transparent logging and community review
+- Never bypasses privacy or access controls
+- Designed for minimal network/resource impact
+
+## Integration
+- Usable by any node class via generic adapter
+- Pluggable into orchestration workflows
+- Supports extension for new protocols or cultural rules 

@@ -1,0 +1,122 @@
+title: Next Agent Handoff
+version: '1.0'
+content:
+- '# **NEXT AGENT HANDOFF: COMPREHENSIVE BRIEFING**'
+- '---'
+utc: '2025-06-28T03:57:35Z'
+from_agent: Gemini 2.5 Pro
+previous_handoff: agents/handoff/archive/2024-07-12_Gemini-2.5-Pro_RAG-Engine-Pivot.md
+1_executive_summary__mission:
+  title: 1. Executive Summary & Mission
+  content:
+  - '**Project State**: The project has successfully pivoted from a legacy Python
+    application to a structured TypeScript monorepo. Foundational work is complete,
+    including a comprehensive frontend UI specification and the initial scaffolding
+    of backend packages for storage and a RAG engine.'
+  - '**Critical Blocker**: The chosen RAG engine implementation, which relied on the
+    `llamaindex` library, is non-functional due to significant breaking changes in
+    the dependency. This has invalidated the initial technical approach for service
+    and data interaction.'
+  - '**Your Directive**: Your primary mission is to **design and implement a new,
+    custom service connector framework** to replace the failed `llamaindex` implementation.
+    This is a strategic pivot. You will draw inspiration from the proven patterns
+    in the `kai-cd` reference project but build a solution tailored to the `griot-node`
+    architecture.'
+  - '---'
+2_mandatory_agent_onboarding:
+  title: 2. Mandatory Agent Onboarding
+  content:
+  - 'To proceed, you **must** ground yourself in the project''s core principles and
+    current state. Review these documents in order:'
+  - '---'
+  items:
+  - '**Core Identity & Workflow**:'
+  - '`agents/02_SYSTEM_PROMPT.md`: Understand your persona and the project''s ethical
+    framework.'
+  - '`agents/00_AGENT_WORKFLOW.md`: Follow the mandatory workflow for logging and
+    handoffs. It is the absolute source of truth for process.'
+  - '**Architectural Vision**:'
+  - '`ai-q/04_architecture/02_AI_Orchestration_Framework.md`: This is the constitutional
+    document for the project. It outlines the vision of an AI-driven orchestration
+    system where agents compose generic node capabilities.'
+  - '**This Handoff Document**: Read this document in its entirety.'
+  - '**Historical Context**:'
+  - Review my final session summary in `agents/01_AGENT_CHANGELOG.md` under the entry
+    for **2024-07-12** for a detailed log of the events leading to this pivot.
+3_project_artifacts__lowlevel_details:
+  title: 3. Project Artifacts & Low-Level Details
+  content:
+  - This section contains direct links to the key directories and files relevant to
+    your mission.
+  31_frontend_architecture_complete:
+    title: 3.1. Frontend Architecture (COMPLETE)
+    content:
+    - A detailed specification for the frontend UI was created to enable parallel
+      development. This work is complete and provides critical context for the backend
+      services you will be building.
+    items:
+    - '**Directory**: `ai-q/04_architecture/frontend_specs/`'
+    - '**Files**:'
+    - '`00_Client_Overview_and_Architecture.md`'
+    - '`02_Recipe_Studio_and_Generative_UI.md`'
+    - '`03_Service_Integration_and_Management.md`'
+    - '`04_Artifact_and_Job_Management.md`'
+  32_backend_packages_current_state:
+    title: 3.2. Backend Packages (CURRENT STATE)
+    content:
+    - The backend is structured as a series of packages within the `packages/` directory.
+    items:
+    - '**Directory**: `packages/`'
+    - '**Modules**:'
+    - '`griot-kitchen/`: The main orchestrator service (currently a skeleton).'
+    - '`storage-mongodb/`: A functional package for connecting to MongoDB. The `StorageClient`
+      class is implemented here.'
+    - '`rag-engine/`: **(BROKEN)** This package is non-functional and is the target
+      for replacement.'
+  33_reference_project_kaicd:
+    title: 3.3. Reference Project (`kai-cd`)
+    content:
+    - The `kai-cd` project contains proven concepts for service connectors that you
+      must use as a reference. **Do not copy code directly**, but use its architecture
+      as inspiration.
+    - '---'
+    items:
+    - '**Path**: `/Users/danger/CascadeProjects/kai-cd`'
+    - '**Key Files of Interest**:'
+    - '`kai-cd/src/connectors/definitions/`'
+    - '`kai-cd/src/services/GriotSeedClient.ts`'
+4_detailed_execution_plan:
+  title: 4. DETAILED EXECUTION PLAN
+  content:
+  - Your mission is to replace the broken RAG engine with a robust, custom-built service
+    connector framework. Follow these steps precisely.
+  phase_1_decommission_and_design:
+    title: '**Phase 1: Decommission and Design**'
+    content: []
+    items:
+    - '**Analyze `kai-cd` Connectors**: Thoroughly review the connector definitions
+      in the `kai-cd` project. Understand how it defines services, manages different
+      protocols (HTTP, etc.), and standardizes interactions.'
+    - '**Create a New Specification**: Before writing any code, create a new specification
+      document: `ai-q/04_architecture/03_Griot-Seed_Connector_Framework_Spec.md`.
+      This document must detail the architecture for the new framework, including:'
+    - The base `Connector` interface.
+    - How "Recipes" will define service interactions.
+    - How different service types (e.g., A1111, ComfyUI, Ollama) will be implemented
+      as concrete classes.
+    - Data models for requests, responses, and service discovery.
+    - '**Remove the Broken Package**: Once the specification is complete and approved,
+      delete the `packages/rag-engine/` directory entirely.'
+  phase_2_implementation:
+    title: '**Phase 2: Implementation**'
+    content: []
+    items:
+    - '**Scaffold New Package**: Create a new directory: `packages/service-connectors/`.'
+    - '**Initialize Package**: Create the `package.json` and `tsconfig.json` for the
+      new `@griot-seed/service-connectors` package.'
+    - '**Implement Core Framework**: Based on your specification, implement the base
+      classes and interfaces for the connector framework.'
+    - '**Implement First Connector**: As a proof-of-concept, implement a simple connector
+      (e.g., a basic HTTP connector for a local service you can easily test).'
+    - '**Test and Verify**: Ensure the new connector can be dynamically loaded and
+      used by the `griot-kitchen` orchestrator.'

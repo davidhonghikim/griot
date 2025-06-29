@@ -1,0 +1,205 @@
+name: document_search_workflow
+description: "Comprehensive search workflow for finding and discovering documents in the kOS documentation system"
+version: "1.0.0"
+node_class: "Yachay"
+cultural_origin: "Quechua Tradition"
+tier: "governance"
+
+# Workflow steps
+steps:
+  - step: 1
+    name: "parse_search_request"
+    description: "Parse and validate the search request"
+    skill: "document_search"
+    function: "parse_search_query"
+    parameters:
+      query: "{{request.query}}"
+      filters: "{{request.filters}}"
+    output: "parsed_query"
+
+  - step: 2
+    name: "semantic_search"
+    description: "Perform semantic search across documents"
+    skill: "document_search"
+    function: "semantic_search"
+    parameters:
+      query: "{{parsed_query.semantic_query}}"
+      filters: "{{request.filters}}"
+      limit: "{{request.limit}}"
+      similarity_threshold: "{{request.similarity_threshold}}"
+    output: "semantic_results"
+
+  - step: 3
+    name: "metadata_search"
+    description: "Perform metadata-based search"
+    skill: "document_search"
+    function: "metadata_search"
+    parameters:
+      metadata_filters: "{{parsed_query.metadata_filters}}"
+      limit: "{{request.limit}}"
+    output: "metadata_results"
+
+  - step: 4
+    name: "combine_results"
+    description: "Combine and rank search results"
+    skill: "document_search"
+    function: "combine_search_results"
+    parameters:
+      semantic_results: "{{semantic_results}}"
+      metadata_results: "{{metadata_results}}"
+      ranking_weights:
+        semantic_score: 0.7
+        metadata_score: 0.3
+    output: "combined_results"
+
+  - step: 5
+    name: "apply_cultural_filtering"
+    description: "Apply cultural sensitivity filtering"
+    skill: "document_validation"
+    function: "validate_cultural_sensitivity"
+    parameters:
+      content: "{{combined_results}}"
+      cultural_context: "quechua"
+    output: "culturally_filtered_results"
+
+  - step: 6
+    name: "format_results"
+    description: "Format search results for presentation"
+    skill: "document_search"
+    function: "format_search_results"
+    parameters:
+      results: "{{culturally_filtered_results}}"
+      format: "{{request.format}}"
+    output: "formatted_results"
+
+  - step: 7
+    name: "return_results"
+    description: "Return formatted search results"
+    output:
+      success: true
+      results: "{{formatted_results}}"
+      total_count: "{{formatted_results.total_count}}"
+      search_time: "{{search_time}}"
+
+# Error handling
+error_handling:
+  - error_type: "query_parse_error"
+    action: "stop_workflow"
+    response:
+      success: false
+      error: "Invalid search query"
+      details: "{{error_details}}"
+
+  - error_type: "no_results_found"
+    action: "continue_with_empty"
+    response:
+      success: true
+      results: []
+      total_count: 0
+      message: "No documents found matching your search criteria"
+
+  - error_type: "search_timeout"
+    action: "return_partial_results"
+    response:
+      success: true
+      results: "{{partial_results}}"
+      warning: "Search timed out, showing partial results"
+
+# Input validation
+input_validation:
+  required_fields:
+    - "query"
+
+  field_validation:
+    query:
+      min_length: 1
+      max_length: 1000
+    
+    limit:
+      min_value: 1
+      max_value: 100
+      default: 10
+    
+    similarity_threshold:
+      min_value: 0.0
+      max_value: 1.0
+      default: 0.7
+
+# Search strategies
+search_strategies:
+  - strategy: "semantic_primary"
+    description: "Use semantic search as primary method"
+    steps: [1, 2, 4, 5, 6, 7]
+    
+  - strategy: "metadata_primary"
+    description: "Use metadata search as primary method"
+    steps: [1, 3, 4, 5, 6, 7]
+    
+  - strategy: "hybrid"
+    description: "Use both semantic and metadata search"
+    steps: [1, 2, 3, 4, 5, 6, 7]
+
+# Cultural integration
+cultural_integration:
+  quechua_principles:
+    - "Yachay (Knowledge): Search enables knowledge discovery and sharing"
+    - "Ayni (Reciprocity): Search results benefit the collective"
+    - "Pachamama (Earth Mother): Search respects natural knowledge cycles"
+    - "Sumak Kawsay (Good Living): Search contributes to collective well-being"
+
+  search_philosophy:
+    - "Knowledge should be accessible to all"
+    - "Search results should respect cultural context"
+    - "Discovery should honor traditional wisdom"
+    - "Results should serve collective understanding"
+
+# Performance considerations
+performance:
+  timeout: 30
+  max_parallel_searches: 3
+  cache_results: true
+  cache_ttl: 3600
+
+# Integration points
+integrations:
+  - name: "documentation_registry"
+    description: "Document registry for search"
+    permissions: ["read", "search"]
+
+  - name: "vector_database"
+    description: "Vector database for semantic search"
+    permissions: ["read", "search"]
+
+  - name: "metadata_store"
+    description: "Metadata store for structured search"
+    permissions: ["read", "search"]
+
+  - name: "document_validation"
+    description: "Cultural validation for search results"
+    permissions: ["read", "validate"]
+
+# Example usage
+example:
+  input:
+    query: "documentation system architecture"
+    filters:
+      document_type: "specification"
+      priority: "high"
+    limit: 10
+    similarity_threshold: 0.8
+
+  output:
+    success: true
+    results:
+      - document_id: "doc_12345"
+        title: "Documentation System Architecture"
+        path: "ai-q/07_development/01_Agent_Documentation_System_Proposal.md"
+        similarity_score: 0.95
+        excerpt: "Comprehensive proposal for centralized documentation management..."
+        metadata:
+          agent: "Claude-Sonnet-4"
+          document_type: "specification"
+          priority: "high"
+          created_at: "2025-06-29T15:00:00Z"
+    total_count: 5
+    search_time: 1.2 

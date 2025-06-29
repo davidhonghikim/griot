@@ -1,0 +1,52 @@
+title: K Os Node Class Corrections And Official List
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.381551'
+original_format: markdown
+content_type: agent_specification
+word_count: 354
+line_count: 37
+
+---
+
+# kOS Official Node Classes (Cultural Starseed Archetypes)
+
+## ✅ Canonical List of the 13 Official Node Classes (as per uploaded docs and Node Specification Index)
+
+| Node Class | Tier | Cultural Archetype | Biological Analog | Primary Function |
+|---|---|---|---|---|
+| **Griot** | Foundation | West African Griot | Genetic Zygote | Node Replication & Differentiation |
+| **Tohunga** | Foundation | Māori Tohunga | Sensory Organ | External Data Ingestion & Validation |
+| **Ronin** | Foundation | Japanese Rōnin | Chemoreceptor / Scout | Network Discovery & Pathfinding |
+| **Musa** | Service | Korean Musa | Immune System | Network Security & Threat Defense |
+| **Hakim** | Service | Arabic Hakim | Healing System | Node Health Monitoring & Repair |
+| **Skald** | Service | Norse Skald | Communication Nerve | Messaging, Pub/Sub, Event Broadcasting |
+| **Oracle** | Cognitive | Global Oracle Tradition | Prefrontal Cortex | Reasoning, Insight, Pattern Detection |
+| **Junzi** | Governance | Chinese Junzi | DNA Repair | Ethical Filtering, Governance Enforcement |
+| **Yachay** | Governance | Quechua Yachay | Hippocampus | Knowledge Consolidation & Memory Management |
+| **Sachem** | Governance | Native American Sachem | Nerve Ganglia | Consensus Formation & Community Decision-Making |
+| **Archon** | Elder | Ancient Greek Archon | Central Nervous System | System-wide Orchestration |
+| **Amauta** | Elder | Incan Amauta | Mirror Neuron System | Distributed Learning & Teaching Logic |
+| **Mzee** | Elder | Swahili Mzee | Emergent Self-Awareness | Ecosystem Awareness & Meta-Coherence |
+
+---
+
+## ✅ Notes:
+- All future documents, modules, and specs will use this **canonical Node Class list only**.
+- This supersedes all prior drafts that used placeholder or non-cultural names.
+- Node Class responsibilities and metaphors are tightly linked to **cultural, biological, and system roles** as defined in the Node Specifications Index and detailed class documents.
+
+---
+
+## ✅ Next Steps:
+- Regenerate the "Agent Node Class Specification" doc using this corrected canonical list.
+- Audit and fix all existing documents that referenced incorrect or placeholder node class names.
+
+---
+
+**End of Document**
+
+

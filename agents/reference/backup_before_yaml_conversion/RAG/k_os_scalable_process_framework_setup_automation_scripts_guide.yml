@@ -1,0 +1,95 @@
+title: kOS Scalable Process Framework Setup Automation Scripts Guide
+description: Implementation plan and script recommendations for automating environment
+  setup, service deployment, and agent configuration across all kOS deployment phases.
+type: automation-guide
+status: active
+priority: high
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:46.966616'
+original_format: markdown
+content_type: api_specification
+word_count: 389
+line_count: 72
+created: '2025-06-28T00:00:00Z'
+version: 1.0.0
+tags:
+- kOS
+- automation
+- setup
+- scripts
+- deployment
+
+---
+
+# ✅ kOS Scalable Process Framework Setup Automation Scripts Guide
+
+---
+
+## ✅ Overview
+This guide defines the recommended **setup automation scripts** for each phase of kOS deployment, covering **local dev environments**, **CI/CD**, **Kubernetes**, and **Federated Mesh setup**.
+
+---
+
+## ✅ Phase 1: Solo Developer Deployment Automation
+
+| Task | Recommended Script Type |
+|---|---|
+| Local `.env` generator | Bash or Node.js CLI |
+| Docker Compose launcher | Shell script: `launch_local_stack.sh` |
+| VectorStore schema loader | Python: `load_vector_schemas.py` |
+| Neo4j node creator | Node.js or Python: `init_neo4j_schema.js/py` |
+| MongoDB collection initializer | Node.js: `init_mongo_collections.js` |
+| Local pre-commit setup | Bash: `setup_precommit.sh` |
+
+---
+
+## ✅ Phase 2: Team Scale – CI/CD and Testing Automation
+
+| Task | Recommended Script Type |
+|---|---|
+| CI pipeline bootstrap | YAML: `.github/workflows/ci.yml` or `.gitlab-ci.yml` |
+| Drift detection CI step | Python: `run_drift_check.py` |
+| Test coverage report generator | Bash/Python: `generate_coverage.sh/py` |
+| Lint + Test pre-push hooks | Bash/Node.js: `pre_push_hook.sh` |
+| Automated ethics check | Python: `junzi_ethics_gate.py` |
+
+---
+
+## ✅ Phase 3: Enterprise Multi-Node Deployment Automation
+
+| Task | Recommended Script Type |
+|---|---|
+| Kubernetes manifests generator | Python or Helm Charts: `/k8s/manifests/` |
+| Prometheus + Grafana deployment | Helm Chart or Terraform module |
+| Service Mesh installer | Bash: `install_service_mesh.sh` |
+| Neo4j cluster setup | Bash/Python: `deploy_neo4j_cluster.sh` |
+| Log aggregator deployment | Docker Compose or Helm: `deploy_elk_stack.sh` |
+| API Gateway config generator | YAML + Bash: `generate_api_gateway_config.sh` |
+
+---
+
+## ✅ Phase 4: Federation and Global Mesh Automation
+
+| Task | Recommended Script Type |
+|---|---|
+| Peer Discovery API deployer | Node.js: `deploy_peer_discovery_api.js` |
+| Federation config sync tool | Python: `sync_federation_config.py` |
+| Inter-node TLS cert generator | Bash: `generate_tls_certs.sh` |
+| Cross-node Weaviate federation setup | Python/Node.js: `setup_vector_federation.py/js` |
+| KLF encrypted messaging keypair generator | Python: `generate_klf_keys.py` |
+| Global Prometheus federation config | YAML: `prometheus_federation.yml` |
+
+---
+
+## ✅ Cross-Phase Automation Best Practices
+- ✅ Use Makefiles or CLI wrappers for multi-step flows
+- ✅ Containerize key setup tools if possible
+- ✅ Always log automation run outputs
+- ✅ Build idempotent scripts (safe to re-run)
+- ✅ Store all automation scripts in `/scripts/` or `/automation/` directory
+
+---
+
+**Plan ID:** kos_2025_06_setup_automation_scripts_guide  
+**Created by:** ChatGPT + User Collaboration  
+**Last Updated:** 2025-06-28T00:00:00Z

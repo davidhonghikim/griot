@@ -1,0 +1,87 @@
+title: "kOS History & Changelog System"
+version: "1.0"
+last_updated: "2025-06-27"
+original_file: "2025-06-29_history_system.md"
+conversion_date: "2025-06-30T08:45:00Z"
+
+purpose: "Provide a concise, high-signal, and easily navigable record of all significant actions taken by both AI agents and humans working on the kOS project."
+
+core_principles:
+  newest_first_order: "Entries are prepended so the latest information is always at the top"
+  quarterly_archives: "Each UTC quarter resides in its own file inside `agents/history/01_agent_archives/`"
+  single_line_events: "Each bullet captures exactly one _high-value_ event"
+  strict_event_keywords: "One of `CHANGE`, `FIX`, `ERROR`, `DECISION`, or `SPEC_UPDATE` _must_ prefix every bullet"
+  automation_first: "The `scripts/kos-log.js` CLI handles timestamping and formatting via `agents/agents_docs_templates/changelog_entry.md.tpl`"
+
+directory_layout:
+  description: "Directory structure for the history system"
+  structure:
+    agents:
+      "01_AGENT_CHANGELOG_LATEST.md": "Active log for the current quarter (editable)"
+      "01_agent_archives": "💾 Rolled-over changelogs"
+        "CHANGELOG_2025_Q1.md": "Quarterly archive example"
+        "…": "Additional quarterly archives"
+      "04_HISTORY_SYSTEM.md": "History system documentation (this file)"
+      templates:
+        "changelog_entry.md.tpl": "Log entry template"
+      "config.yml": "History-system configuration"
+    scripts:
+      "kos-log.js": "Logging CLI helper"
+
+quarterly_rollover_procedure:
+  description: "Steps for quarterly changelog rollover"
+  steps:
+    step_1:
+      trigger: "At 00:00:00 **UTC** on 1 Jan, 1 Apr, 1 Jul, 1 Oct (CI job or manual)"
+    step_2:
+      action: "Derive filename: `CHANGELOG_<YYYY>_Q<n>.md`"
+    step_3:
+      action: "`git mv` `01_AGENT_CHANGELOG_LATEST.md` → `01_agent_archives/` with derived name"
+    step_4:
+      action: "Create a fresh `01_AGENT_CHANGELOG_LATEST.md` with header"
+    step_5:
+      action: "Commit both moves plus a `SPEC_UPDATE` entry documenting the rollover"
+
+log_entry_format:
+  description: "Template for log entries"
+  template: |
+    ## {{timestamp}} – {{agent}}{{#if mission}} (MISSION: {{mission}}){{/if}}
+    * {{event_type}}: {{message}}
+  
+  guidelines:
+    placement: "Place all **new** entries at the **very top** of the file"
+    conciseness: "Keep each bullet to a _single_ concise sentence"
+    batching: "Batch related low-level actions into a single bullet"
+    event_types: "Do **not** mix event types in one bullet"
+
+accepted_event_keywords:
+  description: "Event keywords and their use cases"
+  keywords:
+    CHANGE: "Committed modification to code or documentation"
+    FIX: "Bug correction or refactor that removes faulty logic"
+    ERROR: "New, unresolved problem discovered"
+    DECISION: "Architectural/process choice – include rationale"
+    SPEC_UPDATE: "Update to canonical specs, prompts, or workflow docs"
+
+using_kos_log_js:
+  command: "node scripts/kos-log.js <EVENT_TYPE> \"<message>\" \"<optional mission>\""
+  example: "node scripts/kos-log.js FIX \"Corrected KLF message type enum\" \"refactor KLF spec\""
+  script_functionality:
+    reads_config: "Reads `agents/history/history_config.yml` for default paths"
+    determines_timestamp: "Determines the current UTC timestamp"
+    uses_agent_name: "Uses `$AGENT_NAME` (env) or `default_agent` from the config file"
+    prepends_entry: "Prepends the formatted entry to `agents/history/01_AGENT_CHANGELOG_LATEST.md`"
+
+manual_logging_fallback:
+  description: "When automation is unavailable, copy the template, fill out variables, and paste it at the top of `agents/history/01_AGENT_CHANGELOG_LATEST.md`"
+
+responsibility_matrix:
+  all_contributors: "Ensure significant events are logged before commit/push"
+  ci_pipeline: "Enforce quarterly rollovers and validate entry format"
+  repository_owners: "Periodically review archives for completeness"
+
+non_goals:
+  fine_grained_tracing: "Fine-grained action tracing (Git already handles this)"
+  minor_actions: "Duplicating minor shell commands or exploratory edits"
+
+end_note: "End of specification" 

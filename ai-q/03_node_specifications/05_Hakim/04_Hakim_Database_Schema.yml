@@ -1,0 +1,41 @@
+metadata:
+  original_file: 04_Hakim_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Hakim Class: Database Schema'
+  description: PostgreSQL database schema for the Hakim Node Class.
+sections:
+- level: 1
+  title: Hakim Class Database Schema
+  type: section
+  content: "The Hakim node requires a persistent storage layer to track historical\
+    \ health data and manage the state of maintenance jobs.\n\n```sql\n-- Enables\
+    \ UUID generation, if not already enabled\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"\
+    ;\n\n-- Table to store historical health reports for trend analysis.\nCREATE TABLE\
+    \ health_reports (\n    -- A unique identifier for each report.\n    report_id\
+    \ UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n\n    -- The DID of the node that\
+    \ was monitored. Indexed for fast lookups.\n    target_node_did VARCHAR(255) NOT\
+    \ NULL,\n\n    -- Timestamp when the report was generated. Indexed for time-series\
+    \ queries.\n    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,\n\n    -- The overall\
+    \ status of the node at the time of the report.\n    status VARCHAR(50) NOT NULL,\n\
+    \n    -- A JSONB blob containing detailed performance metrics.\n    metrics JSONB,\n\
+    \n    -- A JSONB blob containing a summary of the diagnosis.\n    diagnosis JSONB,\n\
+    \n    -- The full, raw report data.\n    raw_report JSONB NOT NULL\n);\n\nCREATE\
+    \ INDEX idx_health_reports_target_node_did ON health_reports (target_node_did);\n\
+    CREATE INDEX idx_health_reports_timestamp ON health_reports (timestamp);\n\n\n\
+    -- Table to manage the state of maintenance jobs.\nCREATE TABLE maintenance_jobs\
+    \ (\n    -- A unique identifier for each maintenance job.\n    job_id UUID PRIMARY\
+    \ KEY DEFAULT uuid_generate_v4(),\n\n    -- The DID of the node being maintained.\n\
+    \    target_node_did VARCHAR(255) NOT NULL,\n\n    -- The DID of the entity that\
+    \ requested the job.\n    requester_did VARCHAR(255) NOT NULL,\n    \n    -- The\
+    \ name of the task to be performed.\n    task_name VARCHAR(100) NOT NULL,\n\n\
+    \    -- A JSONB blob containing the parameters for the task.\n    params JSONB,\n\
+    \n    -- The current status of the job (e.g., 'PendingApproval', 'Running'). Indexed\
+    \ for quick filtering.\n    status VARCHAR(50) NOT NULL,\n\n    -- A JSONB array\
+    \ to log the history of status changes.\n    status_history JSONB,\n\n    -- Timestamp\
+    \ of when the job was created.\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT\
+    \ NOW(),\n\n    -- Timestamp of when the job was completed or failed.\n    completed_at\
+    \ TIMESTAMP WITH TIME ZONE\n);\n\nCREATE INDEX idx_maintenance_jobs_status ON\
+    \ maintenance_jobs (status);\nCREATE INDEX idx_maintenance_jobs_target_node_did\
+    \ ON maintenance_jobs (target_node_did);\n```"

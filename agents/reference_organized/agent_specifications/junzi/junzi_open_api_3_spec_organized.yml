@@ -1,0 +1,148 @@
+title: Junzi Open Api 3 Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.530092'
+authors: []
+tags: []
+content_type: documentation
+technical_level: intermediate
+word_count: 376
+has_code_blocks: true
+has_api_specs: true
+has_architecture: false
+has_deployment: false
+has_testing: false
+has_security: true
+has_rag: false
+has_ethics: false
+original_filename: junzi_open_api_3_spec.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/junzi/junzi_open_api_3_spec.yml
+category: agent_specifications/junzi
+
+---
+
+title: Junzi Open Api 3 Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.763146'
+original_format: markdown
+content_type: api_specification
+word_count: 349
+line_count: 105
+
+---
+
+```json
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "JUNZI Public API",
+    "version": "1.0.0",
+    "description": "API for accessing public-facing data from JUNZI, including entity profiles, contradictions, risk scores, promise tracking, and public alerts."
+  },
+  "servers": [
+    {"url": "https://api.junzi.kos/v1"}
+  ],
+  "paths": {
+    "/entities/{id}/profile": {
+      "get": {
+        "summary": "Get Entity Profile",
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "responses": {
+          "200": {"description": "Entity profile with risk and contradictions", "content": {"application/json": {"example": {"entity_id": "123", "name": "Jane Doe", "jurisdiction": "Federal", "risk_score": 7.2}}}},
+          "404": {"description": "Entity not found"}
+        }
+      }
+    },
+    "/entities/{id}/contradictions": {
+      "get": {
+        "summary": "List Contradictions for Entity",
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "responses": {
+          "200": {"description": "List of contradictions", "content": {"application/json": {"example": [{"date": "2025-06-01", "confidence": 0.92, "description": "Conflict between Statement X and Action Y"}]}}}
+        }
+      }
+    },
+    "/risk_scores/": {
+      "get": {
+        "summary": "List Risk Scores",
+        "parameters": [
+          {"name": "jurisdiction", "in": "query", "schema": {"type": "string"}},
+          {"name": "risk_level", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Paginated risk score list", "content": {"application/json": {"example": [{"entity_id": "123", "risk_score": 7.2}]}}}
+        }
+      }
+    },
+    "/promises/{entity_id}": {
+      "get": {
+        "summary": "Get Promise Tracking for Entity",
+        "parameters": [{"name": "entity_id", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "responses": {
+          "200": {"description": "List of promises", "content": {"application/json": {"example": [{"promise": "Reduce emissions by 2030", "status": "Pending"}]}}}
+        }
+      }
+    },
+    "/alerts/": {
+      "get": {
+        "summary": "List Public Alerts",
+        "responses": {
+          "200": {"description": "Current high-confidence public alerts", "content": {"application/json": {"example": [{"entity_id": "123", "alert_type": "Critical Risk Breach", "timestamp": "2025-06-26T12:00:00Z"}]}}}
+        }
+      }
+    },
+    "/sources/{source_id}": {
+      "get": {
+        "summary": "Get Source Metadata",
+        "parameters": [{"name": "source_id", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "responses": {
+          "200": {"description": "Source details", "content": {"application/json": {"example": {"source_id": "SRC456", "origin": "gov_records", "timestamp": "2025-06-01"}}}}
+        }
+      }
+    },
+    "/user_reports/": {
+      "post": {
+        "summary": "Submit User Report",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "entity_id": "123",
+                "report_type": "contradiction",
+                "content": "I found a new contradiction...",
+                "user_contact": "optional@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {"description": "Report submitted successfully"},
+          "400": {"description": "Invalid input"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "security": [{"ApiKeyAuth": []}]
+}
+```
+
+
+

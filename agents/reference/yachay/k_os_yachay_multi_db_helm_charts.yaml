@@ -1,0 +1,69 @@
+# kOS Yachay - Additional Helm Charts for PostgreSQL, ChromaDB, Redis, and Milvus
+
+---
+# 1. PostgreSQL Helm Chart
+apiVersion: v2
+name: kos-yachay-postgres
+version: 1.0.0
+description: PostgreSQL relational storage for structured Yachay data
+
+defaults:
+  postgres:
+    image: postgres:15
+    port: 5432
+    persistence:
+      enabled: true
+      size: 2Gi
+    auth:
+      user: yachay_user
+      password: yachay_pass
+      database: yachay_db
+
+---
+# 2. ChromaDB Helm Chart (Lightweight VectorDB)
+apiVersion: v2
+name: kos-yachay-chroma
+version: 1.0.0
+description: Chroma VectorDB for Yachay development and lightweight RAG
+
+defaults:
+  chroma:
+    image: chromadb/chroma:latest
+    port: 8000
+    persistence:
+      enabled: true
+      size: 1Gi
+
+---
+# 3. Redis Helm Chart (Cache and Temp State)
+apiVersion: v2
+name: kos-yachay-redis
+version: 1.0.0
+description: RedisJSON / RedisGraph for Yachay caching and transient state
+
+defaults:
+  redis:
+    image: redis:7
+    port: 6379
+    persistence:
+      enabled: false
+
+---
+# 4. Milvus Helm Chart (Production-Scale VectorDB)
+apiVersion: v2
+name: kos-yachay-milvus
+version: 1.0.0
+description: Milvus VectorDB for large-scale semantic search and embeddings
+
+defaults:
+  milvus:
+    image: milvusdb/milvus:v2.4.2
+    port: 19530
+    persistence:
+      enabled: true
+      size: 4Gi
+
+---
+# ✅ Each chart follows kOS Yachay naming standards
+# ✅ Fully compatible with existing Yachay REST, API, and CI/CD flow
+# ✅ Next Optional Step: Generate unified Yachay Knowledge Backend Config YAML for dynamic backend switching

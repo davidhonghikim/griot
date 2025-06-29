@@ -1,0 +1,61 @@
+# kOS Yachay Helm Chart - Chart.yaml
+apiVersion: v2
+name: kos-yachay
+version: 1.0.0
+description: Yachay Memory Starseed Deployment Chart for kOS Documentation System
+type: application
+
+---
+# values.yaml
+replicaCount: 1
+image:
+  repository: kos-yachay
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 80
+resources: {}
+
+---
+# templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: yachay
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 3000
+
+---
+# templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-service
+spec:
+  selector:
+    app: {{ .Release.Name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: 3000
+  type: {{ .Values.service.type }}
+
+---
+# ✅ This Helm Chart provides:
+# - Parameterized image, replica, and service settings
+# - Quick multi-environment deploy support
+# ✅ Next optional step: Write artifact hosting instructions for GitHub Releases or cloud storage

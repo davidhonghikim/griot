@@ -1,0 +1,75 @@
+# kOS Ronin - Connecting External Services to Reticulum Network
+
+Node Class: **Ronin (Nomadic Starseed)**
+
+---
+
+## ✅ Integration Overview
+
+To connect external services (e.g., web apps, APIs, databases, external agents) to the Reticulum mesh, you need to implement a **service bridge or adapter** that can:
+
+1. **Speak Reticulum**: Using Reticulum’s Python API or a Reticulum-compatible protocol handler.
+2. **Expose a Local API or Connector**: HTTP, gRPC, WebSocket, or CLI interface that your external service can use.
+3. **Handle Identity + Encryption**: Reticulum uses cryptographic identities, destination keys, and packet signing for all communication.
+
+---
+
+## ✅ Recommended Patterns for External Service Integration
+
+| Integration Pattern | Description |
+|---|---|
+| **Python Service Adapters** | Write Reticulum-native microservices in Python that talk directly over Reticulum |
+| **Local TCP-to-Reticulum Proxy** | Run a small TCP server locally that listens for external service traffic and forwards it as Reticulum packets |
+| **HTTP-to-Reticulum Bridge** | Expose local HTTP endpoints (like our Ronin API server) that internally send/receive Reticulum packets |
+| **MQTT/Message Broker Gateway** | Bridge MQTT topics (or other queues) into Reticulum pubsub topics |
+| **gRPC-to-Reticulum Stub** | Expose a gRPC service that proxies calls into Reticulum |
+
+---
+
+## ✅ Required Reticulum Python Modules
+- `reticulum`
+- `RNS` (Reticulum Network Stack Python module)
+- `Destination`, `Identity`, `Packet`, `Channel`, etc.
+
+(Available via [https://github.com/markqvist/Reticulum](https://github.com/markqvist/Reticulum))
+
+---
+
+## ✅ High-Level Steps:
+
+1. **Service chooses its identity:**
+   - Generate Reticulum private/public keys.
+   - Optionally register with Ronin Discovery.
+
+2. **Service listens on a Destination:**
+   - Example: `Destination(service_identity, "example_service", Destination.SINGLE, Destination.PLAIN)`
+
+3. **External apps communicate via the service adapter:**
+   - E.g., External HTTP POST → Local Python Reticulum Adapter → Sends Reticulum Packet → Receives ACK/Response → Returns to HTTP client.
+
+---
+
+## ✅ Example: External Web App Posting to Reticulum
+
+| Flow | Action |
+|---|---|
+| External Web App | Sends HTTP POST to Ronin REST API |
+| Ronin Node API Server | Calls `reticulum_bridge.py` or Python API |
+| Python Adapter | Creates and sends Reticulum Packet |
+| Reticulum Mesh | Delivers packet to destination node |
+| Destination Node | Processes and optionally replies |
+| Ronin Server | Returns response back to original web app |
+
+---
+
+## ✅ Optional Advanced Features:
+- QoS / retry handling for lossy LoRa links
+- Persistent queue for store-and-forward
+- Encryption and signature verification
+- Multi-protocol fallback (HTTP, MQTT, Serial)
+- Service-to-service mesh routing via Ronin Adaptive Router
+
+---
+
+**Ronin + Reticulum = Mesh-Aware External Service Fabric**
+> Allowing non-mesh apps to seamlessly participate in mesh communications, securely and efficiently.

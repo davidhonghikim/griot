@@ -1,0 +1,48 @@
+metadata:
+  original_file: 02_Musa_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Musa Class: Data Models'
+  description: Data models for the Musa Node Class, including Principal, Policy, and
+    SecurityLog.
+sections:
+- level: 1
+  title: Musa Class Data Models
+  type: section
+  content: ''
+- level: 3
+  title: 1. Principal
+  type: section
+  content: "Represents the authenticated entity (a user or another node) attempting\
+    \ an action. This object is the output of a successful authentication.\n\n```json\n\
+    {\n  \"principal_id\": \"string (did:kos:...)\",\n  \"claims\": {\n    \"iss\"\
+    : \"string (Issuer, did:kos:musa:...)\",\n    \"sub\": \"string (Subject, same\
+    \ as principal_id)\",\n    \"aud\": \"string (Audience, did of the service this\
+    \ principal is accessing)\",\n    \"iat\": \"number (Issued At, unix timestamp)\"\
+    ,\n    \"exp\": \"number (Expiration, unix timestamp)\",\n    \"roles\": [\"string\"\
+    ],\n    \"groups\": [\"string\"]\n  },\n  \"signature\": \"string (JWT-style signature\
+    \ of the claims)\"\n}\n```"
+- level: 3
+  title: 2. Policy
+  type: section
+  content: "Represents a declarative authorization policy. These policies are managed\
+    \ by the Musa node and evaluated by its Policy Decision Point.\n\n```json\n{\n\
+    \    \"policy_id\": \"string (uuid)\",\n    \"policy_name\": \"string (human-readable\
+    \ name, e.g., 'Allow Editors to Write Documents')\",\n    \"effect\": \"Allow\
+    \ | Deny\",\n    \"actions\": [\"read\", \"write\", \"delete\"],\n    \"resources\"\
+    : [\"did:kos:document:*\"],\n    \"conditions\": {\n      \"rego_policy\": \"\
+    package authz; default allow = false; allow { input.principal.claims.roles[_]\
+    \ == 'editor' }\"\n    },\n    \"owner_did\": \"string (did:kos:...)\",\n    \"\
+    created_at\": \"string (ISO 8601 timestamp)\"\n}\n```"
+- level: 3
+  title: 3. SecurityAuditLog
+  type: section
+  content: "Represents an entry in the secure audit trail. These logs are immutable\
+    \ records of security-sensitive events.\n\n```json\n{\n  \"log_id\": \"string\
+    \ (uuid)\",\n  \"timestamp\": \"string (ISO 8601 timestamp)\",\n  \"event_type\"\
+    : \"AUTHENTICATION | AUTHORIZATION | CRYPTOGRAPHIC_OP\",\n  \"principal_id\":\
+    \ \"string (did:kos:...)\",\n  \"source_ip\": \"string\",\n  \"action\": \"string\"\
+    ,\n  \"resource\": \"string\",\n  \"outcome\": \"Success | Failure\",\n  \"details\"\
+    : {\n    \"policy_id_evaluated\": \"string (uuid)\",\n    \"error_code\": \"string\
+    \ (if outcome was Failure)\"\n  }\n}\n```"

@@ -19,7 +19,7 @@ const llmChatCapability: LlmChatCapability = {
         key: 'model',
         label: 'Model',
         type: 'select',
-        defaultValue: 'llama3.2',
+        defaultValue: 'gemma3b',
         description: 'The model to use for the chat.',
         optionsEndpoint: 'getModels',
         optionsPath: 'models',
@@ -85,8 +85,8 @@ const modelManagementCapability: ModelManagementCapability = {
         key: 'name',
         label: 'Model Name',
         type: 'string',
-        defaultValue: '',
-        description: 'Name of the model to pull (e.g., llama3.2, codellama)'
+        defaultValue: 'gemma3b',
+        description: 'Name of the model to pull (e.g., gemma3b, qwen2.5-coder)'
       }
     ],
     deleteModel: [
@@ -131,7 +131,7 @@ export const ollamaDefinition: ServiceDefinition = {
       title: 'Ollama Setup',
       instructions: [
         'Install Ollama from https://ollama.ai',
-        'Pull a model: ollama pull llama3.2',
+        'Pull a model: ollama pull gemma3b',
         'Start the server: ollama serve',
         'Access the API at http://localhost:11434',
         'For HTTPS: Set up nginx/caddy reverse proxy with SSL certificates',

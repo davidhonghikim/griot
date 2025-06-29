@@ -1,0 +1,38 @@
+metadata:
+  original_file: 05_Ronin_Code_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Ronin Class: Code Examples'
+  description: TypeScript code examples for interacting with the Ronin Node Class
+    via KLF.
+sections:
+- level: 1
+  title: Ronin Class Code Examples
+  type: section
+  content: This section provides conceptual TypeScript examples for interacting with
+    the Ronin node using the KLF.
+- level: 2
+  title: 1. Running a Network Discovery Job
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\
+    \ // Assuming an SDK exists\n\nasync function runDiscovery(client: KLFClient,\
+    \ cidr: string) {\n    console.log(`Requesting network discovery for CIDR: ${cidr}...`);\n\
+    \n    const requestMessage = createMessage()\n        .from('did:kos:my-node:789')\n\
+    \        .to('did:kos:ronin:pqr') // Target Ronin node\n        .type(MessageType.TASK_REQUEST)\n\
+    \        .payload({\n            task_name: 'run_discovery_job',\n           \
+    \ params: {\n                target: {\n                    type: 'network_cidr',\n\
+    \                    value: cidr\n                },\n                protocols:\
+    \ ['mdns', 'http-api'],\n                depth\": 1\n            }\n        })\n\
+    \        .build();\n\n    // Listen for progress and final response\n    client.onMessage((message)\
+    \ => {\n        if (message.payload.task_name !== 'run_discovery_job') return;\n\
+    \n        if (message.type === MessageType.TASK_PROGRESS) {\n            console.log(`[DISCOVERY]\
+    \ ${message.payload.progress}%: ${message.payload.message}`);\n        } else\
+    \ if (message.type === MessageType.TASK_RESPONSE) {\n            if (message.payload.status\
+    \ === 'completed') {\n                console.log('Discovery job successful!');\n\
+    \                console.log('Services Found:', message.payload.result.services_found.length);\n\
+    \                console.log(JSON.stringify(message.payload.result.services_found,\
+    \ null, 2));\n            } else {\n                console.error('Discovery job\
+    \ failed:');\n                console.error(message.payload.error.message);\n\
+    \            }\n        }\n    });\n\n    await client.sendMessage(requestMessage);\n\
+    }\n```"

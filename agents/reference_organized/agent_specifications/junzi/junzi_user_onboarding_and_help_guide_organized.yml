@@ -1,0 +1,121 @@
+title: Junzi User Onboarding And Help Guide
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.447548'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 614
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: false
+has_testing: false
+has_security: false
+has_rag: true
+has_ethics: false
+original_filename: junzi_user_onboarding_and_help_guide.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/junzi/junzi_user_onboarding_and_help_guide.yml
+category: agent_specifications/junzi
+
+---
+
+title: Junzi User Onboarding And Help Guide
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.767472'
+original_format: markdown
+content_type: api_specification
+word_count: 586
+line_count: 78
+
+---
+
+# JUNZI User Onboarding and Help Content Guide
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** User Education and Support Content
+
+---
+
+## 🎯 Onboarding Flow: First-Time Users
+
+### Target Users:
+- Journalists
+- Researchers
+- Concerned Citizens
+- Watchdog Organizations
+
+### Onboarding Steps:
+
+| Step | Action |
+|---|---|
+| **Step 1: Welcome Screen** | "Welcome to JUNZI – The Civic Integrity and Accountability Dashboard." |
+| **Step 2: Quick System Overview** | Short 90-second intro: "How JUNZI Tracks Public Integrity." |
+| **Step 3: Entity Search Tutorial** | Interactive demo: "Search for a public entity by name, jurisdiction, or role." |
+| **Step 4: Contradictions Walkthrough** | Show example of a contradiction timeline with source links and confidence score. |
+| **Step 5: Risk Score Explanation** | Tooltip-driven: "Learn how risk levels are calculated." |
+| **Step 6: Submit Your First Report** | Encourage users to submit their first tip or contradiction flag. |
+| **Step 7: API Access Info (Optional)** | For developers and journalists: "How to access JUNZI data via API." |
+
+---
+
+## 🛠️ Help Center Structure:
+
+| Section | Articles (Examples) |
+|---|---|
+| **Getting Started** | "What is JUNZI?", "How to Search for Entities", "Understanding Risk Scores" |
+| **Contradictions** | "How JUNZI Detects Contradictions", "Confidence Scores Explained", "Disputing a Contradiction" |
+| **Risk Scoring** | "What Contributes to an Entity's Risk Level?", "Bias Audits and Risk Profiles", "How Often Are Risk Scores Updated?" |
+| **Promise Tracking** | "Tracking Public Promises", "What Does 'Pending' Mean?", "Historical Promise Fulfillment Rates" |
+| **Public Reporting** | "How to Submit a Tip", "What Happens After I Submit a Report?", "How We Verify User Submissions" |
+| **Data Provenance** | "Where Does JUNZI Get Its Data?", "Can I See Source Documents?", "How We Prevent Tampering" |
+| **API Access** | "Getting an API Key", "Rate Limits and Usage", "API Endpoint Overview" |
+| **Dispute Process** | "How to Dispute a Risk Score or Report", "Dispute Resolution Timeline", "What Happens After a Dispute?" |
+
+---
+
+## 🧭 Tooltip and Inline Help Language:
+
+| UI Element | Tooltip Text |
+|---|---|
+| **Risk Score Indicator** | "Calculated from entity actions, contradictions, and ethical risk patterns. Click for details." |
+| **Contradiction Report Link** | "Click to view detected contradiction timeline for this entity." |
+| **Promise Status Badge** | "Track this entity's public promises and fulfillment record." |
+| **Source Reference Icon** | "View original source for this data point." |
+| **Dispute Button** | "Flag an error or dispute this report." |
+
+---
+
+## ❓ Sample Public FAQs:
+
+### "Is JUNZI affiliated with any political party or government?"
+> No. JUNZI operates as a nonpartisan integrity monitoring system. All outputs are driven by data and subject to external audit.
+
+### "How does JUNZI detect contradictions?"
+> JUNZI uses AI-powered natural language processing combined with human-in-the-loop validation to identify contradictions between public statements and actions.
+
+### "Can entities manipulate their scores?"
+> No. All risk scores and contradiction records are based on publicly verifiable data with immutable source tracking.
+
+### "Can I use JUNZI data in my research or reporting?"
+> Yes, within the terms outlined in our Public Data Use Policy and API License Agreement.
+
+### "What happens if JUNZI makes a mistake?"
+> Entities can file a dispute through our Dispute Resolution Portal. All disputes undergo human and algorithmic review.
+
+---
+
+**This document now serves as the canonical JUNZI User Onboarding and Help Content Guide within the kOS ecosystem until formally revised.**
+
+
+

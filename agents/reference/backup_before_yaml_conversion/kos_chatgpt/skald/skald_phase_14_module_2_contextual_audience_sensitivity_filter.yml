@@ -1,0 +1,151 @@
+title: Skald Phase 14 Module 2 Contextual Audience Sensitivity Filter
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.955183'
+original_format: markdown
+content_type: agent_specification
+word_count: 853
+line_count: 136
+
+---
+
+# Skald Phase 14 - Module 2: Contextual Audience Sensitivity Filter (CASF)
+
+## Node Class: Skald (Communication & Expression)
+
+## Phase 14 Focus:
+Ethical Reasoning and Audience Impact Control Layer
+
+---
+
+## 1. Module Overview
+The **Contextual Audience Sensitivity Filter (CASF)** serves as a dynamic audience-focused layer for all Skald content outputs. Its primary role is to ensure communication is appropriate, respectful, and context-aware for all intended audience segments.
+
+The CASF works alongside the **Skald Global Ethical Policy Decision Engine (GEPDE)** but specializes in evaluating audience-specific sensitivities such as age, culture, trauma risk, and professional setting.
+
+---
+
+## 2. Primary Functions
+
+| Function | Description |
+| --- | --- |
+| **Audience Profiling Engine** | Ingests and analyzes audience metadata (age, culture, education level, language fluency, professional role, etc). |
+| **Sensitivity Risk Mapper** | Identifies audience-specific sensitivities and creates real-time risk profiles per output. |
+| **Tone Modulation Engine** | Adjusts language tone (formal, casual, child-appropriate, trauma-sensitive, etc). |
+| **Content Framing and Redaction Layer** | Automatically reframes or redacts sensitive content based on risk analysis. |
+| **Multi-Audience Conflict Handler** | Resolves conflicts when multiple audience groups with differing sensitivities are targeted simultaneously. |
+| **Cultural Localization Filter** | Adapts content for region-specific norms, taboos, or linguistic framing preferences. |
+| **User Sensitivity Preference Handler** | Honors user-defined sensitivity preferences (where permitted by policy). |
+| **Real-time Sensitivity Alert System** | Flags high-risk content for manual or automated review before release. |
+
+---
+
+## 3. Data Inputs
+
+| Input | Source |
+| --- | --- |
+| **Audience Context Metadata** | Supplied by Skald Contextual Trigger Engine or external source modules |
+| **Draft Content (Pre-Ethics Layer)** | From Skald Story Assembly Engine or upstream modules |
+| **Active Sensitivity Profiles** | Pulled from local or organizational sensitivity policy packs |
+| **User/Org Sensitivity Overrides (Optional)** | Configuration-defined |
+
+---
+
+## 4. Data Outputs
+
+| Output | Destination |
+| --- | --- |
+| **Sensitivity-Adjusted Content Draft** | Sent downstream to GEPDE for ethical validation |
+| **Audience Impact Metadata Tags** | Attached for audit logging and downstream reference |
+| **Risk Level Annotation** | Sent to kOS Global Audit Layer and next Skald processing layer |
+| **Conflict Resolution Notes (If Needed)** | Logged for audit and human-in-the-loop review if escalated |
+
+---
+
+## 5. Processing Pipeline
+
+1. Receive audience profile and draft content
+2. Load active sensitivity policy pack
+3. Generate sensitivity risk map for target audience
+4. Adjust tone, framing, language, and content as needed
+5. Revalidate adjusted content against audience profiles
+6. Annotate output with sensitivity metadata
+7. Forward to GEPDE for ethics pass
+
+---
+
+## 6. Sensitivity Profile Schema
+
+| Field | Description |
+| --- | --- |
+| **Profile ID** | Unique identifier per sensitivity profile |
+| **Audience Type** | Child, Corporate, Trauma Survivors, Multilingual, etc |
+| **Trigger Keywords** | Word and phrase patterns requiring adjustment or removal |
+| **Risk Scoring Rules** | Numeric or categorical risk levels per audience segment |
+| **Adjustment Logic** | Substitution rules, tone modulation parameters, redaction settings |
+| **Localization Data** | Regional linguistic and cultural settings |
+
+---
+
+## 7. Deployment Options
+
+| Configurable Option | Description |
+| --- | --- |
+| **Default Sensitivity Pack** | Skald global defaults (child, academic, corporate, trauma-informed, etc) |
+| **Custom Organizational Profiles** | Enterprise-specific audience sensitivity rules |
+| **User-Specific Overrides** | Optional, based on deployment settings |
+| **Regional Localization Sets** | Country or region-specific content framing |
+| **Risk Threshold Settings** | Allow administrators to tune risk tolerance levels |
+
+---
+
+## 8. Governance Hooks
+
+- Real-time risk escalation triggers
+- Multi-agent sensitivity review process
+- Sensitivity drift detection and automatic retraining prompts
+- Profile versioning and update tracking
+- Audit-ready logs of sensitivity decisions and adjustments
+
+---
+
+## 9. Example Use Case Scenarios
+
+| Scenario | CASF Action |
+| --- | --- |
+| **Youth-focused educational chatbot** | Simplify vocabulary, block mature content, add age-appropriate explanations |
+| **Corporate training module** | Formalize tone, strip colloquial language, ensure compliance language |
+| **Mental health assistant for trauma survivors** | Apply trauma-sensitive language filters, avoid triggering terms |
+| **Multicultural global announcement** | Normalize idioms, remove culturally offensive metaphors, apply global English style |
+| **Power user requesting low filtering** | Minimize adjustments, log increased risk exposure |
+
+---
+
+## 10. Module Integration Points
+
+| Module | Integration |
+| --- | --- |
+| **Skald Contextual Trigger Engine** | Provides audience metadata feed |
+| **Skald Story Assembly Engine** | Supplies pre-ethics content draft |
+| **GEPDE** | Performs final ethics check on CASF-adjusted content |
+| **kOS Global Audit Layer** | Archives audience sensitivity decision logs |
+
+---
+
+## 11. Future Roadmap
+
+- Machine learning-driven audience sensitivity prediction
+- Psychographic real-time mood detection for conversational agents
+- Geo-sensitive humor and metaphor handling layer
+- Continuous sensitivity drift monitoring with self-tuning profiles
+
+---
+
+✅ **Status:** Skald Phase 14 - Module 2: Contextual Audience Sensitivity Filter (CASF) Specification Complete
+
+👉 **Next:** Continue with Skald Phase 14 - Module 3
+
+

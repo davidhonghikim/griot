@@ -1,0 +1,51 @@
+# kOS Yachay Kubernetes Deployment and Service
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kos-yachay-deployment
+  labels:
+    app: kos-yachay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kos-yachay
+  template:
+    metadata:
+      labels:
+        app: kos-yachay
+    spec:
+      containers:
+      - name: kos-yachay
+        image: kos-yachay:latest
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: agents-data
+          mountPath: /app/agents
+      volumes:
+      - name: agents-data
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kos-yachay-service
+spec:
+  selector:
+    app: kos-yachay
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: ClusterIP
+
+---
+# ✅ Deployment Summary:
+# - Deploys Yachay as a single replica pod
+# - Exposes Yachay REST API on internal port 80
+# - Uses ClusterIP (internal only, safe for private network use)
+# Next Step Optional: Generate Ingress YAML or external LoadBalancer Service if you want to expose publicly

@@ -1,0 +1,35 @@
+{
+  "name": "@griot/persona-rag-bridge",
+  "version": "1.0.0",
+  "description": "Bridge service connecting PersonaRAG engine to OpenWebUI for persona-aware AI interactions",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "node scripts/test-bridge.js"
+  },
+  "dependencies": {
+    "@griot/core": "workspace:*",
+    "@griot/data": "workspace:*",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/ws": "^8.5.10"
+  },
+  "keywords": [
+    "persona-rag",
+    "openwebui",
+    "bridge",
+    "ai-orchestration"
+  ]
+} 

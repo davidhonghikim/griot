@@ -1,0 +1,189 @@
+title: Junzi External Monitoring Dashboard Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.547803'
+original_format: markdown
+content_type: api_specification
+word_count: 631
+line_count: 174
+
+---
+
+# JUNZI Phase 3 - Detailed Technical Specification: External Ethics Monitoring Dashboard (EEMD)
+
+## Module Name:
+
+External Ethics Monitoring Dashboard (EEMD)
+
+## Module Purpose:
+
+The EEMD provides a centralized, real-time interface for monitoring ethical decision-making performance, stakeholder feedback trends, ethical drift, risk incidents, and system health across all JUNZI pilot sites. It offers interactive visualizations, live metrics, historical reporting, and drill-down diagnostic tools for governance teams and external ethics auditors.
+
+---
+
+## System Architecture
+
+### Core Dashboard Components:
+
+1. **Data Aggregation Layer:**
+
+   - Pulls live and historical data from:
+     - JEDE (decision throughput and outcomes)
+     - SFL (feedback volume and sentiment)
+     - EDM (ethical drift scores)
+     - RAME (risk levels and mitigation rates)
+     - EAT (audit logs)
+
+2. **Metrics Calculation Engine:**
+
+   - Calculates KPIs such as:
+     - Decision Latency
+     - Ethical Conflict Rate
+     - Stakeholder Satisfaction Index (SSI)
+     - Risk Mitigation Effectiveness
+     - Drift Score Trends
+
+3. **Visualization Renderer:**
+
+   - Supports real-time dashboards and historical reports.
+   - Chart types:
+     - Time series graphs
+     - Heatmaps
+     - Pie charts (feedback types)
+     - Geographic distribution maps (per site metrics)
+
+4. **Drill-Down Explorer:**
+
+   - Allows governance teams to explore individual decision records, feedback submissions, or rule change logs linked to specific time windows or KPIs.
+
+5. **Alert Notification Center:**
+
+   - Displays live alerts for ethical incidents, drift threshold breaches, or system health failures.
+
+6. **Role-Based Access Layer:**
+
+   - Provides filtered views based on user role (Auditor, Ethics Council, Stakeholder Liaison, etc.)
+
+---
+
+## Data Models
+
+### Dashboard Metric Record:
+
+```json
+{
+  "metric_id": "uuid",
+  "metric_type": "DecisionThroughput | ConflictRate | StakeholderSatisfaction | DriftIndex | RiskScore",
+  "site_id": "uuid",
+  "value": "float",
+  "timestamp": "ISO8601",
+  "status": "Normal | Warning | Critical"
+}
+```
+
+---
+
+## UI Features
+
+- **Global Metrics Summary Panel**
+- **Per-Site Metric Tabs**
+- **Ethical Drift Trend Graphs**
+- **Stakeholder Feedback Heatmaps**
+- **Recent Ethical Incidents Table**
+- **Decision Latency Distribution Charts**
+- **Customizable Alerts Panel**
+- **CSV/JSON Export for any dashboard view**
+
+---
+
+## API Endpoints (for backend data feed to dashboard frontend)
+
+| Endpoint                                    | Method | Description                                                           |
+| ------------------------------------------- | ------ | --------------------------------------------------------------------- |
+| /eemd/metrics/summary                       | GET    | Returns global KPI summary                                            |
+| /eemd/metrics/site/{site\_id}               | GET    | Returns KPIs for a specific site                                      |
+| /eemd/metrics/history                       | POST   | Returns time series data for selected metrics and timeframe           |
+| /eemd/alerts/live                           | GET    | Returns active system alerts                                          |
+| /eemd/drilldown/{record\_type}/{record\_id} | GET    | Returns detailed view of a selected decision, feedback, or rule event |
+
+---
+
+## Performance Targets
+
+- **Dashboard Refresh Rate:** Real-time updates every 5 seconds for critical metrics
+- **API Response Time:** Under 200ms for metric queries
+- **Drill-Down Load Time:** Under 1 second per detailed record
+
+---
+
+## Monitoring and Metrics (Self-monitoring for EEMD)
+
+- **Dashboard Uptime**
+- **Metric Fetch Error Rate**
+- **Visualization Render Latency**
+- **Alert Delivery Success Rate**
+
+---
+
+## Security Considerations
+
+- OAuth 2.0 with role-based scopes
+- Audit logging of all user interactions with the dashboard (stored in EAT)
+- TLS encryption for all frontend-backend communication
+- Data access segmentation based on user role and site permissions
+
+---
+
+## Testing Requirements
+
+- **Unit Tests:**
+
+  - Metric calculation functions
+  - Alert state transitions
+
+- **Integration Tests:**
+
+  - EEMD ↔ JEDE, EDM, RAME, SFL, EAT API calls
+
+- **Load Tests:**
+
+  - High-volume metric queries under stress
+
+- **UI Tests:**
+
+  - Cross-browser rendering
+  - Role-based access restriction testing
+
+---
+
+## Deployment Profile
+
+- **Frontend:** React.js + D3.js or Plotly for visualizations
+- **Backend:** Node.js 18+ or Python (FastAPI)
+- **Containerization:** Docker + Kubernetes
+- **Database:** PostgreSQL for metric cache; ElasticSearch for logs
+
+---
+
+## Dependencies
+
+- JEDE API
+- EDM API
+- RAME API
+- SFL API
+- EAT API
+
+---
+
+## Next Document:
+
+Ethical Incident Response Protocol - Full Technical Specification
+
+---
+
+*End of JUNZI External Ethics Monitoring Dashboard (EEMD) Technical Specification Document.*
+
+

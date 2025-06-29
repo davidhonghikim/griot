@@ -1,0 +1,46 @@
+metadata:
+  original_file: 03_Ronin_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Ronin Class: KLF Message API'
+  description: KLF Message API specification for the Ronin Node Class's services.
+sections:
+- level: 1
+  title: Ronin Class KLF Message API
+  type: section
+  content: In alignment with the **"Framework, Not Application"** principle, the Ronin
+    Class API is job-based. Clients submit a discovery job with parameters, and the
+    Ronin node executes it asynchronously.
+- level: 3
+  title: '**Request: `run_discovery_job`**'
+  type: section
+  content: "-   **Message Type**: `TASK_REQUEST`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_discovery_job\",\n      \"params\": {\n   \
+    \     \"target\": {\n          \"type\": \"network_cidr\", // or \"domain\", \"\
+    did\"\n          \"value\": \"192.168.1.0/24\"\n        },\n        \"protocols\"\
+    : [\"mdns\", \"http-api\"],\n        \"depth\": 1\n      }\n    }\n    ```"
+- level: 3
+  title: '**Progress Updates**'
+  type: section
+  content: "-   **Message Type**: `TASK_PROGRESS`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_discovery_job\",\n      \"job_id\": \"string\
+    \ (uuid of the running job)\",\n      \"status\": \"running\",\n      \"progress\"\
+    : \"number (0-100)\",\n      \"message\": \"string (e.g., 'Scanning 192.168.1.50...',\
+    \ 'Probing http port 80...')\"\n    }\n    ```"
+- level: 3
+  title: '**Response: Success**'
+  type: section
+  content: "-   **Message Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_discovery_job\",\n      \"job_id\": \"string\
+    \ (uuid of the job)\",\n      \"status\": \"completed\",\n      \"result\": {\n\
+    \        \"services_found\": [\n            // Array of DiscoveredService objects\n\
+    \        ]\n      }\n    }\n    ```"
+- level: 3
+  title: '**Response: Error**'
+  type: section
+  content: "-   **Message Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"task_name\": \"run_discovery_job\",\n      \"job_id\": \"string\
+    \ (uuid of the job)\",\n      \"status\": \"failed\",\n      \"error\": {\n  \
+    \      \"code\": \"string (e.g., 'INVALID_TARGET', 'SCAN_FAILED')\",\n       \
+    \ \"message\": \"string (Detailed error message)\"\n      }\n    }\n    ```"

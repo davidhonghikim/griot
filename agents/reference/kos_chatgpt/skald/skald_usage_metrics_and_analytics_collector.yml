@@ -1,0 +1,111 @@
+title: Skald Usage Metrics And Analytics Collector
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:48.022223'
+original_format: markdown
+content_type: api_specification
+word_count: 583
+line_count: 96
+
+---
+
+# Skald Module Specification: Usage Metrics and Analytics Collector (UMAC)
+
+## Module Name
+**Skald Usage Metrics and Analytics Collector (UMAC)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Usage Metrics and Analytics Collector (UMAC) is the centralized telemetry and analytics engine for collecting, aggregating, analyzing, and exporting all runtime usage data from Skald modules, nodes, workflows, and user interactions. UMAC enables real-time and historical analysis of system utilization, performance trends, and operational efficiency.
+
+## Purpose
+To provide visibility into system usage patterns, workflow performance metrics, user interaction statistics, and resource consumption trends, supporting both operational monitoring and strategic capacity planning.
+
+## Functional Requirements
+
+### 1. Metrics Collection
+- **Workflow Execution Metrics:** Total workflows, success/failure counts, average runtime per workflow type.
+- **Module-Level Metrics:** Calls per module, average processing time, error rates.
+- **User-Level Metrics:** API usage per user, workflows submitted, active sessions.
+- **Node Resource Metrics:** CPU, Memory, Disk I/O, Network Bandwidth (in collaboration with RUM).
+
+### 2. Aggregation and Storage
+- **Time-Series Data Storage:** Store metrics in a time-series database (e.g., Prometheus, InfluxDB).
+- **Rollup Support:** Aggregate metrics at minute, hourly, and daily granularity.
+- **Historical Retention Policies:** Configurable data retention windows.
+
+### 3. Query and Reporting
+- **Metrics API:** Allow external tools to query system metrics.
+- **Custom Dashboards:** Integrate with Grafana, Kibana, or internal dashboard tools.
+- **Trend Analysis Reports:** Generate periodic usage and performance summaries.
+
+### 4. Alerting and Threshold Monitoring
+- **Threshold Rules:** Define metric-based thresholds for triggering alerts.
+- **Anomaly Detection Hooks:** Allow integration with external or future AI anomaly detectors.
+- **Event Bus Notifications:** Emit metric-based alerts system-wide.
+
+### 5. Export and Integration
+- **External Monitoring Integration:** Export metrics to external observability platforms (Prometheus, Datadog, etc.).
+- **Data Export APIs:** Allow bulk export for offline analysis.
+- **Usage Billing Support:** Provide metering data for billing or quota tracking (integration with CRAM module).
+
+## Non-Functional Requirements
+- **Latency:** Real-time metric ingestion under 100ms per event.
+- **Scalability:** Support millions of metric points per minute.
+- **Resilience:** Guarantee data integrity under high load.
+- **Extensibility:** Pluggable metrics collectors and exporters.
+
+## Data Flow Diagram (Textual)
+1. **Metric Event Generation (from Modules/Nodes/Users)** → 2. **UMAC Collector** → 3. **Aggregation Engine** → 4. **Storage Backend** → 5. **Query/Export/API Layer** → 6. **Dashboards/Alert Systems**
+
+## Interfaces
+- **Input Interfaces:** All Skald modules, Node Health Monitors, Event Bus, User Interaction Logs.
+- **Output Interfaces:** Metrics Storage (e.g., Prometheus), Dashboard Layers, Notification Systems, Billing Module (CRAM).
+
+## Configuration Options
+- **Retention Period:** Configurable per metric type.
+- **Aggregation Intervals:** Minute, hour, day.
+- **Threshold Profiles:** For real-time alerting.
+- **External Export Targets:** Prometheus, InfluxDB, ElasticSearch, etc.
+
+## Example Use Cases
+- Monitoring workflow execution rates over time.
+- Analyzing average module processing times.
+- Generating monthly API usage reports per client.
+- Alerting on sudden spikes in workflow failures.
+
+## Extensibility Hooks
+- **Custom Metric Collectors:** For module-specific telemetry.
+- **AI-Based Forecasting Plugins:** Predict future load trends.
+- **User Behavior Analytics Hooks:** Track user interaction patterns for UX improvements.
+
+## Testing and Validation Plan
+- High-frequency metric ingestion stress tests.
+- Data retention and rollup validation.
+- API query performance benchmarking.
+- Failure recovery simulations.
+
+## Dependencies
+- **kOS Event Bus**
+- **Resource Utilization Monitor (RUM)**
+- **Admin Control Panel (ACP)**
+- **External Metrics Storage Systems (Prometheus, InfluxDB, etc.)**
+
+## Future Enhancements
+- AI-driven capacity forecasting.
+- Built-in metric visualization UI.
+- Real-time SLA breach alerts.
+- Multi-cluster metric aggregation.
+
+---
+
+**Next module:** `skald_dashboard_and_visualization_layer.md`
+
+Let me know when you want me to continue.
+
+

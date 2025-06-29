@@ -1,0 +1,138 @@
+---
+title: "Comprehensive Dual Project Scan Report"
+version: "1.0"
+scan_date: "2025-01-27T00:00:00Z"
+projects:
+  - griot-node
+  - kai-cd
+
+griot_node:
+  total_files: 1966
+  file_types:
+    yaml: 1436
+    markdown: 123
+    python: 65
+    typescript: 183
+    javascript: 160
+  key_directories:
+    ai_q:
+      total: 307
+      node_specifications: 103
+      architecture: 27
+      modules: 155
+      protocols: 2
+    agents:
+      total: 1128
+      reference: 682
+      reference_organized: 342
+      handoff: 41
+      implementation_plans: 14
+    packages: 235
+    apps: 100
+  content_focus:
+    node_specifications:
+      count: 103
+      archetypes:
+        - griot
+        - tohunga
+        - ronin
+        - musa
+        - hakim
+        - skald
+      description: "Detailed technical specifications with cultural and functional documentation"
+    architecture:
+      count: 27
+      components:
+        - "AI Orchestration Framework"
+        - "Kind Link Framework (KLF)"
+        - "System design patterns"
+    modules:
+      count: 155
+      categories: 13
+      major_categories:
+        - "Automation & Workflow"
+        - "Discovery & Intelligence"
+        - "Health & Performance"
+        - "Content & Media"
+        - "Security & Privacy"
+    agent_system:
+      count: 1128
+      components:
+        reference: 682
+        reference_organized: 342
+        handoff: 41
+        implementation_plans: 14
+
+kai_cd:
+  total_files: 2407
+  file_types:
+    yaml: 1059
+    markdown: 1150
+    python: 16
+    typescript: 150
+    javascript: 32
+  key_directories:
+    documentation:
+      total: 2115
+      agents: 72
+      future: 454
+      current: 86
+    brainstorm:
+      total: 1357
+      kos: 1210
+    src: 75
+  content_focus:
+    brainstorm_kos:
+      count: 1210
+      description: "Extensive kOS development history, installation guides, component specifications, architecture evolution"
+    future_planning:
+      count: 454
+      components:
+        - "Advanced agent specifications"
+        - "Protocol definitions"
+        - "Security frameworks"
+        - "Infrastructure planning"
+    current_state:
+      count: 86
+      components:
+        - "Architecture documentation"
+        - "Component specifications"
+        - "Service definitions"
+        - "Deployment guides"
+
+observations:
+  content_maturity:
+    griot_node: "Highly structured, YAML-dominant (73%), focused on implementation"
+    kai_cd: "Mixed format, Markdown-heavy (48%), focused on exploration and planning"
+  documentation_strategy:
+    griot_node: "Systematic, modular approach with clear separation of concerns"
+    kai_cd: "Comprehensive but less organized, extensive brainstorming content"
+  technical_depth:
+    griot_node: "Implementation-ready specifications with detailed technical requirements"
+    kai_cd: "Conceptual and exploratory content with extensive architectural thinking"
+
+recommendations:
+  griot_node_development:
+    - "Content Integration: Consider mining kai-cd for valuable conceptual content"
+    - "Documentation Enhancement: Leverage kai-cd's extensive brainstorming for feature planning"
+    - "Architecture Validation: Cross-reference current specifications with kai-cd's architectural evolution"
+  knowledge_management:
+    - "Reference Consolidation: Continue organizing reference materials systematically"
+    - "Content Migration: Identify high-value content from kai-cd for potential migration"
+    - "Documentation Standards: Maintain YAML-first approach for consistency"
+  project_evolution:
+    - "Historical Context: Use kai-cd as a reference for understanding design decisions"
+    - "Feature Planning: Leverage kai-cd's extensive future planning for roadmap development"
+    - "Architecture Validation: Cross-reference current designs with historical architectural thinking"
+
+next_steps:
+  - "Content Mining: Identify specific high-value content from kai-cd for potential integration"
+  - "Architecture Review: Compare current griot-node architecture with kai-cd's extensive architectural thinking"
+  - "Documentation Enhancement: Use kai-cd's comprehensive content to fill gaps in current specifications"
+  - "Reference Organization: Continue systematic organization of reference materials"
+
+summary:
+  scan_completed: "2025-01-27T00:00:00Z"
+  total_files_analyzed: 4373
+  projects_covered: 2
+  recommendations_generated: 9 

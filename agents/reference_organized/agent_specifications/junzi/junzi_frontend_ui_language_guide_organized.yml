@@ -1,0 +1,132 @@
+title: Junzi Frontend Ui Language Guide
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.623909'
+authors: []
+tags: []
+content_type: documentation
+technical_level: intermediate
+word_count: 494
+has_code_blocks: false
+has_api_specs: false
+has_architecture: true
+has_deployment: false
+has_testing: true
+has_security: false
+has_rag: false
+has_ethics: false
+original_filename: junzi_frontend_ui_language_guide.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/junzi/junzi_frontend_ui_language_guide.yml
+category: agent_specifications/junzi
+
+---
+
+title: Junzi Frontend Ui Language Guide
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.483757'
+original_format: markdown
+content_type: agent_specification
+word_count: 467
+line_count: 89
+
+---
+
+# JUNZI Frontend and UI Language Guide
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** Frontend/UI Copy and Language Standards
+
+---
+
+## Purpose:
+To establish a clean, production-ready language guide for all JUNZI frontend UI components, dashboards, notifications, and public-facing communications.
+
+---
+
+## Brand Voice Summary:
+| Attribute | Description |
+|---|---|
+| **Tone** | Serious, impartial, clear, and empowering |
+| **Style** | Fact-based, nonpartisan, accessible to general public |
+| **Goal** | Help users understand truth, integrity, and ethical accountability of public entities |
+
+---
+
+## Core UI Language Standards:
+
+| Component | Copy Standard |
+|---|---|
+| **Entity Profiles** | "Entity Overview," "Risk Level," "Promise Tracker," "Contradictions History" |
+| **Alerts & Notifications** | "New Contradiction Detected," "Risk Score Updated," "Integrity Breach Alert" |
+| **Buttons** | "View Full Profile," "See Contradictions," "Report Issue," "Submit Feedback" |
+| **Search & Filter** | "Search Entities," "Filter by Jurisdiction," "Filter by Risk Level" |
+| **Tables and Lists** | Column headers: "Entity Name," "Jurisdiction," "Risk Score," "Contradictions Detected," "Promises Outstanding" |
+| **Graphs & Charts** | "Contradiction Trends Over Time," "Risk Score Distribution," "Promise Fulfillment Timeline" |
+| **Error Messages** | "Data temporarily unavailable. Please try again later." or "Entity not found. Double-check the ID." |
+| **Loading States** | "Analyzing data integrity...", "Fetching latest entity records..." |
+
+---
+
+## Section-Specific UI Copy:
+
+### Dashboard Home:
+- "Welcome to JUNZI – Your Civic Integrity Dashboard"
+- "Track, verify, and stay informed on public trustworthiness."
+
+### Contradiction Reports:
+- "Detected Contradictions"
+- "Review Statement History"
+- "View Supporting Data Sources"
+
+### Risk Profiles:
+- "Current Integrity Risk Level: [Low / Moderate / High / Critical]"
+- "Factors Contributing to Risk Score"
+- "Historical Risk Trends"
+
+### Promise Tracker:
+- "Tracked Public Promises"
+- "Fulfillment Status: [Fulfilled / Broken / Pending / Inactive]"
+- "Original Promise Date"
+- "Outcome Assessment"
+
+### Alerts Feed:
+- "Latest Ethical Alerts"
+- "Jurisdictional Violations Detected"
+- "Bias Audit Warnings"
+
+### Public Submission Forms:
+- "Submit a Tip"
+- "Report a Possible Contradiction"
+- "Contribute Supporting Evidence"
+
+---
+
+## Accessibility & Inclusivity Standards:
+| Standard | Implementation |
+|---|---|
+| Plain Language | Minimize jargon, explain AI decisions where possible |
+| Screen Reader Support | Use ARIA labels for all major navigation and data points |
+| Color Contrast | High contrast mode for all risk level indicators |
+| Language Localization | Prepare all key UI strings for easy translation into multiple languages |
+
+---
+
+## Logging and Internal Labels:
+- All system logs, monitoring dashboards, and error tracking tools should use "JUNZI" as the project/service identifier.
+- Example: `[JUNZI-ContradictionScanner] EntityID=12345 contradiction confidence=0.92`
+
+---
+
+**This document now serves as the canonical JUNZI Frontend and UI Language Guide for all design, development, and content teams within the kOS ecosystem until formally revised.**
+
+
+

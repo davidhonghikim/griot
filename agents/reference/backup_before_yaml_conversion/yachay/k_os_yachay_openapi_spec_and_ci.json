@@ -1,0 +1,87 @@
+// kOS Yachay OpenAPI (Swagger) Specification and GitHub Actions CI Workflow
+
+// 1. swagger.json (OpenAPI Spec)
+export const swaggerSpec = {
+  "openapi": "3.0.0",
+  "info": {
+    "title": "kOS Yachay REST API",
+    "version": "1.0.0",
+    "description": "Yachay Memory Starseed API for documentation validation, pruning, manifest generation, and export"
+  },
+  "paths": {
+    "/api/yachay/validate": {
+      "post": {
+        "summary": "Run document validation",
+        "responses": { "200": { "description": "Validation successful" }, "500": { "description": "Validation failed" } }
+      }
+    },
+    "/api/yachay/manifest": {
+      "post": {
+        "summary": "Generate system manifest",
+        "responses": { "200": { "description": "Manifest generated" }, "500": { "description": "Error" } }
+      }
+    },
+    "/api/yachay/prune": {
+      "post": {
+        "summary": "Prune archives",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "targetDir": { "type": "string" },
+                  "retentionDays": { "type": "integer" }
+                },
+                "required": ["targetDir"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Prune complete" }, "400": { "description": "Bad Request" }, "500": { "description": "Error" } }
+      }
+    },
+    "/api/yachay/export": {
+      "post": {
+        "summary": "Export data for database import",
+        "responses": { "200": { "description": "Export complete" }, "500": { "description": "Export error" } }
+      }
+    }
+  }
+};
+
+// 2. .github/workflows/yachay.yml (GitHub Actions CI Workflow)
+export const githubActionsWorkflow = `
+name: Yachay CI Validation
+
+on:
+  push:
+    paths:
+      - 'agents/**'
+      - 'scripts/**'
+  pull_request:
+    paths:
+      - 'agents/**'
+      - 'scripts/**'
+
+jobs:
+  yachay-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Yachay CI Pipeline
+        run: npm run yachay:ci
+`;
+
+// ---
+// ✅ This file contains both:
+// - Full OpenAPI (Swagger) spec for REST API exposure
+// - GitHub Actions CI pipeline YAML for auto-validation on push and PR
+// Next optional step: Generate README.md + full Developer Setup Guide for Yachay.

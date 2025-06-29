@@ -1,0 +1,277 @@
+title: Next Agent Handoff
+version: '1.0'
+content:
+- '# **NEXT AGENT HANDOFF**'
+- '---'
+utc: '2025-06-30T04:15:00Z'
+from_agent: Claude Sonnet 4
+previous_handoff: agents/handoff/archive/2025-06-30T04:10:00Z_ClaudeSonnet4_Standardization_Complete.md
+1_current_project_status:
+  title: 1. Current Project Status
+  content:
+  - The project has successfully established standardized naming conventions and modular
+    architecture for the `packages/service-connectors/adapters/documentation/` directory.
+    TypeScript import errors have been resolved, and a comprehensive naming system
+    has been implemented. The next phase requires applying these same standards across
+    ALL remaining code directories to ensure consistency and maintainability throughout
+    the entire codebase.
+2_your_directive:
+  title: 2. Your Directive
+  content:
+  - '**MISSION**: Apply the established standardized naming system and modular architecture
+    patterns to ALL remaining code directories in the project. This includes packages,
+    apps, scripts, and any other code directories that contain monolithic or inconsistently
+    named modules.'
+  - '**PRIMARY GOAL**: Achieve complete consistency across the entire codebase by
+    implementing the standardized naming conventions, modular architecture, and documentation
+    patterns established in the service-connectors package.'
+3_context__history:
+  title: 3. Context & History
+  content:
+  - For a complete history of the actions that led to this handoff, please review
+    my final session log in `agents/changelog/2025-06-29T15:30:00Z_changelog.json`
+    under the entry for **2025-06-30**.
+  what_was_accomplished:
+    title: '**What Was Accomplished**:'
+    content: []
+    items:
+    - ✅ Fixed TypeScript import errors in documentation adapters
+    - ✅ Established standardized naming system (`STANDARDIZED_NAMING.md`)
+    - ✅ Created comprehensive service-connectors README with module catalog
+    - ✅ Implemented consistent export patterns (default exports)
+    - ✅ Resolved file naming conventions (`index.ts` vs `__init__.ts`)
+    - ✅ Created modular architecture documentation
+  standards_established:
+    title: '**Standards Established**:'
+    content: []
+    items:
+    - '**File Naming**: `index.ts` (not `__init__.ts`), `[feature]-adapter.ts`'
+    - '**Export Pattern**: `export default` for adapter classes'
+    - '**Directory Structure**: `core/` for utilities, `adapters/` for implementations'
+    - '**Size Limits**: <200 lines per file (single responsibility)'
+    - '**Type Safety**: Strict typing, comprehensive error handling'
+4_implementation_plan:
+  title: 4. Implementation Plan
+  content: []
+  phase_1_directory_discovery__analysis_priority_high:
+    title: '**Phase 1: Directory Discovery & Analysis** (Priority: HIGH)'
+    content:
+    - '**Goal**: Identify all code directories that need standardization'
+    - '**Tasks**:'
+    - find packages/ -name "*.ts" -o -name "*.js" | head -20
+    - find packages/ -type d -name "adapters" -o -name "core" -o -name "services"
+    - find packages/ -name "*.ts" -exec wc -l {} + | sort -nr | head -20
+    - '**Target Directories**:'
+    items:
+    - '**Scan All Packages**:'
+    - '**Identify Monolithic Files** (>200 lines):'
+    - '**Check for Naming Violations**:'
+    - Files named `__init__.ts` (should be `index.ts`)
+    - Inconsistent export patterns
+    - Missing type definitions
+    - Large, multi-purpose modules
+    - '`packages/core/`'
+    - '`packages/data/`'
+    - '`packages/schemas/`'
+    - '`packages/sdk/`'
+    - '`apps/web-app/`'
+    - '`apps/starseed-node/`'
+    - '`apps/griot-kitchen/`'
+    - '`scripts/`'
+  phase_2_packagebypackage_standardization_priority_high:
+    title: '**Phase 2: Package-by-Package Standardization** (Priority: HIGH)'
+    content:
+    - '**Goal**: Apply standards to each package systematically'
+    - '**For Each Package**:'
+    - '#### **A. Create Package README** (if missing)'
+    - '#### **B. Modularize Large Files**'
+    - '#### **C. Standardize Export Patterns**'
+    - '#### **D. Implement Type Safety**'
+    items:
+    - Follow the pattern established in `packages/service-connectors/README.md`
+    - Include module catalog, usage examples, development guidelines
+    - Document architecture principles and patterns
+    - Split files >200 lines into focused modules
+    - Follow single responsibility principle
+    - Use established naming conventions
+    - Convert to default exports for adapter classes
+    - Create proper `index.ts` files
+    - Remove `__init__.ts` files
+    - Add comprehensive type definitions
+    - Ensure strict typing throughout
+    - Create proper interfaces
+  phase_3_crosspackage_consistency_priority_medium:
+    title: '**Phase 3: Cross-Package Consistency** (Priority: MEDIUM)'
+    content:
+    - '**Goal**: Ensure consistency between packages'
+    - '**Tasks**:'
+    items:
+    - '**Standardize Common Patterns**:'
+    - Configuration interfaces
+    - Error handling patterns
+    - Logging patterns
+    - Testing patterns
+    - '**Create Shared Utilities**:'
+    - Common type definitions
+    - Shared validation functions
+    - Standard error types
+    - '**Documentation Consistency**:'
+    - Standard README format
+    - Consistent API documentation
+    - Usage examples
+  phase_4_quality_assurance_priority_high:
+    title: '**Phase 4: Quality Assurance** (Priority: HIGH)'
+    content:
+    - '**Goal**: Verify all standards are properly implemented'
+    - '**Tasks**:'
+    - npm run build
+    - npm run type-check
+    - npm run lint
+    - npm run lint:fix
+    items:
+    - '**TypeScript Compilation Check**:'
+    - '**Linting Verification**:'
+    - '**Test Coverage**:'
+    - Ensure all new modules have tests
+    - Verify existing tests still pass
+    - Add integration tests where needed
+5_specific_directories_to_target:
+  title: 5. Specific Directories to Target
+  content: []
+  high_priority_start_here:
+    title: '**High Priority** (Start Here):'
+    content:
+    - '#### **`packages/data/`**'
+    - '#### **`packages/core/`**'
+    - '#### **`apps/web-app/`**'
+    items:
+    - '**Current State**: Contains adapters, skills, recipes, personas'
+    - '**Issues**: Likely has monolithic files, inconsistent naming'
+    - '**Action**: Apply same patterns as service-connectors'
+    - '**Current State**: Core functionality, likely has large modules'
+    - '**Issues**: Probably contains foundational code that needs modularization'
+    - '**Action**: Break down into focused modules'
+    - '**Current State**: Main web application'
+    - '**Issues**: Likely has large components, inconsistent structure'
+    - '**Action**: Apply modular patterns to components and services'
+  medium_priority:
+    title: '**Medium Priority**:'
+    content:
+    - '#### **`packages/schemas/`**'
+    - '#### **`packages/sdk/`**'
+    - '#### **`scripts/`**'
+    items:
+    - '**Current State**: Data schemas and validation'
+    - '**Action**: Ensure consistent schema organization'
+    - '**Current State**: Software development kit'
+    - '**Action**: Apply modular patterns to SDK components'
+    - '**Current State**: Utility scripts and automation'
+    - '**Action**: Organize scripts by purpose, add documentation'
+  low_priority:
+    title: '**Low Priority**:'
+    content:
+    - '#### **`apps/starseed-node/`** and **`apps/griot-kitchen/`**'
+    items:
+    - '**Current State**: Application implementations'
+    - '**Action**: Apply standards to internal structure'
+6_success_criteria:
+  title: 6. Success Criteria
+  content: []
+  phase_1_success:
+    title: '**Phase 1 Success**:'
+    content: []
+    items:
+    - '[ ] All code directories identified and analyzed'
+    - '[ ] Monolithic files (>200 lines) catalogued'
+    - '[ ] Naming violations documented'
+    - '[ ] Priority order established'
+  phase_2_success:
+    title: '**Phase 2 Success**:'
+    content: []
+    items:
+    - '[ ] All packages have comprehensive READMEs'
+    - '[ ] All files >200 lines split into focused modules'
+    - '[ ] All `__init__.ts` files renamed to `index.ts`'
+    - '[ ] All adapter classes use default exports'
+    - '[ ] TypeScript compilation passes without errors'
+  phase_3_success:
+    title: '**Phase 3 Success**:'
+    content: []
+    items:
+    - '[ ] Consistent patterns across all packages'
+    - '[ ] Shared utilities implemented'
+    - '[ ] Documentation follows standard format'
+    - '[ ] Cross-package dependencies properly managed'
+  phase_4_success:
+    title: '**Phase 4 Success**:'
+    content: []
+    items:
+    - '[ ] All TypeScript errors resolved'
+    - '[ ] All linting errors fixed'
+    - '[ ] Test coverage maintained or improved'
+    - '[ ] Build process completes successfully'
+7_resources__references:
+  title: 7. Resources & References
+  content: []
+  key_documents:
+    title: '**Key Documents**:'
+    content: []
+    items:
+    - '`packages/service-connectors/STANDARDIZED_NAMING.md` - Naming conventions'
+    - '`packages/service-connectors/README.md` - Example package documentation'
+    - '`packages/service-connectors/QUICK_REFERENCE.md` - Quick reference guide'
+    - '`agents/changelog/2025-06-29T15:30:00Z_changelog.json` - Complete session history'
+  established_patterns:
+    title: '**Established Patterns**:'
+    content: []
+    items:
+    - '**File Naming**: `[feature]-adapter.ts`, `index.ts`'
+    - '**Export Pattern**: `export default [Feature]Adapter`'
+    - '**Directory Structure**: `core/` + `adapters/`'
+    - '**Size Limit**: <200 lines per file'
+    - '**Type Safety**: Strict typing, comprehensive interfaces'
+  tools__commands:
+    title: '**Tools & Commands**:'
+    content:
+    - '# Find large files'
+    - find . -name "*.ts" -exec wc -l {} + | sort -nr | head -20
+    - '# Find naming violations'
+    - find . -name "__init__.ts"
+    - '# TypeScript check'
+    - npm run build
+    - npm run type-check
+    - '# Linting'
+    - npm run lint
+    - npm run lint:fix
+8_risk_mitigation:
+  title: 8. Risk Mitigation
+  content: []
+  potential_issues:
+    title: '**Potential Issues**:'
+    content: []
+    items:
+    - '**Breaking Changes**: Large refactoring might break existing functionality'
+    - '**Time Constraints**: Many directories to process'
+    - '**Dependency Conflicts**: Cross-package dependencies might be affected'
+  mitigation_strategies:
+    title: '**Mitigation Strategies**:'
+    content: []
+    items:
+    - '**Incremental Approach**: Process one package at a time'
+    - '**Comprehensive Testing**: Test after each package completion'
+    - '**Backup Strategy**: Keep original files until verification complete'
+    - '**Documentation**: Document all changes for rollback if needed'
+9_next_steps:
+  title: 9. Next Steps
+  content:
+  - '---'
+  - '**Remember**: The goal is complete consistency across the entire codebase. Every
+    directory should follow the same patterns established in the service-connectors
+    package. Quality and consistency are more important than speed - take the time
+    to do this right.'
+  - '**Good luck!** 🚀'
+  items:
+  - '**Immediate**: Begin Phase 1 - Directory Discovery & Analysis'
+  - '**Short-term**: Complete Phase 2 for high-priority packages'
+  - '**Medium-term**: Complete all phases for all packages'
+  - '**Long-term**: Establish monitoring to maintain standards'

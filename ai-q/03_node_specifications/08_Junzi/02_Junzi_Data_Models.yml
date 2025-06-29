@@ -1,0 +1,175 @@
+metadata:
+  original_file: 02_Junzi_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Junzi Data Models: The Integrity Starseed'
+  description: Comprehensive data structures and TypeScript interfaces for the Junzi
+    node
+  type: data_models
+  status: active
+  priority: critical
+  last_updated: '2025-01-28'
+  version: 1.0.0
+  cultural_origin: Chinese Confucian Tradition
+sections:
+- level: 1
+  title: 'Junzi Node Data Models: The Integrity Starseed'
+  type: section
+  content: ''
+- level: 2
+  title: 🗄️ Core Data Structures
+  type: section
+  content: ''
+- level: 3
+  title: '**1. ComplianceJob**'
+  type: section
+  content: "The primary data model for policy validation requests.\n\n```typescript\n\
+    /**\n * @interface ComplianceJob\n * @description A request to the Junzi to validate\
+    \ an object against a policy\n */\ninterface ComplianceJob {\n  jobId: string;\
+    \ // UUID\n  inputObject: ValidationTarget;\n  policy: PolicyDefinition;\n  status:\
+    \ JobStatus;\n  report?: ComplianceReport;\n  metadata: JobMetadata;\n  createdAt:\
+    \ string; // ISO 8601 timestamp\n  updatedAt: string; // ISO 8601 timestamp\n\
+    \  completedAt?: string; // ISO 8601 timestamp\n}\n\nenum JobStatus {\n  PENDING\
+    \ = \"pending\",\n  RUNNING = \"running\",\n  COMPLETED = \"completed\",\n  FAILED\
+    \ = \"failed\",\n  CANCELLED = \"cancelled\",\n  TIMEOUT = \"timeout\"\n}\n\n\
+    interface JobMetadata {\n  requestSource: string;\n  priority: ValidationPriority;\n\
+    \  timeout: number; // seconds\n  retryCount: number;\n  tags: string[];\n  culturalContext?:\
+    \ CulturalContext;\n}\n\nenum ValidationPriority {\n  CRITICAL = \"critical\"\
+    ,\n  HIGH = \"high\",\n  NORMAL = \"normal\",\n  LOW = \"low\",\n  BACKGROUND\
+    \ = \"background\"\n}\n```"
+- level: 3
+  title: '**2. PolicyDefinition**'
+  type: section
+  content: "Comprehensive policy structure supporting multiple languages and frameworks.\n\
+    \n```typescript\n/**\n * @interface PolicyDefinition\n * @description Complete\
+    \ policy specification with language-specific implementations\n */\ninterface\
+    \ PolicyDefinition {\n  policyId: string;\n  policyName: string;\n  description:\
+    \ string;\n  version: string;\n  language: PolicyLanguageType;\n  definition:\
+    \ string | PolicyAST;\n  metadata: PolicyMetadata;\n  validationRules: ValidationRule[];\n\
+    \  culturalConsiderations: CulturalConsideration[];\n}\n\ninterface PolicyMetadata\
+    \ {\n  author: string;\n  organization: string;\n  createdAt: string;\n  lastModified:\
+    \ string;\n  applicableDomains: string[];\n  severity: PolicySeverity;\n  compliance:\
+    \ ComplianceFramework[];\n}\n\nenum PolicySeverity {\n  BLOCKING = \"blocking\"\
+    ,\n  WARNING = \"warning\",\n  ADVISORY = \"advisory\",\n  INFORMATIONAL = \"\
+    informational\"\n}\n\nenum ComplianceFramework {\n  HIEROS = \"hieros\",\n  GDPR\
+    \ = \"gdpr\",\n  HIPAA = \"hipaa\",\n  SOX = \"sox\",\n  ISO27001 = \"iso27001\"\
+    ,\n  NIST = \"nist\",\n  CUSTOM = \"custom\"\n}\n```"
+- level: 3
+  title: '**3. ComplianceReport**'
+  type: section
+  content: "Detailed validation results and recommendations.\n\n```typescript\n/**\n\
+    \ * @interface ComplianceReport\n * @description Comprehensive compliance validation\
+    \ results\n */\ninterface ComplianceReport {\n  reportId: string;\n  jobId: string;\n\
+    \  isCompliant: boolean;\n  overallScore: number; // 0-100\n  violations: PolicyViolation[];\n\
+    \  warnings: PolicyWarning[];\n  recommendations: PolicyRecommendation[];\n  culturalAssessment:\
+    \ CulturalAssessment;\n  performanceMetrics: ValidationMetrics;\n  generatedAt:\
+    \ string;\n}\n\ninterface PolicyViolation {\n  violationId: string;\n  ruleId:\
+    \ string;\n  severity: ViolationSeverity;\n  message: string;\n  detailedDescription:\
+    \ string;\n  affectedPath: string;\n  actualValue: any;\n  expectedValue: any;\n\
+    \  remediationSuggestions: string[];\n  culturalImpact?: CulturalImpact;\n}\n\n\
+    enum ViolationSeverity {\n  CRITICAL = \"critical\",\n  HIGH = \"high\",\n  MEDIUM\
+    \ = \"medium\",\n  LOW = \"low\",\n  INFO = \"info\"\n}\n\ninterface CulturalAssessment\
+    \ {\n  sensitivityScore: number; // 0-100\n  biasIndicators: BiasIndicator[];\n\
+    \  inclusivityMetrics: InclusivityMetric[];\n  traditionRespectScore: number;\
+    \ // 0-100\n  recommendedActions: CulturalAction[];\n}\n```"
+- level: 3
+  title: '**4. ValidationTarget**'
+  type: section
+  content: "Universal structure for objects being validated.\n\n```typescript\n/**\n\
+    \ * @interface ValidationTarget\n * @description Universal wrapper for any object\
+    \ undergoing validation\n */\ninterface ValidationTarget {\n  targetId: string;\n\
+    \  targetType: TargetType;\n  sourceNode?: string; // Node that submitted for\
+    \ validation\n  content: any; // The actual object being validated\n  schema?:\
+    \ SchemaDefinition;\n  context: ValidationContext;\n  metadata: TargetMetadata;\n\
+    }\n\nenum TargetType {\n  NODE_CONFIGURATION = \"node_configuration\",\n  WORKFLOW_DEFINITION\
+    \ = \"workflow_definition\",\n  API_SPECIFICATION = \"api_specification\",\n \
+    \ DATA_STRUCTURE = \"data_structure\",\n  SECURITY_POLICY = \"security_policy\"\
+    ,\n  CULTURAL_CONTENT = \"cultural_content\",\n  GENERIC_OBJECT = \"generic_object\"\
+    \n}\n\ninterface ValidationContext {\n  environmentType: EnvironmentType;\n  culturalContext:\
+    \ CulturalContext;\n  businessContext: BusinessContext;\n  technicalContext: TechnicalContext;\n\
+    }\n\nenum EnvironmentType {\n  PRODUCTION = \"production\",\n  STAGING = \"staging\"\
+    ,\n  DEVELOPMENT = \"development\",\n  TESTING = \"testing\",\n  SANDBOX = \"\
+    sandbox\"\n}\n```"
+- level: 3
+  title: '**5. PolicyEngine Configuration**'
+  type: section
+  content: "Configuration for different validation engines.\n\n```typescript\n/**\n\
+    \ * @interface PolicyEngineConfig\n * @description Configuration for policy validation\
+    \ engines\n */\ninterface PolicyEngineConfig {\n  engineType: ValidationEngineType;\n\
+    \  configuration: EngineConfiguration;\n  resourceLimits: EngineResourceLimits;\n\
+    \  performanceSettings: EnginePerformanceSettings;\n  securitySettings: EngineSecuritySettings;\n\
+    }\n\ninterface EngineConfiguration {\n  runtimeVersion: string;\n  moduleSettings:\
+    \ ModuleSettings;\n  cacheConfiguration: CacheConfiguration;\n  debugSettings:\
+    \ DebugSettings;\n}\n\ninterface EngineResourceLimits {\n  maxMemoryMB: number;\n\
+    \  maxCpuTime: number; // milliseconds\n  maxFileDescriptors: number;\n  maxNetworkConnections:\
+    \ number;\n  maxExecutionTime: number; // milliseconds\n}\n\ninterface EnginePerformanceSettings\
+    \ {\n  enableJIT: boolean;\n  optimizationLevel: OptimizationLevel;\n  parallelEvaluation:\
+    \ boolean;\n  cacheResults: boolean;\n  precompilePolicies: boolean;\n}\n\nenum\
+    \ OptimizationLevel {\n  NONE = \"none\",\n  BASIC = \"basic\",\n  STANDARD =\
+    \ \"standard\",\n  AGGRESSIVE = \"aggressive\",\n  MAX = \"max\"\n}\n```"
+- level: 3
+  title: '**6. Audit Trail Models**'
+  type: section
+  content: "Comprehensive audit and logging structures.\n\n```typescript\n/**\n *\
+    \ @interface AuditEntry\n * @description Detailed audit trail entry for all validation\
+    \ activities\n */\ninterface AuditEntry {\n  entryId: string;\n  timestamp: string;\n\
+    \  eventType: AuditEventType;\n  jobId?: string;\n  userId?: string;\n  nodeId?:\
+    \ string;\n  action: string;\n  resourceType: string;\n  resourceId: string;\n\
+    \  details: AuditDetails;\n  outcome: AuditOutcome;\n  culturalImpact?: CulturalImpact;\n\
+    }\n\nenum AuditEventType {\n  VALIDATION_REQUEST = \"validation_request\",\n \
+    \ POLICY_CREATION = \"policy_creation\",\n  POLICY_UPDATE = \"policy_update\"\
+    ,\n  POLICY_DELETION = \"policy_deletion\",\n  COMPLIANCE_CHECK = \"compliance_check\"\
+    ,\n  VIOLATION_DETECTED = \"violation_detected\",\n  REMEDIATION_APPLIED = \"\
+    remediation_applied\",\n  CULTURAL_REVIEW = \"cultural_review\"\n}\n\ninterface\
+    \ AuditDetails {\n  beforeState?: any;\n  afterState?: any;\n  changedFields:\
+    \ string[];\n  rationale: string;\n  approvalChain: ApprovalRecord[];\n  attachments:\
+    \ AuditAttachment[];\n}\n\nenum AuditOutcome {\n  SUCCESS = \"success\",\n  FAILURE\
+    \ = \"failure\",\n  PARTIAL_SUCCESS = \"partial_success\",\n  CANCELLED = \"cancelled\"\
+    ,\n  PENDING_APPROVAL = \"pending_approval\"\n}\n```"
+- level: 3
+  title: '**7. Cultural Sensitivity Models**'
+  type: section
+  content: "Specialized models for cultural awareness and sensitivity.\n\n```typescript\n\
+    /**\n * @interface CulturalContext\n * @description Comprehensive cultural context\
+    \ for validation\n */\ninterface CulturalContext {\n  primaryTradition: CulturalTradition;\n\
+    \  secondaryTraditions: CulturalTradition[];\n  geographicRegion: GeographicRegion;\n\
+    \  languageContext: LanguageContext;\n  religiousContext: ReligiousContext;\n\
+    \  sensitivities: CulturalSensitivity[];\n}\n\nenum CulturalTradition {\n  CONFUCIAN\
+    \ = \"confucian\",\n  BUDDHIST = \"buddhist\",\n  TAOIST = \"taoist\",\n  ISLAMIC\
+    \ = \"islamic\",\n  CHRISTIAN = \"christian\",\n  HINDU = \"hindu\",\n  INDIGENOUS_NATIVE_AMERICAN\
+    \ = \"indigenous_native_american\",\n  INDIGENOUS_AFRICAN = \"indigenous_african\"\
+    ,\n  INDIGENOUS_AUSTRALIAN = \"indigenous_australian\",\n  SECULAR_HUMANIST =\
+    \ \"secular_humanist\",\n  MIXED_HERITAGE = \"mixed_heritage\"\n}\n\ninterface\
+    \ CulturalSensitivity {\n  sensitivityType: SensitivityType;\n  description: string;\n\
+    \  severity: SensitivitySeverity;\n  guidelines: string[];\n  avoidancePatterns:\
+    \ string[];\n  respectfulAlternatives: string[];\n}\n\nenum SensitivityType {\n\
+    \  SACRED_TERMINOLOGY = \"sacred_terminology\",\n  CULTURAL_APPROPRIATION = \"\
+    cultural_appropriation\",\n  HISTORICAL_TRAUMA = \"historical_trauma\",\n  RELIGIOUS_SYMBOLS\
+    \ = \"religious_symbols\",\n  TRADITIONAL_KNOWLEDGE = \"traditional_knowledge\"\
+    ,\n  GENDER_EXPECTATIONS = \"gender_expectations\",\n  SOCIAL_HIERARCHIES = \"\
+    social_hierarchies\"\n}\n```"
+- level: 3
+  title: '**8. Performance and Metrics Models**'
+  type: section
+  content: "Detailed performance tracking and metrics.\n\n```typescript\n/**\n * @interface\
+    \ ValidationMetrics\n * @description Comprehensive performance and quality metrics\n\
+    \ */\ninterface ValidationMetrics {\n  executionTime: ExecutionTimeMetrics;\n\
+    \  resourceUsage: ResourceUsageMetrics;\n  qualityMetrics: QualityMetrics;\n \
+    \ culturalMetrics: CulturalMetrics;\n  errorMetrics: ErrorMetrics;\n}\n\ninterface\
+    \ ExecutionTimeMetrics {\n  totalExecutionTime: number; // milliseconds\n  policyLoadTime:\
+    \ number;\n  validationTime: number;\n  reportGenerationTime: number;\n  culturalAnalysisTime:\
+    \ number;\n}\n\ninterface ResourceUsageMetrics {\n  peakMemoryUsage: number; //\
+    \ MB\n  averageMemoryUsage: number; // MB\n  cpuUtilization: number; // percentage\n\
+    \  diskIOOperations: number;\n  networkRequests: number;\n}\n\ninterface QualityMetrics\
+    \ {\n  accuracyScore: number; // 0-100\n  precisionScore: number; // 0-100\n \
+    \ recallScore: number; // 0-100\n  f1Score: number; // 0-100\n  falsePositiveRate:\
+    \ number; // 0-1\n  falseNegativeRate: number; // 0-1\n}\n\ninterface CulturalMetrics\
+    \ {\n  sensitivityAccuracy: number; // 0-100\n  biasDetectionRate: number; //\
+    \ 0-100\n  inclusivityScore: number; // 0-100\n  traditionRespectScore: number;\
+    \ // 0-100\n  appropriationPreventionScore: number; // 0-100\n}\n```\n\n---\n\n\
+    **Data Models Status**: ✅ **Complete TypeScript Interface Definitions**  \n**Cultural\
+    \ Integration**: Comprehensive cultural sensitivity and tradition respect models\
+    \  \n**Implementation Ready**: Production-grade data structures with performance\
+    \ optimization  \n**HIEROS Compliance**: Full integration of cultural awareness\
+    \ and ethical considerations"

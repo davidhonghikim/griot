@@ -1,0 +1,63 @@
+metadata:
+  original_file: 04_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Sachem Node 04: Database Schema'
+  version: 1.0
+sections:
+- level: 1
+  title: '**4. Sachem Node Database Schema**'
+  type: section
+  content: ''
+- level: 2
+  title: 4.1. Introduction
+  type: section
+  content: The Sachem Node requires a database to manage the state of active `Claim`
+    debates and to persist the `ReputationRecord` for every node in the kOS ecosystem.
+    Unlike Yachay, which archives final `Accord` records, Sachem is concerned with
+    the *process* of consensus. A document-oriented database like MongoDB is well-suited
+    for this role.
+- level: 2
+  title: 4.2. MongoDB Collections
+  type: section
+  content: ''
+- level: 3
+  title: 4.2.1. `claims` Collection
+  type: section
+  content: "This collection holds `Claim` documents, representing all assertions currently\
+    \ or previously under debate.\n\n-   **Document Structure**: Maps to the `Claim`\
+    \ interface from `02_Data_Models.md`.\n\n    ```json\n    {\n      \"_id\": \"\
+    <ObjectId>\",\n      \"claimId\": \"<UUID>\",\n      \"proposingNodeId\": \"<String>\"\
+    ,\n      \"timestamp\": \"<ISODate>\",\n      \"statement\": \"<String>\",\n \
+    \     \"evidence_tapestryIds\": [\"<UUID>\", ...],\n      \"status\": \"PENDING\"\
+    \ | \"DEBATE\" | \"ACCEPTED\" | \"REJECTED\",\n      \"voting_deadline\": \"<ISODate>\"\
+    \n    }\n    ```\n\n-   **Indexes**:\n    1.  **Claim ID Index**:\n        - \
+    \  **Field**: `claimId`\n        -   **Type**: `UNIQUE`\n        -   **Purpose**:\
+    \ Fast lookup of specific claims.\n    2.  **Status & Deadline Index**:\n    \
+    \    -   **Fields**: `{ \"status\": 1, \"voting_deadline\": 1 }`\n        -  \
+    \ **Type**: `COMPOUND`\n        -   **Purpose**: Allows the Debate Manager to\
+    \ efficiently find all claims currently in the `DEBATE` state that have passed\
+    \ their deadline."
+- level: 3
+  title: 4.2.2. `votes` Collection
+  type: section
+  content: "This collection stores every individual `Vote` cast on every `Claim`.\n\
+    \n-   **Document Structure**: Maps to the `Vote` interface from `02_Data_Models.md`.\n\
+    \n    ```json\n    {\n      \"_id\": \"<ObjectId>\",\n      \"claimId\": \"<UUID>\"\
+    ,\n      \"votingNodeId\": \"<String>\",\n      \"choice\": \"FOR\" | \"AGAINST\"\
+    \ | \"ABSTAIN\",\n      \"reputationWeight\": \"<Number>\"\n    }\n    ```\n\n\
+    -   **Indexes**:\n    1.  **Claim & Voter Index**:\n        -   **Fields**: `{\
+    \ \"claimId\": 1, \"votingNodeId\": 1 }`\n        -   **Type**: `UNIQUE (COMPOUND)`\n\
+    \        -   **Purpose**: Ensures a node can only vote once per claim and allows\
+    \ for fast retrieval of all votes for a given claim."
+- level: 3
+  title: 4.2.3. `reputation_ledger` Collection
+  type: section
+  content: "This collection holds the authoritative `ReputationRecord` for each node.\n\
+    \n-   **Document Structure**: Maps to the `ReputationRecord` interface from `02_Data_Models.md`.\n\
+    \n    ```json\n    {\n      \"_id\": \"<ObjectId>\",\n      \"nodeId\": \"<String>\"\
+    ,\n      \"score\": \"<Number>\",\n      \"lastUpdated\": \"<ISODate>\"\n    }\n\
+    \    ```\n\n-   **Indexes**:\n    1.  **Node ID Index**:\n        -   **Field**:\
+    \ `nodeId`\n        -   **Type**: `UNIQUE`\n        -   **Purpose**: Ensures there\
+    \ is only one reputation record per node and allows for fast lookup."

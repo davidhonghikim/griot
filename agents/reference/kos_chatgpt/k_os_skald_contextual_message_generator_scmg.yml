@@ -1,0 +1,121 @@
+title: K Os Skald Contextual Message Generator Scmg
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.260177'
+original_format: markdown
+content_type: api_specification
+word_count: 476
+line_count: 106
+
+---
+
+# kOS Skald Contextual Message Generator (SCMG)
+
+## Overview
+The **kOS Skald Contextual Message Generator (SCMG)** is the primary content generation engine within the Skald Class. It is responsible for dynamically creating context-aware, audience-tailored messages, responses, alerts, and narrative content across the kOS ecosystem.
+
+SCMG translates structured trigger events from the GCTE into human-readable, machine-consumable, or multi-format outputs based on predefined templates, learned patterns, or AI-assisted composition.
+
+---
+
+## 1. Functional Role within Skald
+
+- Converts GCTE triggers into actionable messages.
+- Applies audience targeting parameters.
+- Supports multi-modal content outputs (text, speech, API payloads).
+- Interfaces with translation, summarization, and formatting modules downstream.
+
+---
+
+## 2. Input Sources
+
+- GCTE Trigger Payloads
+- Agent task outputs
+- Knowledge Graph insights
+- User profile preferences
+- External API data (if allowed by GEIG)
+
+---
+
+## 3. Content Generation Layers
+
+### 3.1 Template Engine
+- Supports Markdown, HTML, JSON, and plaintext templates.
+- Dynamic variable substitution from trigger payloads and context enrichments.
+- Includes default system templates for common alerts, system messages, and notifications.
+
+### 3.2 AI Language Model Integration (Optional)
+- LLM plugin integration for free-form or adaptive message generation.
+- Contextual constraint enforcement to maintain factuality and alignment with GEIG ethical parameters.
+- Supports fine-tuned models for domain-specific communications.
+
+### 3.3 Summarization and Condensation Layer
+- Auto-generates concise summaries for long payloads.
+- Multi-level verbosity controls (Brief, Standard, Detailed).
+
+---
+
+## 4. Audience Targeting Module
+
+- Customizes messages based on:
+  - Recipient type (User, Agent, Node, External System)
+  - Role sensitivity (Admin, Public, Restricted)
+  - Preferred language or data format
+  - Delivery channel (UI, Email, SMS, API callback, WebSocket, etc.)
+
+---
+
+## 5. API Endpoints
+
+- `/scmg/message/generate`
+- `/scmg/template/list`
+- `/scmg/template/update`
+- `/scmg/message/preview`
+- `/scmg/message/dispatch`
+
+---
+
+## 6. Ethical and Security Filters
+
+- Pre-generation GEIG ethical check on message content and delivery target.
+- Rate-limiting for high-frequency notification types.
+- Sensitive content redaction or modification before dispatch.
+- Full logging of generated message history.
+
+---
+
+## 7. Multi-Modal Output Support
+
+- Text (Markdown, HTML, Plaintext)
+- Audio (via TTS engines, optional)
+- JSON payloads for API consumption
+- Graphical or tabular embeds for UI presentation
+
+---
+
+## 8. Performance and Scaling
+
+- Stateless API model for high parallelism
+- Caching of frequently generated standard messages
+- Batched generation support for bulk notifications
+
+---
+
+## 9. Advanced Features
+
+- Sentiment and tone adjustment based on recipient context
+- Support for multilingual output (via downstream Skald Translation Layer)
+- Personalization hooks for user-preference-driven messaging
+- A/B testing framework for optimizing notification styles
+
+---
+
+## Conclusion
+The **kOS Skald Contextual Message Generator (SCMG)** serves as the creative voice and messaging engine of the Skald Class—transforming raw triggers into ethically safe, audience-specific, and context-aware messages for users, agents, and external systems across the kOS ecosystem.
+
+Next Step: Proceeding to the **kOS Skald Audience Targeting and Routing Engine (SATRE)** document.
+
+

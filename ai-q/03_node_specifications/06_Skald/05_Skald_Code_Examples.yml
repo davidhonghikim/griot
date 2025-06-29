@@ -1,0 +1,51 @@
+metadata:
+  original_file: 05_Skald_Code_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Skald Class: Code Examples'
+  description: TypeScript code examples for interacting with the Skald Node Class
+    via KLF.
+sections:
+- level: 1
+  title: Skald Class Code Examples
+  type: section
+  content: This section provides conceptual TypeScript examples for a client interacting
+    with a Skald node.
+- level: 2
+  title: 1. Subscribing to a Topic and Handling Events
+  type: section
+  content: "This example shows a \"listener\" node that subscribes to a topic and\
+    \ logs any messages it receives.\n\n```typescript\nimport { KLFClient, createMessage,\
+    \ MessageType } from './klf-sdk';\n\nfunction setupListener(client: KLFClient,\
+    \ skaldDid: string, topic: string) {\n    console.log(`Setting up listener for\
+    \ topic: ${topic}`);\n\n    // First, send the command to subscribe\n    const\
+    \ subscribeCommand = createMessage()\n        .from(client.getDid()) // Assuming\
+    \ the client knows its own DID\n        .to(skaldDid)\n        .type(MessageType.SYSTEM_COMMAND)\n\
+    \        .payload({\n            command_name: 'subscribe',\n            params:\
+    \ { \"topic_name\": topic }\n        })\n        .build();\n    \n    client.sendMessage(subscribeCommand);\n\
+    \    console.log('Subscription command sent.');\n\n    // Then, set up a handler\
+    \ to process incoming event deliveries\n    client.onMessage((message) => {\n\
+    \        if (message.type === MessageType.EVENT_DELIVERY && message.payload.topic_name\
+    \ === topic) {\n            console.log(`\\n--- New Event Received on '${topic}'\
+    \ ---`);\n            console.log(`From Publisher: ${message.payload.publisher_did}`);\n\
+    \            console.log(`Published At:   ${message.payload.published_at}`);\n\
+    \            console.log('Payload:', JSON.stringify(message.payload.payload, null,\
+    \ 2));\n            console.log('--- End of Event ---');\n        }\n    });\n\
+    }\n```"
+- level: 2
+  title: 2. Publishing an Event to a Topic
+  type: section
+  content: "This example shows a \"publisher\" node that sends an event to a topic.\n\
+    \n```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \nasync function publishHealthAlert(client: KLFClient, skaldDid: string, unhealthyNode:\
+    \ string) {\n    const topic = 'kos:system:node_health_alerts';\n    console.log(`Publishing\
+    \ health alert to topic: ${topic}`);\n\n    const eventMessage = createMessage()\n\
+    \        .from(client.getDid()) // This message is from me (the publisher)\n \
+    \       .to(skaldDid) // Sent to the Skald node for distribution\n        .type(MessageType.EVENT_PUBLISH)\n\
+    \        .payload({\n            topic_name: topic,\n            payload: {\n\
+    \                alert_type: 'HIGH_CPU_LOAD',\n                node_did\": unhealthyNode,\n\
+    \                cpu_usage_percent: 98.5,\n                timestamp: new Date().toISOString()\n\
+    \            }\n        })\n        .build();\n\n    // Fire-and-forget publish\n\
+    \    await client.sendMessage(eventMessage);\n    console.log('Health alert published.');\n\
+    }\n```"

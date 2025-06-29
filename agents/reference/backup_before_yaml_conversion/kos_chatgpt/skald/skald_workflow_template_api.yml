@@ -1,0 +1,113 @@
+title: Skald Workflow Template Api
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.818300'
+original_format: markdown
+content_type: api_specification
+word_count: 582
+line_count: 98
+
+---
+
+# Skald Module Specification: Workflow Template API (WTA)
+
+## Module Name
+**Skald Workflow Template API (WTA)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Workflow Template API (WTA) provides a standardized interface for defining, storing, retrieving, modifying, and deleting reusable Skald workflow templates. These templates allow users and developers to predefine workflow structures that can be instantiated and customized at runtime.
+
+## Purpose
+To streamline workflow creation, encourage reuse, and support automation by enabling declarative workflow definitions that can be easily deployed across multiple Skald executions.
+
+## Functional Requirements
+
+### 1. Template Definition and Storage
+- **YAML/JSON Schema Support:** Workflow templates defined in structured, human-readable formats.
+- **Template Versioning:** Maintain multiple versions of a template.
+- **Metadata Support:** Allow tagging, descriptions, authorship, and usage statistics per template.
+- **Template Validation:** Validate templates at creation and update time against Skald Workflow Orchestrator requirements.
+
+### 2. API Endpoints
+- **POST /templates:** Create a new workflow template.
+- **GET /templates/{id}:** Retrieve template details.
+- **PUT /templates/{id}:** Update an existing template.
+- **DELETE /templates/{id}:** Remove a template.
+- **GET /templates:** List all available templates (with filtering and pagination).
+- **POST /templates/{id}/instantiate:** Generate a new workflow instance from a template.
+
+### 3. Parameterization and Customization
+- **Template Variables:** Allow placeholder variables for runtime substitution.
+- **Conditional Steps:** Support template logic with optional and conditional steps.
+- **Input Schema Definition:** Specify expected parameters at instantiation time.
+
+### 4. Access Control and Permissions
+- **User/Role Based Access:** Restrict template creation, editing, or deletion.
+- **Public vs Private Templates:** Allow users to mark templates as globally visible or private.
+- **Audit Logging:** Track who created, edited, or deleted templates.
+
+### 5. Observability and Metrics
+- **Usage Stats:** Track how often each template is instantiated.
+- **Error Tracking:** Monitor template execution failures tied back to specific template versions.
+- **Template Change Logs:** Record all template edits with diffs.
+
+## Non-Functional Requirements
+- **Latency:** Template retrieval under 100ms.
+- **Scalability:** Support thousands of templates per deployment.
+- **Reliability:** Strong consistency for template storage and retrieval.
+- **Extensibility:** Pluggable storage backend (SQL, NoSQL, or file-based).
+
+## Data Flow Diagram (Textual)
+1. **API Call (CRUD or Instantiate Template)** → 2. **Template Store / Manager** → 3. **Template Validator** → 4. **Workflow Instantiation (SWO)** → 5. **Response Returned**
+
+## Interfaces
+- **Input Interfaces:** External REST API calls, CLI Tools, SDK calls.
+- **Output Interfaces:** Skald Workflow Orchestrator (SWO), Logging Systems, Notification Channels.
+
+## Configuration Options
+- **Template Storage Backend:** (SQL/NoSQL/File)
+- **Max Template Size:** Configurable.
+- **Template Retention Policy:** Auto-archive or delete old template versions.
+
+## Example Use Cases
+- Creating a preconfigured translation → summary → tone adjustment workflow template.
+- Allowing non-technical users to trigger common workflows via template IDs.
+- Version-controlling frequently used narrative generation pipelines.
+
+## Extensibility Hooks
+- **Custom Template Preprocessors:** Inject logic before template instantiation.
+- **Third-Party Template Importers:** Allow bulk import from external systems.
+- **Auto-Template Generation (AI-Assisted):** Future AI module to auto-suggest templates.
+
+## Testing and Validation Plan
+- API contract and schema validation tests.
+- CRUD operation tests across multiple storage backends.
+- Template instantiation flow tests.
+- Access control validation tests.
+
+## Dependencies
+- **kOS Event Bus**
+- **Skald Workflow Orchestrator (SWO)**
+- **Skald API Gateway (SAG)**
+- **Authentication Layer (AAL)**
+- **Template Storage System**
+
+## Future Enhancements
+- Web-based visual template designer.
+- Template marketplace for community sharing.
+- AI-driven template optimization suggestions.
+- Automated rollback support for faulty template versions.
+
+---
+
+**Next module:** `skald_response_formatting_and_output_apis.md`
+
+Let me know when you want me to continue.
+
+

@@ -1,0 +1,43 @@
+metadata:
+  original_file: 02_Skald_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Skald Class: Data Models'
+  description: Data models for the Skald Node Class, including Topic, Subscription,
+    and EventMessage.
+sections:
+- level: 1
+  title: Skald Class Data Models
+  type: section
+  content: ''
+- level: 3
+  title: 1. Topic
+  type: section
+  content: "Represents a channel for publication. Topics are created dynamically when\
+    \ a node first publishes to them.\n\n```json\n{\n  \"topic_name\": \"string (e.g.,\
+    \ 'kos:system:node_health_alerts')\",\n  \"is_persistent\": \"boolean\",\n  \"\
+    owner_did\": \"string (did of the node that created the topic)\",\n  \"acl\":\
+    \ {\n    \"read_access\": \"public | restricted\",\n    \"write_access\": \"public\
+    \ | restricted\",\n    \"allowed_readers\": [\"did:kos:group:admins\"],\n    \"\
+    allowed_writers\": [\"did:kos:hakim:*\"]\n  },\n  \"created_at\": \"string (ISO\
+    \ 8601 timestamp)\",\n  \"last_published_at\": \"string (ISO 8601 timestamp)\"\
+    \n}\n```"
+- level: 3
+  title: 2. Subscription
+  type: section
+  content: "Represents a node's interest in a topic.\n\n```json\n{\n  \"subscription_id\"\
+    : \"string (uuid)\",\n  \"topic_name\": \"string\",\n  \"subscriber_did\": \"\
+    string (did:kos:...)\",\n  \"subscription_type\": \"realtime | replay_from_start\"\
+    ,\n  \"is_active\": \"boolean\",\n  \"created_at\": \"string (ISO 8601 timestamp)\"\
+    \n}\n```"
+- level: 3
+  title: 3. EventMessage
+  type: section
+  content: "Represents the actual data packet that is published to a topic and delivered\
+    \ to subscribers. This is the payload of the KLF message.\n\n```json\n{\n  \"\
+    event_id\": \"string (uuid)\",\n  \"topic_name\": \"string\",\n  \"publisher_did\"\
+    : \"string (did:kos:...)\",\n  \"published_at\": \"string (ISO 8601 timestamp)\"\
+    ,\n  \"payload\": {\n    // Arbitrary JSON payload\n  },\n  \"metadata\": {\n\
+    \    \"content_type\": \"application/json\",\n    \"correlation_id\": \"string\
+    \ (optional)\"\n  }\n}\n```"

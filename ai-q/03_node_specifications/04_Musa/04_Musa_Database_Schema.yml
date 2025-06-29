@@ -1,0 +1,49 @@
+metadata:
+  original_file: 04_Musa_Database_Schema.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Musa Class: Database Schema'
+  description: PostgreSQL database schema for the Musa Node Class.
+sections:
+- level: 1
+  title: Musa Class Database Schema
+  type: section
+  content: "The Musa node requires a persistent storage layer to manage authorization\
+    \ policies and to create an immutable audit trail of security events.\n\n```sql\n\
+    -- Enables UUID generation, if not already enabled\nCREATE EXTENSION IF NOT EXISTS\
+    \ \"uuid-ossp\";\n\n-- Table to store authorization policies.\nCREATE TABLE policies\
+    \ (\n    -- A unique identifier for each policy.\n    policy_id UUID PRIMARY KEY\
+    \ DEFAULT uuid_generate_v4(),\n\n    -- A human-readable name for the policy.\n\
+    \    policy_name TEXT NOT NULL,\n\n    -- The effect of the policy, either 'Allow'\
+    \ or 'Deny'.\n    effect VARCHAR(10) NOT NULL CHECK (effect IN ('Allow', 'Deny')),\n\
+    \n    -- A JSONB array of actions this policy applies to (e.g., [\"read\", \"\
+    write\"]).\n    actions JSONB NOT NULL,\n\n    -- A JSONB array of resources this\
+    \ policy applies to, supporting wildcards\n    -- (e.g., [\"did:kos:document:123\"\
+    , \"did:kos:document:456:*\"]).\n    resources JSONB NOT NULL,\n\n    -- A JSONB\
+    \ object containing the detailed policy logic, e.g., a Rego policy definition.\n\
+    \    conditions JSONB,\n\n    -- The DID of the node or user that owns and can\
+    \ manage this policy.\n    owner_did VARCHAR(255) NOT NULL,\n\n    -- Timestamp\
+    \ of when the policy was created.\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT\
+    \ NOW()\n);\n\n-- Index on owner_did for efficient lookup of policies.\nCREATE\
+    \ INDEX idx_policies_owner_did ON policies (owner_did);\n\n-- Table to store an\
+    \ immutable log of security-sensitive events.\nCREATE TABLE security_audit_logs\
+    \ (\n    -- A unique identifier for each log entry.\n    log_id UUID PRIMARY KEY\
+    \ DEFAULT uuid_generate_v4(),\n\n    -- Timestamp of the event, with timezone.\n\
+    \    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,\n\n    -- Type of the event\
+    \ being logged (e.g., 'AUTHENTICATION', 'AUTHORIZATION').\n    event_type VARCHAR(50)\
+    \ NOT NULL,\n\n    -- The DID of the principal that initiated the event.\n   \
+    \ principal_id VARCHAR(255) NOT NULL,\n\n    -- The IP address from which the\
+    \ request originated.\n    source_ip INET,\n\n    -- The action that was attempted\
+    \ (e.g., 'validate_credential', 'read').\n    action VARCHAR(100) NOT NULL,\n\n\
+    \    -- The resource that was targeted.\n    resource TEXT,\n\n    -- The outcome\
+    \ of the event (e.g., 'Success', 'Failure').\n    outcome VARCHAR(50) NOT NULL,\n\
+    \n    -- A JSONB blob for storing detailed, event-specific context,\n    -- such\
+    \ as the policy that was evaluated or the error code on failure.\n    details\
+    \ JSONB\n);\n\n-- Index on timestamp for time-series analysis and efficient querying\
+    \ by date range.\nCREATE INDEX idx_security_audit_logs_timestamp ON security_audit_logs\
+    \ (timestamp);\n\n-- Index on principal_id to quickly retrieve all events for\
+    \ a specific user or node.\nCREATE INDEX idx_security_audit_logs_principal_id\
+    \ ON security_audit_logs (principal_id);\n\n-- Index on event_type to filter by\
+    \ event category.\nCREATE INDEX idx_security_audit_logs_event_type ON security_audit_logs\
+    \ (event_type);\n```"

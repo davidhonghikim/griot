@@ -1,0 +1,35 @@
+# kOS Yachay - Umbrella Helm Chart (Deploy Entire Knowledge Stack in One Command)
+
+apiVersion: v2
+name: kos-yachay-stack
+version: 1.0.0
+description: Full kOS Yachay Knowledge Stack (App + Mongo + Postgres + Neo4j + Weaviate + Redis + Milvus)
+type: application
+
+dependencies:
+  - name: kos-yachay
+    repository: "file://../kos-yachay"
+  - name: kos-yachay-mongo
+    repository: "file://../kos-yachay-mongo"
+  - name: kos-yachay-postgres
+    repository: "file://../kos-yachay-postgres"
+  - name: kos-yachay-neo4j
+    repository: "file://../kos-yachay-neo4j"
+  - name: kos-yachay-weaviate
+    repository: "file://../kos-yachay-weaviate"
+  - name: kos-yachay-chroma
+    repository: "file://../kos-yachay-chroma"
+  - name: kos-yachay-milvus
+    repository: "file://../kos-yachay-milvus"
+  - name: kos-yachay-redis
+    repository: "file://../kos-yachay-redis"
+
+defaults:
+  global:
+    namespace: kos-yachay
+    loggingLevel: info
+
+---
+# ✅ This umbrella chart allows single-command deployment of entire Yachay memory ecosystem
+# ✅ Deploys Yachay App + All Backends (Mongo, Postgres, Neo4j, Weaviate, Chroma, Milvus, Redis)
+# ✅ Next Optional Step: Build runtime adapter module for API-side dynamic DB switching

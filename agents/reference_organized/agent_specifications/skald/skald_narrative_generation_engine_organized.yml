@@ -1,0 +1,151 @@
+title: Skald Narrative Generation Engine
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.803897'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 702
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: false
+has_testing: true
+has_security: false
+has_rag: true
+has_ethics: false
+original_filename: skald_narrative_generation_engine.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/skald/skald_narrative_generation_engine.yml
+category: agent_specifications/skald
+
+---
+
+title: Skald Narrative Generation Engine
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.798950'
+original_format: markdown
+content_type: api_specification
+word_count: 676
+line_count: 108
+
+---
+
+# Skald Module Specification: Narrative Generation Engine (NGE)
+
+## Module Name
+**Narrative Generation Engine (NGE)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Narrative Generation Engine (NGE) is the core storytelling and narrative composition submodule within the Skald class. It is responsible for generating structured, coherent, and contextually relevant narratives of any length, style, or format based on user prompts, system triggers, or multi-source input data.
+
+## Purpose
+To enable Skald agents to produce dynamic narratives for diverse purposes such as entertainment, documentation, scenario simulation, education, summaries, or interactive dialogue storytelling.
+
+## Functional Requirements
+
+### 1. Narrative Input Types
+- **Prompt-based Generation:** Freeform text prompts from users or agents.
+- **Data-driven Generation:** Structured data (JSON, CSV, databases) converted into story format.
+- **Multi-source Contextual Inputs:** Blend data from multiple sources (chat history, logs, APIs, etc.).
+- **Preloaded Scenario Templates:** Predefined narrative starting points.
+
+### 2. Narrative Output Types
+- **Short Form:** Tweets, status updates, short answers.
+- **Medium Form:** Blog posts, emails, educational summaries.
+- **Long Form:** Full stories, scripts, reports, multi-part articles.
+- **Dialogue Style:** Chatbot conversations, roleplay scenarios.
+- **Multi-format:** Markdown, HTML, JSON, plain text, audio-ready text.
+
+### 3. Structural Control
+- **Beginning-Middle-End Enforcement:** Ensure complete narrative arcs.
+- **Section Markers:** Auto-generate headers and chapter breaks when applicable.
+- **Thematic Consistency:** Maintain story tone and themes across long outputs.
+- **Character/Entity Tracking:** Maintain consistency in names, roles, and descriptions.
+
+### 4. Creativity and Variance Control
+- **Temperature Setting:** Control output randomness vs determinism.
+- **Top-K / Top-P Sampling Control:** Advanced sampling configuration for LLM generation.
+- **Repetition Penalty:** Reduce redundant phrasing.
+- **User Style Injection:** Allow narrative style to emulate specific authors or genres.
+
+### 5. Contextual Awareness
+- **Session Memory Integration:** Utilize ongoing session history.
+- **Event-based Narrative Hooks:** Integrate external triggers from CTE (Contextual Trigger Engine).
+- **Emotion and Tone Inheritance:** Leverage outputs from SEE (Sentiment and Emotion Engine) and PTE (Personality and Tone Engine).
+
+### 6. Multi-Agent and Multi-Audience Support
+- **Role-Based Narratives:** Different narratives for different audiences within the same system event.
+- **Multi-Character Dialogue:** Support scenes with multiple characters/voices.
+- **Audience Sensitivity Filters:** Generate age-appropriate or domain-appropriate narratives.
+
+## Non-Functional Requirements
+- **Latency:** Under 1 second for short prompts (<500 tokens).
+- **Scalability:** Parallel narrative generation support for high-demand environments.
+- **Extensibility:** Modular design for new narrative templates or LLM backends.
+- **Reliability:** Graceful fallback on smaller models if primary model fails.
+
+## Data Flow Diagram (Textual)
+1. **Input Source (Prompt/Data/Triggers)** → 2. **Preprocessor** → 3. **Contextual Data Fetcher** → 4. **Narrative Composition Engine** → 5. **Post-Processing (Tone/Emotion Adjustments)** → 6. **Output Formatter** → 7. **Delivery Channel**
+
+## Interfaces
+- **Input Interfaces:** REST API, CLI, Web UI, Event Bus, Prompt Manager.
+- **Output Interfaces:** kOS Event Bus, Text Output Handlers, Skald Output Formatter, TTS Module.
+
+## Configuration Options
+- **Temperature:** (0.2 - 1.2)
+- **Top-K / Top-P Sampling Settings:**
+- **Max Output Length:** (Tokens or characters)
+- **Narrative Style Profile:** (Fictional, Technical, Casual, etc.)
+- **Session Context Depth:** (Last X messages/events)
+
+## Example Use Cases
+- Auto-generating meeting summaries as storytelling narratives.
+- Simulating fictional dialogue between historical figures.
+- Converting JSON sensor logs into human-readable event narratives.
+- Producing daily motivational stories for team morale.
+
+## Extensibility Hooks
+- **Custom Narrative Templates:** Support for industry-specific storytelling formats.
+- **Multi-LLM Backend Switching:** Select different LLMs per narrative type.
+- **Plugin API for Custom Post-Processors:** For special formatting, additional QA, or downstream analysis.
+
+## Testing and Validation Plan
+- Human quality reviews of generated narratives.
+- BLEU/ROUGE metric benchmarking (for summary-like narratives).
+- Latency/load tests across varying input sizes.
+- Style accuracy evaluation via persona-based prompts.
+
+## Dependencies
+- **kOS Event Bus**
+- **Skald NLP Engine**
+- **Personality and Tone Engine (PTE)**
+- **Sentiment and Emotion Engine (SEE)**
+- **Contextual Trigger Engine (CTE)**
+- **LLM Model Hosting (local or external)**
+
+## Future Enhancements
+- AI-powered narrative critique and self-edit loop.
+- Emotionally responsive real-time story updates.
+- Interactive story branching for choose-your-own-adventure style outputs.
+- Narrative scaffolding tools for human-AI co-writing.
+
+---
+
+**Next module:** `skald_conversational_memory_manager.md`
+
+Let me know when to continue.
+
+
+

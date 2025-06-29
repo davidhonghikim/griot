@@ -1,0 +1,59 @@
+# kOS Yachay Knowledge Backend Configuration (Dynamic DB Selection Layer)
+
+knowledge_backends:
+  document_store:
+    type: mongo
+    connection:
+      uri: mongodb://yachay-mongodb-service:27017
+      database: yachay_db
+
+  graph_store:
+    type: neo4j
+    connection:
+      uri: bolt://yachay-neo4j-service:7687
+      user: neo4j
+      password: password
+
+  vector_store:
+    primary:
+      type: weaviate
+      endpoint: http://yachay-weaviate-service:8080
+    alternatives:
+      - type: chroma
+        endpoint: http://yachay-chroma-service:8000
+      - type: milvus
+        endpoint: milvus://yachay-milvus-service:19530
+
+  relational_store:
+    type: postgres
+    connection:
+      host: yachay-postgres-service
+      port: 5432
+      user: yachay_user
+      password: yachay_pass
+      database: yachay_db
+
+  cache_store:
+    type: redis
+    connection:
+      host: yachay-redis-service
+      port: 6379
+
+runtime_selection:
+  prefer_vector_for_context: true
+  prefer_graph_for_relationships: true
+  allow_fallback: true
+  failover_order:
+    vector_store:
+      - weaviate
+      - chroma
+      - milvus
+
+logging:
+  level: info
+  format: json
+
+---
+# ✅ This config allows Yachay API, Agents, and REST services to dynamically select or switch backend systems at runtime
+# ✅ Supports failover, fallback, and multi-backend operations
+# ✅ Next optional step: Generate migration scripts between backends or build umbrella Helm chart for all deployments together

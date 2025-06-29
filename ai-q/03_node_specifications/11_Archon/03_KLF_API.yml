@@ -1,0 +1,108 @@
+metadata:
+  original_file: 03_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Archon Node 03: KLF API'
+  version: 1.0
+sections:
+- level: 1
+  title: '**3. Archon Node KLF API Specification**'
+  type: section
+  content: ''
+- level: 2
+  title: 3.1. Introduction
+  type: section
+  content: The Archon Node's KLF API is primarily concerned with receiving high-level
+    `Directives` and reporting on their final status. Unlike other nodes, its main
+    function is not to respond to queries, but to *initiate* messages to other nodes
+    as part of executing a `WorkflowPlan`.
+- level: 2
+  title: 3.2. Inbound KLF Messages
+  type: section
+  content: 'The Archon Node listens for one primary message type:
+
+
+    | Message Type          | Description                               | Payload
+    Interface       |
+
+    | --------------------- | ----------------------------------------- | -----------------------
+    |
+
+    | `ARCHON_SUBMIT_DIRECTIVE` | Submits a new high-level `Directive` for execution.
+    | `Directive`             |'
+- level: 2
+  title: 3.3. Outbound KLF Messages
+  type: section
+  content: 'The Archon Node is a major *producer* of KLF messages. It can, in principle,
+    send any message defined by another node''s API. For example, it will send `YACHAY_QUERY_REQUEST`
+    to Yachay, `SACHEM_PROPOSE_CLAIM` to Sachem, and so on, as defined by the `Tasks`
+    in its `WorkflowPlan`.
+
+
+    It also dispatches messages to report the final outcome of a `Directive`.
+
+
+    | Message Type          | Description                                        |
+    Payload Interface           |
+
+    | --------------------- | -------------------------------------------------- |
+    --------------------------- |
+
+    | `ARCHON_DIRECTIVE_COMPLETE` | Announces the successful completion of a directive.    |
+    `ArchonDirectiveComplete`   |
+
+    | `ARCHON_DIRECTIVE_FAILED`   | Announces the failure of a directive.              |
+    `ArchonDirectiveFailed`     |
+
+    | `ARCHON_API_ERROR`        | Indicates an error processing a directive submission.
+    | `ArchonApiError`            |'
+- level: 2
+  title: 3.4. API Endpoint Details & Payloads
+  type: section
+  content: ''
+- level: 3
+  title: 3.4.1. Submitting a Directive
+  type: section
+  content: '**Request Message:** `ARCHON_SUBMIT_DIRECTIVE`
+
+
+    -   **Description**: A user or another high-level node sends this message to command
+    the kOS swarm to achieve a goal.
+
+    -   **Payload (`Directive`)**: The full `Directive` data model as defined in `02_Data_Models.md`.'
+- level: 3
+  title: 3.4.2. Reporting Directive Completion
+  type: section
+  content: "**Dispatch Message:** `ARCHON_DIRECTIVE_COMPLETE`\n\n-   **Description**:\
+    \ Sent by the Archon's Reporting Engine back to the original requesting entity\
+    \ upon the successful completion of a `WorkflowPlan`.\n-   **Payload (`ArchonDirectiveComplete`)**:\n\
+    \    ```typescript\n    interface ArchonDirectiveComplete {\n      /**\n     \
+    \  * @property {string} directiveId - The ID of the original directive.\n    \
+    \   */\n      directiveId: string;\n\n      /**\n       * @property {'SUCCESS'}\
+    \ status - The final status.\n       */\n      status: 'SUCCESS';\n\n      /**\n\
+    \       * @property {any} finalResult - The synthesized final result that fulfills\
+    \ the directive.\n       */\n      finalResult: any;\n\n      /**\n       * @property\
+    \ {Date} completionTimestamp - The ISO 8601 timestamp of completion.\n       */\n\
+    \      completionTimestamp: Date;\n    }\n    ```"
+- level: 3
+  title: 3.4.3. Reporting Directive Failure
+  type: section
+  content: "**Dispatch Message:** `ARCHON_DIRECTIVE_FAILED`\n\n-   **Description**:\
+    \ Sent if the `WorkflowPlan` fails and cannot be recovered by the Failure Handler.\n\
+    -   **Payload (`ArchonDirectiveFailed`)**:\n    ```typescript\n    interface ArchonDirectiveFailed\
+    \ {\n      /**\n       * @property {string} directiveId - The ID of the original\
+    \ directive.\n       */\n      directiveId: string;\n\n      /**\n       * @property\
+    \ {'FAILED'} status - The final status.\n       */\n      status: 'FAILED';\n\n\
+    \      /**\n       * @property {string} reason - A human-readable explanation\
+    \ of why the directive failed.\n       */\n      reason: string;\n\n      /**\n\
+    \       * @property {string} failedTaskId - The ID of the specific task that caused\
+    \ the failure.\n       */\n      failedTaskId: string;\n    }\n    ```"
+- level: 3
+  title: 3.4.4. Error Handling
+  type: section
+  content: "**Response Message:** `ARCHON_API_ERROR`\n\n-   **Description**: Sent\
+    \ in response to an invalid `ARCHON_SUBMIT_DIRECTIVE` message.\n-   **Payload\
+    \ (`ArchonApiError`)**:\n    ```typescript\n    interface ArchonApiError {\n \
+    \     requestMessageId: string;\n      errorCode: 'INVALID_DIRECTIVE' | 'PLANNING_FAILED';\n\
+    \      errorMessage: string;\n    }\n    ```"

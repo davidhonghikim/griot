@@ -1,0 +1,210 @@
+title: K Os Agent Doc Storage And Pruning System
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.907875'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 795
+has_code_blocks: true
+has_api_specs: true
+has_architecture: true
+has_deployment: false
+has_testing: false
+has_security: false
+has_rag: true
+has_ethics: false
+original_filename: k_os_agent_doc_storage_and_pruning_system.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/yachay/k_os_agent_doc_storage_and_pruning_system.yml
+category: agent_specifications/skald
+
+---
+
+title: K Os Agent Doc Storage And Pruning System
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:48.050626'
+original_format: markdown
+content_type: api_specification
+word_count: 765
+line_count: 167
+
+---
+
+# kOS Agent Documentation Storage, Validation, and Pruning System
+
+## 📍 Node Class: **Skald** (Documentation, Narrative, Knowledge Continuity)
+
+---
+
+## ✅ System Purpose
+
+A fully AI-compatible, human-readable, open-source, and DB-migration-friendly **Documentation + Changelog + Metrics + Analysis + Pruning + Validation + Export System** for all kOS agents, optimized for both large context window AI use and structured DB storage.
+
+---
+
+## ✅ Architecture Overview
+
+### Core Layers:
+
+| Layer                        | Function                                                        |
+| ---------------------------- | --------------------------------------------------------------- |
+| **Filesystem Layer (Now)**   | Flat files in JSON, YAML, and Markdown with frontmatter         |
+| **Schema Layer**             | JSON Schema / YAML Schema for each doc type                     |
+| **Manifest Layer**           | Central `system_manifest.json` (registry of all docs with meta) |
+| **Validation Layer**         | Pre-save and pre-commit JSON/YAML/Markdown validator CLI        |
+| **Pruning Layer**            | Smart script for archive reduction and log summarization        |
+| **Export Layer (Migration)** | Batch dump JSON and MD into DB-importable JSONL or NDJSON       |
+| **Optional Future**          | Connectors for PostgreSQL, MongoDB, Neo4j, Weaviate             |
+
+## ✅ Target Technologies (JS Ecosystem)
+
+| Function               | Recommended Tools                          |
+| ---------------------- | ------------------------------------------ |
+| JSON Schema Validation | `ajv` (Another JSON Schema Validator)      |
+| Markdown Parsing / AST | `markdown-it`, `unified`, or `remark`      |
+| Frontmatter Parsing    | `gray-matter`                              |
+| File System Walk       | `fast-glob`, `fs-extra`, Node.js `fs` APIs |
+| CLI Tooling            | Node.js scripts (ESM or CJS)               |
+| Archive and Pruning    | Node.js scripts, optional cronjob          |
+| Export                 | Node.js JSON flattener / JSONL writer      |
+
+## ✅ Directory Layout (For Now)
+
+```plaintext
+/agents
+├── bootstrap/
+├── config/
+├── handoff/
+├── analysis/
+├── performance/
+├── implementation-plans/
+├── archive/
+├── scripts/
+│   ├── validate-docs.js
+│   ├── generate-manifest.js
+│   ├── prune-archives.js
+│   └── export-for-db.js
+└── system_manifest.json
+```
+
+## ✅ Required JSON Schemas (Minimum Set for Now)
+
+- `plan-schema.json`
+- `changelog-schema.json`
+- `performance-schema.json`
+- `handoff-schema.json`
+- `analysis-schema.json`
+- Optional: `manifest-schema.json`
+
+## ✅ Smart Pruning System Design
+
+| Mode                    | Behavior                                                             |
+| ----------------------- | -------------------------------------------------------------------- |
+| **Log Pruning**         | Auto-summarize low-value log lines, preserve error/fix summaries     |
+| **Changelog Pruning**   | Collapse minor changelog entries into daily/weekly summaries         |
+| **Performance Pruning** | Drop raw metrics after X months, keep rollups                        |
+| **Plan Pruning**        | Keep all completed plans, prune backlog of cancelled/abandoned plans |
+| **Analysis Pruning**    | Never prune; always archive                                          |
+| **Export Before Prune** | Auto-run `export-for-db.js` before any destructive prune             |
+
+---
+
+## ✅ Script Descriptions
+
+### 1. `validate-docs.js`
+
+- Validate all JSON, YAML, and Markdown files
+- Enforce frontmatter standards
+- JSON Schema checks per doc type
+- Optional: Auto-fix minor issues (missing fields, bad indentation)
+
+### 2. `generate-manifest.js`
+
+- Recursively scans `/agents/`
+- Builds/upserts `system_manifest.json`
+- Captures: `file_path`, `doc_type`, `timestamp`, `last_updated`, `author`, `status`
+
+### 3. `prune-archives.js`
+
+- Accepts CLI args: prune mode, retention period, target systems (logs, changelog, metrics, etc.)
+- Creates `pre_prune_backup/`
+- Moves pruned files to backup before deletion
+- Writes summary report of prune actions
+
+### 4. `export-for-db.js`
+
+- Outputs all JSON/YAML/Markdown into **single JSONL export per system**
+- Compatible with Postgres `COPY`, Mongo `mongoimport`, or vector DB loaders
+- Options: full export / delta export / by date range
+
+---
+
+## ✅ Frontmatter Standard (For ALL .md files)
+
+```yaml
+---
+doc_type: "implementation-plan"  # or changelog, analysis, etc.
+doc_id: "plan_2025_06_rag_storage"
+timestamp: "2025-06-29T15:30:00Z"
+author: "agent_name"
+version: "1.0"
+status: "active|completed|archived"
+tags: ["migration", "storage", "metrics"]
+---
+```
+
+## ✅ AI Agent Prompt Guardrail Snippet (Embed in System Prompts)
+
+```
+Before outputting any file:
+- Query current JSON/YAML/Markdown schemas
+- Use correct directory, filename, and timestamp prefix
+- Validate output JSON or YAML against schema
+- Include full YAML frontmatter block if Markdown
+- Respect kOS archive and timestamp naming conventions
+```
+
+## ✅ Future Migration Steps (DB Phase)
+
+1. Run `export-for-db.js`
+2. Validate data files
+3. Use Postgres/Mongo import tools, or ETL pipeline
+4. Optional: Add Vector DB embedding step for AI semantic search
+5. Switch LLM agents to pull context from DB instead of filesystem
+
+## ✅ License Recommendation for Scripts
+
+- **Apache 2.0** or **MIT** for full open source compatibility with KLF and broader ecosystem
+
+---
+
+## ✅ Summary:
+
+This Skald-class kOS system ensures that all documentation, changelogs, plans, and performance metrics stay AI-friendly, schema-valid, human-readable, and database-migration-ready. Pruning scripts reduce long-term bloat while preserving critical project history.
+
+---
+
+**Next Steps:**
+
+- Want me to generate sample Node.js scripts for each?
+- Want me to generate missing JSON schemas?
+- Want an AI prompt template for agent-level format enforcement?
+
+Reply with a number:
+
+1. Scripts
+2. JSON Schemas
+3. Agent Prompts
+4. All of the above
+
+
+

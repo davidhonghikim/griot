@@ -1,0 +1,122 @@
+title: "Performance System"
+version: "1.0"
+status: "OPTIMIZED FOR AI PROCESSING"
+description: "This directory contains the kOS Agent Performance & Analytics System, optimized for AI processing with JSON configuration."
+
+quick_access:
+  title: "Quick Access"
+  files:
+    - "Configuration: performance_metrics.json - Complete system configuration"
+    - "Current Metrics: metrics/current/ - Live performance data"
+    - "Reports: reports/ - Generated performance reports"
+    - "Templates: templates/ - Performance analysis templates"
+
+system_overview:
+  title: "System Overview"
+  description: "The performance system tracks:"
+  tracking_areas:
+    - "Agent Performance: Success rates, completion times, quality scores"
+    - "Task Categories: Classification and difficulty assessment"
+    - "Prompt Effectiveness: Success rates by prompt type and complexity"
+    - "Execution Plans: Adherence, completion rates, deviation analysis"
+    - "Resource Utilization: Time spent, tools used, efficiency metrics"
+
+directory_structure:
+  title: "Directory Structure"
+  structure: |
+    performance/
+    ├── performance_metrics.json    # System configuration (JSON)
+    ├── metrics/                    # Performance data (JSON format)
+    │   ├── current/               # Live metrics
+    │   ├── archives/              # Historical data by quarter
+    │   └── reports/               # Generated reports (YAML)
+    ├── prompts/                   # Prompt templates and analysis
+    │   ├── current/               # Active prompts
+    │   ├── archives/              # Historical prompts
+    │   └── templates/             # Prompt templates
+    ├── execution_plans/           # Plan tracking and analysis
+    │   ├── current/               # Active plans
+    │   ├── archives/              # Completed/abandoned plans
+    │   └── templates/             # Plan templates
+    └── reviews/                   # Agent review system
+        ├── current/               # Active reviews
+        ├── archives/              # Historical reviews
+        └── templates/             # Review templates
+
+format_strategy:
+  title: "Format Strategy"
+  formats:
+    - "JSON: Structured data (performance_metrics.json, metrics)"
+    - "YAML: Narrative content (reports, documentation, templates)"
+    - "YAML: Configuration files (when hierarchical structure needed)"
+
+usage:
+  title: "Usage"
+  commands:
+    - command: "cat agents/performance/performance_metrics.json"
+      description: "To view system configuration"
+    - command: "# Update the appropriate JSON file in metrics/current/"
+      description: "To add performance metrics"
+    - command: "# Use templates in reports/ directory"
+      description: "To generate reports"
+
+quality_standards:
+  title: "Quality Standards"
+  description: "The system tracks quality across three dimensions:"
+  dimensions:
+    - "Code Quality: Clean, well-documented, follows best practices"
+    - "Documentation Quality: Comprehensive, clear, actionable"
+    - "Handoff Quality: Complete context, clear next steps"
+  scale: "Each dimension uses a 4-point scale: poor, fair, good, excellent."
+
+note: "This system is mandatory for all agent sessions and provides data-driven insights for continuous improvement."
+
+archive_policy:
+  title: "Archive Policy"
+  note: "All performance archives are stored in agents/performance/archive/, organized by year and month. Do not use the centralized agents/archive/ directory for performance archives."
+  
+  current_month_access:
+    title: "Current Month Access"
+    location: "Root of performance directory"
+    purpose: "Easy access to recent performance files"
+    naming: "[TIMESTAMP]_performance_name.yml or .json"
+  
+  monthly_archiving:
+    title: "Monthly Archiving"
+    trigger: "Monthly (or manual when needed)"
+    destination: "archive/[YYYY]/[MM]/"
+    benefits:
+      - "Keeps root directory clean"
+      - "Maintains chronological organization"
+      - "Preserves historical context"
+  
+  archive_structure:
+    title: "Archive Structure"
+    structure: |
+      archive/
+      └── [YEAR]/
+          ├── [01]/  # January
+          ├── [02]/  # February
+          ├── ...
+          └── [12]/  # December
+  
+  archive_process:
+    title: "Archive Process"
+    steps:
+      - "Monthly: Move all files from previous month to archive"
+      - "Update Index: Maintain references in 00_Performance_Index.yml"
+      - "Preserve Context: Keep metadata and cross-references intact"
+  
+  automated_archiving:
+    title: "Automated Archiving"
+    script_location: "scripts/archiving/archive_monthly.sh"
+    usage:
+      - command: "./scripts/archiving/archive_monthly.sh"
+        description: "Archive all systems"
+      - command: "./scripts/archiving/archive_monthly.sh agents/performance"
+        description: "Archive specific system"
+    features:
+      - "Archives files from previous months only"
+      - "Maintains current month files in root directory"
+      - "Creates proper year/month directory structure"
+      - "Handles both .yml and .json files" 

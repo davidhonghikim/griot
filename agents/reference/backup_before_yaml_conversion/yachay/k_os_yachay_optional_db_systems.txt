@@ -1,0 +1,50 @@
+# kOS Yachay - Optional and Recommended Database Systems
+
+Node Class: **Yachay (Memory Starseed)**
+
+---
+
+## ✅ Recommended Additional Database Targets for Yachay (Beyond MongoDB, Neo4j, Weaviate)
+
+| DB System | Type | Best Use Cases in Yachay | Notes |
+|---|---|---|---|
+| **PostgreSQL** | Relational / SQL | Task tracking, agent sessions, structured logs, metrics | Works well with TimescaleDB for time-series data |
+| **ChromaDB** | VectorDB (embedded or server) | Lightweight local vector storage for dev/test, RAG prototyping | Easy for single-node dev, can scale horizontally with effort |
+| **Milvus** | VectorDB (Cloud-scale) | High-throughput, high-volume vector search (millions of docs) | Heavyweight, production-grade VectorDB |
+| **RedisJSON / RedisGraph** | In-memory + JSON store | Fast caching for prompt contexts, temp storage | Not durable for long-term memory |
+| **ElasticSearch** | Full-text + Vector (with plugins) | Hybrid full-text and vector similarity | Requires more ops overhead |
+| **TimescaleDB (on top of Postgres)** | Time-series | Metrics, logs, performance tracking, event timelines | Native SQL interface |
+| **Pinecone** | Managed VectorDB | Fully hosted, easy RAG integration | External SaaS, $$$ |
+| **Zilliz Cloud** | Managed Milvus | Hosted Milvus alternative | External, less control |
+
+---
+
+## ✅ Yachay Design Principle:
+"**Pluggable Knowledge Backend**"
+
+You should be able to swap or run multiple DB types in parallel without breaking Yachay agent workflows.
+
+---
+
+## ✅ Deployment Pattern Recommendation:
+
+| Layer | Recommended DB |
+|---|---|
+| **Structured Data (Tasks, Metrics, Config)** | PostgreSQL |
+| **Documents / Personas / Sessions** | MongoDB |
+| **Graph Relationships (Agent Links, Persona Graphs)** | Neo4j |
+| **Semantic Vector Memory (RAG, Context Retrieval)** | Weaviate / Chroma / Milvus / ElasticSearch (choose based on scale) |
+| **Cache / Temp State** | Redis |
+| **Logs + Time-Series** | TimescaleDB |
+
+---
+
+## ✅ Optional Next Steps:
+- Generate Helm charts for Postgres, ChromaDB, Milvus, Redis
+- Build a unified "Yachay Knowledge Store Config" allowing runtime selection of DB backends
+- Build DB migration scripts (Mongo → Postgres → Vector chunks)
+
+---
+
+**Yachay - The Hippocampus of kOS**  
+Ensuring every byte of context, history, and knowledge lives where it performs best.

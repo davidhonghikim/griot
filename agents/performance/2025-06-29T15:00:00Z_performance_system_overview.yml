@@ -1,0 +1,494 @@
+title: Document
+version: '1.0'
+content:
+- '# **kOS Agent Performance & Analytics System Overview**'
+- '**Version**: 1.0'
+- '**Purpose**: Complete guide to the agent performance tracking, prompt management,
+  and execution plan system'
+- '**Status**: ACTIVE - Mandatory reading for all agents'
+- '---'
+1_system_overview:
+  title: 1. SYSTEM OVERVIEW
+  content: []
+  what_this_system_provides:
+    title: '**What This System Provides**'
+    content: []
+    items:
+    - '**Agent Performance Tracking**: Comprehensive metrics on agent success rates,
+      quality scores, and efficiency'
+    - '**Prompt Management**: Version control and effectiveness tracking for all prompts'
+    - '**Execution Plan Tracking**: Monitoring of plan adherence and completion rates'
+    - '**Agent Review System**: Detailed analysis and recommendations for agent improvement'
+    - '**Automated Reporting**: Weekly, monthly, and quarterly performance reports'
+  key_benefits:
+    title: '**Key Benefits**'
+    content:
+    - '---'
+    items:
+    - '**Data-Driven Decisions**: Choose the best agent for specific task types'
+    - '**Continuous Improvement**: Identify and fix process inefficiencies'
+    - '**Quality Assurance**: Ensure consistent high-quality output'
+    - '**Resource Optimization**: Maximize agent effectiveness and efficiency'
+    - '**Historical Analysis**: Track improvements over time'
+2_system_architecture:
+  title: 2. SYSTEM ARCHITECTURE
+  content: []
+  directory_structure:
+    title: '**Directory Structure**'
+    content:
+    - agents/
+    - '├── performance/                    # 🎯 PERFORMANCE TRACKING HUB'
+    - '│   ├── metrics/                    # Raw performance data'
+    - '│   │   ├── current/               # Live metrics (JSON)'
+    - '│   │   ├── archives/              # Historical data'
+    - '│   │   └── reports/               # Generated reports (MD)'
+    - '│   ├── prompts/                   # Prompt management'
+    - '│   │   ├── current/               # Active prompts'
+    - '│   │   ├── archives/              # Historical prompts'
+    - '│   │   └── templates/             # Prompt templates'
+    - '│   ├── execution_plans/           # Plan tracking'
+    - '│   │   ├── current/               # Active plans'
+    - '│   │   ├── archives/              # Completed/abandoned plans'
+    - '│   │   └── templates/             # Plan templates'
+    - '│   └── reviews/                   # Agent reviews'
+    - '│       ├── current/               # Active reviews'
+    - '│       ├── archives/              # Historical reviews'
+    - '│       └── templates/             # Review templates'
+    - '├── handoff/                       # Handoff management'
+    - '├── changelog/                     # Session history'
+    - '└── workflows/                     # Process documentation'
+  data_flow:
+    title: '**Data Flow**'
+    content:
+    - '---'
+    items:
+    - '**Agent Session Start** → Log session metrics'
+    - '**Task Planning** → Create execution plan'
+    - '**Task Execution** → Track progress and adherence'
+    - '**Session End** → Update final metrics'
+    - '**Review Process** → Analyze performance and generate insights'
+    - '**Report Generation** → Create actionable reports'
+3_mandatory_agent_workflow_integration:
+  title: 3. MANDATORY AGENT WORKFLOW INTEGRATION
+  content: []
+  updated_workflow_steps:
+    title: '**Updated Workflow Steps**'
+    content:
+    - '#### **Step 1: Session Start (Mandatory)**'
+    - '# Log session start'
+    - node scripts/performance/collect-metrics.js "AGENT_NAME" "SESSION_ID" "TASK_CATEGORY"
+      "START_TIME" "END_TIME" "IN_PROGRESS" "0"
+    - '#### **Step 2: Execution Planning (For Tasks >15min)**'
+    - '# Create execution plan'
+    - cp agents/performance/execution_plans/templates/execution_plan.md.tpl \
+    - agents/performance/execution_plans/current/$(date +%Y-%m-%d)_AGENT_NAME_TASK_NAME.md
+    - '#### **Step 3: Progress Tracking (During Session)**'
+    - '#### **Step 4: Session End (Mandatory)**'
+    - '# Update final metrics'
+    - node scripts/performance/collect-metrics.js "AGENT_NAME" "SESSION_ID" "TASK_CATEGORY"
+      "START_TIME" "END_TIME" "COMPLETED" "QUALITY_SCORE"
+    - '# Generate performance report'
+    - node scripts/performance/generate-report.js "agent"
+    - '---'
+    items:
+    - Update execution plan with progress
+    - Log major milestones in changelog
+    - Track time spent on each phase
+4_metrics_collection_system:
+  title: 4. METRICS COLLECTION SYSTEM
+  content: []
+  tracked_metrics:
+    title: '**Tracked Metrics**'
+    content:
+    - '#### **Session-Level Metrics**'
+    - '#### **Task Categories**'
+    - '#### **Quality Assessment Criteria**'
+    items:
+    - '**Agent ID**: Which agent performed the work'
+    - '**Session ID**: Unique identifier for the session'
+    - '**Task Category**: Type of work performed'
+    - '**Start/End Time**: Session duration'
+    - '**Success Status**: Completed/Partial/Failed'
+    - '**Quality Score**: 1-10 rating of work quality'
+    - '**Tools Used**: Which functions were called'
+    - '**Files Modified**: Number and types of files changed'
+    - '**code_implementation**: Writing or modifying code'
+    - '**architecture_design**: System design decisions'
+    - '**documentation**: Creating/updating docs'
+    - '**debugging**: Identifying and fixing issues'
+    - '**code_review**: Reviewing existing code'
+    - '**Code Quality**: Compilation, tests, style compliance'
+    - '**Documentation Quality**: Completeness, clarity, accuracy'
+    - '**Architecture Quality**: Design patterns, scalability, maintainability'
+    - '**Process Quality**: Workflow adherence, handoff quality'
+  data_storage:
+    title: '**Data Storage**'
+    content:
+    - '---'
+    items:
+    - '**Format**: JSON for machine readability'
+    - '**Location**: `agents/performance/metrics/current/`'
+    - '**Backup**: Quarterly archives in `agents/performance/metrics/archives/`'
+    - '**Versioning**: Git-tracked for full history'
+5_execution_plan_system:
+  title: 5. EXECUTION PLAN SYSTEM
+  content: []
+  when_to_create_plans:
+    title: '**When to Create Plans**'
+    content: []
+    items:
+    - '**Tasks >15 minutes**: Mandatory planning'
+    - '**Complex tasks**: Multi-phase work'
+    - '**High-risk tasks**: Critical path items'
+    - '**Team handoffs**: Clear transition points'
+  plan_structure:
+    title: '**Plan Structure**'
+    content:
+    - '# EXECUTION PLAN: [TASK_NAME]'
+    - '**Agent**: [AGENT_NAME]'
+    - '**Session**: [SESSION_ID]'
+    - '**Start Time**: [TIMESTAMP]'
+    - '**Estimated Duration**: [DURATION]'
+    - '**Task Category**: [CATEGORY]'
+    - '**Complexity**: [LOW/MEDIUM/HIGH]'
+mission_statement:
+  title: Mission Statement
+  content:
+  - '[Clear, specific mission description]'
+success_criteria:
+  title: Success Criteria
+  content: []
+  items:
+  - '[ ] [Criterion 1]'
+  - '[ ] [Criterion 2]'
+  - '[ ] [Criterion 3]'
+execution_phases:
+  title: Execution Phases
+  content: []
+  phase_1_phasename_estimated_time:
+    title: 'Phase 1: [PHASE_NAME] (Estimated: [TIME])'
+    content:
+    - '**Objective**: [What this phase accomplishes]'
+    - '**Steps**:'
+    items:
+    - '[ ] [Step 1 description]'
+    - '**Expected Outcome**: [What should happen]'
+    - '**Success Metric**: [How to measure success]'
+    - '**Risk Level**: [LOW/MEDIUM/HIGH]'
+risk_assessment:
+  title: Risk Assessment
+  content:
+  - '| Risk | Probability | Impact | Mitigation |'
+progress_tracking:
+  title: Progress Tracking
+  content: []
+  items:
+  - '**Phase 1 Start**: [TIMESTAMP]'
+  - '**Phase 1 End**: [TIMESTAMP]'
+  - '**Total Duration**: [CALCULATED]'
+final_status:
+  title: Final Status
+  content: []
+  items:
+  - '**Completion Status**: [COMPLETED/PARTIAL/ABANDONED]'
+  - '**Success Rate**: [PERCENTAGE]'
+  - '**Quality Score**: [1-10]'
+  - '**Lessons Learned**: [Key insights]'
+  plan_analysis:
+    title: '**Plan Analysis**'
+    content:
+    - 'After completion, plans are analyzed for:'
+    - '---'
+    items:
+    - '**Adherence Rate**: How closely the plan was followed'
+    - '**Time Accuracy**: Estimated vs actual duration'
+    - '**Quality Consistency**: Maintained quality throughout'
+    - '**Risk Assessment**: Accuracy of risk identification'
+6_prompt_management_system:
+  title: 6. PROMPT MANAGEMENT SYSTEM
+  content: []
+  prompt_categories:
+    title: '**Prompt Categories**'
+    content:
+    - '#### **System Prompts**'
+    - '#### **Task-Specific Prompts**'
+    - '#### **Specialized Prompts**'
+    items:
+    - '**Core Identity**: Agent persona and ethical framework'
+    - '**Workflow Enforcement**: Process compliance requirements'
+    - '**Quality Standards**: Output quality expectations'
+    - '**Code Review**: Code analysis and improvement'
+    - '**Architecture Design**: System design patterns'
+    - '**Documentation**: Content creation guidelines'
+    - '**Debugging**: Problem-solving approaches'
+    - '**Griot Artifact Generation**: Content creation workflows'
+    - '**Tohunga Orchestration**: Workflow management'
+    - '**Musa Security**: Security and compliance'
+  prompt_versioning:
+    title: '**Prompt Versioning**'
+    content: []
+    items:
+    - '**Version Control**: Track changes over time'
+    - '**Effectiveness Tracking**: Success rate by prompt version'
+    - '**Optimization History**: Document improvements'
+    - '**A/B Testing**: Compare prompt effectiveness'
+  prompt_optimization:
+    title: '**Prompt Optimization**'
+    content:
+    - '---'
+    items:
+    - '**Success Rate Analysis**: Which prompts work best'
+    - '**Agent-Specific Optimization**: Tailor prompts to agent strengths'
+    - '**Task-Specific Optimization**: Optimize for specific task types'
+    - '**Continuous Improvement**: Regular prompt updates'
+7_agent_review_system:
+  title: 7. AGENT REVIEW SYSTEM
+  content: []
+  review_frequency:
+    title: '**Review Frequency**'
+    content: []
+    items:
+    - '**Weekly**: Quick performance check'
+    - '**Monthly**: Comprehensive analysis'
+    - '**Quarterly**: Deep dive with recommendations'
+  review_components:
+    title: '**Review Components**'
+    content:
+    - '#### **Performance Analysis**'
+    - '#### **Comparative Analysis**'
+    - '#### **Recommendations**'
+    items:
+    - '**Success Rate**: Percentage of completed tasks'
+    - '**Quality Score**: Average quality rating'
+    - '**Efficiency**: Time to completion'
+    - '**Specialization**: Best task categories'
+    - '**Against Peers**: How does this agent compare to others?'
+    - '**Against Benchmarks**: How does performance compare to targets?'
+    - '**Trend Analysis**: Is performance improving over time?'
+    - '**Agent Selection**: Best tasks for this agent'
+    - '**Process Improvement**: How to improve workflows'
+    - '**Prompt Optimization**: How to improve prompts'
+    - '**Training Needs**: Areas for improvement'
+  review_template:
+    title: '**Review Template**'
+    content:
+    - '# AGENT PERFORMANCE REVIEW'
+    - '**Agent**: [AGENT_NAME]'
+    - '**Reviewer**: [REVIEWER_NAME]'
+    - '**Review Date**: [TIMESTAMP]'
+    - '**Session Period**: [START_DATE] to [END_DATE]'
+performance_summary:
+  title: Performance Summary
+  content: []
+  items:
+  - '**Total Sessions**: [COUNT]'
+  - '**Success Rate**: [PERCENTAGE]'
+  - '**Average Quality Score**: [SCORE]'
+  - '**Average Completion Time**: [TIME]'
+task_category_performance:
+  title: Task Category Performance
+  content: []
+  code_implementation:
+    title: Code Implementation
+    content: []
+    items:
+    - '**Sessions**: [COUNT]'
+    - '**Success Rate**: [PERCENTAGE]'
+    - '**Average Quality**: [SCORE]'
+    - '**Strengths**: [List]'
+    - '**Weaknesses**: [List]'
+    - '**Recommendations**: [List]'
+comparative_analysis:
+  title: Comparative Analysis
+  content:
+  - '| Metric | This Agent | Average | Best | Rank |'
+recommendations:
+  title: Recommendations
+  content: []
+  for_agent_selection:
+    title: For Agent Selection
+    content: []
+    items:
+    - '**Best For**: [Task categories this agent excels at]'
+    - '**Avoid For**: [Task categories this agent struggles with]'
+final_assessment:
+  title: Final Assessment
+  content:
+  - '**Overall Rating**: [1-10]'
+  - '**Recommendation**: [USE_REGULARLY/USE_SELECTIVELY/AVOID]'
+  - '---'
+8_automation_scripts:
+  title: 8. AUTOMATION SCRIPTS
+  content: []
+  available_scripts:
+    title: '**Available Scripts**'
+    content:
+    - '#### **Metrics Collection**'
+    - '# Collect session metrics'
+    - node scripts/performance/collect-metrics.js <AGENT_NAME> <SESSION_ID> <TASK_CATEGORY>
+      <START_TIME> <END_TIME> <SUCCESS_STATUS> <QUALITY_SCORE>
+    - '#### **Report Generation**'
+    - '# Generate performance reports'
+    - node scripts/performance/generate-report.js <REPORT_TYPE>
+    - '# Report types: agent, category, weekly, monthly, quarterly'
+    - '#### **Data Management**'
+    - '# Archive quarterly data'
+    - node scripts/performance/archive-quarter.js
+    - '# Validate data integrity'
+    - node scripts/performance/validate-data.js
+  script_features:
+    title: '**Script Features**'
+    content:
+    - '---'
+    items:
+    - '**Error Handling**: Robust error checking and reporting'
+    - '**Data Validation**: Ensure data quality and consistency'
+    - '**Logging**: Comprehensive logging for debugging'
+    - '**Modularity**: Reusable functions for different use cases'
+9_reporting_system:
+  title: 9. REPORTING SYSTEM
+  content: []
+  available_reports:
+    title: '**Available Reports**'
+    content:
+    - '#### **Agent Performance Report**'
+    - '#### **Task Category Analysis**'
+    - '#### **Weekly/Monthly Reports**'
+    items:
+    - Agent rankings by success rate
+    - Task category performance
+    - Quality score trends
+    - Efficiency metrics
+    - Category-specific performance
+    - Best agents per category
+    - Common issues and solutions
+    - Improvement recommendations
+    - Recent performance trends
+    - Active agent analysis
+    - Task distribution
+    - Quality trends
+  report_features:
+    title: '**Report Features**'
+    content:
+    - '---'
+    items:
+    - '**Automated Generation**: Scheduled report creation'
+    - '**Customizable**: Configurable report parameters'
+    - '**Export Options**: Multiple output formats'
+    - '**Historical Comparison**: Track changes over time'
+10_implementation_roadmap:
+  title: 10. IMPLEMENTATION ROADMAP
+  content: []
+  phase_1_foundation_week_1:
+    title: '**Phase 1: Foundation (Week 1)**'
+    content: []
+    items:
+    - '[x] Create directory structure'
+    - '[x] Implement basic metrics collection'
+    - '[x] Create templates'
+    - '[x] Basic automation scripts'
+  phase_2_data_collection_week_2:
+    title: '**Phase 2: Data Collection (Week 2)**'
+    content: []
+    items:
+    - '[ ] Mandatory logging for all agents'
+    - '[ ] Execution plan tracking'
+    - '[ ] Prompt effectiveness monitoring'
+    - '[ ] Initial agent reviews'
+  phase_3_analysis__optimization_week_3:
+    title: '**Phase 3: Analysis & Optimization (Week 3)**'
+    content: []
+    items:
+    - '[ ] Generate performance reports'
+    - '[ ] Identify patterns and trends'
+    - '[ ] Optimize prompts based on data'
+    - '[ ] Refine processes based on insights'
+  phase_4_advanced_features_week_4:
+    title: '**Phase 4: Advanced Features (Week 4+)**'
+    content:
+    - '---'
+    items:
+    - '[ ] Predictive analytics'
+    - '[ ] Agent matching algorithms'
+    - '[ ] Automated reviews'
+    - '[ ] Continuous learning system'
+11_success_metrics:
+  title: 11. SUCCESS METRICS
+  content: []
+  system_success_indicators:
+    title: '**System Success Indicators**'
+    content: []
+    items:
+    - '**Data Completeness**: 95%+ of sessions tracked'
+    - '**Review Coverage**: 100% of agents reviewed monthly'
+    - '**Process Improvement**: Measurable quality increases'
+    - '**Efficiency Gains**: Reduced completion times'
+    - '**Agent Satisfaction**: Improved task success rates'
+  key_performance_indicators:
+    title: '**Key Performance Indicators**'
+    content:
+    - '---'
+    items:
+    - '**Overall Success Rate**: Target 85%+'
+    - '**Average Quality Score**: Target 8.0+'
+    - '**Task Completion Time**: 20% reduction'
+    - '**Prompt Effectiveness**: 15% improvement'
+    - '**Agent Specialization**: Clear strength identification'
+12_integration_with_existing_systems:
+  title: 12. INTEGRATION WITH EXISTING SYSTEMS
+  content: []
+  changelog_integration:
+    title: '**Changelog Integration**'
+    content: []
+    items:
+    - Performance metrics complement changelog entries
+    - Both systems provide different perspectives on agent work
+    - Changelog focuses on what was done, metrics focus on how well
+  handoff_integration:
+    title: '**Handoff Integration**'
+    content: []
+    items:
+    - Execution plans inform handoff quality
+    - Performance data helps select best agents for tasks
+    - Review insights improve handoff effectiveness
+  workflow_integration:
+    title: '**Workflow Integration**'
+    content:
+    - '---'
+    items:
+    - Performance tracking is mandatory workflow step
+    - Templates ensure consistency across all processes
+    - Automation reduces manual overhead
+13_best_practices:
+  title: 13. BEST PRACTICES
+  content: []
+  for_agents:
+    title: '**For Agents**'
+    content: []
+    items:
+    - '**Always Log Sessions**: Start and end metrics are mandatory'
+    - '**Create Plans**: Use execution plans for complex tasks'
+    - '**Track Progress**: Update plans as you work'
+    - '**Self-Assess**: Rate your work honestly'
+    - '**Learn from Data**: Review your performance regularly'
+  for_reviewers:
+    title: '**For Reviewers**'
+    content: []
+    items:
+    - '**Regular Reviews**: Conduct reviews on schedule'
+    - '**Objective Assessment**: Use data, not opinions'
+    - '**Actionable Feedback**: Provide specific recommendations'
+    - '**Trend Analysis**: Look for patterns over time'
+    - '**Continuous Improvement**: Update processes based on insights'
+  for_system_administrators:
+    title: '**For System Administrators**'
+    content:
+    - '---'
+    - This comprehensive system provides the foundation for data-driven agent management,
+      continuous improvement, and optimal resource allocation in the kOS project ecosystem.
+    items:
+    - '**Data Quality**: Ensure accurate data collection'
+    - '**Regular Backups**: Archive data quarterly'
+    - '**System Maintenance**: Keep scripts and templates updated'
+    - '**Performance Monitoring**: Track system performance'
+    - '**User Training**: Ensure all users understand the system'

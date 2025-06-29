@@ -1,0 +1,160 @@
+title: "Agent Bootstrap Guide"
+version: "1.0"
+purpose: "This document provides new agents with everything they need to understand and use the project's systems effectively."
+original_file: "2025-06-29_bootstrap_guide.md"
+conversion_date: "2025-06-30T08:40:00Z"
+
+quick_start_checklist:
+  read_core_documents:
+    description: "Read Core Documents (in order):"
+    documents:
+      - "`02_SYSTEM_PROMPT.md` - Your identity and core principles"
+      - "`00_AGENT_WORKFLOW.md` - Mandatory workflow procedures"
+      - "`03_PROJECT_OVERVIEW.md` - Project context and vision"
+      - "`BOOTSTRAP_GUIDE.md` - This document (system usage)"
+  
+  check_current_state:
+    description: "Check Current State:"
+    actions:
+      - "Read `handoff/LATEST_HANDOFF.md` for your specific mission"
+      - "Review latest changelog entry in `changelogs/YYYY/MM/`"
+      - "Check active implementation plans in `implementation-plans/YYYY/MM/`"
+  
+  initialize_session:
+    description: "Initialize Your Session:"
+    actions:
+      - "Add entry to changelog using template"
+      - "Review any incomplete work from previous agent"
+
+system_overview:
+  changelog_system:
+    location: "`changelogs/YYYY/MM/`"
+    purpose: "Chronological project history and agent activity log"
+    structure: "Year/Month folders with dated files"
+    usage: "Add entries for major accomplishments, findings, decisions"
+    template: "Use `agents_docs_templates/changelog_entry.md.tpl`"
+  
+  performance_system:
+    location: "`performance/YYYY/MM/`"
+    purpose: "Track agent performance metrics and reviews"
+    structure: "Year/Month folders with metrics, reviews, reports"
+    usage: "Log performance data, conduct reviews, generate reports"
+    integration: "Links to changelogs and implementation plans"
+  
+  implementation_plans:
+    location: "`implementation-plans/YYYY/MM/`"
+    purpose: "Track and manage development plans and progress"
+    structure: "Year/Month folders with active plans and reports"
+    usage: "Create, update, and track implementation progress"
+    integration: "Links to changelogs and performance metrics"
+
+file_naming_conventions:
+  changelog_files:
+    format: "`YYYY-MM-DD_AGENTNAME_DESCRIPTION.md`"
+    example: "`2025-01-28_AgentName_FeatureImplementation.md`"
+  
+  performance_files:
+    metrics: "`YYYY-MM-DD_metrics.json`"
+    reviews: "`YYYY-MM-DD_review.md`"
+    reports: "`YYYY-MM-DD_report.md`"
+  
+  implementation_plans:
+    plans: "`YYYY-MM-DD_plan_NAME.json` and `YYYY-MM-DD_plan_NAME.md`"
+    reports: "`YYYY-MM-DD_report_NAME.md`"
+
+bootstrap_commands:
+  find_latest_files:
+    latest_changelog: "find agents/changelogs -name \"*.md\" | sort | tail -1"
+    latest_performance_data: "find agents/performance -name \"*.json\" | sort | tail -1"
+    active_implementation_plans: "find agents/implementation-plans -name \"*plan*.json\" | sort"
+  
+  initialize_new_session:
+    create_month_directories: |
+      # Create new month directory if needed
+      mkdir -p agents/changelogs/$(date +%Y)/$(date +%m)
+      mkdir -p agents/performance/$(date +%Y)/$(date +%m)
+      mkdir -p agents/implementation-plans/$(date +%Y)/$(date +%m)
+
+quality_assurance_checklist:
+  description: "Before completing any task:"
+  checklist:
+    - "Changelog entry added with proper format"
+    - "Performance metrics logged"
+    - "Implementation plan updated"
+    - "Cross-references added between systems"
+    - "Handoff prepared with clear next steps"
+
+common_patterns:
+  starting_new_feature:
+    steps:
+      - "Create implementation plan"
+      - "Add changelog entry"
+      - "Set performance baseline"
+      - "Execute plan"
+      - "Update all systems"
+      - "Prepare handoff"
+  
+  fixing_issues:
+    steps:
+      - "Log finding in changelog"
+      - "Create correction plan"
+      - "Execute fix"
+      - "Update performance metrics"
+      - "Document lessons learned"
+  
+  completing_work:
+    steps:
+      - "Finalize all documentation"
+      - "Update performance metrics"
+      - "Archive completed plans"
+      - "Prepare comprehensive handoff"
+      - "Update changelog with summary"
+
+error_prevention:
+  always_cross_reference: "Link entries between systems"
+  use_templates: "Don't create files from scratch"
+  check_for_completeness: "Ensure all systems are updated"
+  validate_format: "Use provided schemas and templates"
+  assume_errors: "Review previous agent's work critically"
+
+integration_points:
+  ai_q_knowledge_library:
+    specifications_location: "All specifications in `ai-q/` directory"
+    klf_usage: "Use KLF (Kind Link Framework) for connections"
+    patterns: "Follow atomic knowledge unit patterns"
+  
+  agent_workflow:
+    follow_workflow: "Follow `00_AGENT_WORKFLOW.md` precisely"
+    onboarding: "Use mandatory onboarding process"
+    handoff_procedures: "Maintain proper handoff procedures"
+  
+  project_architecture:
+    reference_architecture: "Reference `ai-q/04_architecture/` for system design"
+    follow_patterns: "Follow established patterns and conventions"
+    maintain_standards: "Maintain interoperability standards"
+
+troubleshooting:
+  missing_files:
+    check_month_directory: "Check if month directory exists"
+    look_previous_months: "Look in previous months for related files"
+    use_search_commands: "Use search commands to locate misplaced files"
+  
+  format_issues:
+    use_templates: "Use provided templates and schemas"
+    validate_json: "Validate JSON files before committing"
+    check_frontmatter: "Check markdown frontmatter format"
+  
+  integration_problems:
+    ensure_cross_references: "Ensure cross-references are properly linked"
+    check_system_updates: "Check that all systems are updated"
+    verify_handoff: "Verify handoff contains all necessary information"
+
+next_steps:
+  actions:
+    - "Read the specific handoff document"
+    - "Review any incomplete work"
+    - "Begin your assigned mission"
+    - "Follow this guide for all system interactions"
+    - "Prepare comprehensive handoff when complete"
+  
+  reminder: "This system is designed for traceability and quality. Every action should be documented and cross-referenced." 

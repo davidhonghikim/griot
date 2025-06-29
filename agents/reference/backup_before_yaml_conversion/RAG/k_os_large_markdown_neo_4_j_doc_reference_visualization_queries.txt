@@ -1,0 +1,36 @@
+// Visualize document-to-document references
+MATCH (d1:Document)-[r:REFERENCES]->(d2:Document)
+RETURN d1.title AS Source, d2.title AS Target
+
+// Show full graph of documents and their references
+MATCH (d1:Document)-[r:REFERENCES]->(d2:Document)
+RETURN d1, r, d2
+
+// Count number of outgoing references per document
+MATCH (d:Document)-[:REFERENCES]->()
+RETURN d.title AS Document, count(*) AS OutgoingReferences
+
+// Count number of incoming references (citations) per document
+MATCH ()-[r:REFERENCES]->(d:Document)
+RETURN d.title AS Document, count(*) AS IncomingReferences
+
+// Find highly connected documents (both incoming and outgoing)
+MATCH (d:Document)
+OPTIONAL MATCH (d)-[:REFERENCES]->(out)
+OPTIONAL MATCH (in)-[:REFERENCES]->(d)
+WITH d, count(distinct out) AS Outgoing, count(distinct in) AS Incoming
+WHERE Outgoing > 5 OR Incoming > 5
+RETURN d.title AS Document, Outgoing, Incoming
+
+// Detect circular reference paths (documents that reference each other)
+MATCH (d1:Document)-[:REFERENCES]->(d2:Document)-[:REFERENCES]->(d1)
+RETURN d1.title AS Doc1, d2.title AS Doc2
+
+// Export document reference graph as JSON
+CALL apoc.export.json.query(
+  "MATCH (d1:Document)-[r:REFERENCES]->(d2:Document) RETURN d1, r, d2",
+  "doc_reference_graph.json",
+  {}
+)
+YIELD file, nodes, relationships, properties, time
+RETURN file, nodes, relationships, time

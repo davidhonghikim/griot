@@ -1,0 +1,465 @@
+---
+title: "RAG System Configuration"
+description: "Configuration for the Yachay Content Analysis Engine RAG system"
+type: "configuration"
+status: "current"
+version: "1.0"
+last_updated: "2025-06-28"
+organization_date: "2025-06-28T20:00:00Z"
+authors:
+  - "kOS Development Team"
+tags:
+  - "rag_system"
+  - "vector_store"
+  - "content_analysis"
+  - "yachay_agent"
+content_type: "configuration"
+technical_level: "advanced"
+---
+
+# RAG System Configuration
+
+## Vector Store Configuration
+
+### ChromaDB Settings
+```yaml
+vector_store:
+  type: "chroma"
+  persist_directory: "/Users/danger/CascadeProjects/griot-node/agents/performance/vector_store"
+  embedding_function: "sentence-transformers/all-MiniLM-L6-v2"
+  collection_name: "skald_analysis"
+  settings:
+    anonymized_telemetry: false
+    allow_reset: true
+    is_persistent: true
+```
+
+### Alternative Vector Stores
+```yaml
+# Qdrant Configuration
+qdrant_config:
+  host: "localhost"
+  port: 6333
+  collection_name: "skald_analysis"
+  vector_size: 384
+  distance: "cosine"
+
+# Weaviate Configuration
+weaviate_config:
+  url: "http://localhost:8080"
+  collection_name: "skald_analysis"
+  vectorizer: "text2vec-transformers"
+```
+
+## Knowledge Base Structure
+
+### Collections
+```yaml
+collections:
+  original_content:
+    name: "original_content"
+    description: "Original Markdown content from reference files"
+    metadata_schema:
+      file_type: "string"
+      agent_type: "string"
+      analysis_timestamp: "string"
+      quality_score: "float"
+      file_path: "string"
+      word_count: "integer"
+      file_size: "integer"
+
+  converted_content:
+    name: "converted_content"
+    description: "Converted YAML content from organized files"
+    metadata_schema:
+      file_type: "string"
+      agent_type: "string"
+      analysis_timestamp: "string"
+      quality_score: "float"
+      file_path: "string"
+      word_count: "integer"
+      file_size: "integer"
+      yaml_frontmatter: "boolean"
+
+  analysis_results:
+    name: "analysis_results"
+    description: "Analysis results and quality metrics"
+    metadata_schema:
+      original_file: "string"
+      converted_file: "string"
+      transmission_loss_score: "float"
+      quality_assessment: "float"
+      analysis_timestamp: "string"
+      analysis_duration: "float"
+      critical_losses_count: "integer"
+      structural_changes_count: "integer"
+
+  transmission_loss:
+    name: "transmission_loss"
+    description: "Detected transmission losses and issues"
+    metadata_schema:
+      file_pair: "string"
+      loss_type: "string"
+      severity: "string"
+      loss_description: "string"
+      analysis_timestamp: "string"
+      recoverable: "boolean"
+```
+
+## Query Templates
+
+### Content Analysis Queries
+```yaml
+queries:
+  quality_assessment:
+    query: "What are the quality scores for Skald specifications?"
+    collection: "analysis_results"
+    filters:
+      agent_type: "skald"
+    sort_by: "quality_assessment"
+    limit: 20
+
+  transmission_loss:
+    query: "What transmission losses occurred during conversion?"
+    collection: "transmission_loss"
+    filters:
+      agent_type: "skald"
+    sort_by: "severity"
+    limit: 50
+
+  critical_losses:
+    query: "What critical content was lost during YAML conversion?"
+    collection: "transmission_loss"
+    filters:
+      severity: "critical"
+      agent_type: "skald"
+    limit: 100
+
+  structural_changes:
+    query: "What structural changes were made during conversion?"
+    collection: "analysis_results"
+    filters:
+      structural_changes_count: {"$gt": 0}
+      agent_type: "skald"
+    sort_by: "structural_changes_count"
+    limit: 30
+
+  best_performing:
+    query: "Which Skald specifications have the highest quality preservation?"
+    collection: "analysis_results"
+    filters:
+      agent_type: "skald"
+      quality_assessment: {"$gt": 0.9}
+    sort_by: "quality_assessment"
+    limit: 10
+
+  worst_performing:
+    query: "Which Skald specifications have the lowest quality preservation?"
+    collection: "analysis_results"
+    filters:
+      agent_type: "skald"
+      quality_assessment: {"$lt": 0.7}
+    sort_by: "quality_assessment"
+    limit: 10
+```
+
+## Performance Optimization
+
+### Caching Strategy
+```yaml
+caching:
+  analysis_results:
+    ttl: 3600  # 1 hour
+    storage: "redis"
+    max_size: "1GB"
+  
+  vector_embeddings:
+    ttl: 86400  # 24 hours
+    storage: "local_disk"
+    max_size: "10GB"
+  
+  file_content:
+    ttl: 1800  # 30 minutes
+    storage: "memory"
+    max_size: "500MB"
+  
+  query_results:
+    ttl: 1800  # 30 minutes
+    storage: "memory"
+    max_size: "100MB"
+```
+
+### Parallel Processing
+```yaml
+parallel_processing:
+  max_workers: 4
+  batch_size: 10
+  chunk_size: 1000
+  timeout: 300  # 5 minutes
+  retry_attempts: 3
+  retry_delay: 5  # seconds
+```
+
+### Memory Management
+```yaml
+memory_management:
+  max_memory_usage: "4GB"
+  cleanup_interval: 300  # 5 minutes
+  cache_eviction_policy: "lru"
+  garbage_collection_threshold: 0.8
+  memory_monitoring: true
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+```yaml
+metrics:
+  analysis_duration:
+    name: "analysis_duration"
+    description: "Time taken for content analysis"
+    unit: "seconds"
+    aggregation: "average"
+  
+  file_processing_rate:
+    name: "file_processing_rate"
+    description: "Files processed per minute"
+    unit: "files/minute"
+    aggregation: "rate"
+  
+  transmission_loss_rate:
+    name: "transmission_loss_rate"
+    description: "Average transmission loss percentage"
+    unit: "percentage"
+    aggregation: "average"
+  
+  quality_score_distribution:
+    name: "quality_score_distribution"
+    description: "Distribution of quality scores"
+    unit: "score"
+    aggregation: "histogram"
+  
+  rag_query_performance:
+    name: "rag_query_performance"
+    description: "RAG query response times"
+    unit: "milliseconds"
+    aggregation: "average"
+  
+  vector_store_size:
+    name: "vector_store_size"
+    description: "Size of vector store"
+    unit: "bytes"
+    aggregation: "current"
+```
+
+### Logging Strategy
+```yaml
+logging:
+  level: "INFO"
+  format: "structured"
+  outputs:
+    - "file"
+    - "stdout"
+  retention: "30 days"
+  rotation:
+    max_size: "100MB"
+    max_files: 10
+  
+  structured_fields:
+    - "timestamp"
+    - "level"
+    - "component"
+    - "operation"
+    - "duration"
+    - "file_count"
+    - "error_code"
+```
+
+## Security & Access Control
+
+### Authentication
+```yaml
+authentication:
+  enabled: true
+  method: "api_key"
+  api_key_header: "X-API-Key"
+  api_key_env_var: "KOS_RAG_API_KEY"
+  
+  permissions:
+    read: ["analysis_results", "transmission_loss"]
+    write: ["original_content", "converted_content"]
+    admin: ["all"]
+```
+
+### Data Privacy
+```yaml
+data_privacy:
+  encryption_at_rest: true
+  encryption_in_transit: true
+  data_retention: "90 days"
+  anonymization: false
+  audit_logging: true
+```
+
+## Integration Points
+
+### kOS Agent Integration
+```yaml
+kos_integration:
+  agent_type: "yachay"
+  capabilities:
+    - "content_analysis"
+    - "transmission_loss_detection"
+    - "vectorization"
+    - "rag_querying"
+  
+  api_endpoints:
+    - "/api/v1/analysis/run"
+    - "/api/v1/analysis/results"
+    - "/api/v1/rag/query"
+    - "/api/v1/rag/search"
+    - "/api/v1/vectorize"
+  
+  webhooks:
+    - "analysis_completed"
+    - "critical_loss_detected"
+    - "quality_threshold_breached"
+```
+
+### External System Integration
+```yaml
+external_integrations:
+  monitoring:
+    - "prometheus"
+    - "grafana"
+    - "datadog"
+  
+  storage:
+    - "s3"
+    - "gcs"
+    - "azure_blob"
+  
+  databases:
+    - "postgresql"
+    - "mongodb"
+    - "elasticsearch"
+```
+
+## Deployment Configuration
+
+### Docker Configuration
+```yaml
+docker:
+  image: "kos/yachay-rag-engine:latest"
+  ports:
+    - "8000:8000"
+  environment:
+    - VECTOR_STORE_TYPE=chroma
+    - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+    - LOG_LEVEL=INFO
+  volumes:
+    - "./vector_store:/app/vector_store"
+    - "./logs:/app/logs"
+  resources:
+    memory: "4Gi"
+    cpu: "2"
+```
+
+### Kubernetes Configuration
+```yaml
+kubernetes:
+  namespace: "kos-agents"
+  replicas: 2
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1"
+    limits:
+      memory: "4Gi"
+      cpu: "2"
+  
+  service:
+    type: "ClusterIP"
+    port: 8000
+  
+  ingress:
+    enabled: true
+    host: "yachay-rag.kos.local"
+    tls: true
+```
+
+## Backup & Recovery
+
+### Backup Strategy
+```yaml
+backup:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "30 days"
+  storage:
+    type: "s3"
+    bucket: "kos-backups"
+    path: "yachay-rag"
+  
+  components:
+    - "vector_store"
+    - "analysis_results"
+    - "configuration"
+  
+  verification:
+    enabled: true
+    checksum_validation: true
+```
+
+### Recovery Procedures
+```yaml
+recovery:
+  procedures:
+    vector_store_restore:
+      steps:
+        - "Stop yachay-rag service"
+        - "Restore vector store from backup"
+        - "Verify data integrity"
+        - "Restart service"
+      estimated_time: "30 minutes"
+    
+    analysis_data_restore:
+      steps:
+        - "Export analysis results"
+        - "Restore from backup"
+        - "Re-index vector store"
+        - "Verify consistency"
+      estimated_time: "60 minutes"
+```
+
+## Testing & Validation
+
+### Test Configuration
+```yaml
+testing:
+  unit_tests:
+    enabled: true
+    coverage_threshold: 80
+    frameworks:
+      - "pytest"
+      - "unittest"
+  
+  integration_tests:
+    enabled: true
+    test_data: "test_skald_specifications"
+    scenarios:
+      - "basic_analysis"
+      - "parallel_processing"
+      - "rag_querying"
+      - "error_handling"
+  
+  performance_tests:
+    enabled: true
+    load_testing: true
+    benchmarks:
+      - "analysis_speed"
+      - "query_latency"
+      - "memory_usage"
+      - "concurrent_users"
+```
+
+This configuration provides a comprehensive framework for the Yachay RAG system, ensuring scalability, performance, and reliability for content analysis tasks. 

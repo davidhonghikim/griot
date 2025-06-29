@@ -1,0 +1,192 @@
+title: K Os Skill And Recipe Framework Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.290354'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 824
+has_code_blocks: true
+has_api_specs: true
+has_architecture: true
+has_deployment: false
+has_testing: true
+has_security: false
+has_rag: true
+has_ethics: false
+original_filename: k_os_skill_and_recipe_framework_spec.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/k_os_skill_and_recipe_framework_spec.yml
+category: agent_specifications/junzi
+
+---
+
+title: K Os Skill And Recipe Framework Spec
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.083279'
+original_format: markdown
+content_type: api_specification
+word_count: 795
+line_count: 149
+
+---
+
+# kOS Skill and Recipe Framework Specification
+
+## Overview
+
+The kOS Skill and Recipe Framework defines how all AI behaviors, tasks, and workflows are modularly structured, composed, executed, and evolved over time. This layer is the **heart of kOS automation and intelligence orchestration**. It allows any user or agent to create, modify, and share AI behaviors using plain language, pseudocode, YAML, or JSON formats.
+
+---
+
+## Core Concepts
+
+| Concept | Description |
+|---|---|
+| Skill | A modular, testable, and reusable unit of AI logic (e.g., Summarize Text, Translate Language, Classify Image). |
+| Recipe | A declarative workflow that defines how multiple skills, tools, and data sources are chained together to accomplish complex tasks. |
+| Recipe Registry | A centralized (or decentralized in future phases) index of all known recipes available to the system. |
+| Adapter Mapping | Recipes reference skills, and skills reference adapters (APIs, local tools, etc.) that perform the actual execution. |
+| Execution Context | Each recipe execution retains runtime context (inputs, outputs, logs, decision paths). |
+| Meta-Learning Feedback | After execution, performance metrics and user feedback get logged for recipe improvement and self-learning. |
+
+---
+
+## Skill Structure
+
+| Attribute | Description |
+|---|---|
+| Skill Name | Unique identifier for the skill |
+| Input Schema | Expected input types and formats |
+| Execution Method | Which adapter, API, or tool performs this skill |
+| Output Schema | Expected output types |
+| Metadata | Performance logs, source history, last update date |
+
+**Example Skill (YAML):**
+
+```yaml
+skill_name: summarize_text
+input:
+  - type: text
+execution:
+  adapter: openai_adapter
+  function: gpt_4_summarize
+output:
+  - type: summary_text
+```
+
+---
+
+## Recipe Structure
+
+| Field | Description |
+|---|---|
+| Recipe Name | Unique identifier |
+| Trigger | Natural language patterns or API call triggers that invoke this recipe |
+| Steps | Sequential list of skills to execute |
+| Conditions | Optional logic conditions per step |
+| Parallelization | Allow parallel execution for non-dependent steps |
+| Error Handling | Recovery steps if errors occur |
+| Meta-Tags | Tags for discoverability and search |
+
+**Example Recipe (YAML):**
+
+```yaml
+recipe_name: summarize_pdf_and_notify_slack
+trigger: "summarize pdf and slack it"
+steps:
+  - skill: extract_text_from_pdf
+    input: {file_path}
+  - skill: summarize_text
+    input: {extracted_text}
+  - skill: format_slack_message
+    input: {summary}
+  - skill: send_slack_message
+    input: {formatted_message}
+```
+
+---
+
+## Recipe Types
+
+| Type | Purpose |
+|---|---|
+| Single-Step Recipe | One skill execution per user request (e.g., translate text) |
+| Multi-Step Sequential | Linear workflows (e.g., fetch → analyze → report) |
+| Conditional Branching | Recipes that adjust execution based on data or user input |
+| Parallelized Recipes | Run multiple skills simultaneously for speed or comparison |
+| Meta-Recipes | Recipes that generate new recipes or compose other recipes dynamically |
+
+---
+
+## Recipe Lifecycle
+
+1. **Creation:** Human writes, AI suggests, or system learns a new recipe.
+2. **Registration:** Recipe is stored in the Recipe Registry with versioning.
+3. **Execution:** Triggered by user or agent intent.
+4. **Logging:** Execution context, errors, metrics, and outputs logged.
+5. **Learning:** System tracks effectiveness and suggests optimizations.
+6. **Evolution:** Recipes updated over time based on usage patterns and user edits.
+
+---
+
+## Recipe Storage Formats
+
+| Format | Use Case |
+|---|---|
+| YAML | Human-readable editing and sharing |
+| JSON | Programmatic storage and transmission |
+| NLP Templates | For ultra-simple recipe definitions using natural language |
+| Code-Embedded Recipes | For developer-focused recipes in Python or TypeScript |
+
+---
+
+## Integration with Adapter and Orchestration Layers
+
+- **Skills map to adapters.**
+- **Recipes map to skill chains.**
+- **The Orchestration Engine resolves and executes recipes.**
+- **The Meta-Learning Layer tracks recipe usage and optimization paths.**
+
+---
+
+## Sample Recipe Types (Starter Library Examples)
+
+| Recipe Name | Function |
+|---|---|
+| summarize_pdf_and_notify_slack | Summarize PDF and send to Slack |
+| multi_model_factual_answer | Query multiple LLMs and distill consensus answer |
+| keyword_extraction | Extract keywords from user text |
+| seo_tag_generator | Generate SEO tags from content |
+| multi_agent_code_review | Let multiple LLMs audit a code snippet and compare findings |
+| ethical_content_review | Run content through Junzi ethical filter |
+| entity_extraction | Extract named entities from text input |
+| pdf_to_vector_db | Ingest PDF into Vector DB for future retrieval |
+| document_translation_pipeline | Translate documents and deliver via email |
+| user_behavior_analysis | Analyze user chat history for behavior patterns |
+
+---
+
+## Next Steps for Agents
+
+- Draft and publish the Recipe Registry Schema
+- Populate Starter Recipe Library
+- Build Recipe Loader Module in the Orchestration Engine
+- Implement Recipe Editing UI/CLI
+- Connect Recipes to the Adapter Layer
+- Integrate Meta-Learning tracking for recipe optimization
+
+---
+
+**End of Document**
+
+
+

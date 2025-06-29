@@ -1,0 +1,225 @@
+title: K Os Starter Recipe Library
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.239531'
+original_format: markdown
+content_type: agent_specification
+word_count: 542
+line_count: 210
+
+---
+
+# kOS Starter Recipe Library
+
+## Overview
+
+This document contains a curated set of starter recipes for the kOS Hybrid AI Recipe Orchestration System. These recipes demonstrate various task types across content generation, data analysis, communication, and system management. They serve as reference implementations for agents and developers to build from.
+
+---
+
+## Recipe: Summarize PDF and Notify Slack
+
+```yaml
+recipe_name: summarize_pdf_and_notify_slack
+version: 1.0.0
+description: Summarize a PDF document and send the summary to a Slack channel.
+trigger_phrases:
+  - "summarize pdf"
+  - "send pdf summary to slack"
+steps:
+  - skill: extract_text_from_pdf
+    input: {file_path}
+  - skill: summarize_text
+    input: {extracted_text}
+  - skill: format_slack_message
+    input: {summary}
+  - skill: send_slack_message
+    input: {formatted_message}
+```
+
+---
+
+## Recipe: Multi-Model Factual Answer Distillation
+
+```yaml
+recipe_name: multi_model_factual_answer
+version: 1.0.0
+description: Query multiple LLMs for the same question and distill a consensus factual answer.
+trigger_phrases:
+  - "cross check answer"
+  - "get multi-source fact check"
+steps:
+  - skill: query_openai
+    input: {question}
+  - skill: query_anthropic
+    input: {question}
+  - skill: query_ollama
+    input: {question}
+  - skill: distill_multi_response
+    input:
+      - {openai_response}
+      - {anthropic_response}
+      - {ollama_response}
+```
+
+---
+
+## Recipe: Keyword Extraction
+
+```yaml
+recipe_name: keyword_extraction
+version: 1.0.0
+description: Extract keywords from user-submitted text.
+trigger_phrases:
+  - "extract keywords"
+steps:
+  - skill: extract_keywords
+    input: {text}
+```
+
+---
+
+## Recipe: SEO Tag Generator
+
+```yaml
+recipe_name: seo_tag_generator
+version: 1.0.0
+description: Generate SEO-friendly tags from content text.
+trigger_phrases:
+  - "generate seo tags"
+steps:
+  - skill: extract_keywords
+    input: {text}
+  - skill: generate_seo_tags
+    input: {keywords}
+```
+
+---
+
+## Recipe: Multi-Agent Code Review
+
+```yaml
+recipe_name: multi_agent_code_review
+version: 1.0.0
+description: Have multiple LLMs review a code snippet and highlight bugs or improvements.
+trigger_phrases:
+  - "review this code"
+steps:
+  - skill: query_openai_for_code_review
+    input: {code_snippet}
+  - skill: query_anthropic_for_code_review
+    input: {code_snippet}
+  - skill: consolidate_code_review_feedback
+    input:
+      - {openai_feedback}
+      - {anthropic_feedback}
+```
+
+---
+
+## Recipe: Ethical Content Review
+
+```yaml
+recipe_name: ethical_content_review
+version: 1.0.0
+description: Run user-submitted text through the Junzi ethical evaluation layer.
+trigger_phrases:
+  - "ethics check"
+steps:
+  - skill: junzi_ethics_filter
+    input: {text}
+```
+
+---
+
+## Recipe: Entity Extraction
+
+```yaml
+recipe_name: entity_extraction
+version: 1.0.0
+description: Extract named entities from text (e.g., people, places, organizations).
+trigger_phrases:
+  - "extract entities"
+steps:
+  - skill: named_entity_recognition
+    input: {text}
+```
+
+---
+
+## Recipe: PDF Ingestion to Vector DB
+
+```yaml
+recipe_name: pdf_to_vector_db
+version: 1.0.0
+description: Parse a PDF document and store its contents in a vector database for retrieval.
+trigger_phrases:
+  - "ingest pdf"
+steps:
+  - skill: extract_text_from_pdf
+    input: {file_path}
+  - skill: embed_text_for_vector_db
+    input: {extracted_text}
+  - skill: store_in_vector_db
+    input: {embedding}
+```
+
+---
+
+## Recipe: Document Translation Pipeline
+
+```yaml
+recipe_name: document_translation_pipeline
+version: 1.0.0
+description: Translate a document into a target language and email the result.
+trigger_phrases:
+  - "translate document and email it"
+steps:
+  - skill: extract_text_from_pdf
+    input: {file_path}
+  - skill: translate_text
+    input: {extracted_text, target_language}
+  - skill: send_email
+    input:
+      to: {recipient_email}
+      subject: "Translated Document"
+      body: {translated_text}
+```
+
+---
+
+## Recipe: User Behavior Analysis
+
+```yaml
+recipe_name: user_behavior_analysis
+version: 1.0.0
+description: Analyze user chat history for behavioral patterns and preferences.
+trigger_phrases:
+  - "analyze user behavior"
+steps:
+  - skill: fetch_user_chat_history
+    input: {user_id}
+  - skill: run_behavior_analysis
+    input: {chat_history}
+  - skill: generate_behavior_report
+    input: {analysis_result}
+```
+
+---
+
+## Next Steps for Agents
+
+- Expand the Recipe Library for new use cases
+- Implement recipe version control
+- Build a public-facing recipe contribution workflow
+- Integrate Recipe Registry with Skill Registry and Adapter Layer
+- Build UI/CLI tools for browsing and searching recipes
+
+---
+
+**End of Document**
+
+

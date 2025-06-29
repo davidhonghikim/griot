@@ -1,0 +1,209 @@
+title: "Agent Bootstrap System"
+version: "1.0"
+status: "Active"
+created: "2025-06-29"
+updated: "2025-06-29"
+introduction:
+  title: "Agent Bootstrap System"
+  status: "OPTIMIZED FOR AI PROCESSING"
+  description: |
+    This directory contains the core bootstrap files for agent initialization and workflow management. These files provide the essential context and procedures that every agent needs to operate effectively on the kOS project.
+
+directory_structure:
+  title: "Directory Structure"
+  note: |
+    LOG FILES USE [TIMESTAMP]_FILENAME.ext format. Keep the timestamp in the filename as variable since it changes but there should only be one file like it in that directory as the current file. Others are archived. Don't hardcode the timestamp in the filename in this file.
+  layout: |
+    agents/bootstrap/
+    ├── [TIMESTAMP]_00_AGENT_WORKFLOW.yml                   # Core workflow mandate
+    ├── [TIMESTAMP]_01_SYSTEM_PROMPT.yml                    # Agent system prompt
+    ├── [TIMESTAMP]_02_PROJECT_CONTEXT.yml                  # Project context
+    ├── archive/                                 # Historical archives
+    │   └── 2025/                               # Year-based organization
+    │       └── 06/                             # June 2025 (when archived)
+    │           ├── [TIMESTAMP]_agent_workflow.yml
+    │           ├── [TIMESTAMP]_system_prompt.yml
+    │           └── [TIMESTAMP]_project_overview.yml
+    └── README.yml                              # This file
+
+core_files:
+  - title: "[TIMESTAMP]_00_AGENT_WORKFLOW.yml"
+    purpose: "Mandatory workflow and process mandate"
+    key_features:
+      - "Onboarding procedure"
+      - "Changelog requirements"
+      - "Implementation plans integration"
+      - "Handoff process"
+      - "Style & naming conventions"
+  - title: "[TIMESTAMP]_01_AGENT_CHANGELOG.md"
+    purpose: "Chronological project history"
+    key_features:
+      - "Session-based logging"
+      - "Major task tracking"
+      - "Finding/Correction/Decision logging"
+      - "Session summaries"
+  - title: "[TIMESTAMP]_02_SYSTEM_PROMPT.yml"
+    purpose: "Agent identity and core principles"
+    key_features:
+      - "Agent identity definition"
+      - "HIEROS covenant principles"
+      - "Operational context"
+      - "Procedural mandates"
+  - title: "[TIMESTAMP]_02_PROJECT_CONTEXT.yml"
+    purpose: "Project state and architecture"
+    key_features:
+      - "Current project status"
+      - "Infrastructure overview"
+      - "Core skills and nodes"
+      - "Current mission and priorities"
+
+archive_policy:
+  title: "Archive Policy"
+  rules:
+    - "Monthly archiving: First day of each month"
+    - "Time-based structure: `archive/YYYY/MM/` format"
+    - "ISO 8601 Timestamp naming: ALL archived files use `[TIMESTAMP]_Description.ext` format"
+    - "Working files: Current files use descriptive names (e.g., `[TIMESTAMP]_01_AGENT_WORKFLOW.yml`)"
+    - "Archived files: Historical files use full ISO 8601 timestamps in names"
+    - "Automation: `scripts/archiving/archive_monthly.sh`"
+
+bootstrap_process:
+  title: "Bootstrap Process"
+  for_new_agents:
+    title: "For New Agents"
+    start_here: "START HERE: Read `agents/README.md` first for overview and structure."
+    steps:
+      - title: "Read Core Documents"
+        instruction: "in order"
+        documents:
+          - "`agents/README.md` - Start here for overview and structure"
+          - "`[TIMESTAMP]_00_SYSTEM_PROMPT.yml` - Your identity and core principles"
+          - "`[TIMESTAMP]_01_AGENT_WORKFLOW.yml` - Mandatory workflow procedures"
+          - "`[TIMESTAMP]_02_PROJECT_CONTEXT.yml` - Project history and context"
+      - title: "Check Current State"
+        tasks:
+          - "Read `handoff/[TIMESTAMP]_LATEST_HANDOFF.md` for your specific mission"
+          - "Review latest changelog entry"
+          - "Check active implementation plans"
+      - title: "Initialize Your Session"
+        tasks:
+          - "Add entry to changelog using template"
+          - "Review any incomplete work from previous agent"
+
+integration_with_other_systems:
+  title: "Integration with Other Systems"
+  cross_system_dependencies:
+    title: "Cross-System Dependencies"
+    dependencies:
+      - "Workflow → Changelog: All sessions must be logged"
+      - "Workflow → Handoff: Session summaries inform handoffs"
+      - "Workflow → Implementation Plans: Complex tasks use plans"
+      - "Performance → All Systems: Metrics collected across all activities"
+  data_flow:
+    title: "Data Flow"
+    flow: |
+      Agent Session → Changelog → Performance Metrics → Reports
+           ↓
+      Implementation Plans → Metrics → Analytics → Handoff
+
+quality_assurance:
+  title: "Quality Assurance"
+  before_completing_task:
+    title: "Before Completing Any Task"
+    checklist:
+      - "[ ] Changelog entry added with proper format"
+      - "[ ] Performance metrics logged"
+      - "[ ] Implementation plan updated (if applicable)"
+      - "[ ] Cross-references added between systems"
+      - "[ ] Handoff prepared with clear next steps"
+  error_prevention:
+    title: "Error Prevention"
+    rules:
+      - "Always cross-reference: Link entries between systems"
+      - "Use templates: Don't create files from scratch"
+      - "Check for completeness: Ensure all systems are updated"
+      - "Validate format: Use provided schemas and templates"
+      - "Assume errors: Review previous agent's work critically"
+
+maintenance:
+  title: "Maintenance"
+  regular_tasks:
+    title: "Regular Tasks"
+    tasks:
+      - "Daily: Update changelog with session activities"
+      - "Weekly: Review performance metrics"
+      - "Monthly: Archive completed files"
+      - "Quarterly: Generate comprehensive reports"
+  system_health:
+    title: "System Health"
+    checks:
+      - "Validate implementation plans against schema"
+      - "Check handoff archive for completeness"
+      - "Review performance metrics for trends"
+      - "Update templates as needed"
+
+footer:
+  last_updated: "2025-06-29"
+  next_review: "2025-07-01"
+
+quick_access:
+  title: "Quick Access"
+  important_note: "Agents should start with `agents/README.md` first, then load bootstrap files as needed."
+  links:
+    - "Entry Point: `agents/README.md` - Start here for overview and structure"
+    - "Workflow: `[TIMESTAMP]_01_AGENT_WORKFLOW.yml` - Mandatory workflow process"
+    - "Changelog: `[TIMESTAMP]_changelog.yml` - Complete session history (chronological)"
+    - "Project Context: `[TIMESTAMP]_02_PROJECT_CONTEXT.yml` - Project state and architecture"
+    - "Identity: `[TIMESTAMP]_00_SYSTEM_PROMPT.yml` - Agent identity and principles"
+    - "Archive: `archive/` - Historical workflow versions"
+
+system_overview:
+  title: "System Overview"
+  description: "The bootstrap system provides:"
+  provides:
+    - "Workflow Process: Mandatory procedures for all agents"
+    - "Session History: Complete changelog with chronological ordering"
+    - "Project Context: Current project state and mission context"
+    - "Agent Identity: Core principles and operational context"
+    - "Version Control: Historical workflow versions"
+
+format_strategy:
+  title: "Format Strategy"
+  formats:
+    - "YAML: For all structured data (workflows, prompts, context, changelogs, configs). They must have proper ISO 8601 timestamps."
+    - "Markdown: For narrative content (readmes, analysis, handoffs, documentation). They must have proper ISO 8601 timestamps where applicable."
+    - "Archive: Historical versions with proper ISO 8601 timestamps."
+
+usage:
+  title: "Usage"
+  view_session_history:
+    instruction: "To view project context:"
+    command: "cat agents/bootstrap/[TIMESTAMP]_02_PROJECT_CONTEXT.yml"
+  add_new_session:
+    instruction: "To add a new session entry:"
+    command_description: "# Update [TIMESTAMP]_changelog.yml with new session data"
+    command_followup: "# Follow the format in agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.yml"
+  view_workflow:
+    instruction: "To view workflow:"
+    command: "cat agents/bootstrap/[TIMESTAMP]_01_AGENT_WORKFLOW.yml"
+
+changelog_format:
+  title: "Changelog Format"
+  description: "The [TIMESTAMP]_changelog.yml contains:"
+  contains:
+    - "Sessions: Complete session history in chronological order"
+    - "Metadata: Agent info, dates, missions, log entries"
+    - "Statistics: Entry types, agent usage, date ranges"
+    - "Summaries: Accomplishments, final state, key findings"
+
+project_context_format:
+  title: "Project Context Format"
+  description: "The [TIMESTAMP]_PROJECT_CONTEXT.yml contains:"
+  contains:
+    - "Current Status: Project state and infrastructure"
+    - "Mission: Current mission and immediate priorities"
+    - "Architecture: System architecture and design"
+    - "Success Metrics: Performance and quality targets"
+    - "Key Files: Important files and their purposes"
+
+final_note: "This system is mandatory for all agent sessions and provides the foundation for consistent workflow execution." 

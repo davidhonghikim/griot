@@ -1,0 +1,60 @@
+metadata:
+  original_file: 05_Hakim_Code_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Hakim Class: Code Examples'
+  description: TypeScript code examples for interacting with the Hakim Node Class
+    via KLF.
+sections:
+- level: 1
+  title: Hakim Class Code Examples
+  type: section
+  content: This section provides conceptual TypeScript examples for interacting with
+    the Hakim node's services.
+- level: 2
+  title: 1. Requesting a Health Report for a Node
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \nasync function getNodeHealth(client: KLFClient, targetNodeDid: string) {\n \
+    \   console.log(`Requesting health report for node: ${targetNodeDid}`);\n\n  \
+    \  const queryMessage = createMessage()\n        .from('did:kos:my-admin-console:456')\n\
+    \        .to('did:kos:hakim:xyz') // Target Hakim node\n        .type(MessageType.DATA_QUERY)\n\
+    \        .payload({\n            query_name: 'get_health_report',\n          \
+    \  params: {\n                target_node_did: targetNodeDid\n            }\n\
+    \        })\n        .build();\n    \n    const response = await client.sendMessage(queryMessage);\n\
+    \n    if (response.type === MessageType.DATA_RESULT && !response.payload.error)\
+    \ {\n        console.log('Health report received successfully!');\n        const\
+    \ report = response.payload.result;\n        console.log(JSON.stringify(report,\
+    \ null, 2));\n        return report;\n    } else {\n        console.error('Failed\
+    \ to retrieve health report:', response.payload.error.message);\n        return\
+    \ null;\n    }\n}\n```"
+- level: 2
+  title: 2. Requesting a Service Restart and Approving It
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \n// --- Step 1: An admin requests the restart ---\nasync function requestServiceRestart(client:\
+    \ KLFClient, targetNodeDid: string, serviceName: string) {\n    console.log(`Requesting\
+    \ restart of service '${serviceName}' on node ${targetNodeDid}`);\n\n    const\
+    \ requestMessage = createMessage()\n        .from('did:kos:my-admin-console:456')\n\
+    \        .to('did:kos:hakim:xyz') // Target Hakim node\n        .type(MessageType.TASK_REQUEST)\n\
+    \        .payload({\n            task_name: 'request_maintenance',\n         \
+    \   params: {\n                target_node_did: targetNodeDid,\n             \
+    \   maintenance_task: 'restart_service',\n                task_params\": {\n \
+    \                   \"service_name\": serviceName\n                }\n       \
+    \     }\n        })\n        .build();\n    \n    const response = await client.sendMessage(requestMessage);\n\
+    \n    if (response.type === MessageType.TASK_RESPONSE && response.payload.status\
+    \ === 'completed') {\n        const { job_id, job_status } = response.payload.result;\n\
+    \        console.log(`Maintenance job created with ID: ${job_id}, Status: ${job_status}`);\n\
+    \        return job_id;\n    } else {\n        console.error('Failed to create\
+    \ maintenance request:', response.payload.error.message);\n        return null;\n\
+    \    }\n}\n\n// --- Step 2: The node owner approves the request ---\nasync function\
+    \ approveRestart(ownerClient: KLFClient, hakimDid: string, jobId: string) {\n\
+    \    console.log(`Approving maintenance job: ${jobId}`);\n    \n    const approvalMessage\
+    \ = createMessage()\n        .from('did:kos:griot:123') // From the owner of the\
+    \ target node\n        .to(hakimDid)\n        .type(MessageType.SYSTEM_COMMAND)\n\
+    \        .payload({\n            command_name: 'approve_maintenance_job',\n  \
+    \          params: {\n                job_id: jobId\n            }\n        })\n\
+    \        .build();\n\n    // Fire-and-forget command, no direct response needed\n\
+    \    await ownerClient.sendMessage(approvalMessage);\n    console.log('Approval\
+    \ command sent.');\n}\n```"

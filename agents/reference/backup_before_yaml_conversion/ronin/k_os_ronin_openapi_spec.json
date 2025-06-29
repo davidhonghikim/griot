@@ -1,0 +1,58 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "kOS Ronin Reticulum API",
+    "version": "1.0.0",
+    "description": "API definition for Ronin Reticulum networking, discovery, data transfer, and messaging"
+  },
+  "paths": {
+    "/api/ronin/login": {
+      "post": {
+        "summary": "Node Login and Authentication",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "nodeId": { "type": "string" }, "signature": { "type": "string" } }, "required": ["nodeId", "signature"] } } }
+        },
+        "responses": { "200": { "description": "Login success" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/ronin/discover": {
+      "post": {
+        "summary": "Trigger Service Discovery",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "action": { "type": "string" } } } } },
+        "responses": { "200": { "description": "Discovery result" } }
+      }
+    },
+    "/api/ronin/upload": {
+      "post": {
+        "summary": "Upload file/data chunk",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "filename": { "type": "string" }, "chunk": { "type": "string" }, "sequence": { "type": "integer" } }, "required": ["filename", "chunk", "sequence"] } } } },
+        "responses": { "200": { "description": "Upload ACK" }, "400": { "description": "Invalid chunk" } }
+      }
+    },
+    "/api/ronin/message/send": {
+      "post": {
+        "summary": "Send direct message to another node",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "toNodeId": { "type": "string" }, "message": { "type": "string" } }, "required": ["toNodeId", "message"] } } } },
+        "responses": { "200": { "description": "Message sent" } }
+      }
+    },
+    "/api/ronin/pubsub/publish": {
+      "post": {
+        "summary": "Publish message to a topic",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "topic": { "type": "string" }, "message": { "type": "string" } }, "required": ["topic", "message"] } } } },
+        "responses": { "200": { "description": "Publish success" } }
+      }
+    },
+    "/api/ronin/metrics": {
+      "post": {
+        "summary": "Report or query node metrics",
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "metrics": { "type": "object" } } } } } },
+        "responses": { "200": { "description": "Metrics result" } }
+      }
+    }
+  }
+}
+
+// ---
+// ✅ Covers: Login, Discovery, Upload, Direct Messaging, PubSub Publish, Metrics
+// ✅ Easily expandable for BBS, backup sync, download, etc.

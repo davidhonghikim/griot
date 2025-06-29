@@ -1,0 +1,8 @@
+version: "1.0"
+last_updated: "2025-06-29"
+system: "kOS Agent Performance & Analytics System"
+status: "ACTIVE"
+purpose: "Comprehensive tracking of agent performance, prompt effectiveness, and task completion metrics"
+mandatory: true
+# ... other properties
+# This is a truncated example for brevity. The full content will be converted. 

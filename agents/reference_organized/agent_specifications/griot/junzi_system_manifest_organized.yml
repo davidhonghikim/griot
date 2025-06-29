@@ -1,0 +1,122 @@
+title: Junzi System Manifest
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.400617'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 625
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: true
+has_testing: true
+has_security: true
+has_rag: true
+has_ethics: false
+original_filename: junzi_system_manifest.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/junzi/junzi_system_manifest.yml
+category: agent_specifications/griot
+
+---
+
+title: Junzi System Manifest
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.716539'
+original_format: markdown
+content_type: api_specification
+word_count: 600
+line_count: 79
+
+---
+
+# JUNZI System Manifest
+
+**Full Capability Specification for JUNZI: Jurisdictional Understanding and Nonpartisan Zero-bias Intelligence**  
+**Node Class:** JunziNode (as defined in kOS Starseed Archetype Framework)
+
+---
+
+## 🌐 Core Mission:
+JUNZI exists as the ethical, factual, nonpartisan intelligence layer within the kOS ecosystem. Its job is to observe, detect, and report deviations from integrity and truth across all jurisdictions, institutions, and public entities.
+
+JUNZI is the **DNA Repair Enzyme** of the civic space—**identifying misinformation, broken promises, contradictions, corruption, and ethical risks** in real time.
+
+---
+
+## 🧬 JUNZI Node Capabilities
+
+| Capability | Description |
+|---|---|
+| **Contradiction Detection** | NLP-driven comparison of statements vs actions across time, jurisdiction, and entity. |
+| **Ethical Risk Scoring** | Calculates live risk profiles for entities based on behavioral patterns and contradictions. |
+| **Jurisdictional Awareness Engine** | Contextualizes every action by jurisdiction (local, state, federal, international). |
+| **Zero-Bias Assurance Pipeline** | Applies multi-model consensus checking and counter-weighted bias audits on all AI outputs. |
+| **Promise Tracking** | Maps and monitors the lifecycle of public promises vs outcomes. |
+| **Data Provenance Enforcement** | Tracks every data point back to its source. Immutable. Auditable. |
+| **Nonpartisan Pattern Analysis** | Runs time-based, sector-wide pattern analysis without partisan labeling. |
+| **Cross-Entity Behavior Mapping** | Builds behavioral relationship graphs between people, organizations, and jurisdictions. |
+| **Public Transparency API** | Exposes verified and annotated entity profiles, risk flags, contradiction alerts, and historical behavior scores. |
+
+---
+
+## 🛰️ JUNZI Agent Types (Deployed within JunziNode)
+
+| Agent Name | Function |
+|---|---|
+| **ContradictionScannerAgent** | Runs LLM/NLP analysis comparing past and present entity statements/actions. |
+| **RiskProfilerAgent** | Calculates ethical risk levels based on weighted behavioral patterns and entity history. |
+| **JurisdictionContextAgent** | Classifies every data point by jurisdictional scope and legal context. |
+| **BiasAuditAgent** | Conducts adversarial multi-model cross-checks to detect and mitigate model bias in scoring and analysis. |
+| **PromiseTrackerAgent** | Manages long-term state on entity promises and their fulfillment status. |
+| **SourceAttributionAgent** | Ensures data lineage, source verification, and tamper-proof integrity logs. |
+| **PublicExposureAgent** | Pushes confirmed violations or contradictions to public dashboards, alerts, and feeds. |
+
+---
+
+## 🗄️ Data Structures and Core Schemas
+
+| Data Entity | Fields |
+|---|---|
+| **EntityProfile** | Entity ID, Name, Jurisdiction, Roles, Affiliations, Public Statements, Voting Record, Financial History |
+| **ActionRecord** | Timestamp, Jurisdiction, Action Type, Related Entities, Source References |
+| **ContradictionReport** | Contradiction Type, Confidence Score, Time Span, Source Cross-References |
+| **RiskScore** | Entity ID, Score Value, Factors Considered, Bias Audit Metadata |
+| **PromiseRecord** | Promise Text, Date Given, Expected Outcome, Fulfillment Status, Audit Trail |
+
+---
+
+## 📡 Public API Exposure (High-Level Endpoints)
+
+| Endpoint | Description |
+|---|---|
+| `/junzi/entities/{id}/profile` | Full public profile with ethical risk score, promise status, and contradiction history |
+| `/junzi/contradictions/` | Stream of latest detected contradictions across all entities |
+| `/junzi/risk_scores/` | Current ethical risk profiles for monitored entities |
+| `/junzi/promises/{entity_id}` | Promise tracking data for specific entities |
+| `/junzi/alerts/` | Real-time public ethical violation alerts |
+| `/junzi/sources/{id}` | Data provenance and source verification for every public record |
+
+---
+
+## 🧭 kOS Node Deployment Context:
+- **Node Class:** `JunziNode`
+- **Node Role:** Integrity Oversight & Ethical Risk Monitoring
+- **Supported by:** GriotNode (Narrative Reporting), YachayNode (Long-term Memory), OracleNode (Predictive Integrity Risk), MusaNode (Security Response if needed)
+
+---
+
+## ✅ Single Source of Truth Statement:
+This document represents the canonical **JUNZI System Manifest** for all internal agent teams, developers, and AI nodes working within the kOS ecosystem until formally revised.
+
+
+

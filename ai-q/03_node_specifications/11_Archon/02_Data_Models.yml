@@ -1,0 +1,79 @@
+metadata:
+  original_file: 02_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Archon Node 02: Data Models'
+  version: 1.0
+sections:
+- level: 1
+  title: '**2. Archon Node Data Models**'
+  type: section
+  content: ''
+- level: 2
+  title: 2.1. Introduction
+  type: section
+  content: The Archon Node's orchestration capabilities are built upon a hierarchy
+    of data models that represent a high-level goal and the concrete steps required
+    to achieve it. The primary models are the `Directive`, the `WorkflowPlan`, and
+    the `Task`.
+- level: 2
+  title: 2.2. Core Data Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.2.1. `Directive`
+  type: section
+  content: "A `Directive` is the highest-level object, representing the initial goal\
+    \ or command given to the Archon node. It is purely declarative.\n\n-   **Purpose**:\
+    \ To capture the user's or system's intent without specifying the implementation.\n\
+    -   **Format**: JSON\n\n**TypeScript Interface Definition:**\n\n```typescript\n\
+    /**\n * @interface Directive\n * @description A high-level goal submitted to the\
+    \ Archon for execution.\n */\ninterface Directive {\n  /**\n   * @property {string}\
+    \ directiveId - A unique UUID (v4) for the directive.\n   */\n  directiveId: string;\n\
+    \n  /**\n   * @property {string} description - A human-readable description of\
+    \ the goal.\n   * @example \"Find all network intrusion events from the last 48\
+    \ hours and generate a summary report.\"\n   */\n  description: string;\n\n  /**\n\
+    \   * @property {string} requestingEntity - The ID of the user or node that submitted\
+    \ the directive.\n   */\n  requestingEntity: string;\n\n  /**\n   * @property\
+    \ {Date} submissionTimestamp - The ISO 8601 timestamp of when the directive was\
+    \ submitted.\n   */\n  submissionTimestamp: Date;\n\n  /**\n   * @property {Record<string,\
+    \ any>} parameters - A key-value map of initial parameters needed to fulfill the\
+    \ directive.\n   */\n  parameters: Record<string, any>;\n}\n```"
+- level: 3
+  title: 2.2.2. `WorkflowPlan`
+  type: section
+  content: "The `WorkflowPlan` is the Archon's internal representation of a `Directive`.\
+    \ It contains the full, stateful graph of tasks required to complete the goal.\n\
+    \n-   **Purpose**: To serve as the master plan and state tracker for an active\
+    \ directive.\n-   **Format**: JSON\n\n**TypeScript Interface Definition:**\n\n\
+    ```typescript\n/**\n * @interface WorkflowPlan\n * @description A stateful, ordered\
+    \ graph of tasks to fulfill a directive.\n */\ninterface WorkflowPlan {\n  /**\n\
+    \   * @property {string} planId - A unique UUID (v4), linking back to the directiveId.\n\
+    \   */\n  planId: string;\n\n  /**\n   * @property {'PENDING' | 'RUNNING' | 'COMPLETE'\
+    \ | 'FAILED'} status - The overall status of the plan.\n   */\n  status: 'PENDING'\
+    \ | 'RUNNING' | 'COMPLETE' | 'FAILED';\n\n  /**\n   * @property {Task[]} tasks\
+    \ - An array of all task objects associated with this plan.\n   */\n  tasks: Task[];\n\
+    }\n```"
+- level: 3
+  title: 2.2.3. `Task`
+  type: section
+  content: "A `Task` is the smallest unit of work in a `WorkflowPlan`. It represents\
+    \ a single KLF message to be dispatched to a specific node.\n\n-   **Purpose**:\
+    \ To define a single, concrete, delegable action.\n-   **Format**: JSON\n\n**TypeScript\
+    \ Interface Definition:**\n\n```typescript\n/**\n * @interface Task\n * @description\
+    \ A single, atomic step in a WorkflowPlan.\n */\ninterface Task {\n  /**\n   *\
+    \ @property {string} taskId - A unique identifier for the task within the plan\
+    \ (e.g., \"task-01\").\n   */\n  taskId: string;\n\n  /**\n   * @property {string[]}\
+    \ dependencies - An array of `taskId`s that must be complete before this task\
+    \ can start.\n   */\n  dependencies: string[];\n\n  /**\n   * @property {'PENDING'\
+    \ | 'READY' | 'RUNNING' | 'COMPLETE' | 'FAILED'} status - The current state of\
+    \ the task.\n   */\n  status: 'PENDING' | 'READY' | 'RUNNING' | 'COMPLETE' | 'FAILED';\n\
+    \n  /**\n   * @property {string} targetNodeId - The ID of the node this task is\
+    \ assigned to.\n   */\n  targetNodeId: string;\n\n  /**\n   * @property {string}\
+    \ klfMessage - The KLF message type to be sent (e.g., \"YACHAY_QUERY_REQUEST\"\
+    ).\n   */\n  klfMessage: string;\n\n  /**\n   * @property {Record<string, any>}\
+    \ payload - The actual payload object to be sent with the KLF message.\n   */\n\
+    \  payload: Record<string, any>;\n\n  /**\n   * @property {any} result - The result\
+    \ data returned by the target node upon completion.\n   */\n  result?: any;\n\
+    }\n```"

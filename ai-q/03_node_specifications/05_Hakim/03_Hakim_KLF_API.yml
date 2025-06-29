@@ -1,0 +1,56 @@
+metadata:
+  original_file: 03_Hakim_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Hakim Class: KLF Message API'
+  description: KLF Message API specification for the Hakim Node Class's health and
+    maintenance services.
+sections:
+- level: 1
+  title: Hakim Class KLF Message API
+  type: section
+  content: The Hakim Class API exposes its diagnostic and repair capabilities via
+    the Kind Link Framework.
+- level: 3
+  title: 1. Health Diagnostics
+  type: section
+  content: ''
+- level: 4
+  title: '**Request: `get_health_report`**'
+  type: section
+  content: "-   **Description**: Requests a new, up-to-date health report for a specific\
+    \ node.\n-   **Message Type**: `DATA_QUERY`\n-   **Payload**:\n    ```json\n \
+    \   {\n      \"query_name\": \"get_health_report\",\n      \"params\": {\n   \
+    \     \"target_node_did\": \"did:kos:griot:123\"\n      }\n    }\n    ```\n- \
+    \  **Response (Success)**: `DATA_RESULT` with `result: { ...HealthReport object...\
+    \ }`.\n-   **Response (Error)**: `DATA_RESULT` with `error: { \"code\": \"DIAGNOSTIC_FAILED\"\
+    , ... }`."
+- level: 3
+  title: 2. Maintenance Tasks
+  type: section
+  content: ''
+- level: 4
+  title: '**Request: `request_maintenance`**'
+  type: section
+  content: "-   **Description**: Submits a request to perform a maintenance task on\
+    \ a node. This initiates a job that requires owner approval before running.\n\
+    -   **Message Type**: `TASK_REQUEST`\n-   **Payload**:\n    ```json\n    {\n \
+    \     \"task_name\": \"request_maintenance\",\n      \"params\": {\n        \"\
+    target_node_did\": \"did:kos:griot:123\",\n        \"maintenance_task\": \"restart_service\"\
+    ,\n        \"task_params\": {\n            \"service_name\": \"griot-api\"\n \
+    \       }\n      }\n    }\n    ```\n-   **Response (Success)**: `TASK_RESPONSE`\
+    \ with `status: \"completed\"` and `result: { \"job_id\": \"...\", \"job_status\"\
+    : \"PendingApproval\" }`."
+- level: 4
+  title: '**Request: `approve_maintenance_job`**'
+  type: section
+  content: "-   **Description**: Sent by a node owner to approve a pending maintenance\
+    \ job.\n-   **Message Type**: `CONTROL_COMMAND`\n-   **Payload**:\n    ```json\n\
+    \    {\n      \"command_name\": \"approve_maintenance_job\",\n      \"params\"\
+    : {\n        \"job_id\": \"...\"\n      }\n    }\n    ```\n-   **Response**: No\
+    \ direct response is expected, but the `MaintenanceJob` status will be updated,\
+    \ and progress messages will be emitted.\n\n---\n*Note: Progress updates for the\
+    \ maintenance job (`TASK_PROGRESS`) and the final result (`TASK_RESPONSE`) will\
+    \ be sent asynchronously to the original requester after the job is approved and\
+    \ executed.*"

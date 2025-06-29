@@ -1,0 +1,43 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'webhook-receiver'
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 1h
+
+receivers:
+  - name: 'webhook-receiver'
+    webhook_configs:
+      - url: 'http://your-webhook-endpoint.local/alerts'
+        send_resolved: true
+        max_alerts: 10
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname']
+
+# Optional webhook payload formatting (Alertmanager handles default JSON payload)
+# Example receiving JSON payload:
+# {
+#   "receiver": "webhook-receiver",
+#   "status": "firing",
+#   "alerts": [
+#     {
+#       "status": "firing",
+#       "labels": { "alertname": "VectorAPI_Down", "severity": "critical" },
+#       "annotations": { "summary": "Vector API is down" },
+#       "startsAt": "2025-06-28T01:23:45Z",
+#       "endsAt": "0001-01-01T00:00:00Z"
+#     }
+#   ],
+#   "groupLabels": {"alertname": "VectorAPI_Down"},
+#   "commonLabels": {"alertname": "VectorAPI_Down", "severity": "critical"},
+#   "commonAnnotations": {"summary": "Vector API is down"},
+#   "externalURL": "http://alertmanager.local:9093"
+# }

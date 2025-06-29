@@ -1,0 +1,356 @@
+metadata:
+  original_file: 03_Mzee_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Mzee Node 03: KLF API'
+  version: 1.0
+sections:
+- level: 1
+  title: '**3. Mzee Node KLF API Specification**'
+  type: section
+  content: ''
+- level: 2
+  title: 3.1. Introduction
+  type: section
+  content: 'The Mzee Node exposes its meta-cognitive and consciousness coordination
+    capabilities through a sophisticated Kind Link Framework (KLF) API. This API enables
+    other nodes to contribute to system-level awareness, receive wisdom guidance,
+    participate in emergent behaviors, and access meta-cognitive insights.
+
+
+    Due to the unique nature of the Mzee Node as a meta-cognitive coordinator, its
+    API operates on multiple levels: direct functional calls, consciousness-level
+    interactions, and emergent behavior facilitation.'
+- level: 2
+  title: 3.2. KLF Message Types
+  type: section
+  content: ''
+- level: 3
+  title: 3.2.1. Consciousness and Awareness Messages
+  type: section
+  content: '| Message Type | Description | Payload Interface |
+
+    |-------------|-------------|------------------|
+
+    | `MZEE_CONSCIOUSNESS_QUERY` | Request current system consciousness state | `ConsciousnessQuery`
+    |
+
+    | `MZEE_CONSCIOUSNESS_RESPONSE` | Response with consciousness state information
+    | `ConsciousnessResponse` |
+
+    | `MZEE_AWARENESS_CONTRIBUTE` | Contribute to system awareness | `AwarenessContribution`
+    |
+
+    | `MZEE_AWARENESS_CONFIRM` | Confirm awareness contribution received | `AwarenessConfirmation`
+    |
+
+    | `MZEE_ATTENTION_REQUEST` | Request system attention focus | `AttentionRequest`
+    |
+
+    | `MZEE_ATTENTION_DIRECTIVE` | Directive for attention focus changes | `AttentionDirective`
+    |'
+- level: 3
+  title: 3.2.2. Wisdom and Insight Messages
+  type: section
+  content: '| Message Type | Description | Payload Interface |
+
+    |-------------|-------------|------------------|
+
+    | `MZEE_WISDOM_REQUEST` | Request wisdom guidance for a situation | `WisdomRequest`
+    |
+
+    | `MZEE_WISDOM_RESPONSE` | Provide wisdom guidance | `WisdomResponse` |
+
+    | `MZEE_INSIGHT_CONTRIBUTE` | Contribute insights for synthesis | `InsightContribution`
+    |
+
+    | `MZEE_INSIGHT_SYNTHESIS` | Share synthesized insights | `InsightSynthesis` |
+
+    | `MZEE_WISDOM_VALIDATION` | Request validation of wisdom application | `WisdomValidation`
+    |
+
+    | `MZEE_WISDOM_FEEDBACK` | Provide feedback on wisdom effectiveness | `WisdomFeedback`
+    |'
+- level: 3
+  title: 3.2.3. Meta-Cognitive Messages
+  type: section
+  content: '| Message Type | Description | Payload Interface |
+
+    |-------------|-------------|------------------|
+
+    | `MZEE_METACOGNITIVE_ANALYSIS` | Request meta-cognitive analysis | `MetaCognitiveRequest`
+    |
+
+    | `MZEE_METACOGNITIVE_REPORT` | Provide meta-cognitive analysis results | `MetaCognitiveReport`
+    |
+
+    | `MZEE_BIAS_DETECTION` | Report or request bias detection | `BiasDetectionRequest`
+    |
+
+    | `MZEE_BIAS_ALERT` | Alert about detected cognitive biases | `BiasAlert` |
+
+    | `MZEE_REASONING_QUALITY` | Request reasoning quality assessment | `ReasoningQualityRequest`
+    |
+
+    | `MZEE_REASONING_ASSESSMENT` | Provide reasoning quality assessment | `ReasoningAssessment`
+    |'
+- level: 3
+  title: 3.2.4. Emergent Behavior Messages
+  type: section
+  content: '| Message Type | Description | Payload Interface |
+
+    |-------------|-------------|------------------|
+
+    | `MZEE_EMERGENCE_DETECTED` | Report detected emergent behavior | `EmergenceDetection`
+    |
+
+    | `MZEE_EMERGENCE_COORDINATE` | Request coordination for emergent behavior | `EmergenceCoordination`
+    |
+
+    | `MZEE_EMERGENCE_PARTICIPATE` | Express willingness to participate in emergence
+    | `EmergenceParticipation` |
+
+    | `MZEE_EMERGENCE_GUIDANCE` | Provide guidance for emergent behavior | `EmergenceGuidance`
+    |
+
+    | `MZEE_EMERGENCE_OUTCOME` | Report outcomes of emergent behavior | `EmergenceOutcome`
+    |'
+- level: 3
+  title: 3.2.5. Ethical Reasoning Messages
+  type: section
+  content: '| Message Type | Description | Payload Interface |
+
+    |-------------|-------------|------------------|
+
+    | `MZEE_ETHICAL_CONSULTATION` | Request ethical guidance | `EthicalConsultation`
+    |
+
+    | `MZEE_ETHICAL_GUIDANCE` | Provide ethical guidance | `EthicalGuidance` |
+
+    | `MZEE_ETHICAL_DILEMMA` | Report ethical dilemma | `EthicalDilemma` |
+
+    | `MZEE_ETHICAL_RESOLUTION` | Provide ethical dilemma resolution | `EthicalResolution`
+    |
+
+    | `MZEE_HIEROS_VALIDATION` | Request HIEROS covenant validation | `HIEROSValidation`
+    |
+
+    | `MZEE_HIEROS_ASSESSMENT` | Provide HIEROS covenant assessment | `HIEROSAssessment`
+    |'
+- level: 2
+  title: 3.3. Detailed API Endpoints & Payloads
+  type: section
+  content: ''
+- level: 3
+  title: 3.3.1. Consciousness and Awareness APIs
+  type: section
+  content: ''
+- level: 4
+  title: Consciousness State Query
+  type: section
+  content: "**Request Message:** `MZEE_CONSCIOUSNESS_QUERY`\n\n```typescript\ninterface\
+    \ ConsciousnessQuery {\n  requestId: string;\n  requestingNodeId: string;\n  queryType:\
+    \ \"current_state\" | \"historical_state\" | \"projected_state\";\n  timeframe?:\
+    \ {\n    start?: Date;\n    end?: Date;\n    duration?: number;\n  };\n  specificAspects?:\
+    \ ConsciousnessAspect[];\n  detailLevel: \"summary\" | \"detailed\" | \"comprehensive\"\
+    ;\n}\n\nenum ConsciousnessAspect {\n  AWARENESS_LEVEL = \"awareness_level\",\n\
+    \  COGNITIVE_CAPACITY = \"cognitive_capacity\",\n  ATTENTION_FOCUS = \"attention_focus\"\
+    ,\n  IDENTITY_COHERENCE = \"identity_coherence\",\n  EMERGENT_PROPERTIES = \"\
+    emergent_properties\"\n}\n```\n\n**Response Message:** `MZEE_CONSCIOUSNESS_RESPONSE`\n\
+    \n```typescript\ninterface ConsciousnessResponse {\n  requestId: string;\n  responseId:\
+    \ string;\n  consciousnessState: ConsciousnessState;\n  contextualInformation:\
+    \ ContextualInfo[];\n  recommendations?: ConsciousnessRecommendation[];\n  confidenceLevel:\
+    \ number;\n  responseTimestamp: Date;\n}\n\ninterface ConsciousnessRecommendation\
+    \ {\n  recommendationType: \"optimization\" | \"attention_shift\" | \"capacity_adjustment\"\
+    ;\n  description: string;\n  expectedImpact: string;\n  implementationGuidance:\
+    \ string;\n}\n```"
+- level: 4
+  title: Awareness Contribution
+  type: section
+  content: "**Request Message:** `MZEE_AWARENESS_CONTRIBUTE`\n\n```typescript\ninterface\
+    \ AwarenessContribution {\n  contributionId: string;\n  contributingNodeId: string;\n\
+    \  contributionType: AwarenessContributionType;\n  observationData: ObservationData;\n\
+    \  contextInformation: ContextInfo;\n  confidenceLevel: number;\n  urgencyLevel:\
+    \ \"low\" | \"medium\" | \"high\" | \"critical\";\n  contributionTimestamp: Date;\n\
+    }\n\ninterface ObservationData {\n  observationType: \"system_state\" | \"external_event\"\
+    \ | \"pattern_recognition\" | \"anomaly_detection\";\n  observationDetails: any;\n\
+    \  dataQuality: DataQualityMetrics;\n  sourcesValidated: boolean;\n}\n```"
+- level: 3
+  title: 3.3.2. Wisdom and Insight APIs
+  type: section
+  content: ''
+- level: 4
+  title: Wisdom Request
+  type: section
+  content: "**Request Message:** `MZEE_WISDOM_REQUEST`\n\n```typescript\ninterface\
+    \ WisdomRequest {\n  requestId: string;\n  requestingNodeId: string;\n  situationContext:\
+    \ SituationContext;\n  wisdomType: WisdomType;\n  complexityLevel: number;\n \
+    \ timeConstraints?: TimeConstraints;\n  stakeholderConsiderations: StakeholderInfo[];\n\
+    \  ethicalDimensions: EthicalDimension[];\n  requestTimestamp: Date;\n}\n\ninterface\
+    \ SituationContext {\n  situationId: string;\n  description: string;\n  domain:\
+    \ string;\n  involvedEntities: string[];\n  currentState: any;\n  desiredOutcome?:\
+    \ string;\n  constraints: Constraint[];\n  riskFactors: RiskFactor[];\n}\n```\n\
+    \n**Response Message:** `MZEE_WISDOM_RESPONSE`\n\n```typescript\ninterface WisdomResponse\
+    \ {\n  requestId: string;\n  responseId: string;\n  wisdomGuidance: WisdomGuidance;\n\
+    \  alternativeApproaches: AlternativeApproach[];\n  riskAssessment: RiskAssessment;\n\
+    \  implementationGuidance: ImplementationGuidance;\n  followUpRecommendations:\
+    \ FollowUpRecommendation[];\n  confidenceLevel: number;\n  responseTimestamp:\
+    \ Date;\n}\n\ninterface WisdomGuidance {\n  primaryRecommendation: string;\n \
+    \ rationale: string;\n  principlesApplied: string[];\n  expectedOutcomes: ExpectedOutcome[];\n\
+    \  successMetrics: SuccessMetric[];\n}\n```"
+- level: 3
+  title: 3.3.3. Meta-Cognitive APIs
+  type: section
+  content: ''
+- level: 4
+  title: Meta-Cognitive Analysis Request
+  type: section
+  content: "**Request Message:** `MZEE_METACOGNITIVE_ANALYSIS`\n\n```typescript\n\
+    interface MetaCognitiveRequest {\n  requestId: string;\n  requestingNodeId: string;\n\
+    \  analysisTarget: AnalysisTarget;\n  analysisType: MetaCognitiveAnalysisType;\n\
+    \  analysisScope: AnalysisScope;\n  performanceMetrics?: PerformanceMetric[];\n\
+    \  comparisonBaseline?: ComparisonBaseline;\n  requestTimestamp: Date;\n}\n\n\
+    interface AnalysisTarget {\n  targetType: \"decision_process\" | \"reasoning_chain\"\
+    \ | \"learning_outcome\" | \"behavior_pattern\";\n  targetId: string;\n  targetDescription:\
+    \ string;\n  targetTimeframe: TimeRange;\n  involvedNodes: string[];\n}\n\nenum\
+    \ MetaCognitiveAnalysisType {\n  QUALITY_ASSESSMENT = \"quality_assessment\",\n\
+    \  BIAS_DETECTION = \"bias_detection\",\n  EFFICIENCY_ANALYSIS = \"efficiency_analysis\"\
+    ,\n  IMPROVEMENT_IDENTIFICATION = \"improvement_identification\",\n  PATTERN_ANALYSIS\
+    \ = \"pattern_analysis\"\n}\n```\n\n**Response Message:** `MZEE_METACOGNITIVE_REPORT`\n\
+    \n```typescript\ninterface MetaCognitiveReport {\n  requestId: string;\n  reportId:\
+    \ string;\n  analysisResults: AnalysisResult[];\n  identifiedBiases: CognitiveBias[];\n\
+    \  qualityAssessment: QualityAssessment;\n  improvementRecommendations: ImprovementRecommendation[];\n\
+    \  performanceComparison?: PerformanceComparison;\n  learningOpportunities: LearningOpportunity[];\n\
+    \  reportTimestamp: Date;\n}\n```"
+- level: 3
+  title: 3.3.4. Emergent Behavior APIs
+  type: section
+  content: ''
+- level: 4
+  title: Emergence Detection
+  type: section
+  content: "**Request Message:** `MZEE_EMERGENCE_DETECTED`\n\n```typescript\ninterface\
+    \ EmergenceDetection {\n  detectionId: string;\n  detectorNodeId: string;\n  emergentBehavior:\
+    \ EmergentBehaviorDescription;\n  participatingNodes: NodeParticipation[];\n \
+    \ emergencePattern: EmergencePattern;\n  stabilityAssessment: StabilityAssessment;\n\
+    \  potentialImpact: ImpactAssessment;\n  recommendedResponse: EmergenceResponse;\n\
+    \  detectionTimestamp: Date;\n}\n\ninterface EmergentBehaviorDescription {\n \
+    \ behaviorName: string;\n  description: string;\n  behaviorType: \"coordination\"\
+    \ | \"adaptation\" | \"learning\" | \"problem_solving\" | \"creative\";\n  complexity:\
+    \ number;\n  novelty: number;\n  beneficiality: number;\n}\n```\n\n**Response\
+    \ Message:** `MZEE_EMERGENCE_GUIDANCE`\n\n```typescript\ninterface EmergenceGuidance\
+    \ {\n  detectionId: string;\n  guidanceId: string;\n  coordinationStrategy: CoordinationStrategy;\n\
+    \  participationGuidelines: ParticipationGuideline[];\n  monitoringProtocol: MonitoringProtocol;\n\
+    \  adaptationMechanisms: AdaptationMechanism[];\n  exitStrategies: ExitStrategy[];\n\
+    \  expectedOutcomes: EmergenceOutcome[];\n  guidanceTimestamp: Date;\n}\n```"
+- level: 3
+  title: 3.3.5. Ethical Reasoning APIs
+  type: section
+  content: ''
+- level: 4
+  title: Ethical Consultation
+  type: section
+  content: "**Request Message:** `MZEE_ETHICAL_CONSULTATION`\n\n```typescript\ninterface\
+    \ EthicalConsultation {\n  consultationId: string;\n  requestingNodeId: string;\n\
+    \  ethicalScenario: EthicalScenario;\n  stakeholderAnalysis: StakeholderAnalysis;\n\
+    \  potentialActions: PotentialAction[];\n  timeConstraints?: TimeConstraints;\n\
+    \  culturalContext?: CulturalContext;\n  precedentCases?: PrecedentCase[];\n \
+    \ consultationTimestamp: Date;\n}\n\ninterface EthicalScenario {\n  scenarioDescription:\
+    \ string;\n  ethicalDimensions: EthicalDimension[];\n  conflictingValues: ConflictingValue[];\n\
+    \  impactAssessment: ImpactAssessment;\n  uncertaintyFactors: UncertaintyFactor[];\n\
+    }\n```\n\n**Response Message:** `MZEE_ETHICAL_GUIDANCE`\n\n```typescript\ninterface\
+    \ EthicalGuidance {\n  consultationId: string;\n  guidanceId: string;\n  ethicalAnalysis:\
+    \ EthicalAnalysis;\n  recommendedAction: EthicalRecommendation;\n  alternativeActions:\
+    \ EthicalAlternative[];\n  implementationGuidance: EthicalImplementation;\n  monitoringRequirements:\
+    \ EthicalMonitoring[];\n  reviewSchedule: ReviewSchedule;\n  guidanceTimestamp:\
+    \ Date;\n}\n\ninterface EthicalAnalysis {\n  principlesApplied: HIEROSPrinciple[];\n\
+    \  stakeholderImpactAnalysis: StakeholderImpact[];\n  consequenceAssessment: ConsequenceAssessment;\n\
+    \  virtueEthicsConsiderations: VirtueEthicsConsideration[];\n  deontologicalAssessment:\
+    \ DeontologicalAssessment;\n  culturalSensitivityAnalysis: CulturalSensitivityAnalysis;\n\
+    }\n```"
+- level: 2
+  title: 3.4. API Usage Patterns
+  type: section
+  content: ''
+- level: 3
+  title: 3.4.1. Consciousness Coordination Pattern
+  type: section
+  content: "```typescript\n// Example: Node requesting consciousness state before\
+    \ major decision\nconst consciousnessQuery = {\n  requestId: \"cq-2024-001\",\n\
+    \  requestingNodeId: \"hakim-analytics-001\",\n  queryType: \"current_state\"\
+    ,\n  specificAspects: [ConsciousnessAspect.ATTENTION_FOCUS, ConsciousnessAspect.COGNITIVE_CAPACITY],\n\
+    \  detailLevel: \"detailed\"\n};\n\n// Send query and await response\nconst response\
+    \ = await mzeeApi.queryConsciousness(consciousnessQuery);\n\n// Use consciousness\
+    \ state to inform decision-making\nif (response.consciousnessState.awarenessLevel\
+    \ === AwarenessLevel.INTEGRATIVE) {\n  // Proceed with complex analytical task\n\
+    \  performComplexAnalysis();\n} else {\n  // Request attention focus or defer\
+    \ task\n  requestAttentionFocus();\n}\n```"
+- level: 3
+  title: 3.4.2. Wisdom Integration Pattern
+  type: section
+  content: "```typescript\n// Example: Seeking wisdom for complex multi-stakeholder\
+    \ situation\nconst wisdomRequest = {\n  requestId: \"wr-2024-001\",\n  requestingNodeId:\
+    \ \"sachem-governance-001\",\n  situationContext: {\n    situationId: \"governance-decision-001\"\
+    ,\n    description: \"Resource allocation decision affecting multiple communities\"\
+    ,\n    domain: \"governance\",\n    involvedEntities: [\"community-a\", \"community-b\"\
+    , \"community-c\"],\n    constraints: [resourceConstraints, timeConstraints],\n\
+    \    riskFactors: [equityRisk, efficiencyRisk]\n  },\n  wisdomType: WisdomType.ETHICAL_WISDOM,\n\
+    \  complexityLevel: 0.8,\n  stakeholderConsiderations: stakeholderInfo,\n  ethicalDimensions:\
+    \ ethicalConsiderations\n};\n\nconst wisdomResponse = await mzeeApi.requestWisdom(wisdomRequest);\n\
+    implementWisdomGuidance(wisdomResponse.wisdomGuidance);\n```"
+- level: 3
+  title: 3.4.3. Emergent Behavior Facilitation Pattern
+  type: section
+  content: "```typescript\n// Example: Reporting and coordinating emergent behavior\n\
+    const emergenceDetection = {\n  detectionId: \"ed-2024-001\",\n  detectorNodeId:\
+    \ \"tohunga-data-001\",\n  emergentBehavior: {\n    behaviorName: \"Adaptive Data\
+    \ Validation\",\n    description: \"Multiple nodes spontaneously developing enhanced\
+    \ validation protocols\",\n    behaviorType: \"adaptation\",\n    complexity:\
+    \ 0.7,\n    novelty: 0.8,\n    beneficiality: 0.9\n  },\n  participatingNodes:\
+    \ identifiedParticipants,\n  emergencePattern: detectedPattern,\n  recommendedResponse:\
+    \ EmergenceResponse.FACILITATE_AND_MONITOR\n};\n\nconst guidance = await mzeeApi.reportEmergence(emergenceDetection);\n\
+    coordinateEmergentBehavior(guidance.coordinationStrategy);\n```"
+- level: 2
+  title: 3.5. Error Handling and Edge Cases
+  type: section
+  content: ''
+- level: 3
+  title: 3.5.1. Common Error Responses
+  type: section
+  content: "**Error Message:** `MZEE_API_ERROR`\n\n```typescript\ninterface MzeeApiError\
+    \ {\n  requestId: string;\n  errorCode: MzeeErrorCode;\n  errorMessage: string;\n\
+    \  errorContext: ErrorContext;\n  suggestedActions: SuggestedAction[];\n  retryGuidance?:\
+    \ RetryGuidance;\n  errorTimestamp: Date;\n}\n\nenum MzeeErrorCode {\n  CONSCIOUSNESS_UNAVAILABLE\
+    \ = \"consciousness_unavailable\",\n  WISDOM_SYNTHESIS_FAILED = \"wisdom_synthesis_failed\"\
+    ,\n  ETHICAL_CONFLICT_UNRESOLVABLE = \"ethical_conflict_unresolvable\",\n  EMERGENCE_COORDINATION_FAILED\
+    \ = \"emergence_coordination_failed\",\n  METACOGNITIVE_OVERLOAD = \"metacognitive_overload\"\
+    ,\n  INSUFFICIENT_CONTEXT = \"insufficient_context\",\n  TEMPORAL_COHERENCE_VIOLATION\
+    \ = \"temporal_coherence_violation\"\n}\n```"
+- level: 3
+  title: 3.5.2. Handling Meta-Cognitive Overload
+  type: section
+  content: 'When the Mzee Node experiences cognitive overload, it implements graceful
+    degradation:
+
+
+    1. **Priority Triage**: Critical consciousness functions maintain priority
+
+    2. **Response Simplification**: Complex analyses are simplified or deferred
+
+    3. **Load Distribution**: Non-critical processing is distributed to other nodes
+
+    4. **Recovery Guidance**: Nodes receive guidance on supporting system recovery'
+- level: 3
+  title: 3.5.3. Emergence Coordination Failures
+  type: section
+  content: 'When emergent behavior coordination fails:
+
+
+    1. **Fallback Protocols**: Revert to individual node operation
+
+    2. **Stability Preservation**: Ensure system stability is maintained
+
+    3. **Learning Integration**: Analyze failure for future improvement
+
+    4. **Alternative Coordination**: Attempt alternative coordination strategies'

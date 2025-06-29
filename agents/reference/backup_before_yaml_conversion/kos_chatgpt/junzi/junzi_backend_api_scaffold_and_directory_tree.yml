@@ -1,0 +1,126 @@
+title: Junzi Backend Api Scaffold And Directory Tree
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.723873'
+original_format: markdown
+content_type: api_specification
+word_count: 441
+line_count: 111
+
+---
+
+# JUNZI Backend API Scaffold and Directory Tree
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** Backend Project Structure and API Scaffold Specification
+
+---
+
+## 🎯 Primary Backend Framework:
+- **FastAPI (Python)** for API layer
+- **PostgreSQL** for relational data storage
+- **Docker Compose** for containerized local development and deployment
+- **Alembic** for database migrations
+- **Pytest** for testing
+
+---
+
+## 📂 Directory Structure:
+
+```bash
+junzi_backend/
+├── app/
+│   ├── api/
+│   │   ├── v1/
+│   │   │   ├── endpoints/
+│   │   │   │   ├── entities.py
+│   │   │   │   ├── contradictions.py
+│   │   │   │   ├── risk_scores.py
+│   │   │   │   ├── promises.py
+│   │   │   │   ├── alerts.py
+│   │   │   │   └── user_reports.py
+│   │   │   └── api_router.py
+│   ├── core/
+│   │   ├── config.py
+│   │   └── security.py
+│   ├── db/
+│   │   ├── base.py
+│   │   ├── session.py
+│   │   └── models/
+│   │       ├── entity.py
+│   │       ├── action_event.py
+│   │       ├── contradiction.py
+│   │       ├── risk_score.py
+│   │       ├── promise.py
+│   │       ├── user_report.py
+│   │       ├── source.py
+│   │       └── bias_audit.py
+│   ├── services/
+│   │   ├── contradiction_scanner.py
+│   │   ├── risk_profiler.py
+│   │   ├── promise_tracker.py
+│   │   └── bias_audit.py
+│   ├── utils/
+│   │   └── provenance.py
+│   ├── main.py
+│   └── dependencies.py
+├── alembic/
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+├── docker-compose.yml
+├── requirements.txt
+├── README.md
+└── .env
+```
+
+---
+
+## ✅ API Route Scaffolding (FastAPI v1 Router)
+
+| Endpoint | File | Function |
+|---|---|---|
+| `/entities/{id}/profile` | entities.py | get_entity_profile |
+| `/entities/{id}/contradictions` | contradictions.py | get_entity_contradictions |
+| `/risk_scores/` | risk_scores.py | list_risk_scores |
+| `/promises/{entity_id}` | promises.py | get_entity_promises |
+| `/alerts/` | alerts.py | get_current_alerts |
+| `/sources/{source_id}` | source.py | get_source_details |
+| `/user_reports/` | user_reports.py | submit_user_report |
+
+---
+
+## ✅ Core Service Layer Responsibilities:
+| Service | Purpose |
+|---|---|
+| contradiction_scanner.py | Business logic for contradiction detection |
+| risk_profiler.py | Risk score calculation and bias mitigation hooks |
+| promise_tracker.py | Promise status detection and lifecycle management |
+| bias_audit.py | Bias audit pipeline management |
+
+---
+
+## ✅ Testing Layers:
+| Folder | Coverage |
+|---|---|
+| unit/ | Agent logic, services, and models |
+| integration/ | API endpoint and DB interaction |
+| e2e/ | Full data flow from ingestion to public API output |
+
+---
+
+## ✅ Deployment Targets:
+- Local Docker for development
+- Kubernetes-ready for kOS cluster deployment
+- CI/CD hooks for ethical deployment gate checks
+
+---
+
+**This document now defines the canonical JUNZI Backend API Scaffold and Directory Tree for engineering teams working within the kOS ecosystem until formally revised.**
+
+

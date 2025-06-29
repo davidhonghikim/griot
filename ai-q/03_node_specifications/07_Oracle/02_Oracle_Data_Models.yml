@@ -1,0 +1,45 @@
+metadata:
+  original_file: 02_Oracle_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Oracle Class: Data Models'
+  description: Data models for the Oracle Node Class, including QueryJob and QueryResponse.
+sections:
+- level: 1
+  title: Oracle Class Data Models
+  type: section
+  content: ''
+- level: 3
+  title: 1. QueryJob
+  type: section
+  content: "Represents a complex, asynchronous query submitted to the Oracle.\n\n\
+    ```json\n{\n  \"job_id\": \"string (uuid)\",\n  \"status\": \"pending | planning\
+    \ | executing | completed | failed\",\n  \"query\": {\n    \"dsl_version\": \"\
+    1.0\",\n    \"query_string\": \"SELECT LATEST 10 FROM 'griot:articles' WHERE 'topic'\
+    \ == 'AI' JOIN 'tohunga:sentiments' ON 'article_id' RETURN 'title', 'sentiment_score'\"\
+    ,\n    \"parameters\": {\n        // Optional parameters for parameterized queries\n\
+    \    }\n  },\n  \"requester_did\": \"string (did:kos:...)\",\n  \"created_at\"\
+    : \"string (ISO 8601 timestamp)\",\n  \"completed_at\": \"string (ISO 8601 timestamp,\
+    \ optional)\"\n}\n```"
+- level: 3
+  title: 2. QueryResponse
+  type: section
+  content: "Represents the structured response to a `QueryJob`. This is a rich object\
+    \ containing not just the data, but also the explanation of how the data was derived.\n\
+    \n```json\n{\n  \"job_id\": \"string (uuid)\",\n  \"status\": \"completed\",\n\
+    \  \"response\": {\n    \"results\": [\n        {\n            \"title\": \"The\
+    \ Future of AI is Collaborative\",\n            \"sentiment_score\": 0.92\n  \
+    \      },\n        // ... more results\n    ],\n    \"summary\": {\n        \"\
+    result_count\": 10,\n        \"execution_time_ms\": 1250\n    }\n  },\n  \"explanation\"\
+    : {\n      \"confidence_score\": 0.85,\n      \"sources\": [\n          {\n  \
+    \          \"node_did\": \"did:kos:griot:123\",\n            \"asset_uri\": \"\
+    kos:entry/article/abc-123\",\n            \"contribution\": \"Provided base article\
+    \ data.\"\n          },\n          {\n            \"node_did\": \"did:kos:tohunga:456\"\
+    ,\n            \"asset_uri\": \"kos:asset/sentiment-analysis/def-456\",\n    \
+    \        \"contribution\": \"Provided sentiment analysis for article.\"\n    \
+    \      }\n      ],\n      \"reasoning_trace\": [\n          \"1. Parsed query\
+    \ and identified two data sources.\",\n          \"2. Fetched 50 articles from\
+    \ 'griot:123' matching topic.\",\n          \"3. Performed join against sentiment\
+    \ data from 'tohunga:456'.\",\n          \"4. Sorted by date and returned top\
+    \ 10 with highest sentiment.\"\n      ]\n  }\n}\n```"

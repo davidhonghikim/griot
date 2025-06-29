@@ -1,0 +1,125 @@
+version: "2.0"
+last_updated: "2025-06-29"
+project:
+  name: "kOS (Kindai Operating System)"
+  vision: "AI-driven orchestration framework with intelligent nodes"
+  architecture: "Flexible framework for AI agent capability discovery and composition"
+  status: "PersonaVectorizationService implemented, ready for RAG operations extension"
+current_state:
+  main_repo: "/Users/danger/CascadeProjects/griot-node"
+  reference_repo: "/Users/danger/CascadeProjects/kai-cd"
+  reference_status: "ARCHIVED_REFERENCE_ONLY"
+  phase: "RAG_OPERATIONS_EXTENSION"
+infrastructure:
+  databases:
+    mongodb: "configured"
+    postgresql: "configured"
+    weaviate: "configured"
+    neo4j: "configured"
+  rag_operations:
+    status: "fully_implemented"
+    lines: 387
+    features:
+      - "hybrid_search"
+      - "multi_step_workflows"
+  persona_system:
+    vectorization_service: "implemented"
+    processing_time: "<5s per persona"
+    patterns: "follows_PricingRAGService_success"
+  proven_patterns:
+    PricingRAGService:
+      lines: 381
+      status: "successful_integration"
+      demonstrates: "RAG_integration_patterns"
+core_skills:
+  completed_nodes:
+    - name: "Griot"
+      capabilities:
+        - "Data transformation"
+        - "Content generation"
+    - name: "Tohunga"
+      capabilities:
+        - "Data validation"
+        - "Quality assurance"
+    - name: "Musa"
+      capabilities:
+        - "Message routing"
+        - "Protocol translation"
+    - name: "Skald"
+      capabilities:
+        - "Knowledge indexing"
+        - "Semantic search"
+    - name: "Ronin"
+      capabilities:
+        - "Threat detection"
+        - "Security monitoring"
+    - name: "Hakim"
+      capabilities:
+        - "Decision framework"
+        - "Ethical reasoning"
+    - name: "Oracle"
+      capabilities:
+        - "Pattern recognition"
+        - "Predictive analysis"
+    - name: "Amauta"
+      capabilities:
+        - "Knowledge transfer"
+        - "Learning management"
+current_mission:
+  title: "Extend RAG operations for persona context integration and design database schema for personas"
+  immediate_priorities:
+    - task: "Extend RAG Operations for persona context"
+      subtasks:
+        - "Add persona context to RAG requests (PersonaRAGRequest interface)"
+        - "Implement persona-aware document retrieval"
+        - "Create persona selection algorithms"
+      target: "<200ms for persona-aware queries"
+    - task: "Design Database Schema for personas"
+      subtasks:
+        - "Create MongoDB collections for persona documents and memories"
+        - "Design Neo4j graph schema for relationships"
+        - "Implement migration scripts for existing personas"
+      target: "100% migration success rate"
+    - task: "Create PersonaRAGService"
+      file: "packages/data/core/rag/persona_rag_service.ts"
+      subtasks:
+        - "Extend existing RAG operations with persona context"
+        - "Implement persona-aware document retrieval"
+        - "Create persona selection algorithms"
+      target: "<200ms for persona-aware queries"
+  medium_term_goals:
+    - "Implement Persona Memory System for persistent interaction memories"
+    - "Dynamic Persona Selection for automatic best-match selection"
+    - "Knowledge Graph Integration for complex relationship queries"
+success_metrics:
+  performance:
+    vectorization: "<5s"
+    search: "<200ms"
+    memory: "<100ms"
+  quality:
+    persona_relevance: ">90%"
+    knowledge_coverage: ">95%"
+  integration:
+    system_uptime: ">99.9%"
+    data_consistency: "<0.1%"
+key_files:
+  created:
+    - file: "packages/data/core/rag/persona_vectorization_service.ts"
+      description: "Core vectorization service"
+    - file: "packages/data/skills/ai/persona_vectorization.yaml"
+      description: "Skill interface"
+  to_focus_on:
+    - "packages/data/core/rag/persona_vectorization_service.ts"
+    - "packages/data/skills/ai/persona_vectorization.yaml"
+    - "packages/data/core/rag/persona_rag_service.ts (to be created)"
+integration_gaps:
+  - "PersonaVectorizationService created but not yet integrated with RAG operations"
+  - "No persona-aware RAG requests or document retrieval"
+  - "Missing database schema for persona storage and relationships"
+  - "No persistent memory for persona interactions"
+recommended_approach:
+  - "Leverage existing infrastructure (MongoDB, Weaviate, Neo4j)"
+  - "Build on proven RAG patterns (PricingRAGService)"
+  - "Extend PersonaVectorizationService with RAG integration"
+  - "Create incremental value through phased implementation"
+  - "Follow GPT agent workflow requirements for any GPT-based agent interactions" 

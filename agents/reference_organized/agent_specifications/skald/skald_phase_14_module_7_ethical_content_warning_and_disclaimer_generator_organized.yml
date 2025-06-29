@@ -1,0 +1,176 @@
+title: Skald Phase 14 Module 7 Ethical Content Warning And Disclaimer Generator
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.656453'
+authors: []
+tags: []
+content_type: documentation
+technical_level: advanced
+word_count: 872
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: true
+has_testing: false
+has_security: false
+has_rag: false
+has_ethics: true
+original_filename: skald_phase_14_module_7_ethical_content_warning_and_disclaimer_generator.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/skald/skald_phase_14_module_7_ethical_content_warning_and_disclaimer_generator.yml
+category: agent_specifications/skald
+
+---
+
+title: Skald Phase 14 Module 7 Ethical Content Warning And Disclaimer Generator
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.831439'
+original_format: markdown
+content_type: api_specification
+word_count: 839
+line_count: 133
+
+---
+
+# Skald Phase 14 - Module 7: Ethical Content Warning and Disclaimer Generator (ECWDG)
+
+## Node Class: Skald (Communication & Expression)
+
+## Phase 14 Focus:
+Automated Audience-Appropriate Content Warnings and Ethical Disclaimers
+
+---
+
+## 1. Module Overview
+The **Ethical Content Warning and Disclaimer Generator (ECWDG)** provides Skald agents with a real-time system for generating, formatting, and attaching audience-appropriate content warnings, disclaimers, and ethical transparency statements to outputs that warrant them.
+
+It ensures that users and audiences are adequately informed of potentially sensitive, controversial, or contextually significant content elements prior to engagement.
+
+ECWDG acts as the final-stage notification layer between content generation and audience delivery.
+
+---
+
+## 2. Primary Functions
+
+| Function | Description |
+| --- | --- |
+| **Content Risk Tag Parser** | Reads upstream risk annotations from modules like STHE, RHGL, and CASF to determine if a warning is required. |
+| **Audience Sensitivity Cross-Checker** | Verifies which types of warnings are relevant based on audience profile and jurisdiction. |
+| **Disclaimer Template Loader** | Accesses predefined, customizable disclaimer templates based on content type, risk category, and audience language. |
+| **Dynamic Disclaimer Generator** | Assembles customized warnings and disclaimers in real-time, tailored to the output format (text, audio, visual, etc.). |
+| **Language and Tone Adjuster** | Ensures that disclaimers themselves are clear, non-alarmist, but ethically sufficient to inform users. |
+| **Placement and Formatting Engine** | Determines where and how the warning/disclaimer is attached or presented (before content, inline, at end, etc.). |
+| **Compliance Logging Module** | Records all disclaimer generation actions and final attached warnings for audit and compliance tracking. |
+
+---
+
+## 3. Data Inputs
+
+| Input | Source |
+| --- | --- |
+| **Risk Annotations and Flags** | From STHE, RHGL, ETLAE, CASF, and GEPDE |
+| **Audience Profile Metadata** | From CASF and Contextual Trigger Engine |
+| **Jurisdictional Compliance Data** | From GEPDE |
+| **Disclaimer Template Repository** | Local or organization-specific template library |
+
+---
+
+## 4. Data Outputs
+
+| Output | Destination |
+| --- | --- |
+| **Content Warning / Disclaimer Block** | Prepended, appended, or inlined with final Skald content output |
+| **Metadata Annotations** | For downstream rendering engines or API consumers to parse |
+| **Audit Log Entry** | Sent to kOS Global Audit Layer |
+
+---
+
+## 5. Processing Pipeline
+
+1. Parse risk annotations and audience profile
+2. Cross-check against audience sensitivity settings and jurisdictional requirements
+3. Load appropriate disclaimer or warning templates
+4. Generate customized warning/disclaimer text
+5. Attach and format the warning within the final content package
+6. Generate audit trail for disclaimer action
+
+---
+
+## 6. Disclaimer Types and Formats
+
+| Type | Example Context |
+| --- | --- |
+| **Content Warning** | Graphic violence, strong language, trauma-related content |
+| **Ethical Disclaimer** | AI-generated content notice, bias risk statement |
+| **Jurisdictional Compliance Notice** | Age restrictions, regional speech laws |
+| **Humor Risk Disclaimer** | For humor modules when tone may be misinterpreted |
+| **Educational Contextualization Note** | When content discusses controversial historical or social topics |
+
+---
+
+## 7. Deployment Options
+
+| Option | Description |
+| --- | --- |
+| **Default Disclaimer Packs** | Provided for common risk categories and output types |
+| **Custom Organizational Templates** | Enterprises can upload or mandate custom disclaimers |
+| **User Preference Integration** | Allow users to opt-in/out of certain disclaimer types (if allowed by org policy) |
+| **Dynamic Placement Rules** | Configure where warnings appear (pre-content, pop-up, inline, etc.) |
+
+---
+
+## 8. Governance Hooks
+
+- Template version control and update auditing
+- Compliance audits for missing or insufficient disclaimers
+- Human review triggers for borderline disclaimer cases
+- Periodic effectiveness reviews for disclaimer clarity and user understanding
+
+---
+
+## 9. Example Use Case Scenarios
+
+| Scenario | ECWDG Action |
+| --- | --- |
+| **User accessing sensitive mental health content** | Prepend trauma content warning |
+| **AI-generated legal advisory response** | Append AI-generated content disclaimer |
+| **Political satire humor content** | Insert humor risk and satire disclaimer |
+| **Multilingual educational material on colonial history** | Attach cultural sensitivity note and educational disclaimer |
+| **Jurisdiction with strict speech laws** | Apply mandatory regional compliance notice |
+
+---
+
+## 10. Module Integration Points
+
+| Module | Integration |
+| --- | --- |
+| **STHE** | Provides sensitive topic risk tags |
+| **RHGL** | Flags humor content needing disclaimers |
+| **CASF** | Supplies audience profile for disclaimer targeting |
+| **GEPDE** | Cross-checks disclaimer adequacy during final ethics validation |
+| **kOS Global Audit Layer** | Stores disclaimer generation records |
+
+---
+
+## 11. Future Roadmap
+
+- AI-driven clarity scoring for disclaimers
+- User interaction tracking for disclaimer engagement metrics
+- Dynamic jurisdictional compliance rule updating
+- Automated disclaimer translation for multilingual deployments
+
+---
+
+✅ **Status:** Skald Phase 14 - Module 7: Ethical Content Warning and Disclaimer Generator (ECWDG) Specification Complete
+
+👉 **Next:** Continue with Skald Phase 14 - Module 8
+
+
+

@@ -1,0 +1,178 @@
+title: Next Agent Handoff
+version: '1.0'
+content:
+- '# **NEXT AGENT HANDOFF**'
+- '---'
+utc: '2025-06-28T02:14:30Z'
+from_agent: Claude-Sonnet-4
+previous_handoff: agents/handoff/archive/2025-06-28_Claude-Sonnet-4_System-Analysis-Correction.md
+1_current_project_status:
+  title: 1. Current Project Status
+  content:
+  - The service connector framework replacement mission has revealed that a comprehensive
+    system already exists with 21 connectors across 5 categories. The framework implements
+    the "universal adapter" pattern from kai-cd but requires completion of proper
+    protocol handling and build fixes.
+  - '**Critical Discovery**: The framework is much more advanced than the original
+    handoff indicated. Rather than needing to be built from scratch, it needs protocol
+    fallback logic, type system completion, and final build verification.'
+2_your_directive:
+  title: 2. Your Directive
+  content:
+  - Complete the service connector framework by implementing **smart protocol fallback
+    logic** (HTTPS-first with HTTP fallback for local services), fix remaining build
+    issues, and verify the complete system works properly with the griot-kitchen orchestrator.
+3_context__history:
+  title: 3. Context & History
+  content:
+  - For a complete history of the actions that led to this handoff, please review
+    my final session log in `agents/changelogs/2025/06/01_AGENT_CHANGELOG.md` under
+    the entry for **2025-06-28T02:14:30Z**.
+  - '---'
+4_project_artifacts__current_state:
+  title: 4. Project Artifacts & Current State
+  content: []
+  41_service_connector_framework_85_complete:
+    title: 4.1. Service Connector Framework (85% COMPLETE)
+    content:
+    - The framework implements the universal adapter pattern with comprehensive service
+      definitions.
+    - '**Directory**: `packages/service-connectors/`'
+    - '**Status**: Types implemented, 21 connectors defined, build issues remain'
+    - '**Key Files**:'
+    - '**Connector Categories** (21 total):'
+    items:
+    - '`src/types.ts`: Complete type system (recently implemented)'
+    - '`src/all.ts`: Registry with category organization and lookup functions'
+    - '`src/index.ts`: Barrel exports for clean API'
+    - '**AI Models** (10): OpenAI, Anthropic, Ollama, llama.cpp, LM Studio, vLLM,
+      Hugging Face, Open WebUI, OpenAI-compatible, Civitai'
+    - '**Image Generation** (2): ComfyUI, Automatic1111'
+    - '**Storage** (5): MongoDB, ChromaDB, Qdrant, Milvus, Dropbox'
+    - '**Automation** (1): n8n'
+    - '**Networking** (1): Reticulum'
+  42_protocol_strategy_partially_implemented:
+    title: 4.2. Protocol Strategy (PARTIALLY IMPLEMENTED)
+    content:
+    - '**Current State**:'
+    - '**Missing**: Smart fallback logic - services should attempt HTTPS first, then
+      fallback to HTTP for local deployments.'
+    items:
+    - 'Cloud services correctly use HTTPS: OpenAI, Anthropic, HuggingFace, Civitai,
+      Dropbox'
+    - 'Local services correctly use HTTP: Ollama, ComfyUI, A1111, llama.cpp, LM Studio,
+      vLLM (Local could use https if implemented, so default to use first, then fallback
+      to http)'
+    - 'Vector databases updated to HTTPS: MongoDB, ChromaDB, Qdrant, Milvus'
+  43_build_issues_identified:
+    title: 4.3. Build Issues (IDENTIFIED)
+    content:
+    - '**Remaining TypeScript Errors**:'
+    - '---'
+    items:
+    - Vector database endpoints missing `query`, `upsert`, `delete` in Milvus/Qdrant
+    - ComfyUI parameter mapping extensions need proper type definitions
+    - A1111 `dependsOn` parameter property needs type support
+    - Authentication `defaultValue` property needs type support
+5_detailed_execution_plan:
+  title: 5. DETAILED EXECUTION PLAN
+  content:
+  - Your mission is to complete the service connector framework with proper protocol
+    handling and build verification.
+  phase_1_fix_build_issues_critical:
+    title: '**Phase 1: Fix Build Issues (CRITICAL)**'
+    content: []
+    items:
+    - '**Complete Vector Database Types**: Update Milvus and Qdrant connectors to
+      include required `query`, `upsert`, `delete` endpoints to match VectorDatabaseCapability
+      interface.'
+    - '**Fix ComfyUI Parameter Mapping**: The ComfyUI connector uses advanced parameter
+      mapping for graph-based workflows. Ensure the type system properly supports
+      this pattern.'
+    - '**Complete Authentication Types**: Add support for `defaultValue` in AuthDefinition
+      for services like LM Studio and vLLM.'
+    - '**Test Build**: Verify `npm run build` completes successfully.'
+  phase_2_implement_protocol_fallback_logic:
+    title: '**Phase 2: Implement Protocol Fallback Logic**'
+    content: []
+    items:
+    - '**Design Smart Protocol Detection**: Create a connection utility that:'
+    - Attempts HTTPS first for all services
+    - Falls back to HTTP if HTTPS fails (for local services)
+    - Caches successful protocol per service instance
+    - Handles both cloud and local deployment scenarios
+    - '**Update Service Definitions**: Modify the ServiceDefinition interface to support:'
+    - Primary protocol (https/http)
+    - Fallback protocol capability
+    - Connection retry logic
+    - '**Create Connection Manager**: Implement a service connection manager that
+      handles protocol negotiation automatically.'
+  phase_3_integration__verification:
+    title: '**Phase 3: Integration & Verification**'
+    content:
+    - '---'
+    items:
+    - '**Test with griot-kitchen**: Ensure the service-connectors package can be imported
+      and used by the griot-kitchen orchestrator.'
+    - '**Create Usage Examples**: Implement simple test cases showing how to:'
+    - Connect to cloud services (OpenAI, Anthropic)
+    - Connect to local services (Ollama, ComfyUI)
+    - Handle protocol fallback scenarios
+    - '**Verify All Connectors**: Test that all 21 connectors have proper type definitions
+      and can be instantiated.'
+6_critical_technical_details:
+  title: 6. Critical Technical Details
+  content: []
+  61_universal_adapter_pattern:
+    title: 6.1. Universal Adapter Pattern
+    content:
+    - 'The framework implements a sophisticated universal adapter pattern where:'
+    items:
+    - Each service is defined declaratively through ServiceDefinition
+    - Capabilities are modular (LLM, ImageGen, VectorDB, etc.)
+    - Parameters are self-describing with validation rules
+    - Complex services like ComfyUI use parameter mapping for graph workflows
+  62_protocol_handling_strategy:
+    title: 6.2. Protocol Handling Strategy
+    content:
+    - '**Current Implementation**:'
+    - 'protocol: ''https'' | ''http''  // Static per service'
+    - '**Required Enhancement**:'
+    - 'protocol: {'
+    - 'primary: ''https'' | ''http'','
+    - 'fallback?: ''https'' | ''http'','
+    - 'autoDetect?: boolean'
+    - '}'
+  63_key_architecture_files:
+    title: 6.3. Key Architecture Files
+    content:
+    - '---'
+    items:
+    - '`types.ts`: Core interfaces and type definitions'
+    - '`all.ts`: Service registry with category organization'
+    - '`ai-models/`: 10 AI service connectors'
+    - '`storage/`: 5 storage service connectors (including vector DBs)'
+    - '`image-generation/`: 2 image generation service connectors'
+7_success_criteria:
+  title: 7. Success Criteria
+  content:
+  - '**Phase 1 Complete**: `npm run build` succeeds with zero TypeScript errors'
+  - '**Phase 2 Complete**: Protocol fallback logic implemented and tested'
+  - '**Phase 3 Complete**: Integration with griot-kitchen verified, all connectors
+    functional'
+  - '**Final Deliverable**: A robust, production-ready service connector framework
+    that can adapt to any service through declarative definitions with smart protocol
+    handling for both cloud and local deployments.'
+  - '---'
+8_context__constraints:
+  title: 8. Context & Constraints
+  content:
+  - '**Time Constraint**: Context window is full - prioritize getting the build working
+    first, then implement the protocol fallback logic.'
+  - '**Quality Emphasis**: User emphasized "do it right" - focus on proper implementation
+    over quick compilation fixes.'
+  - '**Local Service Priority**: Many users will run local services (Ollama, ComfyUI,
+    etc.) that don''t support HTTPS. The fallback mechanism is essential for real-world
+    usage.'
+  - This framework will be the foundation for the entire kOS orchestration system
+    - it must be robust, flexible, and handle real-world deployment scenarios properly.

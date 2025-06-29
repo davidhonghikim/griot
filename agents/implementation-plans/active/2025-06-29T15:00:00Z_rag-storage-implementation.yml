@@ -1,0 +1,130 @@
+title: "RAG and Storage Systems Implementation Plan"
+version: "1.0"
+status: "Active"
+created: "2025-06-28"
+priority: "High"
+overview: |
+  This plan implements the integration between the kOS persona system and the existing RAG and storage infrastructure. The goal is to create a comprehensive knowledge management platform that leverages vector search, graph relationships, and persistent memory for intelligent persona interactions.
+phases:
+  - title: "Phase 1: Fix Core Services (Priority: CRITICAL)"
+    tasks:
+      - id: "task-1.1"
+        title: "Implement PersonaLoader (Priority: Critical)"
+        objective: "Create a functional PersonaLoader that can actually load persona files from the filesystem."
+        files_to_update:
+          - "packages/data/core/persona_loader.ts"
+        implementation_details: |
+          # ... (Typescript code for PersonaLoader)
+        success_criteria:
+          - "Can load all 14 existing persona files"
+          - "Returns proper Persona objects with all fields"
+          - "Handles errors gracefully"
+          - "Performance: < 100ms per persona load"
+      - id: "task-1.2"
+        title: "Implement VectorStore (Priority: Critical)"
+        objective: "Create a functional VectorStore that connects to Weaviate."
+        files_to_update:
+          - "packages/data/core/rag/vector_store.ts"
+        implementation_details: |
+          # ... (Typescript code for VectorStore)
+        success_criteria:
+          - "Can store documents in Weaviate"
+          - "Can retrieve documents by ID"
+          - "Can perform vector similarity search"
+          - "Handles Weaviate connection errors"
+      - id: "task-1.3"
+        title: "Implement EmbeddingService (Priority: Critical)"
+        objective: "Create a functional EmbeddingService that generates real embeddings."
+        files_to_update:
+          - "packages/data/core/rag/embedding_service.ts"
+        implementation_details: |
+          # ... (Typescript code for EmbeddingService)
+        success_criteria:
+          - "Generates real embeddings using OpenAI"
+          - "Supports batch processing"
+          - "Handles API errors gracefully"
+          - "Performance: < 2 seconds per embedding"
+  - title: "Phase 2: Fix Schema and Database (Priority: High)"
+    tasks:
+      - id: "task-2.1"
+        title: "Update MongoDB Schema (Priority: High)"
+        objective: "Update the persona schema to match the expected structure."
+        files_to_update:
+          - "packages/schemas/src/persona.schema.ts"
+        implementation_details: |
+          # ... (Typescript code for PersonaSchema)
+        success_criteria:
+          - "Schema matches PersonaVectorizationService expectations"
+          - "All fields properly typed"
+          - "Indexes created for performance"
+          - "Validation working"
+      - id: "task-2.2"
+        title: "Create Database Migration Script (Priority: High)"
+        objective: "Create a script to migrate personas from YAML files to MongoDB."
+        files_to_create:
+          - "scripts/migrate-personas-to-db.ts"
+        implementation_details: |
+          # ... (Typescript code for PersonaMigrationService)
+        success_criteria:
+          - "All 14 personas migrated to MongoDB"
+          - "YAML content preserved"
+          - "No duplicate entries"
+          - "Rollback mechanism available"
+  - title: "Phase 3: Integration and Testing (Priority: Medium)"
+    tasks:
+      - id: "task-3.1"
+        title: "End-to-End Testing (Priority: Medium)"
+        objective: "Test the complete vectorization workflow."
+        files_to_create:
+          - "tests/integration/persona-vectorization.test.ts"
+        implementation_details: |
+          # ... (Typescript code for integration tests)
+        success_criteria:
+          - "All tests pass"
+          - "End-to-end workflow functional"
+          - "Performance meets requirements"
+          - "Error handling works correctly"
+updated_success_criteria:
+  functional_requirements:
+    - "PersonaLoader can load actual persona files"
+    - "VectorStore can store and retrieve vectors in Weaviate"
+    - "EmbeddingService generates real embeddings using OpenAI"
+    - "PersonaVectorizationService can vectorize personas"
+    - "Database migration script works end-to-end"
+    - "MongoDB schema matches expected structure"
+  performance_requirements:
+    - "Vectorization completes in < 5 seconds per persona"
+    - "Search latency < 200ms"
+    - "Memory retrieval < 100ms"
+    - "Persona loading < 100ms per persona"
+  quality_requirements:
+    - "All integration tests pass"
+    - "No placeholder implementations remain"
+    - "End-to-end workflow functional"
+    - "Error handling and logging implemented"
+    - "Database connections stable"
+risk_mitigation:
+  technical_risks:
+    - "Weaviate Connection: Implement connection pooling and retry logic"
+    - "OpenAI API Limits: Implement rate limiting and fallback mechanisms"
+    - "Database Migration: Create backup and rollback procedures"
+    - "Performance: Monitor and optimize slow operations"
+  operational_risks:
+    - "API Keys: Secure environment variable management"
+    - "Data Loss: Regular backups of persona data"
+    - "Integration Issues: Comprehensive testing before deployment"
+    - "Scalability: Monitor resource usage and plan for scaling"
+next_session_priorities:
+  immediate_actions:
+    - "Implement PersonaLoader - Load actual YAML files (Task 1.1)"
+    - "Implement VectorStore - Connect to Weaviate (Task 1.2)"
+    - "Implement EmbeddingService - Use OpenAI embeddings (Task 1.3)"
+    - "Update MongoDB schema - Match expected structure (Task 2.1)"
+    - "Create migration script - Move personas to database (Task 2.2)"
+  validation_actions:
+    - "Test vectorization workflow - End-to-end testing (Task 3.1)"
+    - "Verify database storage - Check MongoDB and Weaviate"
+    - "Performance testing - Measure actual performance"
+    - "Integration testing - Test with existing RAG systems"
+conclusion: |
+  This implementation plan provides a clear roadmap for integrating the kOS persona system with RAG and storage infrastructure. The phased approach ensures incremental value delivery while maintaining system stability and backward compatibility. The result will be a world-class knowledge management platform that provides personalized, intelligent AI experiences through persona-aware RAG operations, persistent memory, and adaptive learning capabilities. 

@@ -1,0 +1,94 @@
+# Implementation Plan Template
+# All fields with placeholders like [PLACEHOLDER] should be filled out when a new plan is created.
+
+title: "[PLAN_TITLE]"
+description: "[PLAN_DESCRIPTION]"
+type: "implementation-plan"
+status: "active" # active | backlog | completed
+priority: "medium" # low | medium | high
+created: "[YYYY-MM-DD]"
+version: "1.0.0"
+tags:
+  - "[TAG1]"
+  - "[TAG2]"
+
+plan_id: "[PLAN_ID]"
+created_by: "[AGENT_NAME]"
+last_updated: "[YYYY-MM-DD]"
+
+overview: "[Detailed plan description and objectives]"
+
+goals:
+  - "[Primary goal 1]"
+  - "[Primary goal 2]"
+  - "[Primary goal 3]"
+
+phases:
+  - title: "[Phase 1 Title]"
+    duration:
+      start: "[YYYY-MM-DD]"
+      end: "[YYYY-MM-DD]"
+    status: "not_started" # not_started | in_progress | completed | blocked
+    completion_percentage: 0
+    milestones:
+      - description: "[Milestone 1]"
+        target_date: "[YYYY-MM-DD]"
+        completed: false
+      - description: "[Milestone 2]"
+        target_date: "[YYYY-MM-DD]"
+        completed: false
+    tasks:
+      - description: "[Task 1]"
+        assignee: "[Assignee]"
+        estimated_hours: 0
+        completed: false
+      - description: "[Task 2]"
+        assignee: "[Assignee]"
+        estimated_hours: 0
+        completed: false
+
+  - title: "[Phase 2 Title]"
+    duration:
+      start: "[YYYY-MM-DD]"
+      end: "[YYYY-MM-DD]"
+    status: "not_started" # not_started | in_progress | completed | blocked
+    completion_percentage: 0
+    milestones:
+      - description: "[Milestone 1]"
+        target_date: "[YYYY-MM-DD]"
+        completed: false
+    tasks:
+      - description: "[Task 1]"
+        assignee: "[Assignee]"
+        estimated_hours: 0
+        completed: false
+
+metrics:
+  overall_completion_percentage: 0
+  phases_completed: "0/2"
+  tasks_completed: "0/4"
+  resource_utilization_percentage: 0
+
+dependencies:
+  - description: "[External Dependency 1]"
+    status: "pending" # pending | met | blocked
+    completed: false
+  - description: "[External Dependency 2]"
+    status: "pending" # pending | met | blocked
+    completed: false
+
+risks:
+  - description: "[Risk 1]"
+    probability: "low" # low | medium | high
+    impact: "low" # low | medium | high
+    mitigation: "[Mitigation Strategy]"
+  - description: "[Risk 2]"
+    probability: "medium" # low | medium | high
+    impact: "medium" # low | medium | high
+    mitigation: "[Mitigation Strategy]"
+
+notes: "[Additional notes, observations, and context]"
+
+updates:
+  - date: "[YYYY-MM-DD]"
+    description: "Plan created." 

@@ -1,0 +1,114 @@
+title: Junzi Public Launch Communications Toolkit
+description: ''
+type: documentation
+status: current
+priority: medium
+version: '1.0'
+last_updated: '2025-06-28'
+organization_date: '2025-06-28T19:48:20.390967'
+authors: []
+tags: []
+content_type: documentation
+technical_level: intermediate
+word_count: 450
+has_code_blocks: false
+has_api_specs: true
+has_architecture: true
+has_deployment: false
+has_testing: false
+has_security: false
+has_rag: false
+has_ethics: false
+original_filename: junzi_public_launch_communications_toolkit.yml
+original_path: /Users/danger/CascadeProjects/griot-node/agents/reference/kos_chatgpt/junzi/junzi_public_launch_communications_toolkit.yml
+category: agent_specifications/junzi
+
+---
+
+title: Junzi Public Launch Communications Toolkit
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.522375'
+original_format: markdown
+content_type: api_specification
+word_count: 423
+line_count: 71
+
+---
+
+# JUNZI Public Launch Communications Toolkit
+
+**Node Class:** JunziNode  
+**System:** kOS Ecosystem  
+**Document Type:** External Communications and PR Plan
+
+---
+
+## 🎯 Purpose:
+To provide pre-written, approved, and targeted communication materials for JUNZI’s public launch, addressing media, partner organizations, watchdog groups, and general citizens.
+
+---
+
+## ✅ Communication Channels:
+| Channel | Purpose |
+|---|---|
+| Press Release | National and international media announcement |
+| Social Media Toolkit | Pre-formatted posts for Twitter, LinkedIn, Facebook, Mastodon |
+| Website Banner | Homepage announcement with CTA link to Transparency Report |
+| Email Blast | Outreach to journalist networks, research institutions, and subscribers |
+| Public Webinars | Schedule live Q&A and system walkthroughs |
+
+---
+
+## ✅ Press Release Template:
+**Headline:** "JUNZI Launches: The World’s First Nonpartisan Civic Integrity and Accountability Platform"
+
+**Subheadline:** "Real-time contradiction tracking and public risk scoring for all elected and appointed officials across jurisdictions."
+
+**Body:**
+> Today, the JUNZI Project, part of the open-source kOS ecosystem, announces the public release of the JUNZI Civic Integrity Platform. JUNZI offers real-time tracking of public figures’ statements, actions, and ethical risk scores. Developed with a strong focus on transparency, fairness, and community participation, JUNZI is now live and available for public use.
+
+**Contact:** press@junzi.kos
+
+---
+
+## ✅ Social Media Post Templates:
+- **Twitter/X:** "Tired of political spin? Introducing JUNZI: A real-time contradiction and risk tracker for public officials. Open-source. Nonpartisan. Transparent. 👉 [link] #Accountability #CivicTech"
+
+- **LinkedIn:** "Introducing JUNZI: Built for journalists, researchers, and citizens who believe in transparency and accountability. Track risk scores, contradictions, and promises—nationwide. Learn more: [link]"
+
+- **Mastodon:** "JUNZI is live! The world’s first open-source, nonpartisan civic accountability system. Search any official. Spot contradictions. Track risk. Build trust. https://junzi.kos"
+
+---
+
+## ✅ Website Banner:
+**Message:** "JUNZI is now live! Click here to view our launch Transparency Report."
+**Link:** `/transparency/launch-report`
+
+---
+
+## ✅ Email Blast Template:
+**Subject:** "Introducing JUNZI: Real-Time Public Integrity Tracking"
+
+**Body:**
+> We’re proud to announce the public launch of JUNZI—a nonpartisan, open-source civic accountability platform. Track officials by jurisdiction, monitor contradictions, and view real-time risk scores. Visit https://junzi.kos to explore.
+
+---
+
+## ✅ Public Webinar Outline:
+| Segment | Content |
+|---|---|
+| Welcome | Intro to JUNZI, kOS Ecosystem |
+| Demo | Live walkthrough: Entity search, contradictions, risk profiles |
+| Q&A | Media and public questions |
+| Closing | How to contribute, API access, community roadmap |
+
+---
+
+**This document now serves as the canonical JUNZI Public Launch Communications Toolkit for outreach teams within the kOS ecosystem until formally revised.**
+
+
+

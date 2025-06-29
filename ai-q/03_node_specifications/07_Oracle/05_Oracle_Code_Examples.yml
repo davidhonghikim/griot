@@ -1,0 +1,49 @@
+metadata:
+  original_file: 05_Oracle_Code_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Oracle Class: Code Examples'
+  description: TypeScript code examples for interacting with the Oracle Node Class
+    via KLF.
+sections:
+- level: 1
+  title: Oracle Class Code Examples
+  type: section
+  content: This section provides a conceptual TypeScript example for submitting a
+    query to an Oracle node and handling the asynchronous results.
+- level: 2
+  title: 1. Submitting a Query and Handling the Response
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \nasync function queryMostCitedAuthors(client: KLFClient, oracleDid: string) {\n\
+    \    const query = `\n        SELECT author, count(citations) as citation_count\n\
+    \        FROM 'griot:articles'\n        WHERE 'published_year' >= 2023\n     \
+    \   GROUP BY author\n        ORDER BY citation_count DESC\n        LIMIT 5\n \
+    \   `;\n\n    console.log(\"Submitting query to Oracle...\");\n\n    // --- Step\
+    \ 1: Submit the initial query ---\n    const requestMessage = createMessage()\n\
+    \        .from(client.getDid())\n        .to(oracleDid)\n        .type(MessageType.TASK_REQUEST)\n\
+    \        .payload({\n            task_name: 'submit_query',\n            params:\
+    \ { \"query_string\": query }\n        })\n        .build();\n\n    const initialResponse\
+    \ = await client.sendMessage(requestMessage);\n    \n    if (initialResponse.payload.status\
+    \ !== 'completed') {\n        console.error(\"Failed to submit query:\", initialResponse.payload.error.message);\n\
+    \        return;\n    }\n\n    const { job_id } = initialResponse.payload.result;\n\
+    \    console.log(`Query submitted successfully. Job ID: ${job_id}`);\n\n    //\
+    \ --- Step 2: Listen for progress and the final result ---\n    console.log(\"\
+    Waiting for final response...\");\n    client.onMessage((message) => {\n     \
+    \   // Filter for messages related to our job\n        if (message.payload.job_id\
+    \ !== job_id) return;\n\n        if (message.type === MessageType.TASK_PROGRESS)\
+    \ {\n            console.log(`[PROGRESS ${message.payload.progress}%]: ${message.payload.message}`);\n\
+    \        } else if (message.type === MessageType.TASK_RESPONSE) {\n          \
+    \  if (message.payload.status === 'completed') {\n                console.log(\"\
+    \\n--- Query Complete! ---\");\n                const fullResponse = message.payload.result;\n\
+    \                \n                console.log(\"Results:\", JSON.stringify(fullResponse.response.results,\
+    \ null, 2));\n                console.log(\"\\nExplanation:\");\n            \
+    \    console.log(`  Confidence: ${fullResponse.explanation.confidence_score}`);\n\
+    \                console.log(\"  Reasoning Trace:\");\n                fullResponse.explanation.reasoning_trace.forEach(step\
+    \ => console.log(`    - ${step}`));\n                console.log(\"  Data Sources:\"\
+    );\n                fullResponse.explanation.sources.forEach(src => console.log(`\
+    \    - ${src.node_did} (${src.contribution})`));\n\n            } else if (message.payload.status\
+    \ === 'failed') {\n                console.error(\"\\n--- Query Failed! ---\"\
+    );\n                console.error(\"Error:\", message.payload.error.message);\n\
+    \            }\n        }\n    });\n}\n```"

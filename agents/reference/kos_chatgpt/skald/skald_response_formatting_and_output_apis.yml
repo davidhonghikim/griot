@@ -1,0 +1,112 @@
+title: Skald Response Formatting And Output Apis
+description: ''
+type: documentation
+status: current
+priority: medium
+last_updated: '2025-06-28'
+conversion_date: '2025-06-28T19:30:47.771390'
+original_format: markdown
+content_type: api_specification
+word_count: 606
+line_count: 97
+
+---
+
+# Skald Module Specification: Response Formatting and Output APIs (RFO)
+
+## Module Name
+**Skald Response Formatting and Output APIs (RFO)**
+
+## Node Class
+**Skald**
+
+## Overview
+The Skald Response Formatting and Output APIs (RFO) provide external-facing endpoints and utility functions for retrieving, transforming, and delivering Skald-generated outputs in various formats and delivery channels. This includes text formatting, media packaging, encoding, and external system handoff.
+
+## Purpose
+To allow clients and external systems to retrieve Skald workflow outputs in multiple formats (text, JSON, HTML, TTS-ready, etc.) and through different delivery mechanisms (poll, push, stream, webhook, file export).
+
+## Functional Requirements
+
+### 1. Output Retrieval APIs
+- **GET /outputs/{workflow_id}:** Retrieve raw output data for a completed workflow.
+- **GET /outputs/{workflow_id}/formatted:** Retrieve output in a specific format (e.g., Markdown, HTML, JSON).
+- **GET /outputs/{workflow_id}/metadata:** Retrieve output metadata (e.g., generation time, format type, length).
+
+### 2. Output Transformation Services
+- **Markdown Renderer:** Convert internal text to clean Markdown.
+- **HTML Formatter:** Package output with HTML styling and templates.
+- **JSON Structuring:** Serialize outputs into API-consumable JSON schemas.
+- **SSML Generator:** Prepare voice synthesis-ready text for TTS engines.
+- **File Exporters:** Allow downloadable output as TXT, PDF, or DOCX.
+
+### 3. Output Delivery Mechanisms
+- **Synchronous API Response:** For small outputs.
+- **Asynchronous Polling:** For long-running workflows (client polls for completion).
+- **Webhooks:** Push output to a client-provided URL when ready.
+- **WebSocket Stream:** Stream output in chunks for large or live workflows.
+
+### 4. Response Personalization and Contextualization
+- **Persona-Based Styling:** Apply tone and style formatting based on persona (from PTE).
+- **Audience-Level Tuning:** Adjust output length, detail, or formality for target audience types.
+- **Localization Support:** Output formatting for different languages, locales, and cultures.
+
+### 5. Error and Status Reporting
+- **Output Status Endpoint:** Check if output is available, still processing, or failed.
+- **Failure Response Standardization:** Consistent error object format for failed output generations.
+
+## Non-Functional Requirements
+- **Latency:** <150ms for format conversions.
+- **Scalability:** Support thousands of concurrent output retrievals.
+- **Content Size Handling:** Stream or paginate large outputs.
+- **Security:** Enforce access control on output retrieval.
+
+## Data Flow Diagram (Textual)
+1. **External Output Retrieval Request** → 2. **Output Store Accessor** → 3. **Format Transformer (if needed)** → 4. **Persona and Tone Formatter (if applicable)** → 5. **Output Delivery (API/Webhook/Stream/File)**
+
+## Interfaces
+- **Input Interfaces:** External REST clients, WebSocket listeners, Webhook endpoints.
+- **Output Interfaces:** Skald Output Formatter, TTS Engine, External Notification Systems.
+
+## Configuration Options
+- **Allowed Output Formats:** (JSON, HTML, Markdown, SSML, PDF, etc.)
+- **Max Output Payload Size:** Configurable.
+- **Output Retention Time:** (e.g., delete outputs after 7 days)
+- **Webhook Retry Policy:** Configurable for failed deliveries.
+
+## Example Use Cases
+- Pulling a Markdown summary of a chat conversation.
+- Streaming generated narrative text to a live UI.
+- Exporting a narrative story as a PDF.
+- Receiving a JSON-structured response via webhook for downstream processing.
+
+## Extensibility Hooks
+- **Custom Format Plugins:** For additional export formats.
+- **External CDN Push:** Option to push outputs to external storage/CDNs.
+- **Template-Based HTML Export:** Allow developer-uploaded HTML templates for output rendering.
+
+## Testing and Validation Plan
+- Format conversion tests.
+- Output size limit tests.
+- Streaming and polling behavior tests.
+- Webhook delivery and retry logic tests.
+
+## Dependencies
+- **kOS Event Bus**
+- **Skald Output Formatter (SOF)**
+- **Skald Workflow Orchestrator (SWO)**
+- **Authentication Layer (AAL)**
+
+## Future Enhancements
+- AI-driven output summarization for large responses.
+- Dynamic output styling based on user profiles.
+- Real-time format conversion previews in developer tools.
+- Export to multimedia formats (audio, video overlays).
+
+---
+
+**Next module:** `skald_access_control_and_authentication_layer.md`
+
+Let me know when you want to continue.
+
+

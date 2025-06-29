@@ -1,0 +1,104 @@
+title: "kOS Agents System - Single Entry Point"
+purpose: "Single entry point for all AI agents working on the kOS project"
+
+quick_start:
+  title: "Quick Start for Agents"
+  single_command_onboarding: |
+    cat agents/README.md && echo "\n---" && cat agents/bootstrap/00_AGENT_WORKFLOW.md && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
+  loads:
+    - "This README - System overview and structure"
+    - "Agent Workflow - Core process and rules"
+    - "Latest Handoff - Current mission and context"
+
+system_overview:
+  core_mission: "Build kOS: The Kindai Operating System - an AI-driven orchestration framework that provides intelligent nodes (Griot, Tohunga, etc.) through the Kind Link Framework (KLF)"
+  
+  current_project_state:
+    main_repo: "/Users/danger/CascadeProjects/griot-node"
+    reference_only: "/Users/danger/CascadeProjects/kai-cd (archived)"
+    status: "PersonaVectorizationService implemented, ready for RAG operations extension"
+  
+  key_infrastructure:
+    databases: ["MongoDB", "PostgreSQL", "Weaviate", "Neo4j (all configured)"]
+    rag_operations: "Full 387-line skill with hybrid search"
+    persona_system: "Vectorization service with <5s processing time"
+    proven_patterns: "PricingRAGService demonstrates successful integration"
+
+directory_structure:
+  agents:
+    README_md: "You are here (single entry point)"
+    bootstrap: "Core agent system files"
+    handoff: "Agent handoff system"
+    analysis: "Project analysis and insights"
+    implementation_plans: "Development plans and tracking"
+    performance: "Performance metrics and optimization"
+    reference: "Reference materials and examples"
+  
+  bootstrap_files:
+    "00_AGENT_WORKFLOW.md": "Process and rules (loaded by onboarding)"
+    "01_AGENT_CHANGELOG.md": "Project history"
+    "02_SYSTEM_PROMPT.md": "Agent identity and principles"
+    archive: "Historical versions"
+  
+  handoff_files:
+    "LATEST_HANDOFF.md": "Current mission (loaded by onboarding)"
+    archive: "Historical handoffs"
+
+optimized_information_loading:
+  ai_optimized_formats:
+    system_configuration: "agents/config/system_config.json"
+    workflow_rules: "agents/config/workflow_rules.yaml"
+    project_context: "agents/config/project_context.json"
+    architecture_overview: "agents/config/architecture.json"
+  
+  reduced_context_window_usage:
+    before: "4 separate markdown files (~800 lines total)"
+    after: "1 README + 3 optimized config files (~200 lines total)"
+    savings: "~75% reduction in context window usage"
+
+current_mission_context:
+  immediate_priority: "Extend RAG operations for persona context integration and design database schema for personas"
+  
+  success_metrics:
+    performance:
+      vectorization: "<5s"
+      search: "<200ms"
+      memory: "<100ms"
+    quality:
+      persona_relevance: ">90%"
+      knowledge_coverage: ">95%"
+    integration:
+      system_uptime: ">99.9%"
+      data_consistency: "<0.1%"
+  
+  key_files_to_focus_on:
+    - "packages/data/core/rag/persona_vectorization_service.ts"
+    - "packages/data/skills/ai/persona_vectorization.yaml"
+    - "packages/data/core/rag/persona_rag_service.ts (to be created)"
+
+additional_resources:
+  architecture_documentation:
+    - "ai-q/04_architecture/02_AI_Orchestration_Framework.md - Project constitution"
+    - "ai-q/03_node_specifications/ - Complete node specifications"
+  
+  development_guidelines:
+    - "ai-q/07_development/02_File_Size_and_Modularization_Guide.md - File size standards"
+    - "agents/bootstrap/00_AGENT_WORKFLOW.md - Detailed workflow process"
+  
+  performance_analysis:
+    - "agents/performance/ - Performance metrics and optimization"
+    - "agents/analysis/ - Project analysis and insights"
+
+workflow_integration:
+  for_gpt_based_agents:
+    mandatory: "Complete tasks end-to-end before reporting"
+    required: "Fix all errors found, don't just report them"
+    prohibited: "Partial work, progress reports without completion"
+    prompt_format: "Use 'Fix X completely. Don't stop until it's done.'"
+  
+  documentation_requirements:
+    - "Update agents/bootstrap/01_AGENT_CHANGELOG.md with session summary"
+    - "Create comprehensive agents/handoff/LATEST_HANDOFF.md before archiving"
+    - "Update all relevant documentation before completing handoff"
+
+next_step: "Execute the onboarding command above to load the complete context and begin your mission" 

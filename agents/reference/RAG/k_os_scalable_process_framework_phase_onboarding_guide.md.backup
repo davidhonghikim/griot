@@ -1,0 +1,82 @@
+---
+title: "kOS Scalable Process Framework Phase-by-Phase Onboarding Guide"
+description: "Detailed onboarding steps and preparatory actions for human and AI agents involved in each deployment phase of the kOS Scalable Process Framework."
+type: "onboarding-guide"
+status: "active"
+priority: "high"
+created: "2025-06-28T00:00:00Z"
+version: "1.0.0"
+tags: ["kOS", "onboarding", "phases", "deployment", "agents", "team"]
+---
+
+# ✅ kOS Scalable Process Framework Phase-by-Phase Onboarding Guide
+
+---
+
+## ✅ Phase 1: Solo Developer Deployment - Onboarding
+
+| Step | Action |
+|---|---|
+| 1 | Install Git, Docker, Docker Compose |
+| 2 | Clone the main kOS repository |
+| 3 | Read: `kOS Developer Quickstart.md` |
+| 4 | Setup local `.env` variables |
+| 5 | Deploy local Weaviate, MongoDB, and Neo4j via Docker Compose |
+| 6 | Load Vector Store class schemas |
+| 7 | Run initial tests using Pytest |
+| 8 | Read and acknowledge `agent_ethics.md` |
+| 9 | Document first deployment results in `phase1_checklist.md` |
+
+---
+
+## ✅ Phase 2: Team Scale – CI/CD + Testing - Onboarding
+
+| Step | Action |
+|---|---|
+| 1 | Grant repository access to all new developers |
+| 2 | Provide CI/CD pipeline overview (read `CI_CD_Pipeline.md`) |
+| 3 | Setup local dev environments with correct `.env` configs |
+| 4 | Train on pre-commit hooks and test coverage policies |
+| 5 | Introduce drift detection, ethics checks, and performance logs |
+| 6 | Assign roles for test writing, CI pipeline maintenance, and agent performance monitoring |
+
+---
+
+## ✅ Phase 3: Enterprise Multi-Node + Observability - Onboarding
+
+| Step | Action |
+|---|---|
+| 1 | Schedule infrastructure walkthrough for all team leads |
+| 2 | Setup Kubernetes access for DevOps and SREs |
+| 3 | Train DevOps on Istio/Linkerd, Prometheus, Grafana, ELK stack |
+| 4 | Assign governance flow owners (Sachem integration) |
+| 5 | Conduct load testing and observability training sessions |
+| 6 | Run disaster recovery drill for Neo4j cluster |
+
+---
+
+## ✅ Phase 4: Federation and Global Mesh - Onboarding
+
+| Step | Action |
+|---|---|
+| 1 | Host multi-org federation kickoff call |
+| 2 | Onboard cross-node governance and security leads |
+| 3 | Deploy peer discovery API documentation to all node operators |
+| 4 | Train engineering teams on encrypted multi-node messaging |
+| 5 | Conduct security reviews on inter-node communication |
+| 6 | Implement knowledge diffusion tracking dashboards |
+| 7 | Review KLF federation messaging protocols with all AI agent developers |
+
+---
+
+## ✅ Cross-Phase Onboarding Constants
+- ✅ Require all human contributors to read `kOS_Contributor_Guide.md`
+- ✅ Have all AI agents load latest VectorStore schemas and Node Class definitions
+- ✅ Maintain onboarding logs per phase for audit trails
+
+---
+
+**Plan ID:** kos_2025_06_onboarding_guide  
+**Created by:** ChatGPT + User Collaboration  
+**Last Updated:** 2025-06-28T00:00:00Z
+

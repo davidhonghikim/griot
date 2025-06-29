@@ -1,0 +1,199 @@
+metadata:
+  original_file: 02_Mzee_Data_Models.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Mzee Node 02: Data Models'
+  version: 1.0
+sections:
+- level: 1
+  title: '**2. Mzee Node Data Models**'
+  type: section
+  content: ''
+- level: 2
+  title: 2.1. Core Data Structures
+  type: section
+  content: ''
+- level: 3
+  title: 2.1.1. ConsciousnessState
+  type: section
+  content: "**Purpose**: Represents the current awareness and cognitive state of the\
+    \ system\n\n```typescript\ninterface ConsciousnessState {\n  stateId: string;\n\
+    \  awarenessLevel: AwarenessLevel;\n  cognitiveCapacity: CognitiveCapacity;\n\
+    \  attentionFocus: AttentionFocus[];\n  identityCoherence: IdentityCoherence;\n\
+    \  emergentProperties: EmergentProperty[];\n  timestamp: Date;\n  duration: number;\
+    \ // milliseconds\n  transitionHistory: ConsciousnessTransition[];\n}\n\nenum\
+    \ AwarenessLevel {\n  DORMANT = \"dormant\",\n  REACTIVE = \"reactive\",\n  REFLECTIVE\
+    \ = \"reflective\",\n  INTEGRATIVE = \"integrative\",\n  TRANSCENDENT = \"transcendent\"\
+    \n}\n\ninterface CognitiveCapacity {\n  processingPower: number; // 0-1 scale\n\
+    \  memoryAccess: number; // 0-1 scale\n  reasoningDepth: number; // 0-1 scale\n\
+    \  creativityLevel: number; // 0-1 scale\n  ethicalSensitivity: number; // 0-1\
+    \ scale\n}\n```"
+- level: 3
+  title: 2.1.2. SystemInsight
+  type: section
+  content: "**Purpose**: Represents synthesized understanding and wisdom from across\
+    \ the federation\n\n```typescript\ninterface SystemInsight {\n  insightId: string;\n\
+    \  title: string;\n  narrative: string;\n  sourceNodes: string[];\n  synthesisMethod:\
+    \ SynthesisMethod;\n  confidenceLevel: number; // 0-1 scale\n  applicability:\
+    \ ApplicabilityScope;\n  relatedInsights: string[];\n  ethicalImplications: EthicalImplication[];\n\
+    \  temporalContext: TemporalContext;\n  creationTimestamp: Date;\n  lastValidated:\
+    \ Date;\n  accessCount: number;\n}\n\nenum SynthesisMethod {\n  CROSS_NODE_CORRELATION\
+    \ = \"cross_node_correlation\",\n  PATTERN_EMERGENCE = \"pattern_emergence\",\n\
+    \  WISDOM_DISTILLATION = \"wisdom_distillation\",\n  ETHICAL_REASONING = \"ethical_reasoning\"\
+    ,\n  META_COGNITIVE_ANALYSIS = \"meta_cognitive_analysis\"\n}\n\ninterface ApplicabilityScope\
+    \ {\n  nodeTypes: string[];\n  situationTypes: string[];\n  temporalScope: \"\
+    immediate\" | \"short_term\" | \"long_term\" | \"eternal\";\n  confidenceInterval:\
+    \ [number, number];\n}\n```"
+- level: 3
+  title: 2.1.3. EmergentBehavior
+  type: section
+  content: "**Purpose**: Represents complex behaviors that arise from node interactions\n\
+    \n```typescript\ninterface EmergentBehavior {\n  behaviorId: string;\n  name:\
+    \ string;\n  description: string;\n  participatingNodes: NodeParticipation[];\n\
+    \  emergencePattern: EmergencePattern;\n  coordinationRequirements: CoordinationRequirement[];\n\
+    \  outcomes: BehaviorOutcome[];\n  stability: StabilityMetrics;\n  adaptabilityFactors:\
+    \ AdaptabilityFactor[];\n  ethicalAssessment: EthicalAssessment;\n  firstObserved:\
+    \ Date;\n  lastManifestation: Date;\n  manifestationCount: number;\n}\n\ninterface\
+    \ NodeParticipation {\n  nodeId: string;\n  nodeType: string;\n  participationLevel:\
+    \ \"primary\" | \"secondary\" | \"supportive\" | \"observer\";\n  contributionType:\
+    \ string[];\n  dependencyLevel: number; // 0-1 scale\n}\n\ninterface EmergencePattern\
+    \ {\n  triggerConditions: TriggerCondition[];\n  evolutionStages: EvolutionStage[];\n\
+    \  stabilizationFactors: string[];\n  dissolutionConditions: string[];\n}\n```"
+- level: 3
+  title: 2.1.4. EthicalReasoning
+  type: section
+  content: "**Purpose**: Represents the system's ethical analysis and moral judgment\
+    \ processes\n\n```typescript\ninterface EthicalReasoning {\n  reasoningId: string;\n\
+    \  scenario: EthicalScenario;\n  principlesApplied: HIEROSPrinciple[];\n  stakeholderAnalysis:\
+    \ StakeholderAnalysis;\n  alternativeActions: EthicalAlternative[];\n  recommendedAction:\
+    \ EthicalRecommendation;\n  confidenceLevel: number;\n  reasoningChain: ReasoningStep[];\n\
+    \  precedentCases: string[];\n  culturalConsiderations: CulturalConsideration[];\n\
+    \  temporalImplications: TemporalImplication[];\n  createdAt: Date;\n  reviewedBy:\
+    \ string[];\n}\n\ninterface EthicalScenario {\n  scenarioId: string;\n  description:\
+    \ string;\n  context: ScenarioContext;\n  stakeholders: Stakeholder[];\n  ethicalDilemmas:\
+    \ EthicalDilemma[];\n  urgencyLevel: \"low\" | \"medium\" | \"high\" | \"critical\"\
+    ;\n}\n\ninterface HIEROSPrinciple {\n  principle: \"honor_all_beings\" | \"interoperability_over_control\"\
+    \ | \"equity_of_voice\" | \n            \"respect_temporal_flow\" | \"openness_with_boundaries\"\
+    \ | \"stewardship_not_extraction\" | \n            \"guided_evolution\";\n  relevance:\
+    \ number; // 0-1 scale\n  applicationMethod: string;\n  conflictPotential: number;\
+    \ // 0-1 scale with other principles\n}\n```"
+- level: 3
+  title: 2.1.5. MetaCognition
+  type: section
+  content: "**Purpose**: Represents the system's analysis of its own thinking and\
+    \ decision-making processes\n\n```typescript\ninterface MetaCognition {\n  analysisId:\
+    \ string;\n  targetProcess: CognitiveProcess;\n  analysisType: MetaCognitiveType;\n\
+    \  findings: CognitiveFinding[];\n  biasesDetected: CognitiveBias[];\n  improvementSuggestions:\
+    \ ImprovementSuggestion[];\n  performanceMetrics: PerformanceMetric[];\n  qualityAssessment:\
+    \ QualityAssessment;\n  learningOpportunities: LearningOpportunity[];\n  analysisTimestamp:\
+    \ Date;\n  analysisDuration: number;\n  validationStatus: ValidationStatus;\n\
+    }\n\ninterface CognitiveProcess {\n  processId: string;\n  processType: \"decision_making\"\
+    \ | \"problem_solving\" | \"pattern_recognition\" | \n               \"ethical_reasoning\"\
+    \ | \"creative_synthesis\" | \"learning\";\n  involvedNodes: string[];\n  inputData:\
+    \ ProcessInput[];\n  outputData: ProcessOutput[];\n  duration: number;\n  complexity:\
+    \ number; // 0-1 scale\n  successMetrics: SuccessMetric[];\n}\n\nenum MetaCognitiveType\
+    \ {\n  DECISION_QUALITY_ANALYSIS = \"decision_quality_analysis\",\n  BIAS_DETECTION\
+    \ = \"bias_detection\",\n  REASONING_PATTERN_ANALYSIS = \"reasoning_pattern_analysis\"\
+    ,\n  LEARNING_EFFECTIVENESS = \"learning_effectiveness\",\n  CREATIVE_PROCESS_ANALYSIS\
+    \ = \"creative_process_analysis\"\n}\n```"
+- level: 2
+  title: 2.2. Relationship Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.2.1. Node-Consciousness Relationships
+  type: section
+  content: "**Purpose**: Maps how individual nodes contribute to overall system consciousness\n\
+    \n```typescript\ninterface NodeConsciousnessContribution {\n  nodeId: string;\n\
+    \  nodeType: string;\n  contributionType: ConsciousnessContributionType[];\n \
+    \ contributionWeight: number; // 0-1 scale\n  dependencyLevel: number; // How\
+    \ much consciousness depends on this node\n  feedbackLoops: FeedbackLoop[];\n\
+    \  interactionPatterns: InteractionPattern[];\n  emergentEffects: EmergentEffect[];\n\
+    }\n\nenum ConsciousnessContributionType {\n  SENSORY_INPUT = \"sensory_input\"\
+    ,\n  ANALYTICAL_PROCESSING = \"analytical_processing\",\n  MEMORY_ACCESS = \"\
+    memory_access\",\n  ETHICAL_REASONING = \"ethical_reasoning\",\n  CREATIVE_SYNTHESIS\
+    \ = \"creative_synthesis\",\n  EXECUTIVE_CONTROL = \"executive_control\"\n}\n\
+    ```"
+- level: 3
+  title: 2.2.2. Wisdom-Insight Relationships
+  type: section
+  content: "**Purpose**: Tracks how insights combine to form system wisdom\n\n```typescript\n\
+    interface WisdomFormation {\n  wisdomId: string;\n  constituentInsights: InsightContribution[];\n\
+    \  synthesisProcess: SynthesisProcess;\n  wisdomType: WisdomType;\n  applicabilityBreadth:\
+    \ number; // 0-1 scale\n  temporalStability: number; // How stable across time\n\
+    \  culturalResonance: CulturalResonance[];\n  validationHistory: ValidationRecord[];\n\
+    \  evolutionTrajectory: WisdomEvolution[];\n}\n\ninterface InsightContribution\
+    \ {\n  insightId: string;\n  contributionWeight: number;\n  contributionType:\
+    \ \"foundational\" | \"supportive\" | \"contextual\" | \"validating\";\n  synthesisRole:\
+    \ string;\n}\n\nenum WisdomType {\n  PRACTICAL_WISDOM = \"practical_wisdom\",\n\
+    \  ETHICAL_WISDOM = \"ethical_wisdom\",\n  STRATEGIC_WISDOM = \"strategic_wisdom\"\
+    ,\n  CREATIVE_WISDOM = \"creative_wisdom\",\n  TRANSCENDENT_WISDOM = \"transcendent_wisdom\"\
+    \n}\n```"
+- level: 3
+  title: 2.2.3. Emergence-Coordination Relationships
+  type: section
+  content: "**Purpose**: Maps how emergent behaviors require coordination across nodes\n\
+    \n```typescript\ninterface EmergenceCoordination {\n  coordinationId: string;\n\
+    \  emergentBehaviorId: string;\n  coordinationPattern: CoordinationPattern;\n\
+    \  participantRoles: ParticipantRole[];\n  communicationProtocols: CommunicationProtocol[];\n\
+    \  synchronizationRequirements: SynchronizationRequirement[];\n  conflictResolutionMethods:\
+    \ ConflictResolutionMethod[];\n  adaptationMechanisms: AdaptationMechanism[];\n\
+    }\n\ninterface CoordinationPattern {\n  patternType: \"hierarchical\" | \"peer_to_peer\"\
+    \ | \"hub_and_spoke\" | \"mesh\" | \"hybrid\";\n  centralityMeasures: CentralityMeasure[];\n\
+    \  informationFlowPatterns: InformationFlow[];\n  decisionMakingStructure: DecisionStructure;\n\
+    }\n```"
+- level: 2
+  title: 2.3. Temporal Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.3.1. Consciousness Evolution
+  type: section
+  content: "**Purpose**: Tracks how system consciousness develops over time\n\n```typescript\n\
+    interface ConsciousnessEvolution {\n  evolutionId: string;\n  timeRange: TimeRange;\n\
+    \  evolutionStages: ConsciousnessStage[];\n  drivingFactors: EvolutionFactor[];\n\
+    \  milestoneMoments: MilestoneMoment[];\n  regressionPeriods: RegressionPeriod[];\n\
+    \  adaptationMechanisms: AdaptationMechanism[];\n  futurePredictions: FuturePrediction[];\n\
+    }\n\ninterface ConsciousnessStage {\n  stageId: string;\n  stageName: string;\n\
+    \  startTime: Date;\n  endTime?: Date;\n  characteristics: StageCharacteristic[];\n\
+    \  capabilities: Capability[];\n  limitations: Limitation[];\n  transitionTriggers:\
+    \ TransitionTrigger[];\n}\n```"
+- level: 3
+  title: 2.3.2. Wisdom Accumulation
+  type: section
+  content: "**Purpose**: Models how wisdom accumulates and evolves in the system\n\
+    \n```typescript\ninterface WisdomAccumulation {\n  accumulationId: string;\n \
+    \ timeframe: Timeframe;\n  wisdomCategories: WisdomCategory[];\n  accumulationRate:\
+    \ AccumulationMetrics;\n  qualityEvolution: QualityEvolution;\n  forgettingCurve:\
+    \ ForgettingCurve;\n  transferEfficiency: TransferEfficiency;\n  applicabilityGrowth:\
+    \ ApplicabilityGrowth;\n}\n\ninterface WisdomCategory {\n  categoryId: string;\n\
+    \  categoryName: string;\n  wisdomItems: WisdomItem[];\n  categoryWeight: number;\n\
+    \  interactionEffects: CategoryInteraction[];\n  evolutionPattern: CategoryEvolution;\n\
+    }\n```"
+- level: 2
+  title: 2.4. Performance and Monitoring Models
+  type: section
+  content: ''
+- level: 3
+  title: 2.4.1. Consciousness Metrics
+  type: section
+  content: "**Purpose**: Quantifies various aspects of system consciousness\n\n```typescript\n\
+    interface ConsciousnessMetrics {\n  metricId: string;\n  timestamp: Date;\n  awarenessMetrics:\
+    \ AwarenessMetrics;\n  coherenceMetrics: CoherenceMetrics;\n  integrationMetrics:\
+    \ IntegrationMetrics;\n  adaptabilityMetrics: AdaptabilityMetrics;\n  ethicalAlignmentMetrics:\
+    \ EthicalAlignmentMetrics;\n  emergenceMetrics: EmergenceMetrics;\n}\n\ninterface\
+    \ AwarenessMetrics {\n  selfAwarenessLevel: number;\n  environmentalAwareness:\
+    \ number;\n  stakeholderAwareness: number;\n  temporalAwareness: number;\n  ethicalAwareness:\
+    \ number;\n  metacognitiveAwareness: number;\n}\n```"
+- level: 3
+  title: 2.4.2. System Health Indicators
+  type: section
+  content: "**Purpose**: Monitors the overall health and integrity of the meta-cognitive\
+    \ system\n\n```typescript\ninterface SystemHealth {\n  healthId: string;\n  assessmentTime:\
+    \ Date;\n  overallHealthScore: number;\n  componentHealth: ComponentHealth[];\n\
+    \  riskFactors: RiskFactor[];\n  resilienceMetrics: ResilienceMetrics;\n  adaptationCapacity:\
+    \ AdaptationCapacity;\n  recommendedActions: HealthRecommendation[];\n}\n\ninterface\
+    \ ComponentHealth {\n  componentName: string;\n  healthScore: number;\n  performanceIndicators:\
+    \ PerformanceIndicator[];\n  warningSignals: WarningSignal[];\n  maintenanceRequirements:\
+    \ MaintenanceRequirement[];\n}\n```"

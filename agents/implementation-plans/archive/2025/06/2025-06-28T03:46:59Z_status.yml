@@ -1,0 +1,16 @@
+id: "plan_2025_01_kos_starseed_restructure"
+title: "kOS Starseed Node Integration & Restructuring Plan"
+description: "Comprehensive restructuring of agents and ai-q directories with 13 Starseed node integration, vector memory system, and AI-native database architecture"
+status: "active"
+priority: "critical"
+# ... other properties
+phases:
+  - id: "phase_1_foundation"
+    title: "Foundation Restructure & Database Setup"
+    # ... other phase properties
+    tasks:
+      - id: "task_1_1_1"
+        title: "Restructure /agents directory with new 6-tier system"
+        # ... other task properties
+# ... other phases and properties
+# This is a truncated example for brevity. The full content will be converted. 

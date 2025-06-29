@@ -1,0 +1,191 @@
+metadata:
+  original_file: 01_Core_Replication_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: Griot Core Replication API Module
+  description: Essential replication operations and basic request/response patterns
+    for the Griot node
+  version: 1.0.0
+  module_type: core_api
+  cultural_origin: West African Griot - Master Storyteller
+  hieros_compliance: true
+sections:
+- level: 1
+  title: Griot Core Replication API Module
+  type: section
+  content: ''
+- level: 2
+  title: 📜 Module Overview
+  type: section
+  content: This module implements the **fundamental replication API operations** for
+    the Griot node, enabling basic node packaging and distribution through the Kind
+    Link Framework. As a master storyteller, Griot preserves and replicates the essential
+    stories and capabilities of kOS nodes.
+- level: 2
+  title: 🏗️ Core API Architecture
+  type: section
+  content: ''
+- level: 3
+  title: 1. Basic Replication Request Interface
+  type: section
+  content: "**Purpose**: Foundation interface for all node replication operations\n\
+    \n```typescript\ninterface BasicReplicationRequest {\n  task_name: \"replicate_node\"\
+    ;\n  params: {\n    // Core identification\n    source_node_did: string;\n   \
+    \ target_version: string;\n    \n    // Basic distribution options\n    distribution_options:\
+    \ {\n      protocol: \"ipfs\" | \"https\" | \"p2p\";\n      compression_level?:\
+    \ number; // 1-9, default: 6\n    };\n    \n    // Request metadata\n    priority?:\
+    \ \"low\" | \"normal\" | \"high\";\n    timeout_seconds?: number; // default:\
+    \ 300\n  };\n}\n\ninterface ReplicationResponse {\n  task_name: \"replicate_node\"\
+    ;\n  job_id: string;\n  status: \"queued\" | \"running\" | \"completed\" | \"\
+    failed\";\n  \n  // Response payload varies by status\n  result?: ReplicationResult;\n\
+    \  error?: ReplicationError;\n  progress?: number; // 0-100\n}\n\ninterface ReplicationResult\
+    \ {\n  artifact_uri: string;\n  artifact_hash: string; // SHA-256\n  artifact_size_bytes:\
+    \ number;\n  creation_timestamp: string; // ISO 8601\n  manifest: ArtifactManifest;\n\
+    }\n```"
+- level: 3
+  title: 2. Core Message Types
+  type: section
+  content: "**Purpose**: Essential KLF message types for replication operations\n\n\
+    ```typescript\nenum CoreMessageType {\n  TASK_REQUEST = \"task_request\",\n  TASK_RESPONSE\
+    \ = \"task_response\", \n  TASK_PROGRESS = \"task_progress\",\n  TASK_CANCEL =\
+    \ \"task_cancel\"\n}\n\ninterface TaskRequest {\n  messageType: CoreMessageType.TASK_REQUEST;\n\
+    \  sourceNode: \"client\";\n  targetNode: \"griot\";\n  timestamp: string;\n \
+    \ \n  payload: BasicReplicationRequest;\n  \n  metadata: {\n    requestId: string;\n\
+    \    clientVersion: string;\n    expectedResponseTimeout: number;\n  };\n}\n\n\
+    interface TaskResponse {\n  messageType: CoreMessageType.TASK_RESPONSE;\n  sourceNode:\
+    \ \"griot\";\n  targetNode: \"client\";\n  timestamp: string;\n  \n  payload:\
+    \ ReplicationResponse;\n  \n  metadata: {\n    requestId: string;\n    processingDuration:\
+    \ number;\n    griotVersion: string;\n  };\n}\n```"
+- level: 3
+  title: 3. Artifact Manifest Structure
+  type: section
+  content: "**Purpose**: Standard metadata format for replicated artifacts\n\n```typescript\n\
+    interface ArtifactManifest {\n  // Artifact identification\n  artifactId: string;\n\
+    \  version: string;\n  createdBy: string; // Griot node DID\n  createdAt: string;\
+    \ // ISO 8601\n  \n  // Source information\n  sourceNode: {\n    did: string;\n\
+    \    version: string;\n    lastModified: string;\n  };\n  \n  // Artifact structure\n\
+    \  contents: {\n    codeBundle: FileEntry;\n    configuration: FileEntry;\n  \
+    \  dependencies: FileEntry[];\n    documentation?: FileEntry[];\n    tests?: FileEntry[];\n\
+    \  };\n  \n  // Integrity verification\n  checksums: {\n    sha256: string;\n\
+    \    md5: string;\n  };\n  \n  // Basic metadata\n  metadata: {\n    nodeType:\
+    \ string;\n    capabilities: string[];\n    compatibilityVersion: string;\n  \
+    \  size: number;\n  };\n}\n\ninterface FileEntry {\n  path: string;\n  size: number;\n\
+    \  checksum: string;\n  permissions?: string;\n}\n```"
+- level: 3
+  title: 4. Basic Progress Tracking
+  type: section
+  content: "**Purpose**: Simple progress reporting for replication operations\n\n\
+    ```typescript\ninterface BasicProgressUpdate {\n  messageType: CoreMessageType.TASK_PROGRESS;\n\
+    \  sourceNode: \"griot\";\n  targetNode: \"client\";\n  timestamp: string;\n \
+    \ \n  payload: {\n    task_name: \"replicate_node\";\n    job_id: string;\n  \
+    \  status: \"running\";\n    progress: number; // 0-100\n    \n    // Simple phase\
+    \ tracking\n    current_phase: BasicReplicationPhase;\n    message: string;\n\
+    \    \n    // Estimated completion\n    estimated_completion?: string; // ISO\
+    \ 8601\n  };\n}\n\nenum BasicReplicationPhase {\n  STARTING = \"starting\",\n\
+    \  ACQUIRING_SOURCE = \"acquiring_source\",\n  PROCESSING = \"processing\", \n\
+    \  PACKAGING = \"packaging\",\n  UPLOADING = \"uploading\",\n  FINALIZING = \"\
+    finalizing\"\n}\n```"
+- level: 3
+  title: 5. Core Error Handling
+  type: section
+  content: "**Purpose**: Essential error reporting for replication operations\n\n\
+    ```typescript\ninterface BasicReplicationError {\n  code: BasicErrorCode;\n  message:\
+    \ string;\n  timestamp: string;\n  \n  // Context information\n  phase: BasicReplicationPhase;\n\
+    \  retryable: boolean;\n  \n  // Basic recovery guidance\n  suggested_action?:\
+    \ string;\n}\n\nenum BasicErrorCode {\n  SOURCE_NOT_FOUND = \"source_not_found\"\
+    ,\n  ACCESS_DENIED = \"access_denied\",\n  INVALID_VERSION = \"invalid_version\"\
+    ,\n  NETWORK_ERROR = \"network_error\",\n  STORAGE_ERROR = \"storage_error\",\n\
+    \  PACKAGING_ERROR = \"packaging_error\",\n  TIMEOUT = \"timeout\",\n  INTERNAL_ERROR\
+    \ = \"internal_error\"\n}\n```"
+- level: 3
+  title: 6. Job Management Interface
+  type: section
+  content: "**Purpose**: Basic job lifecycle management\n\n```typescript\ninterface\
+    \ JobManager {\n  // Start new replication job\n  startReplication(request: BasicReplicationRequest):\
+    \ Promise<string>; // returns job_id\n  \n  // Query job status\n  getJobStatus(jobId:\
+    \ string): Promise<ReplicationResponse>;\n  \n  // Cancel running job\n  cancelJob(jobId:\
+    \ string): Promise<boolean>;\n  \n  // List active jobs\n  listActiveJobs(): Promise<JobSummary[]>;\n\
+    }\n\ninterface JobSummary {\n  jobId: string;\n  taskName: string;\n  status:\
+    \ string;\n  progress: number;\n  startedAt: string;\n  estimatedCompletion?:\
+    \ string;\n}\n```"
+- level: 2
+  title: 🛡️ HIEROS Compliance
+  type: section
+  content: ''
+- level: 3
+  title: Cultural Integration
+  type: section
+  content: '- **Story Preservation**: Maintain complete narratives and context when
+    replicating nodes
+
+    - **Wisdom Transmission**: Ensure cultural knowledge and practices are preserved
+    in replicated artifacts
+
+    - **Community Attribution**: Properly attribute source communities and contributors
+
+    - **Sacred Knowledge Protection**: Respect restrictions on sensitive or sacred
+    information'
+- level: 3
+  title: Ethical Practices
+  type: section
+  content: '- **Consent Verification**: Ensure proper permissions before replicating
+    any node
+
+    - **Attribution Maintenance**: Preserve authorship and cultural attribution metadata
+
+    - **Community Benefit**: Prioritize replication requests that benefit source communities
+
+    - **Transparent Operations**: Maintain clear audit trails for all replication
+    activities'
+- level: 2
+  title: 🚀 Performance Standards
+  type: section
+  content: ''
+- level: 3
+  title: Core Requirements
+  type: section
+  content: '- **Response Time**: Initial acknowledgment within 100ms
+
+    - **Progress Updates**: Status updates every 5-10 seconds during active processing
+
+    - **Reliability**: 99.5% successful completion rate for valid requests
+
+    - **Concurrency**: Support for 50+ concurrent replication jobs'
+- level: 3
+  title: Quality Metrics
+  type: section
+  content: '- **Data Integrity**: 100% artifact integrity verification
+
+    - **Version Accuracy**: Exact source version replication
+
+    - **Manifest Completeness**: Complete and accurate artifact metadata
+
+    - **Error Recovery**: Graceful handling of network and storage failures'
+- level: 2
+  title: 🔄 Integration Points
+  type: section
+  content: ''
+- level: 3
+  title: Module Dependencies
+  type: section
+  content: '- **Requires**: Advanced Configuration Module for enhanced parameter processing
+
+    - **Provides**: Core replication capabilities for all other modules
+
+    - **Collaborates**: With Progress Tracking Module for status reporting'
+- level: 3
+  title: External Integrations
+  type: section
+  content: '- **KLF Protocol**: Native Kind Link Framework message handling
+
+    - **Storage Systems**: IPFS, HTTPS, and P2P distribution protocols
+
+    - **Source Control**: Integration with node source repositories
+
+    - **Identity System**: DID-based node identification and authentication
+
+
+    This module provides the essential foundation for all Griot replication operations
+    while maintaining the storytelling tradition of preserving and sharing knowledge
+    across communities.'

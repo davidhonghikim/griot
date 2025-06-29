@@ -1,0 +1,43 @@
+# kOS Yachay Multi-Cloud Deployment Configs (GKE, AWS EKS, Azure AKS)
+
+---
+# 1. GKE (Google Kubernetes Engine) Cluster Config Snippet
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: kos-yachay-gke-cluster
+spec:
+  location: us-central1
+  initialNodeCount: 3
+  releaseChannel:
+    channel: REGULAR
+
+---
+# 2. AWS EKS Cluster YAML Snippet (For eksctl)
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: kos-yachay-eks
+  region: us-west-2
+nodeGroups:
+  - name: yachay-ng
+    instanceType: t3.medium
+    desiredCapacity: 3
+
+---
+# 3. Azure AKS Cluster YAML Snippet (For az cli or ARM Template)
+apiVersion: 2021-05-01
+location: eastus
+name: kos-yachay-aks
+properties:
+  dnsPrefix: kosyachayaks
+  agentPoolProfiles:
+    - name: agentpool
+      count: 3
+      vmSize: Standard_DS2_v2
+  kubernetesVersion: "1.28.1"
+
+---
+# ✅ This file contains GKE, AWS EKS, and Azure AKS deployment cluster configs
+# ✅ Allows full multi-cloud deployment of Yachay + DB stack
+# ✅ Next Optional Step: Generate backend failover and query fallback logic for runtime use

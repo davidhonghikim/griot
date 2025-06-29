@@ -14,7 +14,7 @@ This directory contains comprehensive analyses performed by agents during develo
 
 ```
 agents/analysis/
-├── 2025-06-29_comprehensive_project_analysis.md  # Current month (root)
+├── [TIMESTAMP]_comprehensive_project_analysis.md  # Current month (root)
 ├── 2025-06-28_another_analysis.md               # Current month (root)
 ├── archive/                                      # Historical archives
 │   └── 2025/                                     # Year-based organization
@@ -22,7 +22,7 @@ agents/analysis/
 │       │   ├── 2025-05-15_analysis.md
 │       │   └── 2025-05-20_analysis.md
 │       └── 06/                                   # June 2025 (when archived)
-│           ├── 2025-06-29_comprehensive_project_analysis.md
+│           ├── [TIMESTAMP]_comprehensive_project_analysis.md
 │           └── 2025-06-28_another_analysis.md
 ├── 00_Analysis_Index.md                          # Master index
 └── README.md                                     # This file
@@ -155,7 +155,7 @@ Completed analyses are archived to:
 
 ### **Analysis Files**
 - Format: `[YYYY-MM-DD]_[analysis_name].md`
-- Example: `2025-06-29_comprehensive_project_analysis.md`
+- Example: `[TIMESTAMP]_comprehensive_project_analysis.md`
 
 ### **Directory Organization**
 - Year-based organization: `2025/`, `2026/`, etc.

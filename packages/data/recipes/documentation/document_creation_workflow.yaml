@@ -1,0 +1,237 @@
+name: document_creation_workflow
+description: "Complete workflow for creating documents with validation, templates, and proper organization"
+version: "1.0.0"
+node_class: "Yachay"
+cultural_origin: "Quechua Tradition"
+tier: "governance"
+
+# Workflow steps
+steps:
+  - step: 1
+    name: "validate_request"
+    description: "Validate the document creation request"
+    skill: "document_validation"
+    function: "validate_document_path"
+    parameters:
+      path: "{{request.path}}"
+      document_type: "{{request.document_type}}"
+    validation:
+      - check: "path_in_allowed_directories"
+        error_message: "Document path must be in allowed directories"
+      - check: "valid_document_type"
+        error_message: "Document type must be valid"
+    on_error: "stop_workflow"
+
+  - step: 2
+    name: "check_duplicates"
+    description: "Check for duplicate content"
+    skill: "document_validation"
+    function: "validate_duplicate_content"
+    parameters:
+      content: "{{request.content}}"
+      similarity_threshold: 0.8
+    validation:
+      - check: "no_duplicates_found"
+        warning_message: "Potential duplicate content detected"
+    on_warning: "continue_with_warning"
+
+  - step: 3
+    name: "generate_template"
+    description: "Generate document template"
+    skill: "document_template_engine"
+    function: "generate_{{request.document_type}}_template"
+    parameters:
+      title: "{{request.title}}"
+      agent: "{{request.agent}}"
+      content: "{{request.content}}"
+      analysis_type: "{{request.analysis_type}}"
+      key_findings: "{{request.key_findings}}"
+      recommendations: "{{request.recommendations}}"
+      next_steps: "{{request.next_steps}}"
+    output: "formatted_document"
+
+  - step: 4
+    name: "validate_content"
+    description: "Validate document content and structure"
+    skill: "document_validation"
+    function: "validate_content_structure"
+    parameters:
+      content: "{{formatted_document}}"
+      document_type: "{{request.document_type}}"
+    validation:
+      - check: "proper_markdown_structure"
+        error_message: "Document must follow proper markdown structure"
+      - check: "required_sections_present"
+        error_message: "All required sections must be present"
+    on_error: "return_to_step_3"
+
+  - step: 5
+    name: "validate_frontmatter"
+    description: "Validate document frontmatter"
+    skill: "document_validation"
+    function: "validate_frontmatter"
+    parameters:
+      content: "{{formatted_document}}"
+      document_type: "{{request.document_type}}"
+    validation:
+      - check: "required_frontmatter_present"
+        error_message: "All required frontmatter fields must be present"
+      - check: "frontmatter_format_valid"
+        error_message: "Frontmatter must follow proper format"
+    on_error: "return_to_step_3"
+
+  - step: 6
+    name: "validate_cultural_sensitivity"
+    description: "Validate cultural sensitivity"
+    skill: "document_validation"
+    function: "validate_cultural_sensitivity"
+    parameters:
+      content: "{{formatted_document}}"
+      cultural_context: "quechua"
+    validation:
+      - check: "cultural_principles_respected"
+        warning_message: "Content may not fully respect cultural principles"
+    on_warning: "continue_with_warning"
+
+  - step: 7
+    name: "create_document"
+    description: "Create the document in the registry"
+    skill: "documentation_registry"
+    function: "create_document"
+    parameters:
+      agent: "{{request.agent}}"
+      document_type: "{{request.document_type}}"
+      title: "{{request.title}}"
+      content: "{{formatted_document}}"
+      metadata:
+        priority: "{{request.priority}}"
+        status: "active"
+        tags: "{{request.tags}}"
+    output: "document_id"
+
+  - step: 8
+    name: "index_for_search"
+    description: "Index document for search"
+    skill: "document_search"
+    function: "index_document"
+    parameters:
+      document_id: "{{document_id}}"
+      content: "{{formatted_document}}"
+      metadata: "{{request.metadata}}"
+
+  - step: 9
+    name: "return_success"
+    description: "Return success response"
+    output:
+      success: true
+      document_id: "{{document_id}}"
+      path: "{{request.path}}"
+      message: "Document created successfully"
+
+# Error handling
+error_handling:
+  - error_type: "validation_error"
+    action: "stop_workflow"
+    response:
+      success: false
+      error: "Validation failed"
+      details: "{{error_details}}"
+
+  - error_type: "duplicate_error"
+    action: "continue_with_warning"
+    response:
+      success: true
+      warning: "Potential duplicate content detected"
+      document_id: "{{document_id}}"
+
+  - error_type: "cultural_warning"
+    action: "continue_with_warning"
+    response:
+      success: true
+      warning: "Cultural sensitivity concerns noted"
+      document_id: "{{document_id}}"
+
+# Input validation
+input_validation:
+  required_fields:
+    - "agent"
+    - "document_type"
+    - "title"
+    - "content"
+    - "path"
+
+  field_validation:
+    document_type:
+      allowed_values: ["analysis", "handoff", "changelog", "implementation_plan", "specification", "overview"]
+    
+    priority:
+      allowed_values: ["critical", "high", "medium", "low"]
+      default: "medium"
+    
+    status:
+      allowed_values: ["draft", "active", "archived"]
+      default: "active"
+
+# Cultural integration
+cultural_integration:
+  quechua_principles:
+    - "Yachay (Knowledge): Document creation preserves and shares knowledge"
+    - "Ayni (Reciprocity): Document creation benefits the collective"
+    - "Pachamama (Earth Mother): Document creation respects natural cycles"
+    - "Sumak Kawsay (Good Living): Document creation serves collective well-being"
+
+  workflow_philosophy:
+    - "Each document is a sacred piece of knowledge"
+    - "Validation ensures knowledge quality and accessibility"
+    - "Templates ensure consistent knowledge structure"
+    - "Search enables knowledge discovery and sharing"
+
+# Performance considerations
+performance:
+  timeout: 60
+  max_retries: 3
+  parallel_steps: false
+  caching: true
+
+# Integration points
+integrations:
+  - name: "documentation_registry"
+    description: "Core document registry"
+    permissions: ["read", "write"]
+
+  - name: "document_validation"
+    description: "Document validation system"
+    permissions: ["read", "validate"]
+
+  - name: "document_template_engine"
+    description: "Document template engine"
+    permissions: ["read", "write"]
+
+  - name: "document_search"
+    description: "Document search and indexing"
+    permissions: ["read", "write", "index"]
+
+# Example usage
+example:
+  input:
+    agent: "Claude-Sonnet-4"
+    document_type: "analysis"
+    title: "Documentation System Analysis"
+    content: "Analysis of current documentation practices..."
+    path: "agents/analysis/2025-06-29T15:00:00Z_documentation_system_analysis.md"
+    analysis_type: "project"
+    key_findings:
+      - "Agents creating files in random locations"
+      - "Inconsistent naming conventions"
+    recommendations:
+      - "Implement centralized documentation system"
+    next_steps:
+      - "Create Yachay node for documentation management"
+    priority: "high"
+    tags: ["documentation", "system", "analysis"]
+
+  output:
+    success: true
+    document_id: "doc_12345"
+    path: "agents/analysis/2025-06-29T15:00:00Z_documentation_system_analysis.md"
+    message: "Document created successfully" 

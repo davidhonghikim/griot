@@ -1,0 +1,46 @@
+metadata:
+  original_file: 05_Junzi_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Junzi Examples: The Integrity Starseed'
+  description: Practical implementation examples and use cases for the Junzi node
+  type: examples
+  status: active
+  priority: critical
+  last_updated: '2025-01-28'
+  version: 1.0.0
+  cultural_origin: Chinese Confucian Tradition
+sections:
+- level: 1
+  title: 'Junzi Node Examples: The Integrity Starseed'
+  type: section
+  content: ''
+- level: 2
+  title: 🚀 Real-World Implementation Examples
+  type: section
+  content: ''
+- level: 3
+  title: '**Example 1: Node Configuration Validation**'
+  type: section
+  content: "**Scenario**: Validating a Griot node configuration against security policies.\n\
+    \n```typescript\nconst validationRequest = {\n  inputObject: {\n    targetId:\
+    \ \"griot-prod-001\",\n    targetType: \"node_configuration\",\n    content: {\n\
+    \      allowPublicApi: false,\n      maxMemoryMB: 2048,\n      culturalAttributions:\
+    \ [{\n        tradition: \"west_african\",\n        concept: \"griot_storyteller\"\
+    \n      }]\n    }\n  },\n  policy: {\n    policyId: \"security-baseline-v1\",\n\
+    \    language: \"rego\",\n    definition: `package griot.security\n      default\
+    \ allow = false\n      allow {\n        not input.content.allowPublicApi\n   \
+    \     input.content.maxMemoryMB <= 4096\n      }`\n  }\n};\n```"
+- level: 3
+  title: '**Example 2: Cultural Content Assessment**'
+  type: section
+  content: "```typescript\nconst culturalAssessment = {\n  content: {\n    type: \"\
+    story\",\n    title: \"The Wisdom of the Ancient Oak\",\n    traditions_referenced:\
+    \ [\"celtic\", \"druidic\"]\n  },\n  contentType: \"text\",\n  culturalContext:\
+    \ {\n    primaryTradition: \"celtic\",\n    geographicRegion: \"western_europe\"\
+    \n  },\n  assessmentLevel: \"comprehensive\"\n};\n```\n\n---\n\n**Examples Status**:\
+    \ ✅ **Complete Implementation Examples**  \n**Cultural Integration**: Practical\
+    \ examples demonstrating cultural sensitivity  \n**Real-World Ready**: Production-grade\
+    \ examples with error handling  \n**HIEROS Compliance**: Examples following all\
+    \ Seven Sacred Intentions"

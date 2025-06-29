@@ -1,0 +1,170 @@
+metadata:
+  original_file: 03_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Yachay Node 03: KLF API'
+  version: 1.0
+sections:
+- level: 1
+  title: '**3. Yachay Node KLF API Specification**'
+  type: section
+  content: ''
+- level: 2
+  title: 3.1. Introduction
+  type: section
+  content: 'The Yachay Node exposes its functionality to the kOS network through a
+    well-defined Kind Link Framework (KLF) API. This API allows other nodes to store,
+    retrieve, and manage memories in a standardized way. All communication is asynchronous
+    and follows the KLF message-passing protocol.
+
+
+    The API is designed around two primary functions: writing new memories and querying
+    existing ones.'
+- level: 2
+  title: 3.2. KLF Message Types
+  type: section
+  content: 'The Yachay Node listens for the following KLF message types:
+
+
+    | Message Type              | Description                                        |
+    Payload Interface            |
+
+    | ------------------------- | --------------------------------------------------
+    | ---------------------------- |
+
+    | `YACHAY_STORE_REQUEST`    | Request to store a new `MemoryFragment`.           |
+    `YachayStoreRequest`         |
+
+    | `YACHAY_QUERY_REQUEST`    | Request to query the Long-Term Storage.            |
+    `YachayQueryRequest`         |
+
+    | `YACHAY_DELETE_REQUEST`   | Request to delete a `MemoryTapestry` or `Fragment`.|
+    `YachayDeleteRequest`        |
+
+
+    The Yachay Node will dispatch the following message types in response:
+
+
+    | Message Type              | Description                                        |
+    Payload Interface            |
+
+    | ------------------------- | --------------------------------------------------
+    | ---------------------------- |
+
+    | `YACHAY_STORE_CONFIRM`    | Confirms a fragment was successfully stored.       |
+    `YachayStoreConfirm`         |
+
+    | `YACHAY_QUERY_RESPONSE`   | Contains the results of a query.                   |
+    `YachayQueryResponse`        |
+
+    | `YACHAY_DELETE_CONFIRM`   | Confirms a memory object was deleted.              |
+    `YachayDeleteConfirm`        |
+
+    | `YACHAY_API_ERROR`        | Indicates an error occurred processing a request.  |
+    `YachayApiError`             |'
+- level: 2
+  title: 3.3. API Endpoint Details & Payloads
+  type: section
+  content: ''
+- level: 3
+  title: '**3.3.1. Store a New Memory Fragment**'
+  type: section
+  content: "A node sends this message to have Yachay record a new piece of information.\
+    \ The payload contains the raw content to be encoded into a `MemoryFragment`.\n\
+    \n-   **Request Message**: `YACHAY_STORE_REQUEST`\n-   **Payload (`YachayStoreRequest`)**:\n\
+    \    ```typescript\n    export interface YachayStoreRequest {\n      // A unique\
+    \ ID provided by the client to correlate this request with a response.\n     \
+    \ requestId: string;\n      // The raw data payload of the memory. Can be any\
+    \ serializable format.\n      content: any;\n      // Optional list of preliminary\
+    \ keywords or tags.\n      tags?: string[];\n    }\n    ```\n-   **Response Message**:\
+    \ `YACHAY_STORE_RESPONSE`\n-   **Payload (`YachayStoreResponse`)**:\n    ```typescript\n\
+    \    export interface YachayStoreResponse {\n      // The unique ID of the original\
+    \ request.\n      requestId: string;\n      // The unique ID of the newly created\
+    \ and stored MemoryFragment.\n      fragmentId: string;\n      // The status of\
+    \ the ingestion.\n      status: 'RECEIVED';\n    }\n    ```"
+- level: 3
+  title: '**3.3.2. Retrieve a Memory by ID**'
+  type: section
+  content: "Retrieves a single `MemoryTapestry` or `MemoryFragment` by its unique\
+    \ identifier.\n\n-   **Request Message**: `YACHAY_RETRIEVE_REQUEST`\n-   **Payload\
+    \ (`YachayRetrieveRequest`)**:\n    ```typescript\n    export interface YachayRetrieveRequest\
+    \ {\n      requestId: string;\n      memoryId: string;\n    }\n    ```\n-   **Response\
+    \ Message**: `YACHAY_RETRIEVE_RESPONSE`\n-   **Payload (`YachayRetrieveResponse`)**:\n\
+    \    ```typescript\n    export interface YachayRetrieveResponse {\n      requestId:\
+    \ string;\n      // The found memory object, or null if not found.\n      memory:\
+    \ MemoryTapestry | MemoryFragment | null;\n    }\n    ```"
+- level: 3
+  title: '**3.3.3. Query Memories**'
+  type: section
+  content: "Executes a complex search against the Long-Term Storage based on a structured\
+    \ query.\n\n-   **Request Message**: `YACHAY_QUERY_REQUEST`\n-   **Payload (`YachayQueryRequest`)**:\
+    \ This interface uses the `MemoryQuery` data model.\n    ```typescript\n    export\
+    \ interface YachayQueryRequest {\n      requestId: string;\n      query: MemoryQuery;\n\
+    \    }\n    ```\n-   **Response Message**: `YACHAY_QUERY_RESPONSE`\n-   **Payload\
+    \ (`YachayQueryResponse`)**: This interface uses the `QueryResult` data model.\n\
+    \    ```typescript\n    export interface YachayQueryResponse {\n      requestId:\
+    \ string;\n      result: QueryResult;\n    }\n    ```"
+- level: 3
+  title: '**3.3.4. Delete a Memory**'
+  type: section
+  content: "A privileged node can request the deletion of a memory object. This is\
+    \ a sensitive, audited operation.\n\n-   **Request Message**: `YACHAY_DELETE_REQUEST`\n\
+    -   **Payload (`YachayDeleteRequest`)**:\n  ```typescript\n    export interface\
+    \ YachayDeleteRequest {\n      requestId: string;\n      memoryId: string;\n \
+    \   justification: string;\n  }\n  ```\n-   **Response Message**: `YACHAY_DELETE_RESPONSE`\n\
+    -   **Payload (`YachayDeleteResponse`)**:\n  ```typescript\n    export interface\
+    \ YachayDeleteResponse {\n      requestId: string;\n      memoryId: string;\n\
+    \      status: 'DELETED' | 'DELETE_FAILED';\n      message?: string;\n  }\n  ```\n\
+    \n---"
+- level: 2
+  title: '**4. API Usage Examples (JSON)**'
+  type: section
+  content: ''
+- level: 3
+  title: '**Example 1: Storing a simple log message**'
+  type: section
+  content: "**Request:**\n```json\n{\n  \"header\": {\n    \"messageType\": \"YACHAY_STORE_REQUEST\"\
+    ,\n    \"from\": \"did:kos:hakim:123\",\n    \"to\": \"did:kos:yachay:master\"\
+    \n  },\n  \"payload\": {\n    \"requestId\": \"req-001\",\n    \"content\": {\n\
+    \      \"level\": \"info\",\n      \"message\": \"Node did:kos:griot:abc completed\
+    \ artifact generation job-456.\"\n    },\n    \"tags\": [\"system_log\", \"griot\"\
+    , \"artifact_generation\"]\n  }\n}\n```\n\n**Response:**\n```json\n{\n  \"header\"\
+    : {\n    \"messageType\": \"YACHAY_STORE_RESPONSE\",\n    \"from\": \"did:kos:yachay:master\"\
+    ,\n    \"to\": \"did:kos:hakim:123\"\n  },\n  \"payload\": {\n    \"requestId\"\
+    : \"req-001\",\n    \"fragmentId\": \"f-a1b2c3d4-e5f6-7890-1234-567890abcdef\"\
+    ,\n    \"status\": \"RECEIVED\"\n  }\n}\n```"
+- level: 3
+  title: '**Example 2: Performing a complex query**'
+  type: section
+  content: "**Request:**\n```json\n{\n  \"header\": {\n    \"messageType\": \"YACHAY_QUERY_REQUEST\"\
+    ,\n    \"from\": \"did:kos:archon:789\",\n    \"to\": \"did:kos:yachay:master\"\
+    \n  },\n  \"payload\": {\n    \"requestId\": \"req-002\",\n    \"query\": {\n\
+    \      \"operator\": \"AND\",\n      \"filters\": [\n        { \"field\": \"tags\"\
+    , \"op\": \"contains\", \"value\": \"system_log\" },\n        { \"field\": \"\
+    content.message\", \"op\": \"contains\", \"value\": \"griot\" },\n        { \"\
+    field\": \"timestamp\", \"op\": \"gte\", \"value\": \"2025-01-01T00:00:00Z\" }\n\
+    \      ],\n      \"limit\": 10\n    }\n  }\n}\n```\n\n**Response:**\n```json\n\
+    {\n  \"header\": {\n    \"messageType\": \"YACHAY_QUERY_RESPONSE\",\n    \"from\"\
+    : \"did:kos:yachay:master\",\n    \"to\": \"did:kos:archon:789\"\n  },\n  \"payload\"\
+    : {\n    \"requestId\": \"req-002\",\n    \"result\": {\n      \"tapestries\"\
+    : [\n        // Array of MemoryTapestry objects...\n      ],\n      \"metadata\"\
+    : {\n        \"queryId\": \"q-987xyz\",\n        \"executionTimeMs\": 42,\n  \
+    \      \"totalHits\": 1,\n        \"limitApplied\": false\n      }\n    }\n  }\n\
+    }\n```\n---"
+- level: 2
+  title: '**5. Error Handling Details**'
+  type: section
+  content: "When a request fails, Yachay returns a `YACHAY_API_ERROR` message.\n\n\
+    - **Payload (`YachayApiError`)**:\n    ```typescript\n    export interface YachayApiError\
+    \ {\n      // The unique ID of the original request that failed.\n      requestId:\
+    \ string;\n      // A specific error code from the architecture's error table.\n\
+    \      errorCode: 'ERR_INGEST_VALIDATION' | 'ERR_LTS_UNAVAILABLE' | 'ERR_QUERY_EXECUTION'\
+    \ | 'ERR_ACL_VIOLATION' | 'NOT_FOUND' | 'INTERNAL_ERROR';\n      // A human-readable\
+    \ message describing the error.\n      message: string;\n    }\n    ```\n- **Example\
+    \ Error Response:**\n  ```json\n  {\n    \"header\": {\n      \"messageType\"\
+    : \"YACHAY_API_ERROR\",\n      \"from\": \"did:kos:yachay:master\",\n      \"\
+    to\": \"did:kos:archon:789\"\n    },\n    \"payload\": {\n      \"requestId\"\
+    : \"req-003\",\n      \"errorCode\": \"ERR_ACL_VIOLATION\",\n      \"message\"\
+    : \"Access denied. Node did:kos:archon:789 does not have read permission for memory\
+    \ t-1a2b3c.\"\n    }\n    }\n    ```"

@@ -1,0 +1,57 @@
+metadata:
+  original_file: 05_Griot_Code_Examples.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Griot Class: Code Examples'
+  description: TypeScript code examples for interacting with the Griot Node Class
+    via KLF.
+sections:
+- level: 2
+  title: 7. TypeScript Code Examples
+  type: section
+  content: This section provides conceptual TypeScript examples for interacting with
+    the Griot node using the KLF.
+- level: 3
+  title: 7.1. Requesting a Node Package
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\
+    \ // Assuming an SDK exists\n\nasync function requestReplication(client: KLFClient,\
+    \ repoUrl: string, version: string) {\n    console.log(`Requesting replication\
+    \ for ${repoUrl}@${version}...`);\n\n    const requestMessage = createMessage()\n\
+    \        .from('did:kos:my-node:123')\n        .to('did:kos:griot:abc') // Target\
+    \ Griot node\n        .type(MessageType.TASK_REQUEST)\n        .payload({\n  \
+    \          task_name: 'replicate',\n            params: {\n                source_url:\
+    \ repoUrl,\n                version: version,\n            },\n        })\n  \
+    \      .build();\n\n    // Listen for progress and final response\n    client.onMessage((message)\
+    \ => {\n        if (message.payload.task_name !== 'replicate') return;\n\n   \
+    \     if (message.type === MessageType.TASK_PROGRESS) {\n            console.log(`[PROGRESS]\
+    \ ${message.payload.progress}%: ${message.payload.message}`);\n        } else\
+    \ if (message.type === MessageType.TASK_RESPONSE) {\n            if (message.payload.status\
+    \ === 'completed') {\n                console.log('Replication successful!');\n\
+    \                console.log('New Package ID:', message.payload.result.package_id);\n\
+    \            } else {\n                console.error('Replication failed:');\n\
+    \                console.error(message.payload.error.message);\n            }\n\
+    \        }\n    });\n\n    await client.sendMessage(requestMessage);\n}\n```"
+- level: 3
+  title: 7.2. Installing a Node Package
+  type: section
+  content: "```typescript\nimport { KLFClient, createMessage, MessageType } from './klf-sdk';\n\
+    \nasync function requestDifferentiation(client: KLFClient, packageId: string)\
+    \ {\n    console.log(`Requesting differentiation for package ${packageId}...`);\n\
+    \n    const requestMessage = createMessage()\n        .from('did:kos:my-node:123')\n\
+    \        .to('did:kos:griot:abc') // Target Griot node\n        .type(MessageType.TASK_REQUEST)\n\
+    \        .payload({\n            task_name: 'differentiate',\n            params:\
+    \ {\n                package_id: packageId,\n                config: {\n     \
+    \               env_vars: {\n                        LOG_LEVEL: 'debug',\n   \
+    \                 },\n                },\n            },\n        })\n       \
+    \ .build();\n\n    // Listen for progress and final response\n    client.onMessage((message)\
+    \ => {\n        if (message.payload.task_name !== 'differentiate') return;\n\n\
+    \        if (message.type === MessageType.TASK_PROGRESS) {\n            console.log(`[INSTALL]\
+    \ ${message.payload.progress}%: ${message.payload.message}`);\n        } else\
+    \ if (message.type === MessageType.TASK_RESPONSE) {\n            if (message.payload.status\
+    \ === 'completed') {\n                console.log('Differentiation successful!');\n\
+    \                console.log('New Node ID:', message.payload.result.new_node_id);\n\
+    \            } else {\n                console.error('Differentiation failed:');\n\
+    \                console.error(message.payload.error.message);\n            }\n\
+    \        }\n    });\n\n    await client.sendMessage(requestMessage);\n}\n```"

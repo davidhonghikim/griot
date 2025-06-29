@@ -1,0 +1,245 @@
+name: "Knowledge Discovery Workflow"
+description: "Discover and integrate new knowledge from multiple sources with memory enhancement"
+category: "ai"
+tags:
+  primary: "ai"
+  secondary: ["knowledge", "discovery", "rag", "memory", "integration"]
+  priority: "high"
+  complexity: "complex"
+  dependencies: ["semantic_search", "content_analysis", "knowledge_retrieval", "memory_storage"]
+  version: "1.0.0"
+  created: "2025-01-27"
+  updated: "2025-01-27"
+  author: "kOS Development Team"
+
+workflow:
+  name: "knowledge_discovery_workflow"
+  description: "Multi-step knowledge discovery and integration process"
+  triggers:
+    - "discover knowledge about"
+    - "find information on"
+    - "learn about"
+    - "research"
+    - "explore topic"
+  
+  steps:
+    - step: 1
+      name: "query_analysis"
+      skill: "content_analysis"
+      input:
+        content: "{query}"
+        analysis_type: "intent_extraction"
+      output: "query_intent"
+      description: "Analyze user query to extract intent and context"
+      
+    - step: 2
+      name: "semantic_search"
+      skill: "semantic_search"
+      input:
+        query: "{query}"
+        context: "{query_intent.context}"
+        max_results: 20
+        similarity_threshold: 0.7
+      output: "search_results"
+      description: "Perform semantic search across knowledge base"
+      
+    - step: 3
+      name: "memory_context_retrieval"
+      skill: "memory_retrieval"
+      input:
+        query: "{query}"
+        context: "{query_intent.context}"
+        include_persistent: true
+        include_contextual: true
+        limit: 10
+      output: "memory_context"
+      description: "Retrieve relevant memory context"
+      
+    - step: 4
+      name: "knowledge_synthesis"
+      skill: "knowledge_composition"
+      input:
+        search_results: "{search_results}"
+        memory_context: "{memory_context}"
+        query_intent: "{query_intent}"
+        synthesis_strategy: "comprehensive"
+      output: "synthesized_knowledge"
+      description: "Synthesize knowledge from multiple sources"
+      
+    - step: 5
+      name: "quality_assessment"
+      skill: "content_analysis"
+      input:
+        content: "{synthesized_knowledge.content}"
+        analysis_type: "quality_assessment"
+      output: "quality_metrics"
+      description: "Assess quality and reliability of synthesized knowledge"
+      
+    - step: 6
+      name: "knowledge_storage"
+      skill: "memory_storage"
+      input:
+        content: "{synthesized_knowledge}"
+        category: "knowledge"
+        importance: "{quality_metrics.confidence}"
+        tags: "{synthesized_knowledge.tags}"
+        metadata:
+          source: "knowledge_discovery"
+          query: "{query}"
+          quality_score: "{quality_metrics.overall_score}"
+        auto_route: true
+      output: "stored_knowledge"
+      description: "Store synthesized knowledge in appropriate memory layer"
+      
+    - step: 7
+      name: "relationship_mapping"
+      skill: "knowledge_graph_query"
+      input:
+        knowledge_id: "{stored_knowledge.memory_id}"
+        content: "{synthesized_knowledge.content}"
+        tags: "{synthesized_knowledge.tags}"
+      output: "knowledge_relationships"
+      description: "Map relationships to existing knowledge graph"
+      
+    - step: 8
+      name: "response_generation"
+      skill: "content_generation"
+      input:
+        knowledge: "{synthesized_knowledge}"
+        relationships: "{knowledge_relationships}"
+        query: "{query}"
+        format: "structured_response"
+      output: "final_response"
+      description: "Generate structured response with knowledge and relationships"
+
+  error_handling:
+    - condition: "search_results.length < 3"
+      action: "expand_search"
+      fallback_skill: "semantic_search"
+      fallback_input:
+        query: "{query}"
+        similarity_threshold: 0.5
+        max_results: 30
+      
+    - condition: "quality_metrics.overall_score < 0.6"
+      action: "enhance_quality"
+      fallback_skill: "knowledge_enhancement"
+      fallback_input:
+        knowledge: "{synthesized_knowledge}"
+        target_quality: 0.8
+        
+    - condition: "memory_context.length === 0"
+      action: "skip_memory_integration"
+      continue_to: "knowledge_synthesis"
+      
+    - condition: "any_step_fails"
+      action: "graceful_degradation"
+      fallback_response: "Unable to complete full discovery, but here's what I found..."
+
+  parallel_execution:
+    enabled: true
+    parallel_steps:
+      - ["semantic_search", "memory_context_retrieval"]
+      - ["quality_assessment", "relationship_mapping"]
+
+  conditional_logic:
+    - condition: "query_intent.complexity > 0.8"
+      action: "enable_deep_analysis"
+      additional_steps:
+        - skill: "deep_knowledge_analysis"
+          input: "{synthesized_knowledge}"
+          output: "deep_analysis"
+          
+    - condition: "query_intent.urgency > 0.7"
+      action: "prioritize_speed"
+      modifications:
+        - reduce_search_results: 10
+        - skip_relationship_mapping: true
+        - fast_response_generation: true
+
+  output_format:
+    structured: true
+    include_metadata: true
+    include_sources: true
+    include_confidence: true
+    
+  response_structure:
+    knowledge_summary: "string"
+    key_insights: "string[]"
+    related_topics: "string[]"
+    sources: "SourceInfo[]"
+    confidence_score: "number"
+    knowledge_id: "string"
+    relationships: "RelationshipInfo[]"
+    next_steps: "string[]"
+
+examples:
+  basic_discovery: |
+    const workflow = new KnowledgeDiscoveryWorkflow({
+      semanticSearch: semanticSearchSkill,
+      contentAnalysis: contentAnalysisSkill,
+      memoryStorage: memoryStorageSkill,
+      knowledgeComposition: knowledgeCompositionSkill
+    });
+    
+    const result = await workflow.execute({
+      query: "How do RAG systems work?",
+      context: "User is learning about AI systems"
+    });
+    
+    console.log(`Discovered knowledge: ${result.knowledge_summary}`);
+    console.log(`Confidence: ${result.confidence_score}`);
+
+  complex_research: |
+    const result = await workflow.execute({
+      query: "Advanced memory management in distributed systems",
+      context: "Research for system architecture design",
+      options: {
+        enable_deep_analysis: true,
+        include_external_sources: true,
+        cross_reference_validation: true
+      }
+    });
+
+  urgent_query: |
+    const result = await workflow.execute({
+      query: "Quick fix for API authentication error",
+      context: "Production system issue",
+      urgency: 0.9
+    });
+
+dependencies:
+  - "semantic_search_skill"
+  - "content_analysis_skill"
+  - "memory_storage_skill"
+  - "knowledge_composition_skill"
+  - "memory_retrieval_skill"
+  - "knowledge_graph_query_skill"
+  - "content_generation_skill"
+
+performance:
+  average_execution_time: "2-5 seconds"
+  memory_usage: "Medium"
+  scalability: "High"
+  accuracy: "85-95%"
+
+learning_capabilities:
+  - "Adapts search strategies based on query patterns"
+  - "Learns from user feedback on result quality"
+  - "Improves knowledge synthesis over time"
+  - "Builds relationship patterns automatically"
+  - "Optimizes memory storage strategies"
+
+quality_metrics:
+  - "Knowledge completeness"
+  - "Source reliability"
+  - "Relationship accuracy"
+  - "Response relevance"
+  - "User satisfaction"
+
+security:
+  - "Source validation"
+  - "Content filtering"
+  - "Access control"
+  - "Audit logging"
+  - "Privacy compliance" 

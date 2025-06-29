@@ -1,0 +1,52 @@
+metadata:
+  original_file: 03_Oracle_KLF_API.md
+  conversion_date: '2025-06-30T11:00:00Z'
+  format: yaml
+frontmatter:
+  title: 'Oracle Class: KLF Message API'
+  description: KLF Message API specification for the Oracle Node Class's asynchronous
+    query service.
+sections:
+- level: 1
+  title: Oracle Class KLF Message API
+  type: section
+  content: The Oracle Class API is job-based. Clients submit a complex query and receive
+    progress and final results asynchronously.
+- level: 3
+  title: '**Request: `submit_query`**'
+  type: section
+  content: "-   **Description**: Submits a query to the Oracle for asynchronous execution.\n\
+    -   **Message Type**: `TASK_REQUEST`\n-   **Payload**:\n    ```json\n    {\n \
+    \     \"task_name\": \"submit_query\",\n      \"params\": {\n        \"query_string\"\
+    : \"SELECT LATEST 10 FROM 'griot:articles' WHERE 'topic' == 'AI' RETURN 'title',\
+    \ 'author'\",\n        \"dsl_version\": \"1.0\"\n      }\n    }\n    ```\n-  \
+    \ **Response (Immediate)**: `TASK_RESPONSE` with `status: \"completed\"` and `result:\
+    \ { \"job_id\": \"...\", \"job_status\": \"pending\" }`. This acknowledges the\
+    \ query has been accepted."
+- level: 3
+  title: '**Progress Updates**'
+  type: section
+  content: "-   **Description**: The Oracle sends progress updates to the requester\
+    \ as it executes the query plan.\n-   **Message Type**: `TASK_PROGRESS`\n-   **Payload**:\n\
+    \    ```json\n    {\n      \"task_name\": \"submit_query\",\n      \"job_id\"\
+    : \"string (uuid of the running job)\",\n      \"status\": \"running\",\n    \
+    \  \"progress\": \"number (0-100)\",\n      \"message\": \"string (e.g., 'Executing\
+    \ sub-query against griot:123', 'Fusing results...')\"\n    }\n    ```"
+- level: 3
+  title: '**Final Response: Success**'
+  type: section
+  content: "-   **Description**: The final, rich response containing the results and\
+    \ the explanation. This is sent as a separate message upon job completion.\n-\
+    \   **Message Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n    {\n\
+    \      \"task_name\": \"submit_query\",\n      \"job_id\": \"string (uuid of the\
+    \ job)\",\n      \"status\": \"completed\",\n      \"result\": {\n        // ...\
+    \ a full QueryResponse object ...\n      }\n    }\n    ```"
+- level: 3
+  title: '**Final Response: Error**'
+  type: section
+  content: "-   **Description**: Sent if the query fails during execution.\n-   **Message\
+    \ Type**: `TASK_RESPONSE`\n-   **Payload**:\n    ```json\n    {\n      \"task_name\"\
+    : \"submit_query\",\n      \"job_id\": \"string (uuid of the job)\",\n      \"\
+    status\": \"failed\",\n      \"error\": {\n        \"code\": \"string (e.g., 'QUERY_PARSE_ERROR',\
+    \ 'DATA_SOURCE_UNAVAILABLE')\",\n        \"message\": \"string (Detailed error\
+    \ message)\"\n      }\n    }\n    ```"

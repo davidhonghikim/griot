@@ -1,0 +1,30 @@
+// List all documents and their tags
+MATCH (d:Document)-[:TAGGED_WITH]->(t:Tag)
+RETURN d.title AS Document, collect(t.name) AS Tags
+
+// Find all documents with a specific tag
+MATCH (t:Tag {name: "architecture"})<-[:TAGGED_WITH]-(d:Document)
+RETURN d.title AS Document
+
+// Show document-to-tag graph structure
+MATCH (d:Document)-[r:TAGGED_WITH]->(t:Tag)
+RETURN d, r, t
+
+// Find related documents sharing at least one tag
+MATCH (d1:Document)-[:TAGGED_WITH]->(t:Tag)<-[:TAGGED_WITH]-(d2:Document)
+WHERE d1 <> d2
+RETURN d1.title AS Doc1, d2.title AS Doc2, collect(t.name) AS SharedTags
+
+// Optional: Count documents per tag
+MATCH (t:Tag)<-[:TAGGED_WITH]-(d:Document)
+RETURN t.name AS Tag, count(d) AS DocumentCount
+
+// Find orphan documents (no tags)
+MATCH (d:Document)
+WHERE NOT (d)-[:TAGGED_WITH]->()
+RETURN d.title AS OrphanDocument
+
+// Export graph as JSON (for visualization tools)
+CALL apoc.export.json.all("export.json", {})
+YIELD file, nodes, relationships, properties, time
+RETURN file, nodes, relationships, time

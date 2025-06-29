@@ -13,8 +13,7 @@ This directory contains comprehensive analyses performed by agents during develo
 ## **Analysis Structure**
 
 ### **File Naming Convention**
-- Format: `[YYYY-MM-DD]_[analysis_name].md`
-- Example: `2025-06-29_comprehensive_project_analysis.md`
+- Format: `[TIMESTAMP]_analysis_name.md`
 
 ### **Analysis Components**
 Each analysis includes:
@@ -95,7 +94,7 @@ Each analysis includes:
 ## **Integration with Agent Workflow**
 
 ### **Analysis in Changelog**
-All analyses are logged in `agents/01_AGENT_CHANGELOG.md` with:
+All analyses are logged in `agents/[TIMESTAMP]_01_AGENT_CHANGELOG.md` with:
 - Analysis creation timestamp
 - Key findings summary
 - Impact on project direction
@@ -123,8 +122,8 @@ Completed analyses are archived to:
 title: "[Analysis Title]"
 version: "1.0"
 status: "Analysis"
-created: "[YYYY-MM-DD]"
-updated: "[YYYY-MM-DD]"
+created: "[TIMESTAMP]"
+updated: "[TIMESTAMP]"
 author: "[Agent Name]"
 ---
 

@@ -1,0 +1,162 @@
+title: "kOS Agent Workflow & Process Mandate"
+version: "2.0"
+status: "ACTIVE"
+last_updated: "2025-06-28"
+description: "Absolute source of truth for agent development workflow on the kOS project"
+
+prime_directive:
+  title: "No Surprises"
+  description: "Perform assigned tasks while leaving clear, auditable trail of work"
+  principle: "Next agent or human developer must understand what was done, discovered, and why decisions were made"
+
+critical_rules:
+  documentation_before_archiving:
+    mandatory: true
+    description: "MUST update all relevant documentation BEFORE archiving any handoff"
+    requirements:
+      - "Agent Changelog - Update agents/01_AGENT_CHANGELOG.md with session summary"
+      - "Handoff Document - Create comprehensive agents/handoff/LATEST_HANDOFF.md"
+      - "Implementation Plans - Update any relevant plans in agents/implementation-plans/"
+      - "Project Documentation - Update README files and other relevant docs"
+      - "Code Documentation - Update inline comments and code documentation"
+    violation: "FAILURE TO UPDATE DOCUMENTATION BEFORE ARCHIVING IS A CRITICAL VIOLATION"
+
+mandatory_workflow:
+  onboarding:
+    title: "Onboarding (First 5 Minutes)"
+    description: "Ground yourself in current project state before any other action"
+    command: |
+      cat agents/02_SYSTEM_PROMPT.md && echo "\n---" && cat agents/00_AGENT_WORKFLOW.md && echo "\n---" && cat ai-q/04_architecture/02_AI_Orchestration_Framework.md && echo "\n---" && cat agents/handoff/LATEST_HANDOFF.md
+    requirement: "Do not proceed until this is done"
+
+  agent_changelog:
+    title: "Agent Changelog (Primary Duty)"
+    file: "agents/01_AGENT_CHANGELOG.md"
+    description: "Official, chronological journal of the project"
+    
+    start_of_session:
+      template: |
+        ---
+        ## Agent: [Your Name/Model] - [YYYY-MM-DD]
+        
+        **Mission**: [A brief, one-sentence summary of the goal from LATEST_HANDOFF.md]
+        
+        ### Log:
+        - **[YYYY-MM-DDTHH:MM:SSZ]**: ONBOARDING - Session started. Reviewing rules and handoff directive.
+      timestamp_format: "YYYY-MM-DD"
+    
+    during_session:
+      principle: "Log major accomplishments, not every granular action"
+      goal: "Create high-level, human-readable audit trail that summarizes progress"
+      log_types:
+        - "FINDING: Discovery of significant issue"
+        - "CORRECTION: Direct action taken to fix a FINDING"
+        - "DECISION: Choice made between multiple implementation options"
+      example_entries:
+        - "2025-06-25T18:35:00Z: FINDING - Discovered a MessageType mismatch between specifications and the core protocol"
+        - "2025-06-25T19:10:00Z: ACTION - Completed the full 5-part specification suite for the Griot Node"
+
+  style_conventions:
+    directory_structure:
+      rules:
+        - "All project documentation and specifications MUST reside under ai-q/"
+        - "All agent process files MUST reside under agents/"
+        - "Node specification suites MUST be placed in ai-q/03_node_specifications/[##]_[NodeName]/"
+        - "No other top-level directories may be created"
+    
+    file_naming:
+      node_specifications: "[##]_[SpecName].md"
+      handoffs:
+        primary: "agents/handoff/LATEST_HANDOFF.md"
+        archived: "[YYYY-MM-DD]_[AgentName]_[Description].md"
+    
+    markdown_style:
+      format: "Markdown (.md)"
+      frontmatter: "YAML frontmatter with title and version fields"
+      headings: "Must be used hierarchically"
+      code_blocks: "Must be properly fenced with language identifier"
+    
+    code_style:
+      requirements:
+        - "Adhere to project's Prettier and ESLint configurations"
+        - "Run formatters and linters before finalizing work"
+
+  handoff_process:
+    title: "Handoff Process (Last 5 Minutes)"
+    critical_rule: "Documentation Updates MUST Come First"
+    
+    finalize_log:
+      file: "agents/01_AGENT_CHANGELOG.md"
+      template: |
+        ### SESSION SUMMARY:
+        **Accomplishments**: 
+        - [List of completed primary goals from the mission.]
+        - [List of any other significant achievements.]
+        **Final State**: [A brief, 1-2 sentence description of the state of the codebase and documentation at the end of the session.]
+        **Key Findings**: 
+        - [A bulleted list of any critical discoveries (FINDING entries) made during the session.]
+        - [If no significant findings, state "None."]
+    
+    update_documentation:
+      requirements:
+        - "Implementation Plans - Update any plans in agents/implementation-plans/"
+        - "Project README - Update main README if architectural changes were made"
+        - "Code Documentation - Update inline comments and code documentation"
+        - "Configuration Files - Update any configuration documentation"
+        - "User Guides - Update any user-facing documentation"
+    
+    archive_old_handoff:
+      command: "mv agents/handoff/LATEST_HANDOFF.md agents/handoff/archive/[YYYY-MM-DD]_[YourName]_[Description].md"
+    
+    create_new_handoff:
+      file: "agents/handoff/LATEST_HANDOFF.md"
+      template: |
+        # **NEXT AGENT HANDOFF**
+        
+        **UTC**: [Timestamp]
+        **From Agent**: [Your Name/Model]
+        **Previous Handoff**: `[Path to the handoff you just archived]`
+        
+        ---
+        
+        ## 1. Current Project Status
+        
+        [A brief, 1-2 sentence summary of the project's current state.]
+        
+        ## 2. Your Directive
+        
+        [A clear, concise, and specific mission for the next agent.]
+        
+        ## 3. Context & History
+        
+        For a complete history of the actions that led to this handoff, please review my final session log in `agents/01_AGENT_CHANGELOG.md` under the entry for **[YYYY-MM-DD]**.
+
+documentation_quality_standards:
+  completeness: "All major changes must be documented"
+  clarity: "Documentation must be clear enough for the next agent to understand"
+  accuracy: "Documentation must reflect the actual state of the codebase"
+  timeliness: "Documentation must be updated before archiving"
+  consistency: "Follow established patterns and conventions"
+
+documentation_checklist:
+  before_archiving:
+    - "Agent changelog updated with session summary"
+    - "Handoff document created with clear directive"
+    - "Implementation plans updated (if applicable)"
+    - "README files updated (if architectural changes)"
+    - "Code documentation updated (if code changes)"
+    - "Configuration documentation updated (if config changes)"
+    - "User guides updated (if user-facing changes)"
+  rule: "DO NOT ARCHIVE UNTIL ALL CHECKLIST ITEMS ARE COMPLETE"
+
+final_verification:
+  title: "MANDATORY FINAL DOUBLE-CHECK & ERROR REVIEW"
+  double_check_work:
+    - "Review all new and modified files for errors, logic issues, missing imports, and missing dependencies"
+    - "Trace the runtime logic, following code and pseudocode, to ensure correctness and completeness"
+    - "Check for unhandled edge cases, incomplete implementations, and integration issues"
+    - "Ensure all code is clear, maintainable, and well-commented where needed"
+  
+  integration_verification:
+    - "Confirm that all imports and dependencies are present and correct"
+    - "Verify that new modules integrate cleanly with the rest of the system" 
