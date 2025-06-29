@@ -1,0 +1,46 @@
+title: "kOS Chrome Extension Build & Configuration Guide"
+version: "1.0"
+author: "kOS Agent"
+date: "2025-01-28"
+status: "ACTIVE"
+
+summary:
+  description: |
+    This guide documents the canonical build, HTML, and Vite configuration pattern for all Chrome extensions in the kOS ecosystem. It is based on the working kai-cd and OWU+ extension implementations. All agents must follow this pattern for compatibility and maintainability.
+
+html_pattern:
+  placement: "HTML files (popup.html, sidepanel.html, tab.html) must be at the root of the extension project, not in public/."
+  script_tag: "Each HTML file must reference the source TSX/TS entry point (e.g., <script type='module' src='/src/popup.tsx'></script>). Vite will handle transformation during build."
+  root_div: "Each HTML file must have <div id='root'></div> for React mounting."
+
+vite_config:
+  rollup_input: |
+    The Vite config must use the root-level HTML files as entry points:
+      input: {
+        popup: resolve(__dirname, 'popup.html'),
+        sidepanel: resolve(__dirname, 'sidepanel.html'),
+        tab: resolve(__dirname, 'tab.html'),
+        ...
+      }
+  output: "Vite will generate the correct JS bundles and HTML in dist/."
+
+troubleshooting:
+  - problem: "Popup or panel fails to load, 404 for .tsx file"
+    cause: "HTML file is in the wrong location or script tag points to built JS instead of source TSX."
+    solution: "Move HTML to root, use source TSX in script tag, and rebuild."
+  - problem: "Build fails with Rollup import error for missing .tsx entry"
+    cause: "Vite input references a file that does not exist."
+    solution: "Create the missing entry point or update Vite config."
+  - problem: "Extension loads but UI is blank"
+    cause: "No #root div or React entry not mounting."
+    solution: "Ensure <div id='root'></div> is present and entry file renders to it."
+
+reference:
+  canonical_pattern: "kai-cd project (see popup.html, vite.config.ts)"
+  extension_example: "apps/persona-rag-bridge (see docs/BUILD_NOTES.yml)"
+  last_verified: "2025-01-28"
+
+notes:
+  - "Always test in Chrome after build."
+  - "Do not use leading slashes in script src for built JS; use for source TSX only."
+  - "Update this doc if the build pattern changes." 

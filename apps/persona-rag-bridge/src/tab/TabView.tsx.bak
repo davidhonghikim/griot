@@ -1,0 +1,62 @@
+import React, { useState, useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui';
+import { ChatTab } from '../components/tabs/ChatTab';
+import { ServicesTab } from '../components/tabs/ServicesTab';
+import { ArtefactsTab } from '../components/tabs/ArtefactsTab';
+import { RecipesTab } from '../components/tabs/RecipesTab';
+import { AgentsTab } from '../components/tabs/AgentsTab';
+import { SettingsTab } from '../components/tabs/SettingsTab';
+
+interface TabViewProps {
+  initialView: string;
+}
+
+export const TabView: React.FC<TabViewProps> = ({ initialView }) => {
+
+  useEffect(() => {
+    setCurrentTab(initialView);
+  }, [initialView]);
+
+  return (
+    <div className="min-h-screen bg-background-primary text-text-primary">
+      <div className="container mx-auto p-6">
+        <header className="mb-6">
+          <h1 className="text-2xl font-bold text-text-primary">OWU+ Extension</h1>
+          <p className="text-text-secondary">AI-Powered Knowledge Management</p>
+        </header>
+
+        <Tabs defaultValue={initialView} 
+          className="w-full"
+        >
+          <Tabs defaultValue={initialView}List className="grid w-full grid-cols-6 mb-6">
+            <Tabs defaultValue={initialView}Trigger value="chat">Chat</TabsTrigger>
+            <Tabs defaultValue={initialView}Trigger value="services">Services</TabsTrigger>
+            <Tabs defaultValue={initialView}Trigger value="artefacts">Artefacts</TabsTrigger>
+            <Tabs defaultValue={initialView}Trigger value="recipes">Recipes</TabsTrigger>
+            <Tabs defaultValue={initialView}Trigger value="agents">Agents</TabsTrigger>
+            <Tabs defaultValue={initialView}Trigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+
+          <Tabs defaultValue={initialView}Content value="chat" className="space-y-4">
+            <ChatTab />
+          </TabsContent>
+          <Tabs defaultValue={initialView}Content value="services" className="space-y-4">
+            <ServicesTab />
+          </TabsContent>
+          <Tabs defaultValue={initialView}Content value="artefacts" className="space-y-4">
+            <ArtefactsTab />
+          </TabsContent>
+          <Tabs defaultValue={initialView}Content value="recipes" className="space-y-4">
+            <RecipesTab />
+          </TabsContent>
+          <Tabs defaultValue={initialView}Content value="agents" className="space-y-4">
+            <AgentsTab />
+          </TabsContent>
+          <Tabs defaultValue={initialView}Content value="settings" className="space-y-4">
+            <SettingsTab />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+};

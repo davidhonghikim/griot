@@ -1,67 +1,32 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
+    './public/popup.html',
+    './public/tab.html',
+    './public/sidepanel.html',
     './src/**/*.{js,ts,jsx,tsx}',
-    './public/**/*.html',
+    './docs.html'
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
-        },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
-        },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
-      },
-      borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
-      },
-      keyframes: {
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
-        },
-      },
-      animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
+        'background-primary': 'rgb(var(--color-bg-primary) / <alpha-value>)',
+        'background-secondary': 'rgb(var(--color-bg-secondary) / <alpha-value>)',
+        'background-tertiary': 'rgb(var(--color-bg-tertiary) / <alpha-value>)',
+        'text-primary': 'rgb(var(--color-text-primary) / <alpha-value>)',
+        'text-secondary': 'rgb(var(--color-text-secondary) / <alpha-value>)',
+        'text-placeholder': 'rgb(var(--color-text-disabled) / <alpha-value>)',
+        'accent-primary': 'rgb(var(--color-interactive-primary) / <alpha-value>)',
+        'accent-primary-state': 'rgb(var(--color-interactive-primary-hover) / <alpha-value>)',
+        'border-primary': 'rgb(var(--color-border-primary) / <alpha-value>)',
+        'red': 'rgb(var(--color-status-error) / <alpha-value>)',
+        'green': 'rgb(var(--color-status-success) / <alpha-value>)',
+        'blue': 'rgb(var(--color-status-info) / <alpha-value>)',
+        'yellow': 'rgb(var(--color-status-warning) / <alpha-value>)',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }; 

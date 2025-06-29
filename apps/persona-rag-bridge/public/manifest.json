@@ -47,6 +47,8 @@
     {
       "resources": [
         "popup.html",
+        "tab.html",
+        "sidepanel.html",
         "assets/*"
       ],
       "matches": ["<all_urls>"]

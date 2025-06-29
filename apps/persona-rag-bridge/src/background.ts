@@ -5,67 +5,16 @@
  * Handles extension lifecycle, message routing, and background tasks.
  */
 
-// Extension state
-let isInitialized = false;
-
-// Initialize extension
-const initializeExtension = async () => {
-  if (isInitialized) return;
-
-  try {
-    console.log('Initializing OWU+ Extension background service...');
-    
-    // Set up extension icon
-    chrome.action.setIcon({
-      path: {
-        16: 'icons/icon-16.png',
-        32: 'icons/icon-32.png',
-        48: 'icons/icon-48.png',
-        128: 'icons/icon-128.png',
-      },
-    });
-
-    // Set up extension badge
-    chrome.action.setBadgeText({ text: '' });
-    chrome.action.setBadgeBackgroundColor({ color: '#3b82f6' });
-
-    // Initialize services
-    await initializeServices();
-    
-    isInitialized = true;
-    console.log('OWU+ Extension background service initialized');
-  } catch (error) {
-    console.error('Failed to initialize background service:', error);
-  }
-};
-
-// Initialize services
-const initializeServices = async () => {
-  // TODO: Initialize Reticulum client
-  // TODO: Initialize KLF client
-  // TODO: Initialize service connectors
-  // TODO: Set up periodic health checks
-  // TODO: Set up notification handlers
-};
+console.log('OWU+ Extension background service starting...');
 
 // Handle extension installation
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('Extension installed:', details.reason);
-  
-  if (details.reason === 'install') {
-    // First time installation
-    chrome.tabs.create({
-      url: 'https://github.com/your-repo/owu-plus#readme',
-    });
-  }
-  
-  initializeExtension();
 });
 
 // Handle extension startup
 chrome.runtime.onStartup.addListener(() => {
   console.log('Extension starting up...');
-  initializeExtension();
 });
 
 // Handle messages from popup, content scripts, etc.
@@ -73,24 +22,71 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('Received message:', message, 'from:', sender);
   
   switch (message.action) {
-    case 'openPanel':
-      openPanel();
-      break;
-      
-    case 'openVault':
-      openVault();
-      break;
-      
     case 'getStatus':
-      getStatus().then(sendResponse);
-      return true; // Keep message channel open for async response
-      
-    case 'sendMessage':
-      sendReticulumMessage(message.data).then(sendResponse);
+      sendResponse({ status: 'ok', timestamp: Date.now() });
       return true;
       
-    case 'executeWorkflow':
-      executeWorkflow(message.data).then(sendResponse);
+    case 'openTab':
+      const { serviceId, view } = message.payload;
+      const tabUrl = chrome.runtime.getURL('tab.html');
+      
+      // Check if a tab is already open
+      chrome.tabs.query({ url: tabUrl }, (tabs) => {
+        if (tabs.length > 0 && tabs[0].id) {
+          // Tab exists, focus it and send it the new state
+          const tabId = tabs[0].id;
+          chrome.tabs.update(tabId, { active: true });
+          if (tabs[0].windowId) {
+            chrome.windows.update(tabs[0].windowId, { focused: true });
+          }
+          // Send a message to the existing tab to update its state
+          chrome.tabs.sendMessage(tabId, {
+            action: 'setState',
+            payload: { serviceId, view },
+          });
+        } else {
+          // No tab exists, create a new one with query params
+          const params = new URLSearchParams();
+          if (serviceId) {
+            params.set('serviceId', serviceId);
+          }
+          if (view) {
+            params.set('view', view);
+          }
+          const finalUrl = `${tabUrl}?${params.toString()}`;
+          chrome.tabs.create({ url: finalUrl });
+        }
+      });
+      return true;
+      
+    case 'openPanel':
+      const { serviceId: panelServiceId, view: panelView } = message.payload;
+      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        const currentTab = tabs[0];
+        if (currentTab?.id) {
+          try {
+            await chrome.sidePanel.setOptions({
+              tabId: currentTab.id,
+              path: 'sidepanel.html',
+              enabled: true
+            });
+            await chrome.sidePanel.open({ tabId: currentTab.id });
+            
+            // Send state to panel
+            chrome.tabs.sendMessage(currentTab.id, {
+              action: 'setPanelState',
+              payload: { serviceId: panelServiceId, view: panelView },
+            });
+          } catch (error) {
+            console.error('Failed to open panel:', error);
+          }
+        }
+      });
+      return true;
+      
+    case 'openVault':
+      const vaultUrl = chrome.runtime.getURL('tab.html?view=vault');
+      chrome.tabs.create({ url: vaultUrl });
       return true;
       
     default:
@@ -98,82 +94,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-// Open side panel
-const openPanel = () => {
-  chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-};
-
-// Open vault
-const openVault = () => {
-  chrome.tabs.create({
-    url: chrome.runtime.getURL('vault.html'),
-  });
-};
-
-// Get extension status
-const getStatus = async () => {
-  // TODO: Return actual status from services
-  return {
-    reticulum: { connected: false, nodes: 0 },
-    klf: { connected: false, services: 0 },
-    services: { active: 0, total: 0 },
-    timestamp: Date.now(),
-  };
-};
-
-// Send message through Reticulum
-const sendReticulumMessage = async (data: any) => {
-  // TODO: Implement Reticulum message sending
-  console.log('Sending Reticulum message:', data);
-  return { success: true, messageId: crypto.randomUUID() };
-};
-
-// Execute KLF workflow
-const executeWorkflow = async (data: any) => {
-  // TODO: Implement KLF workflow execution
-  console.log('Executing workflow:', data);
-  return { success: true, executionId: crypto.randomUUID() };
-};
-
-// Handle tab updates
-chrome.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.url) {
-    // TODO: Inject content scripts if needed
-    // TODO: Update extension state based on page
-  }
-});
-
-// Handle tab activation
-chrome.tabs.onActivated.addListener((_activeInfo) => {
-  // TODO: Update extension state based on active tab
-});
-
-// Handle storage changes
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  console.log('Storage changed:', namespace, changes);
-  
-  // TODO: Handle configuration changes
-  // TODO: Update service connections
-  // TODO: Refresh extension state
-});
-
-// Periodic health checks
-setInterval(async () => {
-  try {
-    // TODO: Check service health
-    // TODO: Update extension badge
-    // TODO: Send notifications if needed
-  } catch (error) {
-    console.error('Health check failed:', error);
-  }
-}, 30000); // Every 30 seconds
-
-// Handle extension shutdown
-chrome.runtime.onSuspend.addListener(() => {
-  console.log('Extension suspending...');
-  // TODO: Cleanup resources
-  // TODO: Save state
-});
-
-// Initialize on load
-initializeExtension(); 
+console.log('OWU+ Extension background service initialized'); 
