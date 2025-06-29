@@ -1,0 +1,38 @@
+status_mode_state_indicators:
+  theme: "System States, Node Modes, Health, Activity Levels"
+  indicators:
+    - "Online - green dot"
+    - "Offline - gray dot"
+    - "Busy - red dot"
+    - "Idle - yellow dot"
+    - "Maintenance Mode - wrench with clock"
+    - "Error State - exclamation in red circle"
+    - "Recovery Mode - spinning arrows"
+    - "Deployment Mode - rocket launch"
+    - "Training Mode - book with lightbulb"
+    - "Alert State - siren icon"
+    - "Low Power - battery with warning"
+    - "Overheating - thermometer with danger symbol"
+    - "Network Disconnected - broken link"
+    - "Syncing - double arrows"
+    - "High Load - speedometer in red zone"
+    - "Cooling Down - snowflake icon"
+    - "Queued - hourglass with number overlay"
+    - "Scanning - radar sweep"
+    - "Awaiting Input - keyboard with blinking cursor"
+    - "Archived - box with lid closed"
+    - "Active Listening - ear with sound waves"
+    - "Read-Only Mode - eye with slash"
+    - "Writable Mode - pencil icon"
+    - "Testing Mode - flask with gear"
+    - "Shutdown Pending - power icon with countdown"
+  color_palettes:
+    - "Green, Yellow, Red (Status Traffic Light)"
+    - "Cool Blues (Idle / Low Power)"
+    - "Neon Alerts (Errors and Critical Modes)"
+  usage_notes:
+    - "Used in node dashboards, agent state displays, and system health monitors"
+    - "Dynamic switching for real-time state indicators"
+  version: "1.0.0 (June 2025 Status Indicators Pack)"
+  authors: ["kOS Dev Team", "Skald Visual Systems"]
+

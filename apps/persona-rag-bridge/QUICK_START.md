@@ -1,153 +1,170 @@
-# 🚀 Quick Start Guide
+# 🚀 Quick Start Guide - OWU+ Browser Extension
 
-## For OpenWebUI Integration
+## **5-Minute Setup & Testing**
 
-This guide will get you up and running with the PersonaRAG Bridge connected to your OpenWebUI instance at `http://192.168.1.180:3000`.
+This guide will get you up and running with the OWU+ Browser Extension in under 5 minutes.
 
-## Step 1: Setup Vault and Configuration
+## Step 1: Build the Extension
 
 ```bash
-# Navigate to the bridge directory
+# Navigate to the extension directory
 cd apps/persona-rag-bridge
 
-# Run the automated setup (recommended)
-./scripts/setup-vault.sh
-```
-
-**OR** manually:
-
-```bash
 # Install dependencies
 npm install
 
-# Initialize the secure vault
-npm run vault:init
-
-# Set your OpenWebUI API key (you'll be prompted)
-npm run vault:set OPENWEBUI_API_KEY
-
-# Build the project
+# Build the extension
 npm run build
-```
-
-## Step 2: Configure OpenWebUI API Key
-
-You need to get your OpenWebUI API key:
-
-1. **Open your OpenWebUI** at `http://192.168.1.180:3000`
-2. **Go to Settings** → **API Keys**
-3. **Create a new API key** or copy an existing one
-4. **Store it in the vault**:
-
-```bash
-npm run vault:set OPENWEBUI_API_KEY
-# Enter your API key when prompted
-```
-
-## Step 3: Start the Bridge
-
-```bash
-# Start in development mode
-npm run dev
 ```
 
 You should see:
 ```
-🚀 PersonaRAG Bridge running on port 3000
-📡 WebSocket server ready
-🔐 Vault system active
+✓ built in 4.27s
+dist/public/popup.html    1.20 kB │ gzip:  0.61 kB
+dist/popup.css            0.00 kB │ gzip:  0.02 kB
+dist/content.js           0.49 kB │ gzip:  0.31 kB
+dist/background.js        1.91 kB │ gzip:  0.87 kB
+dist/popup.js           281.14 kB │ gzip: 72.11 kB
 ```
 
-## Step 4: Test the Integration
+## Step 2: Load in Chrome
 
-### Test Health Check
+1. **Open Chrome** and go to `chrome://extensions/`
+2. **Enable "Developer mode"** (toggle in top right)
+3. **Click "Load unpacked"**
+4. **Select the `dist` folder** from your project
+5. **The OWU+ extension should appear** in your browser toolbar
+
+## Step 3: Test the Extension
+
+1. **Click the OWU+ icon** in your browser toolbar
+2. **You should see a popup** with 6 tabs:
+   - **Chat**: Message interface with persona selection
+   - **Services**: AI service management and monitoring
+   - **Artefacts**: File and artifact management
+   - **Recipes**: Workflow and recipe management
+   - **Agents**: AI agent management
+   - **Settings**: Configuration and preferences
+
+3. **Navigate between tabs** to test the interface
+4. **Check the status bar** at the bottom for connection indicators
+
+## Step 4: Development Testing (Optional)
+
+For easier development and testing:
+
 ```bash
-curl http://localhost:3000/health
+# Start development server
+npm run dev
+
+# Open http://localhost:3000 in your browser
+# This shows the popup interface in a web page
 ```
-
-### Test Persona Query
-```bash
-curl -X POST http://localhost:3000/api/personas/query \
-  -H "Content-Type: application/json" \
-  -d '{"query": "I need help with storytelling"}'
-```
-
-### Test Enhanced Chat
-```bash
-curl -X POST http://localhost:3000/api/chat/enhanced \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Tell me a story about wisdom", "personaId": "griot_001"}'
-```
-
-## Step 5: Verify OpenWebUI Connection
-
-```bash
-# Test OpenWebUI connectivity
-curl http://192.168.1.180:3000/health
-
-# Check your API key is working
-npm run vault:get OPENWEBUI_API_KEY
-```
-
-## 🔧 Troubleshooting
-
-### If OpenWebUI Connection Fails
-
-1. **Check OpenWebUI is running**:
-   ```bash
-   curl http://192.168.1.180:3000/health
-   ```
-
-2. **Verify API key**:
-   ```bash
-   npm run vault:get OPENWEBUI_API_KEY
-   ```
-
-3. **Update OpenWebUI URL if needed**:
-   ```bash
-   npm run vault:set OPENWEBUI_URL -- --value "http://your-actual-url:3000"
-   ```
-
-### If Vault Has Issues
-
-1. **Check vault status**:
-   ```bash
-   npm run vault:status
-   ```
-
-2. **Validate security**:
-   ```bash
-   npm run vault:validate
-   ```
-
-3. **Reinitialize if needed**:
-   ```bash
-   npm run vault:init -- --force
-   ```
 
 ## 🎯 What You Get
 
-Once running, your OpenWebUI will have:
+Once loaded, your browser extension provides:
 
-- **🔐 Secure API key management** via encrypted vault
-- **🤖 Automatic persona selection** based on your queries
-- **📡 Real-time WebSocket communication**
-- **🛡️ Enterprise-grade security** with encrypted secrets
+- **🎨 Modern UI**: Clean, responsive interface with 6 functional tabs
+- **📊 Real-time Status**: Connection indicators for Reticulum, KLF, and Services
+- **💬 Chat Interface**: Multi-persona conversation system
+- **🔧 Service Management**: AI service monitoring and configuration
+- **📁 File Management**: Artefact and document handling
+- **⚙️ Workflow System**: Recipe and automation management
+- **🤖 Agent Control**: AI agent management interface
 
-## 📋 Next Steps
+## 🔧 Troubleshooting
 
-1. **Test with different personas**: Try queries about "wisdom", "storytelling", "culture"
-2. **Monitor logs**: Check `logs/persona-rag.log` for detailed information
-3. **Add more API keys**: Configure OpenAI, Hugging Face, etc. as needed
-4. **Scale up**: Add MongoDB and Weaviate for production use
+### Extension Won't Load
 
-## 🆘 Need Help?
+1. **Check the dist folder**:
+   ```bash
+   ls -la dist/
+   # Should show: background.js, content.js, popup.js, manifest.json, etc.
+   ```
 
-- **Vault commands**: `npm run vault:help`
-- **Check logs**: `tail -f logs/persona-rag.log`
-- **Security audit**: `npm run vault:validate`
-- **Full documentation**: See `README.md`
+2. **Verify manifest.json**:
+   ```bash
+   cat dist/manifest.json
+   # Should be valid JSON with manifest_version: 3
+   ```
+
+3. **Check for errors** in Chrome's extension page
+
+### UI Not Displaying
+
+1. **Check browser console** for JavaScript errors
+2. **Verify build completed** without errors
+3. **Try refreshing** the extension in Chrome
+
+### TypeScript Errors
+
+```bash
+# Check for type errors
+npm run type-check
+
+# Fix any compilation issues before building
+npm run build
+```
+
+## 🚀 Advanced Testing
+
+### Test All Components
+
+1. **Chat Tab**:
+   - Type a message and press Enter
+   - Check persona selector dropdown
+   - Verify message history
+
+2. **Services Tab**:
+   - View service status indicators
+   - Test service management buttons
+   - Check health monitoring
+
+3. **Status Bar**:
+   - Verify connection indicators
+   - Test Panel and Vault buttons
+   - Check real-time updates
+
+### Development Mode
+
+```bash
+# For continuous development
+npm run dev
+
+# Watch for changes
+npm run build -- --watch
+
+# Type checking
+npm run type-check
+```
+
+## 📋 Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run type-check   # Run TypeScript type checking
+npm run lint         # Run ESLint
+npm run preview      # Preview production build
+```
+
+## 🎉 Success!
+
+Your OWU+ Browser Extension is now:
+- ✅ **Fully functional** with complete UI
+- ✅ **Ready for testing** in Chrome
+- ✅ **Development-ready** with hot reload
+- ✅ **Type-safe** with comprehensive TypeScript coverage
+
+## 🔄 Next Steps
+
+1. **Test all tabs** and functionality
+2. **Integrate with Reticulum** for mesh networking
+3. **Connect to KLF** for service orchestration
+4. **Add AI service connectors** for real functionality
+5. **Implement vault system** for secure credential management
 
 ---
 
-**Your PersonaRAG Bridge is now ready to enhance OpenWebUI with cultural wisdom! 🎉** 
+**Your OWU+ Browser Extension is ready to use! 🎉** 

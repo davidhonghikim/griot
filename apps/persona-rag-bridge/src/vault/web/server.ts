@@ -18,12 +18,12 @@ app.use('/api/vault', vaultRoutes);
 app.use('/api/config', configRoutes);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'vault-web' });
 });
 
 // Serve the web interface
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

@@ -1,0 +1,38 @@
+user_interaction_feedback_glyphs:
+  theme: "UX Feedback, User Prompts, Interactive States"
+  glyphs:
+    - "Hover State - pointer with glow"
+    - "Click Action - mouse click burst"
+    - "Drag and Drop - hand with arrows"
+    - "Success Notification - checkmark in speech bubble"
+    - "Error Notification - X mark in alert box"
+    - "Loading Spinner - circular progress arc"
+    - "Input Focus - text box with highlight"
+    - "Tooltip - speech bubble with info icon"
+    - "Confirmation Dialog - question mark with yes/no buttons"
+    - "Snackbar Alert - slide-in bar icon"
+    - "Modal Window - layered rectangles"
+    - "Form Submission - paper plane with trail"
+    - "Pagination Control - numbered page icons"
+    - "Slider Adjustment - horizontal bar with dot"
+    - "Checkbox Toggle - box with check"
+    - "Radio Selection - filled circle"
+    - "Multi-Select Mode - overlapping checkboxes"
+    - "Expand Section - down arrow with content lines"
+    - "Collapse Section - up arrow with lines"
+    - "Error Validation - red exclamation over form field"
+    - "Success Validation - green check over form field"
+    - "Auto-Save Indicator - floppy disk with clock"
+    - "Real-Time Sync Indicator - twin arrows circling"
+    - "User Feedback Request - star with comment bubble"
+    - "Rating Stars - 5-star row"
+  color_palettes:
+    - "Greens and Blues (Positive Feedback)"
+    - "Red and Yellow (Error States)"
+    - "Grays and Neutrals (Passive States)"
+  usage_notes:
+    - "Used in front-end apps, web interfaces, and real-time user interaction states"
+    - "Optimized for mobile and responsive design contexts"
+  version: "1.0.0 (June 2025 User Interaction Glyph Pack)"
+  authors: ["kOS Dev Team", "Skald Visual Systems"]
+

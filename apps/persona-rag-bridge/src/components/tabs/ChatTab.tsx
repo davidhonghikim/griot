@@ -1,3 +1,5 @@
+/// <reference path="../types/chrome.d.ts" />
+/// <reference path="../types/chrome.d.ts" />
 import React, { useState } from 'react';
 import { useAtom } from 'jotai';
 import { 
@@ -6,7 +8,7 @@ import {
   recentMessagesAtom 
 } from '../../modules/state/atoms';
 import { Button, Input } from '../ui';
-import { Message, Send, User, Bot, Settings } from 'lucide-react';
+import { Send, User, Bot, Settings, MessageSquare } from 'lucide-react';
 
 export const ChatTab: React.FC = () => {
   const [chatState] = useAtom(chatStateAtom);
@@ -62,7 +64,7 @@ export const ChatTab: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center space-x-2">
-          <Message className="w-4 h-4" />
+          <MessageSquare className="w-4 h-4" />
           <span className="font-medium">Chat</span>
         </div>
         <Button variant="ghost" size="sm">
@@ -77,8 +79,8 @@ export const ChatTab: React.FC = () => {
           <select 
             className="flex-1 px-2 py-1 text-sm border border-border rounded bg-background"
             value={chatState.currentConversation.personaId}
-            onChange={(e) => {
-              // Update persona
+            onChange={(_e) => {
+              // TODO: Handle input change
             }}
           >
             <option value="">Select Persona</option>
@@ -95,7 +97,7 @@ export const ChatTab: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {recentMessages.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
-            <Message className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>No messages yet. Start a conversation!</p>
           </div>
         ) : (

@@ -8,9 +8,8 @@
  */
 
 import express from 'express';
-import { getVault } from './secure-vault';
 import path from 'path';
-import fs from 'fs/promises';
+import { getVault } from './secure-vault';
 
 const app = express();
 const PORT = process.env.VAULT_WEB_PORT || 3001;
@@ -21,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'web')));
 
 // API Routes
-app.get('/api/secrets', async (req, res) => {
+app.get('/api/secrets', async (_req, res) => {
   try {
     const vault = getVault();
     const secrets = await vault.listSecrets();
@@ -110,7 +109,7 @@ app.post('/api/import', async (req, res) => {
   }
 });
 
-app.get('/api/export', async (req, res) => {
+app.get('/api/export', async (_req, res) => {
   try {
     const vault = getVault();
     const secrets = await vault.listSecrets();
@@ -133,7 +132,7 @@ app.get('/api/export', async (req, res) => {
   }
 });
 
-app.get('/api/status', async (req, res) => {
+app.get('/api/status', async (_req, res) => {
   try {
     const vault = getVault();
     const secrets = await vault.listSecrets();
@@ -156,7 +155,7 @@ app.get('/api/status', async (req, res) => {
 });
 
 // Serve the web interface
-app.get('/', async (req, res) => {
+app.get('/', async (_req, res) => {
   try {
     const html = await generateHTML();
     res.send(html);

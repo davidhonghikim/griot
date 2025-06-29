@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getVault } from '../../secure-vault';
 
 export class VaultController {
-  async getSecrets(req: Request, res: Response) {
+  async getSecrets(_req: Request, res: Response) {
     try {
       const vault = getVault();
       const secrets = await vault.listSecrets();
@@ -74,7 +74,7 @@ export class VaultController {
     }
   }
 
-  async exportEnv(req: Request, res: Response) {
+  async exportEnv(_req: Request, res: Response) {
     try {
       const vault = getVault();
       const secrets = await vault.listSecrets();
@@ -97,7 +97,7 @@ export class VaultController {
     }
   }
 
-  async getStatus(req: Request, res: Response) {
+  async getStatus(_req: Request, res: Response) {
     try {
       const vault = getVault();
       const secrets = await vault.listSecrets();

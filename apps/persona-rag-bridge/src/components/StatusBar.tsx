@@ -1,3 +1,5 @@
+/// <reference path="../types/chrome.d.ts" />
+/// <reference path="../types/chrome.d.ts" />
 import React from 'react';
 import { useAtom } from 'jotai';
 import { 

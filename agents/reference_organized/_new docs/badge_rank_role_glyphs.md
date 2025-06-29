@@ -1,0 +1,38 @@
+badge_rank_role_glyphs:
+  theme: "User and Agent Roles, Permissions, Contributor Badges"
+  glyphs:
+    - "New User - starburst badge"
+    - "Veteran User - shield with checkmark"
+    - "Contributor - hand with plus sign"
+    - "Moderator - gavel icon"
+    - "Administrator - crown with key"
+    - "Agent Level 1 - single dot rank"
+    - "Agent Level 2 - double dot rank"
+    - "Agent Level 3 - triple dot rank"
+    - "System Architect - compass with layers"
+    - "Bug Hunter - bug icon with target"
+    - "Beta Tester - flask with sparkle"
+    - "Content Creator - quill with document"
+    - "Knowledge Curator - book with plus"
+    - "Ethics Officer - scale with shield"
+    - "Network Steward - network node with heart"
+    - "First Responder - lightning bolt with bell"
+    - "Consensus Voter - ballot box"
+    - "Mentor - hand holding sprout"
+    - "Explorer - compass with path"
+    - "Historian - scroll with clock"
+    - "Visionary - eye with star"
+    - "Community Builder - linked hands"
+    - "Guardian - lock with eye"
+    - "Data Analyst - chart with magnifier"
+    - "Policy Drafter - scroll with pen"
+  color_palettes:
+    - "Golds and Blues (Rank and Authority)"
+    - "Greens and Oranges (Community Roles)"
+    - "Monochrome with Accents (Systemic Roles)"
+  usage_notes:
+    - "Used for user dashboards, agent profile badges, and contributor recognition"
+    - "Can be exported as SVG for forum or user profile overlay"
+  version: "1.0.0 (June 2025 Badge & Role Glyph Pack)"
+  authors: ["kOS Dev Team", "Skald Visual Systems"]
+

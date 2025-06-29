@@ -382,6 +382,9 @@ export class SecureVault {
 // Singleton instance
 let vaultInstance: SecureVault | null = null;
 
+/**
+ * Get or create the vault instance
+ */
 export function getVault(): SecureVault {
   if (!vaultInstance) {
     vaultInstance = new SecureVault();

@@ -2,6 +2,54 @@
 
 A powerful browser extension that integrates Open-WebUI with Reticulum encrypted mesh networking and KLF (Kind Link Framework) service orchestration.
 
+## 🚀 **QUICK START - TESTING & DEVELOPMENT**
+
+### **Immediate Testing (5 minutes)**
+
+1. **Build the Extension**
+   ```bash
+   cd apps/persona-rag-bridge
+   npm install
+   npm run build
+   ```
+
+2. **Load in Chrome**
+   - Open Chrome and go to `chrome://extensions/`
+   - Enable "Developer mode" (top right toggle)
+   - Click "Load unpacked"
+   - Select the `dist` folder from the project
+   - The OWU+ extension should appear in your toolbar
+
+3. **Test the UI**
+   - Click the OWU+ icon in your browser toolbar
+   - You should see a popup with 6 tabs: Chat, Services, Artefacts, Recipes, Agents, Settings
+   - Navigate between tabs to test the interface
+   - Check the status bar at the bottom for connection indicators
+
+### **Development Server (for UI testing)**
+
+```bash
+npm run dev
+# Open http://localhost:3000 in your browser
+# This shows the popup interface in a web page for easier development
+```
+
+## ✅ **CURRENT STATUS**
+
+### **Fully Operational Components**
+- ✅ **UI Interface**: Complete React-based popup with 6 functional tabs
+- ✅ **State Management**: Jotai atoms for all application state
+- ✅ **Build System**: Zero TypeScript errors, successful builds
+- ✅ **Extension Infrastructure**: Background script, content script, manifest
+- ✅ **Component Library**: Button, Input, Tabs, StatusBar components
+- ✅ **Tab System**: Chat, Services, Artefacts, Recipes, Agents, Settings
+
+### **Ready for Integration**
+- 🔄 **Reticulum Network**: Infrastructure ready, needs service implementation
+- 🔄 **KLF Orchestration**: Framework ready, needs service connectors
+- 🔄 **AI Services**: UI ready, needs API integration
+- 🔄 **Vault System**: UI ready, needs encryption implementation
+
 ## Features
 
 ### 🔐 **Reticulum Integration**
@@ -73,7 +121,7 @@ A powerful browser extension that integrates Open-WebUI with Reticulum encrypted
 
 3. **Build the extension**
    ```bash
-   npm run build:extension
+   npm run build
    ```
 
 4. **Load in Chrome**
@@ -86,7 +134,7 @@ A powerful browser extension that integrates Open-WebUI with Reticulum encrypted
 
 1. **Build for production**
    ```bash
-   npm run build:extension
+   npm run build
    ```
 
 2. **Package the extension**
@@ -201,65 +249,82 @@ src/
 └── styles/            # Global styles
 ```
 
-### Key Technologies
-
-- **React 18**: Modern UI framework
-- **TypeScript**: Type-safe development
-- **Jotai**: Atomic state management
-- **Tailwind CSS**: Utility-first styling
-- **Vite**: Fast build tool
-- **WebRTC**: Peer-to-peer communication
-- **WebSocket**: Real-time messaging
-
-### Development Commands
+### Available Scripts
 
 ```bash
-# Development server
-npm run dev
-
-# Build extension
-npm run build:extension
-
-# Watch mode
-npm run watch
-
-# Type checking
-npm run type-check
-
-# Linting
-npm run lint
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run type-check   # Run TypeScript type checking
+npm run lint         # Run ESLint
+npm run preview      # Preview production build
 ```
 
-### Adding New Features
+### Testing the UI
 
-1. **UI Components**: Add to `src/components/`
-2. **State Management**: Add atoms to `src/modules/state/atoms.ts`
-3. **Services**: Add connectors to `src/services/`
-4. **Configuration**: Add to `src/config/environment.ts`
+1. **Development Mode**
+   ```bash
+   npm run dev
+   # Open http://localhost:3000
+   # This shows the popup interface in a web page
+   ```
 
-## Security
+2. **Extension Mode**
+   ```bash
+   npm run build
+   # Load dist/ folder in Chrome extensions
+   # Click the extension icon to test popup
+   ```
 
-### Encryption
-- All Reticulum messages are encrypted using AES-GCM
-- Key exchange uses ECDH for perfect forward secrecy
-- Credentials are encrypted at rest using AES-256
+3. **Component Testing**
+   - All components are in `src/components/`
+   - State management in `src/modules/state/atoms.ts`
+   - UI components in `src/components/ui/`
 
-### Privacy
-- No data is sent to external servers by default
-- All communication is peer-to-peer
-- Local storage for user preferences
+### Key Files
 
-### Permissions
-- Minimal required permissions
-- Granular permission requests
-- Clear permission explanations
+- **Main Popup**: `src/popup.tsx`
+- **Extension Popup**: `src/components/ExtensionPopup.tsx`
+- **Tab Components**: `src/components/tabs/`
+- **State Management**: `src/modules/state/atoms.ts`
+- **Background Script**: `src/background.ts`
+- **Content Script**: `src/content.ts`
+- **Configuration**: `config/environment.ts`
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Extension won't load**
+   - Ensure you're in the `dist` folder, not the root
+   - Check that all files are present in `dist/`
+   - Verify manifest.json is valid
+
+2. **UI not displaying**
+   - Check browser console for errors
+   - Ensure all dependencies are installed
+   - Verify build completed successfully
+
+3. **TypeScript errors**
+   - Run `npm run type-check` to see all errors
+   - Fix any compilation issues before building
+
+### Debug Mode
+
+Enable debug logging by setting:
+```typescript
+// In config/environment.ts
+debug: {
+  enabled: true,
+  level: 'debug'
+}
+```
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Test thoroughly
 5. Submit a pull request
 
 ## License

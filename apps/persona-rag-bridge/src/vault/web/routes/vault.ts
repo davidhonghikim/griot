@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { getVault } from '../../secure-vault';
 import { VaultController } from '../controllers/vault';
 
 const router = Router();

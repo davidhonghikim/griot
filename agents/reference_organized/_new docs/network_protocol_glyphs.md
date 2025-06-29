@@ -1,0 +1,38 @@
+network_protocol_glyphs:
+  theme: "Networking Layers, Communication Protocols, Mesh Systems"
+  glyphs:
+    - "Reticulum - network node with wave arcs"
+    - "LoRa - antenna with long range rings"
+    - "P2P Ad-Hoc - two-way arrows with peer dots"
+    - "Internet - globe with link nodes"
+    - "Satellite Uplink - dish with upward beams"
+    - "Bluetooth - B symbol with data wave"
+    - "Wi-Fi - fan signal waves"
+    - "Mesh Network - hex grid with path lines"
+    - "TCP/IP - stacked layers with packet icon"
+    - "UDP - burst packet with fast lines"
+    - "MQTT - cloud with message queue"
+    - "Zigbee - honeycomb with signal point"
+    - "Cellular Network - tower with signal bars"
+    - "Ethernet - cable plug with connect lines"
+    - "VPN Tunnel - keyhole in tunnel graphic"
+    - "Darknet - masked node with low light"
+    - "Broadcast Mode - megaphone with data rays"
+    - "Multicast - branching arrows"
+    - "Unicast - single arrow to target"
+    - "Relay Node - two arrows passing through point"
+    - "Gateway - doorframe with arrows"
+    - "Firewall - brick wall with shield"
+    - "Proxy Node - mask with data stream"
+    - "Network Bridge - link icon with path arcs"
+    - "Link Quality Monitor - signal with gradient bar"
+  color_palettes:
+    - "Blue and Teal (Signal Clarity)"
+    - "Gray and Green (Mesh and Routing)"
+    - "Orange and Red (Alerts and Errors)"
+  usage_notes:
+    - "Used in network dashboards, protocol selection menus, and topology viewers"
+    - "Dynamic overlays for network diagnostics"
+  version: "1.0.0 (June 2025 Network & Protocol Glyph Pack)"
+  authors: ["kOS Dev Team", "Skald Visual Systems"]
+

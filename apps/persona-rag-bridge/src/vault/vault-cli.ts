@@ -7,11 +7,10 @@
  * Usage: npx ts-node src/vault/vault-cli.ts [command] [options]
  */
 
-import { getVault } from './secure-vault';
 import { Command } from 'commander';
+import { getVault } from './secure-vault';
 import readline from 'readline';
 import fs from 'fs/promises';
-import path from 'path';
 
 const program = new Command();
 

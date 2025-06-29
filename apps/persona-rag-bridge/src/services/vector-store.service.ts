@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { VectorStore, VectorDocument as CoreVectorDocument, SearchOptions, SearchResult } from '@griot/data/rag/vector_store';
+import { VectorStore, VectorDocument as CoreVectorDocument, SearchOptions } from '@griot/data/rag/vector_store';
 import { EmbeddingService } from '@griot/data/rag/embedding_service';
 import { SecureVault } from '../vault/secure-vault';
 
@@ -54,11 +54,9 @@ export abstract class SchemaManager {
 
 // Weaviate schema manager
 export class WeaviateSchemaManager extends SchemaManager {
-  private vectorStore: VectorStore;
-
-  constructor(vectorStore: VectorStore) {
+  constructor(_vectorStore: VectorStore) {
     super();
-    this.vectorStore = vectorStore;
+    // VectorStore will be used in future implementation
   }
 
   async createSchema(): Promise<void> {
@@ -79,11 +77,9 @@ export class WeaviateSchemaManager extends SchemaManager {
 
 // PostgreSQL schema manager
 export class PostgreSQLSchemaManager extends SchemaManager {
-  private vectorStore: VectorStore;
-
-  constructor(vectorStore: VectorStore) {
+  constructor(_vectorStore: VectorStore) {
     super();
-    this.vectorStore = vectorStore;
+    // VectorStore will be used in future implementation
   }
 
   async createSchema(): Promise<void> {
@@ -134,30 +130,22 @@ export class DocumentProcessor {
 // Main vector store service - modular and generic
 export class VectorStoreService {
   private config: VectorStoreConfig;
-  private vectorStore: VectorStore;
+  private currentService: VectorStore | null = null;
   private embeddingService: EmbeddingService;
-  private vault: SecureVault;
-  private schemaManager: SchemaManager;
-  private documentProcessor: DocumentProcessor;
   private isInitialized: boolean = false;
 
-  constructor(config: VectorStoreConfig, vault: SecureVault) {
+  constructor(_vault: SecureVault, config: VectorStoreConfig) {
+    // Vault will be used in future implementation
     this.config = config;
-    this.vault = vault;
     this.embeddingService = new EmbeddingService();
-    this.vectorStore = new VectorStore();
-    this.documentProcessor = new DocumentProcessor(this.embeddingService);
-    
-    // Initialize appropriate schema manager
-    this.schemaManager = this.createSchemaManager();
   }
 
   private createSchemaManager(): SchemaManager {
     switch (this.config.type) {
       case 'weaviate':
-        return new WeaviateSchemaManager(this.vectorStore);
+        return new WeaviateSchemaManager(this.currentService!);
       case 'postgresql':
-        return new PostgreSQLSchemaManager(this.vectorStore);
+        return new PostgreSQLSchemaManager(this.currentService!);
       default:
         throw new Error(`Unsupported vector store type: ${this.config.type}`);
     }
@@ -166,10 +154,10 @@ export class VectorStoreService {
   async initialize(): Promise<void> {
     try {
       // Initialize the core vector store
-      await this.vectorStore.initialize();
+      this.currentService = new VectorStore();
       
       // Create schema if needed
-      await this.schemaManager.createSchema();
+      await this.createSchemaManager().createSchema();
       
       this.isInitialized = true;
       console.log(`✅ Vector store service initialized with ${this.config.type} backend`);
@@ -183,7 +171,7 @@ export class VectorStoreService {
     this.ensureInitialized();
     
     try {
-      const processedDoc = await this.documentProcessor.processDocument(document);
+      const processedDoc = await this.processDocument(document);
       
       const coreDocument: CoreVectorDocument = {
         id: processedDoc.id,
@@ -192,7 +180,7 @@ export class VectorStoreService {
         embedding: processedDoc.embedding || []
       };
       
-      return await this.vectorStore.storeDocument(coreDocument);
+      return await this.currentService!.storeDocument(coreDocument);
     } catch (error) {
       console.error('❌ Failed to add document:', error);
       throw error;
@@ -203,7 +191,7 @@ export class VectorStoreService {
     this.ensureInitialized();
     
     try {
-      const processedDocs = await this.documentProcessor.processBatch(documents);
+      const processedDocs = await this.processBatch(documents);
       
       const results: string[] = [];
       for (const doc of processedDocs) {
@@ -214,7 +202,7 @@ export class VectorStoreService {
           embedding: doc.embedding || []
         };
         
-        const id = await this.vectorStore.storeDocument(coreDocument);
+        const id = await this.currentService!.storeDocument(coreDocument);
         results.push(id);
       }
       
@@ -239,9 +227,9 @@ export class VectorStoreService {
         filter: options.filters || {}
       };
 
-      const results = await this.vectorStore.search(queryEmbedding, searchOptions);
+      const results = await this.currentService!.search(queryEmbedding, searchOptions);
       
-      return results.map(result => ({
+      return results.map((result: any) => ({
         id: result.id,
         content: result.content,
         score: result.score,
@@ -257,7 +245,7 @@ export class VectorStoreService {
     this.ensureInitialized();
     
     try {
-      const document = await this.vectorStore.getDocument(id);
+      const document = await this.currentService!.getDocument(id);
       if (!document) return null;
 
       return {
@@ -288,7 +276,7 @@ export class VectorStoreService {
         updatedDoc.embedding = await this.embeddingService.embedText(updates.content);
       }
 
-      await this.vectorStore.deleteDocument(id);
+      await this.currentService!.deleteDocument(id);
       
       const coreDocument: CoreVectorDocument = {
         id: updatedDoc.id,
@@ -297,7 +285,7 @@ export class VectorStoreService {
         embedding: updatedDoc.embedding || []
       };
       
-      await this.vectorStore.storeDocument(coreDocument);
+      await this.currentService!.storeDocument(coreDocument);
     } catch (error) {
       console.error('❌ Failed to update document:', error);
       throw error;
@@ -308,7 +296,7 @@ export class VectorStoreService {
     this.ensureInitialized();
     
     try {
-      await this.vectorStore.deleteDocument(id);
+      await this.currentService!.deleteDocument(id);
     } catch (error) {
       console.error('❌ Failed to delete document:', error);
       throw error;
@@ -319,7 +307,7 @@ export class VectorStoreService {
     this.ensureInitialized();
     
     try {
-      const totalDocuments = await this.vectorStore.getDocumentCount();
+      const totalDocuments = await this.currentService!.getDocumentCount();
       return {
         totalDocuments,
         backendType: this.config.type,
@@ -334,7 +322,7 @@ export class VectorStoreService {
 
   async healthCheck(): Promise<boolean> {
     try {
-      await this.vectorStore.healthCheck();
+      await this.currentService!.healthCheck();
       return true;
     } catch (error) {
       console.error('❌ Vector store health check failed:', error);
@@ -346,6 +334,27 @@ export class VectorStoreService {
     if (!this.isInitialized) {
       throw new Error('Vector store service not initialized');
     }
+  }
+
+  private async processDocument(document: VectorDocument): Promise<VectorDocument> {
+    if (!document.embedding) {
+      document.embedding = await this.embeddingService.embedText(document.content);
+    }
+    return document;
+  }
+
+  private async processBatch(documents: VectorDocument[], batchSize: number = 10): Promise<VectorDocument[]> {
+    const processed: VectorDocument[] = [];
+    
+    for (let i = 0; i < documents.length; i += batchSize) {
+      const batch = documents.slice(i, i + batchSize);
+      const processedBatch = await Promise.all(
+        batch.map(doc => this.processDocument(doc))
+      );
+      processed.push(...processedBatch);
+    }
+    
+    return processed;
   }
 
   getConfig(): VectorStoreConfig {

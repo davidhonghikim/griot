@@ -1,0 +1,35 @@
+svg_kos_ecosystem_icons:
+  category: "kOS Ecosystem Glyphs"
+  export_batch_1:
+    - "Global Network Map - interconnected_planet_grid.svg"
+    - "Node Cluster - hex_grid_radial_links.svg"
+    - "Agent Swarm - multi_dot_motion_trail.svg"
+    - "HIEROS Code Emblem - layered_triangle_radiating_lines.svg"
+    - "Knowledge Flow - arrows_between_layers.svg"
+    - "Deployment Pipeline - multi_stage_flowchart.svg"
+    - "Orchestrator Core - central_node_orbiting_tasks.svg"
+    - "Node Discovery Pulse - radar_sweep_pattern.svg"
+    - "Data Integrity Shield - lock_checkmark.svg"
+    - "Ethics Compliance Ring - circle_with_scales.svg"
+    - "Consensus Engine - gears_with_council_ring.svg"
+    - "Task Execution Graph - branching_task_flow.svg"
+    - "Version Control Marker - branching_lines_tag.svg"
+    - "Monitoring Dashboard Icon - eye_dashboard.svg"
+    - "Alert Beacon - triangle_pulsing_edges.svg"
+    - "Node Uptime Indicator - server_green_light.svg"
+    - "Network Health Meter - bargraph_signal_waves.svg"
+    - "Agent Deployment Icon - rocket_circuit_board.svg"
+    - "Multi-Agent Orchestrator - nested_layers_agent_dots.svg"
+    - "Task Queue - stack_boxes_arrow.svg"
+    - "Event Trigger Glyph - lightning_calendar.svg"
+    - "Feedback Loop - circular_arrows.svg"
+    - "System Bootstrapper - seed_radiating_lines.svg"
+    - "Data Synchronization - twin_arrows_rotation.svg"
+    - "Governance Control Panel - sliders_decision_tree.svg"
+  export_sizes: [16, 32, 64, 128, 256, 512, 1024]
+  formats: ["SVG", "PNG", "WebP", "Lottie JSON (where animated)"]
+  source_tool: "Figma / Illustrator / AI Vectorizer"
+  output_directory: "/assets/glyphs/kos_ecosystem/"
+  version: "1.0.0 (June 2025 kOS Ecosystem Icon Batch 1)"
+  authors: ["kOS Dev Team", "Skald Visual Systems"]
+

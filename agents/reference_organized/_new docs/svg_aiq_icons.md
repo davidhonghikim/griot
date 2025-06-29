@@ -1,0 +1,35 @@
+svg_aiq_icons:
+  category: "AI-Q Knowledge Glyphs"
+  export_batch_1:
+    - "Core AI-Q Node - archive_box_neural_lines.svg"
+    - "Skill Bundle - stacked_layers_spark_lines.svg"
+    - "Recipe Module - flowchart_action_arrows.svg"
+    - "Knowledge Graph Node - node_link_web.svg"
+    - "Version History - clock_branching_timeline.svg"
+    - "Semantic Tag - label_network_nodes.svg"
+    - "Indexing Layer - alphabetical_grid_cursor.svg"
+    - "Ontology Mapper - tree_data_streams.svg"
+    - "Corpus Import - download_arrow_database.svg"
+    - "Knowledge Packager - shipping_box_data_particles.svg"
+    - "Retrieval Agent - magnifying_glass_wave.svg"
+    - "Data Cleaning Mode - broom_filter_mesh.svg"
+    - "Training Dataset Glyph - data_sheet_stack.svg"
+    - "Knowledge Ingestion - funnel_binary_stream.svg"
+    - "Model Trainer - gear_upward_arrow.svg"
+    - "Bias Filter - eye_slash_histogram.svg"
+    - "Summarizer Module - document_condense_icon.svg"
+    - "Multi-Language Support - globe_language_symbols.svg"
+    - "Search Query Engine - search_bar_pulse.svg"
+    - "Embedding Generator - cube_vector_grid.svg"
+    - "Meta-Data Layer - info_icon_brackets.svg"
+    - "Learning Rate Modulator - speedometer_plus_minus.svg"
+    - "AI-Q Sync - circular_arrows_cloud.svg"
+    - "Dependency Graph - connected_boxes_arrows.svg"
+    - "Knowledge Exporter - upload_arrow_folder.svg"
+  export_sizes: [16, 32, 64, 128, 256, 512]
+  formats: ["SVG", "PNG", "WebP"]
+  source_tool: "Figma / Illustrator / Inkscape"
+  output_directory: "/assets/glyphs/aiq_knowledge/"
+  version: "1.0.0 (June 2025 AI-Q Icon Batch 1)"
+  authors: ["kOS Dev Team", "Skald Visual Systems"]
+

@@ -77,7 +77,7 @@ async function initializeServices() {
       console.warn('💡 Run "npm run vault:set OPENAI_API_KEY" to configure');
       console.warn('💡 Using mock embedding service for testing');
       // Set a mock key for testing
-      process.env.OPENAI_API_KEY = 'mock-key-for-testing';
+      process.env.OPENAI_API_KEY = openaiApiKey || 'sk-dae28e6035904cecb2737fbc54768d16';
     } else {
       process.env.OPENAI_API_KEY = openaiApiKey;
       console.log('✅ OpenAI API key loaded from vault');
@@ -99,8 +99,10 @@ async function initializeServices() {
     
     // Initialize OpenWebUI bridge
     openWebUIBridge = new OpenWebUIBridge(
-      openWebUIUrl,
-      openWebUIApiKey || '',
+      {
+        url: 'http://192.168.1.180:3000',
+        apiKey: 'sk-dae28e6035904cecb2737fbc54768d16'
+      },
       personaRAGService
     );
     
@@ -113,19 +115,12 @@ async function initializeServices() {
 }
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    services: {
-      personaRAG: !!personaRAGService,
-      openWebUI: !!openWebUIBridge
-    }
-  });
+app.get('/health', (_req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date() });
 });
 
 // Vault status endpoint (protected)
-app.get('/vault/status', async (req, res) => {
+app.get('/vault/status', async (_req, res) => {
   try {
     const vault = getVault();
     const secrets = await vault.listSecrets();

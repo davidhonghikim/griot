@@ -1,10 +1,9 @@
+/// <reference path="./types/chrome.d.ts" />
 /**
  * Background Service Worker
  * 
  * Handles extension lifecycle, message routing, and background tasks.
  */
-
-import { getSection } from '../config/environment';
 
 // Extension state
 let isInitialized = false;
@@ -15,8 +14,6 @@ const initializeExtension = async () => {
 
   try {
     console.log('Initializing OWU+ Extension background service...');
-    
-    const config = getSection('extension');
     
     // Set up extension icon
     chrome.action.setIcon({
@@ -139,7 +136,7 @@ const executeWorkflow = async (data: any) => {
 };
 
 // Handle tab updates
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
     // TODO: Inject content scripts if needed
     // TODO: Update extension state based on page
@@ -147,7 +144,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 // Handle tab activation
-chrome.tabs.onActivated.addListener((activeInfo) => {
+chrome.tabs.onActivated.addListener((_activeInfo) => {
   // TODO: Update extension state based on active tab
 });
 

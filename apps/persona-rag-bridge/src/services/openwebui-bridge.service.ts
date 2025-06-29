@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 import axios, { AxiosInstance } from 'axios';
-import { PersonaRAGService, PersonaRAGRequest, PersonaRAGResponse } from '@griot/data/rag/persona_rag_service';
+import { PersonaRAGService, PersonaRAGRequest } from '@griot/data/rag/persona_rag_service';
 
 export interface OpenWebUIConfig {
   url: string;
@@ -63,28 +63,19 @@ export interface EnhancedChatResponse {
 export class OpenWebUIBridge {
   private client: AxiosInstance;
   private personaRAG: PersonaRAGService;
-  private config: OpenWebUIConfig;
 
   constructor(
-    openWebUIUrl: string,
-    apiKey: string,
+    config: OpenWebUIConfig,
     personaRAG: PersonaRAGService
   ) {
-    this.config = {
-      url: openWebUIUrl,
-      apiKey: apiKey
-    };
-    
-    this.personaRAG = personaRAG;
-    
     this.client = axios.create({
-      baseURL: openWebUIUrl,
+      baseURL: config.url,
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${config.apiKey}`,
         'Content-Type': 'application/json'
-      },
-      timeout: 30000
+      }
     });
+    this.personaRAG = personaRAG;
   }
 
   async sendChatMessage(

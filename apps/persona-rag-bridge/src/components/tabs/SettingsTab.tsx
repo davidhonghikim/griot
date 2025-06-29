@@ -1,3 +1,6 @@
+/// <reference path="../types/chrome.d.ts" />
+/// <reference path="../types/chrome.d.ts" />
+/// <reference path="../types/chrome.d.ts" />
 import React from 'react';
 import { useAtom } from 'jotai';
 import { 
@@ -5,7 +8,7 @@ import {
   vaultStateAtom,
   notificationsStateAtom 
 } from '../../modules/state/atoms';
-import { Button, Input } from '../ui';
+import { Button } from '../ui';
 import { 
   Settings, 
   Shield, 

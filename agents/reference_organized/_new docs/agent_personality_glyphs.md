@@ -1,0 +1,38 @@
+agent_personality_glyphs:
+  theme: "DOPE Types, Dawgs, Social Profiles, Behavioral Layers"
+  glyphs:
+    - "Driver (D) - racing flag with arrow"
+    - "Observer (O) - eye with notepad"
+    - "Peacemaker (P) - olive branch over handshake"
+    - "Energizer (E) - lightning bolt with smiley face"
+    - "Dawg Loyalist - paw print with heart"
+    - "Dawg Trickster - mask with grin"
+    - "Dawg Guardian - shield with paw"
+    - "Analytical Thinker - gear over brain"
+    - "Empathic Connector - heart with network lines"
+    - "Social Butterfly - chat bubbles with wings"
+    - "Strategic Planner - chess knight with graph"
+    - "Creative Explorer - paintbrush with star"
+    - "Support Agent - headset with plus sign"
+    - "Mentor Archetype - open book with light rays"
+    - "Challenger Profile - lightning over target"
+    - "Caregiver Persona - hands holding heart"
+    - "Storyteller - quill with speech wave"
+    - "Skeptic Mode - magnifier with question mark"
+    - "Enforcer - gavel with exclamation"
+    - "Mediator - scale over speech bubbles"
+    - "Innovator - lightbulb with burst"
+    - "Explorer - compass with path arrows"
+    - "Archivist - scroll with lock"
+    - "Diplomat - globe with handshake"
+    - "Rebel - cracked chain with flame"
+  color_palettes:
+    - "Vibrant Mixed Colors (Personality Range)"
+    - "Blues and Greens (Calm Types)"
+    - "Oranges and Reds (Assertive Types)"
+  usage_notes:
+    - "Used in agent profiles, personality overlays, and interaction style dashboards"
+    - "Dynamic switching during agent mood shifts or role transitions"
+  version: "1.0.0 (June 2025 Personality Glyph Pack)"
+  authors: ["kOS Dev Team", "Skald Visual Systems"]
+
