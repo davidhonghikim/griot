@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { getVault } from '../../secure-vault';
+import { v4 as uuidv4 } from 'uuid';
 
 export class VaultController {
   async getSecrets(_req: Request, res: Response) {
@@ -11,49 +12,125 @@ export class VaultController {
       for (const key of secrets) {
         const value = await vault.getSecret(key);
         secretData.push({
+          id: uuidv4(), // Generate unique ID for frontend
           key,
           value: value || '',
+          description: '', // Placeholder for description field
           masked: this.maskValue(value),
-          hasValue: !!value
+          hasValue: !!value,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         });
       }
       
-      res.json({ success: true, secrets: secretData });
+      res.json(secretData);
     } catch (error) {
-      res.status(500).json({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   }
 
-  async setSecret(req: Request, res: Response) {
+  async addSecret(req: Request, res: Response) {
     try {
-      const { key, value, encrypted = true } = req.body;
+      const { key, value, description } = req.body;
       
       if (!key || !value) {
-        return res.status(400).json({ success: false, error: 'Key and value are required' });
+        return res.status(400).json({ error: 'Key and value are required' });
       }
       
       const vault = getVault();
-      await vault.setSecret(key, value, encrypted);
+      await vault.setSecret(key, value, true);
       
-      res.json({ success: true, message: 'Secret saved successfully' });
+      res.json({ 
+        success: true, 
+        message: 'Secret added successfully',
+        secret: {
+          id: uuidv4(),
+          key,
+          value,
+          description: description || '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      });
     } catch (error) {
-      res.status(500).json({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
+
+  async updateSecret(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { key, value, description } = req.body;
+      
+      if (!key || !value) {
+        return res.status(400).json({ error: 'Key and value are required' });
+      }
+      
+      const vault = getVault();
+      await vault.setSecret(key, value, true);
+      
+      res.json({ 
+        success: true, 
+        message: 'Secret updated successfully',
+        secret: {
+          id,
+          key,
+          value,
+          description: description || '',
+          updatedAt: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   }
 
   async deleteSecret(req: Request, res: Response) {
     try {
-      const { key } = req.params;
+      const { id } = req.params;
+      const { key } = req.body; // We need the key to delete from vault
+      
+      if (!key) {
+        return res.status(400).json({ error: 'Secret key is required for deletion' });
+      }
+      
       const vault = getVault();
       const removed = await vault.removeSecret(key);
       
       if (removed) {
-        res.json({ success: true, message: 'Secret removed successfully' });
+        res.json({ success: true, message: 'Secret deleted successfully' });
       } else {
-        res.status(404).json({ success: false, error: 'Secret not found' });
+        res.status(404).json({ error: 'Secret not found' });
       }
     } catch (error) {
-      res.status(500).json({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
+
+  async bulkImport(req: Request, res: Response) {
+    try {
+      const { secrets } = req.body;
+      
+      if (!Array.isArray(secrets)) {
+        return res.status(400).json({ error: 'Secrets must be an array' });
+      }
+      
+      const vault = getVault();
+      let imported = 0;
+      
+      for (const secret of secrets) {
+        if (secret.key && secret.value) {
+          await vault.setSecret(secret.key, secret.value, true);
+          imported++;
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Imported ${imported} secrets successfully` 
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   }
 
@@ -62,7 +139,7 @@ export class VaultController {
       const { envContent } = req.body;
       
       if (!envContent) {
-        return res.status(400).json({ success: false, error: 'Environment content is required' });
+        return res.status(400).json({ error: 'Environment content is required' });
       }
       
       const vault = getVault();
@@ -70,7 +147,7 @@ export class VaultController {
       
       res.json({ success: true, message: `Imported ${imported} secrets` });
     } catch (error) {
-      res.status(500).json({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   }
 
@@ -93,7 +170,7 @@ export class VaultController {
       res.setHeader('Content-Disposition', 'attachment; filename="persona-rag.env"');
       res.send(envContent);
     } catch (error) {
-      res.status(500).json({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   }
 
@@ -105,17 +182,14 @@ export class VaultController {
       const status = vault.getStatus();
       
       res.json({
-        success: true,
-        status: {
-          initialized: status.initialized,
-          secretCount: secrets.length,
-          vaultPath: status.vaultPath,
-          securityValid: validation.valid,
-          issues: validation.issues
-        }
+        initialized: status.initialized,
+        secretCount: secrets.length,
+        vaultPath: status.vaultPath,
+        securityValid: validation.valid,
+        issues: validation.issues
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
     }
   }
 
@@ -146,4 +220,4 @@ export class VaultController {
     
     return imported;
   }
-} 
+}

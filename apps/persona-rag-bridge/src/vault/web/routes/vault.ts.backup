@@ -7,17 +7,11 @@ const vaultController = new VaultController();
 // Get all secrets
 router.get('/secrets', vaultController.getSecrets);
 
-// Add new secret
-router.post('/secrets', vaultController.addSecret);
+// Add/Update secret
+router.post('/secrets', vaultController.setSecret);
 
-// Update secret by ID
-router.put('/secrets/:id', vaultController.updateSecret);
-
-// Delete secret by ID
-router.delete('/secrets/:id', vaultController.deleteSecret);
-
-// Bulk import secrets
-router.post('/secrets/bulk', vaultController.bulkImport);
+// Delete secret
+router.delete('/secrets/:key', vaultController.deleteSecret);
 
 // Import from env
 router.post('/import', vaultController.importEnv);
@@ -28,4 +22,4 @@ router.get('/export', vaultController.exportEnv);
 // Get vault status
 router.get('/status', vaultController.getStatus);
 
-export { router as vaultRoutes };
+export { router as vaultRoutes }; 

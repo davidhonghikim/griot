@@ -1,109 +1,128 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { 
   servicesStateAtom, 
   activeServicesAtom,
-  switchToTabAtom,
-  switchToPanelAtom
+  switchToTabAtom
 } from '../modules/state/atoms';
+import { ServicesTab } from './tabs/ServicesTab';
 import { Button } from './ui';
+import { 
+  ExternalLink, 
+  PanelLeftClose,
+  Settings,
+  HelpCircle
+} from 'lucide-react';
+import { ServiceInitializer } from '../services/service-initializer';
 
 export const PopupDashboard: React.FC = () => {
-  const [servicesState] = useAtom(servicesStateAtom);
+  const [servicesState, setServicesState] = useAtom(servicesStateAtom);
   const [activeServices] = useAtom(activeServicesAtom);
   const [, switchToTab] = useAtom(switchToTabAtom);
-  const [, switchToPanel] = useAtom(switchToPanelAtom);
 
-  const services = [
-    {
-      id: 'reticulum',
-      name: 'Reticulum',
-      description: 'Decentralized communication network',
-      status: 'online',
-      type: 'communication'
-    },
-    {
-      id: 'klf',
-      name: 'KLF Protocol',
-      description: 'Kind Link Framework for service discovery',
-      status: 'online',
-      type: 'protocol'
-    },
-    {
-      id: 'griot',
-      name: 'Griot Node',
-      description: 'AI orchestration and workflow management',
-      status: 'online',
-      type: 'ai'
-    }
-  ];
+  // Initialize services on mount
+  useEffect(() => {
+    const serviceInitializer = new ServiceInitializer();
+    
+    const initializeServices = async () => {
+      await serviceInitializer.initializeServices((services) => {
+        setServicesState({
+          ...servicesState,
+          services,
+          status: 'ready',
+          lastScan: new Date(),
+        });
+      });
+    };
 
-  const handleOpenInTab = (serviceId: string) => {
-    switchToTab({ serviceId, view: 'services' });
+    initializeServices();
+
+    // Cleanup on unmount
+    return () => {
+      serviceInitializer.cleanup();
+    };
+  }, []);
+
+  const handleOpenInTab = () => {
+    switchToTab({ serviceId: undefined, view: 'services' });
     window.close();
   };
 
-  const handleOpenInPanel = (serviceId: string) => {
-    switchToPanel({ serviceId, view: 'services' });
+  const handleOpenInPanel = () => {
+    // For panel, we need a serviceId, so we'll use a default one or skip this for now
+    // switchToPanel({ serviceId: 'default', view: 'services' });
+    // For now, just open in tab since panel requires a specific service
+    switchToTab({ serviceId: undefined, view: 'services' });
     window.close();
   };
 
   return (
-    <div className="w-80 h-96 bg-background text-foreground p-4 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-lg font-semibold">OWU+ Dashboard</h1>
-        <div className="text-xs text-muted-foreground">
-          {activeServices} active
+    <div className="w-[640px] h-[600px] bg-background-primary text-text-primary flex flex-col">
+      {/* Header - matching kai-cd style */}
+      <div className="flex items-center justify-between p-4 border-b border-border-primary bg-background-secondary">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-interactive-primary/20 rounded-lg flex items-center justify-center">
+            <Settings className="w-4 h-4 text-interactive-primary" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-text-primary">OWU+ Services</h1>
+            <p className="text-xs text-text-secondary">
+              {activeServices} active • {servicesState.status}
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-text-secondary hover:text-text-primary"
+            onClick={handleOpenInTab}
+          >
+            <ExternalLink className="w-4 h-4 mr-1" />
+            Tab
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-text-secondary hover:text-text-primary"
+            onClick={handleOpenInPanel}
+          >
+            <PanelLeftClose className="w-4 h-4 mr-1" />
+            Panel
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-text-secondary hover:text-text-primary"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
-      {/* Services List */}
-      <div className="flex-1 space-y-3">
-        {services.map((service) => (
-          <div
-            key={service.id}
-            className="p-3 border border-border rounded-lg bg-card"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="font-medium text-sm">{service.name}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {service.description}
-                </p>
-              </div>
-              <div className={`w-2 h-2 rounded-full ${
-                service.status === 'online' ? 'bg-green-500' : 'bg-red-500'
-              }`} />
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 text-xs"
-                onClick={() => handleOpenInTab(service.id)}
-              >
-                Open in Tab
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 text-xs"
-                onClick={() => handleOpenInPanel(service.id)}
-              >
-                Open in Panel
-              </Button>
-            </div>
-          </div>
-        ))}
+      {/* Services Content */}
+      <div className="flex-1 overflow-hidden">
+        <ServicesTab />
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-border pt-3 mt-4">
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Status: {servicesState.status}</span>
-          <span>v1.0.0</span>
+      {/* Footer - matching kai-cd style */}
+      <div className="border-t border-border-primary p-3 bg-background-secondary">
+        <div className="flex justify-between items-center text-xs text-text-secondary">
+          <div className="flex items-center space-x-4">
+            <span>Status: {servicesState.status}</span>
+            <span>Services: {servicesState.services.length}</span>
+            {servicesState.errors.length > 0 && (
+              <span className="text-status-error">
+                {servicesState.errors.length} errors
+              </span>
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <span>v1.0.0</span>
+            <span>•</span>
+            <span>OWU+ Bridge</span>
+          </div>
         </div>
       </div>
     </div>

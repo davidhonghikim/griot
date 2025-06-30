@@ -207,6 +207,31 @@ build_verification:
   conclusion: "This is mandatory for all agents and is critical for maintaining a reliable, error-free codebase."
 
 gpt_agent_requirements:
+  gpt_code_review_mandate:
+    title: "GPT CODE REVIEW & QUALITY MANDATE"
+    introduction: "GPT agents MUST follow these additional requirements for code quality and review:"
+    mandatory_review_steps:
+      - "DOUBLE-CHECK ALL CODE: Before submitting any code, GPT agents must re-read and verify every line for syntax errors, logic issues, and completeness"
+      - "VERIFY IMPORTS: Check that all imports are correct and files exist before proceeding"
+      - "TEST LOGIC FLOW: Mentally trace through the code logic to ensure it works as intended"
+      - "CHECK FOR TYPOS: Look for syntax errors, missing semicolons, brackets, parentheses, and other basic errors"
+      - "VERIFY FILE PATHS: Ensure all file paths and references are correct"
+      - "COMPLETE IMPLEMENTATIONS: Do not leave incomplete functions, TODOs, or placeholder code"
+    quality_standards:
+      - "NO SYNTAX ERRORS: All code must compile without errors"
+      - "COMPLETE FUNCTIONALITY: All functions must be fully implemented"
+      - "PROPER ERROR HANDLING: Include appropriate error handling and edge cases"
+      - "CLEAN CODE: Follow established patterns and conventions"
+      - "DOCUMENTATION: Include clear comments and documentation"
+    review_checklist:
+      - "[ ] Re-read entire file after creation/modification"
+      - "[ ] Check all imports and dependencies"
+      - "[ ] Verify syntax and logic flow"
+      - "[ ] Test mental execution of code paths"
+      - "[ ] Ensure no incomplete implementations"
+      - "[ ] Verify file paths and references"
+      - "[ ] Check for typos and basic errors"
+    warning: "⚠️ GPT AGENTS: FAILURE TO FOLLOW THIS REVIEW PROCESS IS A CRITICAL VIOLATION. ALL CODE MUST BE DOUBLE-CHECKED BEFORE SUBMISSION."
   title: "GPT-BASED AGENT REQUIREMENTS"
   introduction: "For GPT-4/GPT-4.1 agents specifically:"
   work_style:

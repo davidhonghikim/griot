@@ -137,7 +137,7 @@ export class VectorStoreService {
   constructor(_vault: SecureVault, config: VectorStoreConfig) {
     // Vault will be used in future implementation
     this.config = config;
-    this.embeddingService = new EmbeddingService("mock-key-for-dev");
+    this.embeddingService = new EmbeddingService();
   }
 
   private createSchemaManager(): SchemaManager {
