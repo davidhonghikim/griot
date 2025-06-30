@@ -10,8 +10,8 @@ import {
   openaiDefinition,
   comfyuiDefinition,
   qdrantDefinition
-} from '@griot-seed/service-connectors';
-import type { ServiceDefinition, ConnectionResult } from '@griot-seed/service-connectors';
+} from '@griot/service-connectors';
+import type { ServiceDefinition, ConnectionResult } from '@griot/service-connectors';
 
 export interface ServiceInstance {
   id: string;

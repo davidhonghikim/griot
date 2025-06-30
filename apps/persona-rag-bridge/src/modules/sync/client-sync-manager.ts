@@ -1,0 +1,246 @@
+/**
+ * Client-Side Sync Manager
+ * 
+ * Handles local-first sync for browser extension with IndexedDB storage
+ */
+
+import { SyncManager, SyncConfig, SyncSession, SyncMessage, defaultSyncConfig } from '../../config/sync-config';
+
+export class ClientSyncManager extends SyncManager {
+  private db: IDBDatabase | null = null;
+  private clientSyncQueue: SyncMessage[] = [];
+
+  constructor(config: SyncConfig) {
+    super(config);
+    this.initializeIndexedDB();
+  }
+
+  private async initializeIndexedDB() {
+    try {
+      const request = indexedDB.open(this.config.storage.local.database, 1);
+      
+      request.onerror = () => {
+        console.error('Failed to open IndexedDB');
+      };
+      
+      request.onsuccess = () => {
+        this.db = request.result;
+        console.log('IndexedDB initialized successfully');
+        this.loadLocalData();
+      };
+      
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        
+        // Create object stores for each collection
+        this.config.storage.local.collections.forEach(collection => {
+          if (!db.objectStoreNames.contains(collection)) {
+            const store = db.createObjectStore(collection, { keyPath: 'id' });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+            store.createIndex('deviceId', 'deviceId', { unique: false });
+            store.createIndex('sessionId', 'sessionId', { unique: false });
+          }
+        });
+      };
+    } catch (error) {
+      console.error('Failed to initialize IndexedDB:', error);
+    }
+  }
+
+  private async loadLocalData() {
+    if (!this.db) return;
+
+    try {
+      // Load sessions from IndexedDB
+      const transaction = this.db.transaction(['sessions'], 'readonly');
+      const store = transaction.objectStore('sessions');
+      const request = store.getAll();
+      
+      request.onsuccess = () => {
+        const sessions = request.result;
+        sessions.forEach(session => {
+          this.sessions.set(session.id, session);
+        });
+        console.log(`Loaded ${sessions.length} sessions from local storage`);
+      };
+    } catch (error) {
+      console.error('Failed to load local data:', error);
+    }
+  }
+
+  private async saveToIndexedDB(collection: string, data: any) {
+    if (!this.db) return;
+
+    return new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction([collection], 'readwrite');
+      const store = transaction.objectStore(collection);
+      const request = store.put(data);
+      
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async deleteFromIndexedDB(collection: string, id: string) {
+    if (!this.db) return;
+
+    return new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction([collection], 'readwrite');
+      const store = transaction.objectStore(collection);
+      const request = store.delete(id);
+      
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // Override createSession to save to IndexedDB
+  async createSession(type: string, title: string, data: any): Promise<string> {
+    const sessionId = await super.createSession(type, title, data);
+    const session = this.sessions.get(sessionId);
+    
+    if (session) {
+      await this.saveToIndexedDB('sessions', session);
+    }
+    
+    return sessionId;
+  }
+
+  // Override updateSession to save to IndexedDB
+  async updateSession(sessionId: string, data: any): Promise<void> {
+    await super.updateSession(sessionId, data);
+    const session = this.sessions.get(sessionId);
+    
+    if (session) {
+      await this.saveToIndexedDB('sessions', session);
+    }
+  }
+
+  // Override deleteSession to remove from IndexedDB
+  async deleteSession(sessionId: string): Promise<void> {
+    await super.deleteSession(sessionId);
+    await this.deleteFromIndexedDB('sessions', sessionId);
+  }
+
+  // Enhanced sync with offline support
+  async syncData() {
+    if (!this.isOnline) {
+      console.log('Offline - queuing sync data');
+      return;
+    }
+
+    try {
+      // Send queued messages
+      while (this.clientSyncQueue.length > 0) {
+        const message = this.clientSyncQueue.shift();
+        if (message) {
+          await this.sendSyncMessage(message);
+          // Save sync message to local storage
+          await this.saveToIndexedDB('sync_messages', message);
+        }
+      }
+
+      // Request updates from server
+      const updates = await this.requestUpdates();
+      
+      // Process updates and save to local storage
+      for (const message of updates) {
+        await this.handleSyncMessage(message);
+        await this.saveToIndexedDB('sync_messages', message);
+      }
+    } catch (error) {
+      console.error('Sync failed:', error);
+    }
+  }
+
+  // Enhanced presence management
+  async updatePresenceStatus(status: 'online' | 'away' | 'busy' | 'offline') {
+    const presenceMessage: SyncMessage = {
+      type: 'presence',
+      sessionId: 'global',
+      deviceId: this.config.deviceId,
+      timestamp: new Date(),
+      data: { status, deviceName: this.config.deviceName },
+      version: 1
+    };
+
+    await this.sendSyncMessage(presenceMessage);
+  }
+
+  // Get sessions with sync status
+  getSessionsWithSyncStatus(): (SyncSession & { syncStatus: string })[] {
+    return Array.from(this.sessions.values()).map(session => ({
+      ...session,
+      syncStatus: session.synced ? 'synced' : 'pending'
+    }));
+  }
+
+  // Get sync statistics
+  getSyncStats() {
+    const sessions = this.getSessions();
+    const syncedCount = sessions.filter(s => s.synced).length;
+    const pendingCount = sessions.filter(s => !s.synced).length;
+    
+    return {
+      totalSessions: sessions.length,
+      syncedSessions: syncedCount,
+      pendingSessions: pendingCount,
+      syncQueueLength: this.clientSyncQueue.length,
+      isOnline: this.isOnline
+    };
+  }
+
+  // Export local data for backup
+  async exportLocalData(): Promise<any> {
+    const data: any = {};
+    
+    for (const collection of this.config.storage.local.collections) {
+      if (!this.db) continue;
+      
+      const transaction = this.db.transaction([collection], 'readonly');
+      const store = transaction.objectStore(collection);
+      const request = store.getAll();
+      
+      data[collection] = await new Promise((resolve) => {
+        request.onsuccess = () => resolve(request.result);
+      });
+    }
+    
+    return data;
+  }
+
+  // Import data from backup
+  async importLocalData(data: any): Promise<void> {
+    for (const [collection, items] of Object.entries(data)) {
+      if (!this.db) continue;
+      
+      const transaction = this.db.transaction([collection], 'readwrite');
+      const store = transaction.objectStore(collection);
+      
+      for (const item of items as any[]) {
+        await new Promise<void>((resolve, reject) => {
+          const request = store.put(item);
+          request.onsuccess = () => resolve();
+          request.onerror = () => reject(request.error);
+        });
+      }
+    }
+    
+    // Reload data
+    await this.loadLocalData();
+  }
+}
+
+// Create default client configuration
+export const createClientSyncConfig = (deviceType: 'desktop' | 'mobile' | 'tablet'): SyncConfig => ({
+  ...defaultSyncConfig,
+  deviceType,
+  deviceName: `${deviceType.charAt(0).toUpperCase() + deviceType.slice(1)} Device`,
+  storage: {
+    ...defaultSyncConfig.storage,
+    local: {
+      ...defaultSyncConfig.storage.local,
+      database: `persona-rag-sync-${deviceType}`
+    }
+  }
+}); 

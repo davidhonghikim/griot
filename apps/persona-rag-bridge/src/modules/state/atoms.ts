@@ -693,12 +693,6 @@ export const markNotificationReadAtom = atom(
 );
 
 // =============================================================================
-// STORAGE INTEGRATION
-// =============================================================================
-
-// Export storage atoms for unified state management
-
-// =============================================================================
 // VIEW SWITCHING STATE
 // =============================================================================
 
@@ -715,6 +709,9 @@ export const viewStateAtom = atomWithStorage<ViewState>('owu-view-state', {
   activeView: 'chat',
   viewLocation: 'tab',
 });
+
+// Active view atom for tab navigation
+export const activeViewAtom = atomWithStorage<'chat' | 'image' | 'services' | 'artefacts' | 'recipes' | 'agents' | 'settings' | 'vault' | 'docs' | 'console'>('owu-active-view', 'chat');
 
 // View switching actions
 export const switchToTabAtom = atom(

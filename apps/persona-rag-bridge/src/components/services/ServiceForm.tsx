@@ -109,16 +109,16 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({ service, onClose }) =>
   const requiresApiKey = selectedDefinition && selectedDefinition.authentication.type === 'api_key';
 
   return (
-    <div className="bg-slate-800 rounded-lg shadow-2xl p-6 max-w-md w-full">
+    <div className="bg-background-surface rounded-lg shadow-2xl p-6 max-w-md w-full border border-border-primary">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-slate-100">
+        <h3 className="text-xl font-semibold text-text-primary">
           {isEditing ? 'Edit Service' : 'Add New Service'}
         </h3>
         <Button
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="text-slate-400 hover:text-slate-200"
+          className="text-text-secondary hover:text-text-primary"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -127,33 +127,33 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({ service, onClose }) =>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Service Name */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">
+          <label className="block text-sm font-medium text-text-secondary mb-1">
             Service Name
           </label>
           <input
             type="text"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            className={`w-full px-3 py-2 bg-slate-700 border rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.name ? 'border-red-500' : 'border-slate-600'
+            className={`w-full px-3 py-2 bg-background-tertiary border rounded-md text-text-primary placeholder-text-disabled focus:outline-none focus:ring-2 focus:ring-border-focus ${
+              errors.name ? 'border-status-error' : 'border-border-primary'
             }`}
             placeholder="Enter service name"
           />
           {errors.name && (
-            <p className="text-red-400 text-xs mt-1">{errors.name}</p>
+            <p className="text-status-error text-xs mt-1">{errors.name}</p>
           )}
         </div>
 
         {/* Service Type */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">
+          <label className="block text-sm font-medium text-text-secondary mb-1">
             Service Type
           </label>
           <select
             value={formData.serviceDefinitionId}
             onChange={(e) => handleInputChange('serviceDefinitionId', e.target.value)}
-            className={`w-full px-3 py-2 bg-slate-700 border rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.serviceDefinitionId ? 'border-red-500' : 'border-slate-600'
+            className={`w-full px-3 py-2 bg-background-tertiary border rounded-md text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus ${
+              errors.serviceDefinitionId ? 'border-status-error' : 'border-border-primary'
             }`}
           >
             <option value="">Select service type</option>
@@ -164,19 +164,19 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({ service, onClose }) =>
             ))}
           </select>
           {errors.serviceDefinitionId && (
-            <p className="text-red-400 text-xs mt-1">{errors.serviceDefinitionId}</p>
+            <p className="text-status-error text-xs mt-1">{errors.serviceDefinitionId}</p>
           )}
         </div>
 
         {/* IP Type */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">
+          <label className="block text-sm font-medium text-text-secondary mb-1">
             Connection Type
           </label>
           <select
             value={formData.ipType}
             onChange={(e) => handleInputChange('ipType', e.target.value)}
-            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-background-tertiary border border-border-primary rounded-md text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
           >
             <option value="local">Local Network</option>
             <option value="remote">Remote Network</option>
@@ -188,20 +188,20 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({ service, onClose }) =>
         {/* Custom URL */}
         {(formData.ipType === 'custom' || formData.ipType === 'cloud') && (
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-text-secondary mb-1">
               {formData.ipType === 'cloud' ? 'Cloud URL' : 'Custom URL'}
             </label>
             <input
               type="url"
               value={formData.customUrl}
               onChange={(e) => handleInputChange('customUrl', e.target.value)}
-              className={`w-full px-3 py-2 bg-slate-700 border rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.customUrl ? 'border-red-500' : 'border-slate-600'
+              className={`w-full px-3 py-2 bg-background-tertiary border rounded-md text-text-primary placeholder-text-disabled focus:outline-none focus:ring-2 focus:ring-border-focus ${
+                errors.customUrl ? 'border-status-error' : 'border-border-primary'
               }`}
               placeholder={formData.ipType === 'cloud' ? 'https://api.example.com' : 'http://192.168.1.100:3000'}
             />
             {errors.customUrl && (
-              <p className="text-red-400 text-xs mt-1">{errors.customUrl}</p>
+              <p className="text-status-error text-xs mt-1">{errors.customUrl}</p>
             )}
           </div>
         )}
@@ -209,34 +209,34 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({ service, onClose }) =>
         {/* API Key (only if required) */}
         {requiresApiKey && (
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-text-secondary mb-1">
               API Key
             </label>
             <input
               type="password"
               value={formData.authentication?.apiKey || ''}
               onChange={(e) => handleAuthChange('apiKey', e.target.value)}
-              className={`w-full px-3 py-2 bg-slate-700 border rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.apiKey ? 'border-red-500' : 'border-slate-600'
+              className={`w-full px-3 py-2 bg-background-tertiary border rounded-md text-text-primary placeholder-text-disabled focus:outline-none focus:ring-2 focus:ring-border-focus ${
+                errors.apiKey ? 'border-status-error' : 'border-border-primary'
               }`}
               placeholder="Enter API key"
             />
             {errors.apiKey && (
-              <p className="text-red-400 text-xs mt-1">{errors.apiKey}</p>
+              <p className="text-status-error text-xs mt-1">{errors.apiKey}</p>
             )}
           </div>
         )}
 
         {/* Service Description */}
         {selectedDefinition && (
-          <div className="bg-slate-700 rounded-md p-3">
-            <h4 className="text-sm font-medium text-slate-200 mb-2">
+          <div className="bg-background-tertiary rounded-md p-3 border border-border-primary">
+            <h4 className="text-sm font-medium text-text-primary mb-2">
               {selectedDefinition.name}
             </h4>
-            <p className="text-xs text-slate-400 mb-2">
+            <p className="text-xs text-text-tertiary mb-2">
               {selectedDefinition.configuration.help.instructions}
             </p>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-text-disabled">
               <span className="font-medium">Category:</span> {selectedDefinition.category}
               <br />
               <span className="font-medium">Default Port:</span> {selectedDefinition.defaultPort}
@@ -248,8 +248,8 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({ service, onClose }) =>
 
         {/* Error Message */}
         {errors.submit && (
-          <div className="bg-red-900/20 border border-red-500 rounded-md p-3">
-            <p className="text-red-400 text-sm">{errors.submit}</p>
+          <div className="bg-status-error/20 border border-status-error rounded-md p-3">
+            <p className="text-status-error text-sm">{errors.submit}</p>
           </div>
         )}
 

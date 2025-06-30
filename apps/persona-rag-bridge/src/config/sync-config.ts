@@ -1,0 +1,382 @@
+/**
+ * Multi-Device Sync Configuration
+ * 
+ * Enables local-first architecture with real-time sync across devices
+ */
+
+export interface SyncConfig {
+  // Device identification
+  deviceId: string;
+  deviceType: 'server' | 'desktop' | 'mobile' | 'tablet';
+  deviceName: string;
+  
+  // Sync settings
+  sync: {
+    enabled: boolean;
+    autoSync: boolean;
+    syncInterval: number; // milliseconds
+    conflictResolution: 'server-wins' | 'client-wins' | 'manual';
+    maxRetries: number;
+  };
+  
+  // Storage configuration
+  storage: {
+    local: {
+      type: 'indexeddb' | 'localstorage';
+      database: string;
+      collections: string[];
+    };
+    server: {
+      url: string;
+      apiKey?: string;
+      collections: string[];
+    };
+  };
+  
+  // Session management
+  sessions: {
+    maxConcurrent: number;
+    autoSave: boolean;
+    saveInterval: number; // milliseconds
+    retentionDays: number;
+  };
+  
+  // Collaboration settings
+  collaboration: {
+    enabled: boolean;
+    realTimeSync: boolean;
+    presenceIndicators: boolean;
+    sharedWorkspaces: boolean;
+  };
+}
+
+export interface SyncSession {
+  id: string;
+  deviceId: string;
+  deviceName: string;
+  type: 'chat' | 'work' | 'collaboration';
+  title: string;
+  participants: string[];
+  lastActivity: Date;
+  data: any;
+  version: number;
+  synced: boolean;
+}
+
+export interface SyncMessage {
+  type: 'create' | 'update' | 'delete' | 'sync' | 'presence';
+  sessionId: string;
+  deviceId: string;
+  timestamp: Date;
+  data: any;
+  version: number;
+}
+
+export class SyncManager {
+  protected config: SyncConfig;
+  protected sessions: Map<string, SyncSession> = new Map();
+  protected syncQueue: SyncMessage[] = [];
+  protected isOnline: boolean = false;
+  private syncInterval?: NodeJS.Timeout;
+  private websocket?: WebSocket;
+
+  constructor(config: SyncConfig) {
+    this.config = config;
+    this.initializeSync();
+  }
+
+  private async initializeSync() {
+    // Generate device ID if not exists
+    if (!this.config.deviceId) {
+      this.config.deviceId = this.generateDeviceId();
+    }
+
+    // Initialize local storage
+    await this.initializeLocalStorage();
+    
+    // Start sync process
+    if (this.config.sync.enabled) {
+      this.startSync();
+    }
+  }
+
+  private generateDeviceId(): string {
+    return `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private async initializeLocalStorage() {
+    // Initialize IndexedDB for local storage
+    const dbName = this.config.storage.local.database;
+    
+    // Create database and collections
+    // This would be implemented with actual IndexedDB operations
+    console.log(`Initializing local storage: ${dbName}`);
+  }
+
+  private startSync() {
+    if (this.config.sync.autoSync) {
+      this.syncInterval = setInterval(() => {
+        this.syncData();
+      }, this.config.sync.syncInterval);
+    }
+
+    // Start real-time sync if enabled
+    if (this.config.collaboration.realTimeSync) {
+      this.startRealTimeSync();
+    }
+  }
+
+  private async startRealTimeSync() {
+    try {
+      this.websocket = new WebSocket(`${this.config.storage.server.url}/ws/sync`);
+      
+      this.websocket.onopen = () => {
+        console.log('Real-time sync connected');
+        this.isOnline = true;
+        this.syncData(); // Initial sync
+      };
+      
+      this.websocket.onmessage = (event) => {
+        const message: SyncMessage = JSON.parse(event.data);
+        this.handleSyncMessage(message);
+      };
+      
+      this.websocket.onclose = () => {
+        console.log('Real-time sync disconnected');
+        this.isOnline = false;
+        // Attempt to reconnect
+        setTimeout(() => this.startRealTimeSync(), 5000);
+      };
+    } catch (error) {
+      console.error('Failed to start real-time sync:', error);
+      this.isOnline = false;
+    }
+  }
+
+  protected async syncData() {
+    if (!this.isOnline) {
+      console.log('Offline - queuing sync data');
+      return;
+    }
+
+    try {
+      // Send queued messages
+      while (this.syncQueue.length > 0) {
+        const message = this.syncQueue.shift();
+        if (message) {
+          await this.sendSyncMessage(message);
+        }
+      }
+
+      // Request updates from server
+      await this.requestUpdates();
+    } catch (error) {
+      console.error('Sync failed:', error);
+    }
+  }
+
+  protected async sendSyncMessage(message: SyncMessage) {
+    if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+      this.websocket.send(JSON.stringify(message));
+    } else {
+      // Fallback to HTTP
+      await fetch(`${this.config.storage.server.url}/api/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.storage.server.apiKey}`
+        },
+        body: JSON.stringify(message)
+      });
+    }
+  }
+
+  protected async requestUpdates(): Promise<SyncMessage[]> {
+    const response = await fetch(`${this.config.storage.server.url}/api/sync/updates`, {
+      headers: {
+        'Authorization': `Bearer ${this.config.storage.server.apiKey}`
+      }
+    });
+    
+    if (response.ok) {
+      const updates: SyncMessage[] = await response.json();
+      updates.forEach(message => this.handleSyncMessage(message));
+      return updates;
+    }
+    return [];
+  }
+
+  protected handleSyncMessage(message: SyncMessage) {
+    // Handle incoming sync messages
+    switch (message.type) {
+      case 'create':
+      case 'update':
+        this.updateLocalSession(message);
+        break;
+      case 'delete':
+        this.deleteLocalSession(message.sessionId);
+        break;
+      case 'presence':
+        this.updatePresence(message);
+        break;
+    }
+  }
+
+  private updateLocalSession(message: SyncMessage) {
+    const session = this.sessions.get(message.sessionId);
+    if (session && session.version < message.version) {
+      // Update local session with server data
+      this.sessions.set(message.sessionId, {
+        ...session,
+        ...message.data,
+        version: message.version,
+        synced: true
+      });
+    }
+  }
+
+  private deleteLocalSession(sessionId: string) {
+    this.sessions.delete(sessionId);
+  }
+
+  private updatePresence(message: SyncMessage) {
+    // Update presence indicators for collaboration
+    console.log(`Presence update: ${message.deviceId} - ${message.data.status}`);
+  }
+
+  // Public API methods
+  async createSession(type: string, title: string, data: any): Promise<string> {
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const session: SyncSession = {
+      id: sessionId,
+      deviceId: this.config.deviceId,
+      deviceName: this.config.deviceName,
+      type: type as any,
+      title,
+      participants: [this.config.deviceId],
+      lastActivity: new Date(),
+      data,
+      version: 1,
+      synced: false
+    };
+
+    this.sessions.set(sessionId, session);
+    
+    // Queue for sync
+    this.queueSyncMessage({
+      type: 'create',
+      sessionId,
+      deviceId: this.config.deviceId,
+      timestamp: new Date(),
+      data: session,
+      version: 1
+    });
+
+    return sessionId;
+  }
+
+  async updateSession(sessionId: string, data: any): Promise<void> {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    session.data = { ...session.data, ...data };
+    session.lastActivity = new Date();
+    session.version++;
+    session.synced = false;
+
+    // Queue for sync
+    this.queueSyncMessage({
+      type: 'update',
+      sessionId,
+      deviceId: this.config.deviceId,
+      timestamp: new Date(),
+      data: session.data,
+      version: session.version
+    });
+  }
+
+  async deleteSession(sessionId: string): Promise<void> {
+    this.sessions.delete(sessionId);
+    
+    // Queue for sync
+    this.queueSyncMessage({
+      type: 'delete',
+      sessionId,
+      deviceId: this.config.deviceId,
+      timestamp: new Date(),
+      data: null,
+      version: 1
+    });
+  }
+
+  getSessions(): SyncSession[] {
+    return Array.from(this.sessions.values());
+  }
+
+  getSession(sessionId: string): SyncSession | undefined {
+    return this.sessions.get(sessionId);
+  }
+
+  private queueSyncMessage(message: SyncMessage) {
+    this.syncQueue.push(message);
+    
+    // Immediate sync if online
+    if (this.isOnline) {
+      this.syncData();
+    }
+  }
+
+  // Cleanup
+  destroy() {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+    }
+    if (this.websocket) {
+      this.websocket.close();
+    }
+  }
+}
+
+// Default configuration
+export const defaultSyncConfig: SyncConfig = {
+  deviceId: '',
+  deviceType: 'desktop',
+  deviceName: 'Unknown Device',
+  
+  sync: {
+    enabled: true,
+    autoSync: true,
+    syncInterval: 5000, // 5 seconds
+    conflictResolution: 'server-wins',
+    maxRetries: 3
+  },
+  
+  storage: {
+    local: {
+      type: 'indexeddb',
+      database: 'persona-rag-sync',
+      collections: ['sessions', 'chats', 'workspaces', 'artifacts']
+    },
+    server: {
+      url: 'http://localhost:30436',
+      collections: ['sessions', 'chats', 'workspaces', 'artifacts']
+    }
+  },
+  
+  sessions: {
+    maxConcurrent: 10,
+    autoSave: true,
+    saveInterval: 30000, // 30 seconds
+    retentionDays: 30
+  },
+  
+  collaboration: {
+    enabled: true,
+    realTimeSync: true,
+    presenceIndicators: true,
+    sharedWorkspaces: true
+  }
+}; 

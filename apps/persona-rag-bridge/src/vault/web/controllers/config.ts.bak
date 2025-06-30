@@ -1,0 +1,197 @@
+import { Request, Response } from 'express';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+
+export class ConfigController {
+  private configPath = path.join(process.cwd(), 'config', 'services.json');
+
+  async getConfig(_req: Request, res: Response) {
+    try {
+      if (fs.existsSync(this.configPath)) {
+        const configData = fs.readFileSync(this.configPath, 'utf8');
+        const config = JSON.parse(configData);
+        res.json(config);
+      } else {
+        // Return default configuration with correct ports
+        const defaultConfig = {
+          services: {
+            openWebUI: { 
+              name: 'OpenWebUI', 
+              url: 'http://192.168.1.180:3000', 
+              apiKey: '',
+              type: 'llm',
+              healthEndpoint: '/api/v1/health'
+            },
+            personaRAG: { 
+              name: 'PersonaRAG Bridge', 
+              url: 'http://localhost:3001', 
+              type: 'bridge',
+              healthEndpoint: '/health'
+            },
+            vectorStore: { 
+              name: 'Vector Store (Weaviate)', 
+              url: 'http://localhost:8080', 
+              type: 'vector',
+              healthEndpoint: '/v1/.well-known/ready'
+            },
+            postgresql: { 
+              name: 'PostgreSQL', 
+              url: 'localhost:5432', 
+              type: 'database',
+              healthEndpoint: null
+            },
+            mongodb: { 
+              name: 'MongoDB', 
+              url: 'localhost:27017', 
+              type: 'database',
+              healthEndpoint: null
+            },
+            redis: { 
+              name: 'Redis', 
+              url: 'localhost:6379', 
+              type: 'cache',
+              healthEndpoint: null
+            }
+          },
+          vault: {
+            port: 3001,
+            storage: 'file', // or 'database'
+            encryption: true
+          }
+        };
+        res.json(defaultConfig);
+      }
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
+
+  async saveConfig(req: Request, res: Response) {
+    try {
+      const config = req.body;
+      
+      // Ensure config directory exists
+      const configDir = path.dirname(this.configPath);
+      if (!fs.existsSync(configDir)) {
+        fs.mkdirSync(configDir, { recursive: true });
+      }
+      
+      // Save configuration
+      fs.writeFileSync(this.configPath, JSON.stringify(config, null, 2));
+      
+      res.json({ success: true, message: 'Configuration saved successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
+
+  async addService(req: Request, res: Response) {
+    try {
+      const { name, url, type, apiKey, healthEndpoint } = req.body;
+      
+      if (!name || !url || !type) {
+        return res.status(400).json({ error: 'Name, URL, and type are required' });
+      }
+      
+      const config = await this.loadConfig();
+      const serviceId = name.toLowerCase().replace(/\s+/g, '-');
+      
+      config.services[serviceId] = {
+        name,
+        url,
+        type,
+        apiKey: apiKey || '',
+        healthEndpoint: healthEndpoint || null
+      };
+      
+      await this.saveConfigToFile(config);
+      
+      res.json({ 
+        success: true, 
+        message: 'Service added successfully',
+        service: config.services[serviceId]
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
+
+  async removeService(req: Request, res: Response) {
+    try {
+      const { serviceId } = req.params;
+      
+      const config = await this.loadConfig();
+      
+      if (!config.services[serviceId]) {
+        return res.status(404).json({ error: 'Service not found' });
+      }
+      
+      delete config.services[serviceId];
+      await this.saveConfigToFile(config);
+      
+      res.json({ 
+        success: true, 
+        message: 'Service removed successfully' 
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
+
+  async testConnection(req: Request, res: Response) {
+    try {
+      const { service } = req.params;
+      const { url, healthEndpoint } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ error: 'Service URL is required' });
+      }
+      
+      let healthUrl = url;
+      if (healthEndpoint) {
+        healthUrl = `${url}${healthEndpoint}`;
+      } else if (service === 'openWebUI') {
+        healthUrl = `${url}/api/v1/health`;
+      } else if (service === 'vectorStore') {
+        healthUrl = `${url}/v1/.well-known/ready`;
+      } else if (service === 'personaRAG') {
+        healthUrl = `${url}/health`;
+      } else {
+        // For database services, try a simple connection test
+        healthUrl = url;
+      }
+      
+      const response = await axios.get(healthUrl, { timeout: 5000 });
+      
+      res.json({ 
+        success: true, 
+        message: `${service} connection successful`,
+        status: response.status,
+        data: response.data
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  }
+
+  private async loadConfig() {
+    if (fs.existsSync(this.configPath)) {
+      const configData = fs.readFileSync(this.configPath, 'utf8');
+      return JSON.parse(configData);
+    } else {
+      return { services: {} };
+    }
+  }
+
+  private async saveConfigToFile(config: any) {
+    const configDir = path.dirname(this.configPath);
+    if (!fs.existsSync(configDir)) {
+      fs.mkdirSync(configDir, { recursive: true });
+    }
+    fs.writeFileSync(this.configPath, JSON.stringify(config, null, 2));
+  }
+}

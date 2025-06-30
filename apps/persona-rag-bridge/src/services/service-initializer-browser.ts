@@ -20,7 +20,7 @@ export class ServiceInitializer {
       return customUrl || '';
     }
 
-    const ip = ipType === 'local' ? config.networking.localIp : config.networking.remoteIp;
+    const ip = ipType === 'local' ? config.networking.allowedHosts[0] : config.networking.allowedHosts[2];
     if (!ip) return '';
 
     // Mock port mapping
@@ -78,7 +78,7 @@ export class ServiceInitializer {
         status: personaRAGStatus,
         lastCheck: new Date(),
         config: {
-          model: config.services.defaultPersonaRAGModel,
+          model: config.services.defaultModels.local,
           temperature: 0.7,
           maxTokens: 2048,
         },
@@ -95,7 +95,7 @@ export class ServiceInitializer {
         status: openWebUIStatus,
         lastCheck: new Date(),
         config: {
-          model: config.services.defaultOpenWebUIModel,
+          model: config.services.defaultModels.openwebui,
           temperature: 0.7,
           maxTokens: 2048,
         },
@@ -112,7 +112,7 @@ export class ServiceInitializer {
         status: vectorStoreStatus,
         lastCheck: new Date(),
         config: {
-          model: config.services.defaultVectorStoreModel,
+          model: config.rag.vectorStore.model,
           dimension: 384,
         },
       });

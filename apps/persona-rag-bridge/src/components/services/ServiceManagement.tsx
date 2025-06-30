@@ -99,7 +99,7 @@ export const ServiceManagement: React.FC = () => {
   const displayServices = showArchived ? archivedServices : activeServices;
 
   return (
-    <div className="p-4 md:p-6 h-full flex flex-col bg-slate-900">
+    <div className="p-4 md:p-6 h-full flex flex-col bg-background-primary">
       {/* Add/Edit Service Form */}
       {(isAddingService || editingService) && (
         <div className="mb-4 flex justify-center">
@@ -115,9 +115,9 @@ export const ServiceManagement: React.FC = () => {
           {/* Header with controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <div className="flex items-center space-x-4">
-              <h2 className="text-2xl font-bold text-slate-100">
+              <h2 className="text-2xl font-bold text-text-primary">
                 {showArchived ? 'Archived Services' : 'Active Services'}
-                <span className="ml-2 text-sm text-slate-400">
+                <span className="ml-2 text-sm text-text-tertiary">
                   ({displayServices.length})
                 </span>
               </h2>
@@ -147,7 +147,7 @@ export const ServiceManagement: React.FC = () => {
                 <select 
                   value={sortBy} 
                   onChange={(e) => handleSort(e.target.value as typeof sortBy)}
-                  className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-sm text-slate-200"
+                  className="bg-background-tertiary border border-border-primary rounded px-2 py-1 text-sm text-text-primary"
                 >
                   <option value="name">Sort by Name</option>
                   <option value="status">Sort by Status</option>
@@ -172,8 +172,8 @@ export const ServiceManagement: React.FC = () => {
 
           {/* Services list */}
           {displayServices.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <Cloud className="h-16 w-16 mx-auto mb-4 text-slate-600" />
+            <div className="text-center py-12 text-text-tertiary">
+              <Cloud className="h-16 w-16 mx-auto mb-4 text-text-disabled" />
               <p className="text-lg mb-2">
                 {showArchived ? 'No archived services' : 'No active services'}
               </p>

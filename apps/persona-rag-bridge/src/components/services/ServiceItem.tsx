@@ -53,15 +53,15 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
   const getStatusIcon = (status: Service['status']) => {
     switch (status) {
       case 'online':
-        return <CheckCircle className="h-5 w-5 text-green-400 drop-shadow-lg" />;
+        return <CheckCircle className="h-5 w-5 text-status-success drop-shadow-lg" />;
       case 'offline':
-        return <XCircle className="h-5 w-5 text-red-500 drop-shadow-lg" />;
+        return <XCircle className="h-5 w-5 text-status-error drop-shadow-lg" />;
       case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-600 drop-shadow-lg" />;
+        return <AlertCircle className="h-5 w-5 text-status-error drop-shadow-lg" />;
       case 'checking':
-        return <Clock className="h-5 w-5 text-yellow-400 animate-spin drop-shadow-lg" />;
+        return <Clock className="h-5 w-5 text-status-warning animate-spin drop-shadow-lg" />;
       default:
-        return <WifiOff className="h-5 w-5 text-slate-500" />;
+        return <WifiOff className="h-5 w-5 text-text-disabled" />;
     }
   };
 
@@ -96,20 +96,20 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
   };
 
   return (
-    <div className="bg-slate-800 rounded-lg shadow-md transition-all hover:shadow-lg">
+    <div className="bg-background-surface rounded-lg shadow-md transition-all hover:shadow-lg border border-border-primary">
       <div className="flex items-center p-4">
         <div className="flex-grow">
           <div className="flex items-center space-x-3">
             {getStatusIcon(service.status)}
-            <p className="font-bold text-lg text-slate-100">{service.name}</p>
+            <p className="font-bold text-lg text-text-primary">{service.name}</p>
             {service.archived && (
-              <span className="px-2 py-1 text-xs bg-slate-600 text-slate-300 rounded">
+              <span className="px-2 py-1 text-xs bg-background-tertiary text-text-secondary rounded border border-border-primary">
                 Archived
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-400">{service.url}</p>
-          <p className="text-xs text-slate-500 capitalize">
+          <p className="text-sm text-text-secondary">{service.url}</p>
+          <p className="text-xs text-text-disabled capitalize">
             {service.type.replace(/_/g, ' ')} • {service.category}
           </p>
         </div>
@@ -119,7 +119,7 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
             size="sm"
             onClick={handleCheckStatus}
             disabled={service.status === 'checking'}
-            className="text-slate-400 hover:text-slate-200"
+            className="text-text-secondary hover:text-text-primary"
             title="Check Service Status"
           >
             <RefreshCw className="h-4 w-4" />
@@ -128,7 +128,7 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => onEdit(service)}
-            className="text-slate-400 hover:text-slate-200"
+            className="text-text-secondary hover:text-text-primary"
             title="Edit Service"
           >
             <Edit className="h-4 w-4" />
@@ -137,7 +137,7 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleOpenInTab}
-            className="text-slate-400 hover:text-slate-200"
+            className="text-text-secondary hover:text-text-primary"
             title="Open in Tab"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 3h7v7m0-7L10 14" /></svg>
@@ -146,7 +146,7 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleOpenInPanel}
-            className="text-slate-400 hover:text-slate-200"
+            className="text-text-secondary hover:text-text-primary"
             title="Open in Panel"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 9V5a2 2 0 012-2h4m0 0v4m0-4L4 14" /></svg>
@@ -155,7 +155,7 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => onToggleDetails(service.id)}
-            className={`text-slate-400 hover:text-slate-200 transition-transform ${
+            className={`text-text-secondary hover:text-text-primary transition-transform ${
               isExpanded ? 'rotate-180' : ''
             }`}
             title={isExpanded ? 'Hide Details' : 'Show Details'}
@@ -166,7 +166,7 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleToggleArchive}
-            className="text-slate-400 hover:text-slate-200"
+            className="text-text-secondary hover:text-text-primary"
             title={service.archived ? 'Restore Service' : 'Archive Service'}
           >
             {service.archived ? <Eye className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
@@ -175,65 +175,67 @@ export const ServiceItem: React.FC<ServiceItemProps> = ({
       </div>
       
       {isExpanded && (
-        <div className="border-t border-slate-700 p-4">
+        <div className="border-t border-border-primary p-4">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-slate-200 mb-2">Service Details</h4>
+            <h4 className="text-lg font-semibold text-text-primary mb-2">Service Details</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
               <div>
-                <span className="font-semibold text-slate-400">Category:</span> {service.category}
+                <span className="font-semibold text-text-secondary">Category:</span> {service.category}
               </div>
               <div>
-                <span className="font-semibold text-slate-400">Enabled:</span> {service.enabled ? 'Yes' : 'No'}
+                <span className="font-semibold text-text-secondary">Enabled:</span> {service.enabled ? 'Yes' : 'No'}
               </div>
               <div>
-                <span className="font-semibold text-slate-400">Type:</span> 
+                <span className="font-semibold text-text-secondary">Type:</span> 
                 <span className="capitalize"> {service.type.replace(/_/g, ' ')}</span>
               </div>
               <div>
-                <span className="font-semibold text-slate-400">Last Checked:</span> 
+                <span className="font-semibold text-text-secondary">Last Checked:</span> 
                 {service.lastChecked ? new Date(service.lastChecked).toLocaleString() : 'Never'}
               </div>
             </div>
           </div>
           
           {/* Delete section */}
-          <div className="border-t border-slate-600 pt-4">
-            <h5 className="text-sm font-semibold text-red-400 mb-2">Danger Zone</h5>
-            {!showDeleteConfirm ? (
-              <Button 
-                onClick={() => setShowDeleteConfirm(true)}
-                variant="destructive"
-                size="sm"
-                className="text-sm"
-              >
-                <Trash2 className="h-3 w-3 mr-1" />
-                Delete Service
-              </Button>
-            ) : (
-              <div className="space-y-2">
-                <p className="text-sm text-slate-300">
-                  Are you sure? This action cannot be undone.
+          <div className="border-t border-border-primary pt-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h5 className="text-sm font-medium text-text-primary mb-1">Danger Zone</h5>
+                <p className="text-xs text-text-tertiary">
+                  Permanently delete this service. This action cannot be undone.
                 </p>
-                <div className="flex space-x-2">
-                  <Button 
+              </div>
+              {!showDeleteConfirm ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-status-error hover:text-status-error/80"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={handleDelete}
-                    variant="destructive"
-                    size="sm"
-                    className="text-sm"
+                    className="text-status-error hover:text-status-error/80"
                   >
-                    Yes, Delete
+                    Confirm Delete
                   </Button>
-                  <Button 
-                    onClick={() => setShowDeleteConfirm(false)}
-                    variant="secondary"
+                  <Button
+                    variant="ghost"
                     size="sm"
-                    className="text-sm"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="text-text-secondary hover:text-text-primary"
                   >
                     Cancel
                   </Button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}

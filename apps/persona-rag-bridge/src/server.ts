@@ -19,6 +19,9 @@ import { VectorStore } from '@griot/data/rag/vector_store';
 import { EmbeddingService } from '@griot/data/rag/embedding_service';
 import { PersonaVectorizationService } from '@griot/data/rag/persona_vectorization_service';
 import { PersonaLoader } from '@griot/data/persona_loader';
+import { ServiceConfig, ServiceManager } from './config/service-config';
+import { SyncManager, SyncMessage, defaultSyncConfig } from './config/sync-config';
+import path from 'path';
 
 // Load environment variables
 dotenv.config();
@@ -27,14 +30,14 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://192.168.1.180:3000", "http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: true,
     methods: ["GET", "POST"]
   }
 });
 
 // Middleware
 app.use(cors({
-  origin: ["http://192.168.1.180:3000", "http://localhost:3000", "http://127.0.0.1:3000"],
+  origin: true,
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -43,6 +46,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Initialize services
 let personaRAGService: PersonaRAGService;
 let openWebUIBridge: OpenWebUIBridge;
+let serviceManager: ServiceManager;
+let syncManager: SyncManager;
 
 // Initialize vault and services
 async function initializeServices() {
@@ -60,7 +65,7 @@ async function initializeServices() {
     }
     
     // Get OpenWebUI configuration from vault
-    const openWebUIUrl = await vault.getSecret('OPENWEBUI_URL') || 'http://192.168.1.180:3000';
+    const openWebUIUrl = await vault.getSecret('OPENWEBUI_URL') || 'http://localhost:3000';
     const openWebUIApiKey = await vault.getSecret('OPENWEBUI_API_KEY');
     
     console.log(`🌐 OpenWebUI URL: ${openWebUIUrl}`);
@@ -100,11 +105,29 @@ async function initializeServices() {
     // Initialize OpenWebUI bridge
     openWebUIBridge = new OpenWebUIBridge(
       {
-        url: 'http://192.168.1.180:3000',
+        url: openWebUIUrl,
         apiKey: 'sk-dae28e6035904cecb2737fbc54768d16'
       },
       personaRAGService
     );
+    
+    // Initialize service manager
+    serviceManager = new ServiceManager();
+    
+    // Initialize sync manager
+    syncManager = new SyncManager({
+      ...defaultSyncConfig,
+      deviceId: process.env.DEVICE_ID || `server_${Date.now()}`,
+      deviceType: 'server',
+      deviceName: 'PersonaRAG Server',
+      storage: {
+        ...defaultSyncConfig.storage,
+        server: {
+          ...defaultSyncConfig.storage.server,
+          url: `http://localhost:${process.env.PORT || 30436}`
+        }
+      }
+    });
     
     console.log('✅ Services initialized successfully');
     
@@ -184,16 +207,155 @@ app.post('/api/personas/select', async (req, res) => {
   }
 });
 
-// Enhanced chat endpoint
+// Service management endpoints
+app.get('/api/services', (_req, res) => {
+  try {
+    const services = serviceManager.getAllServices();
+    const defaultService = serviceManager.getDefaultService();
+    
+    res.json({
+      services,
+      defaultService: defaultService?.name,
+      totalServices: services.length,
+      enabledServices: services.filter(s => s.enabled).length
+    });
+  } catch (error) {
+    console.error('Error getting services:', error);
+    res.status(500).json({ error: 'Failed to get services' });
+  }
+});
+
+app.post('/api/services', async (req, res) => {
+  try {
+    const service: ServiceConfig = req.body;
+    
+    // Validate service configuration
+    const validation = serviceManager.validateService(service);
+    if (!validation.valid) {
+      return res.status(400).json({ 
+        error: 'Invalid service configuration', 
+        details: validation.errors 
+      });
+    }
+    
+    serviceManager.addService(service);
+    
+    res.json({ 
+      message: 'Service added successfully',
+      service: serviceManager.getService(service.name)
+    });
+  } catch (error) {
+    console.error('Error adding service:', error);
+    res.status(500).json({ error: 'Failed to add service' });
+  }
+});
+
+app.put('/api/services/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+    const updates: Partial<ServiceConfig> = req.body;
+    
+    const existingService = serviceManager.getService(name);
+    if (!existingService) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    
+    const updatedService = { ...existingService, ...updates };
+    const validation = serviceManager.validateService(updatedService);
+    if (!validation.valid) {
+      return res.status(400).json({ 
+        error: 'Invalid service configuration', 
+        details: validation.errors 
+      });
+    }
+    
+    serviceManager.addService(updatedService);
+    
+    res.json({ 
+      message: 'Service updated successfully',
+      service: updatedService
+    });
+  } catch (error) {
+    console.error('Error updating service:', error);
+    res.status(500).json({ error: 'Failed to update service' });
+  }
+});
+
+app.delete('/api/services/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+    
+    const existingService = serviceManager.getService(name);
+    if (!existingService) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    
+    serviceManager.removeService(name);
+    
+    res.json({ message: 'Service removed successfully' });
+  } catch (error) {
+    console.error('Error removing service:', error);
+    res.status(500).json({ error: 'Failed to remove service' });
+  }
+});
+
+app.post('/api/services/default', async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    const service = serviceManager.getService(name);
+    if (!service) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    
+    serviceManager.setDefaultService(name);
+    
+    res.json({ 
+      message: 'Default service updated successfully',
+      defaultService: service
+    });
+  } catch (error) {
+    console.error('Error setting default service:', error);
+    res.status(500).json({ error: 'Failed to set default service' });
+  }
+});
+
+// Enhanced chat endpoint that uses any available service
 app.post('/api/chat/enhanced', async (req, res) => {
   try {
-    const { message, personaId, conversationHistory = [] } = req.body;
+    const { message, personaId, conversationHistory = [], serviceName } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
     
-    const response = await openWebUIBridge.enhancedChat(message, personaId, conversationHistory);
+    // Use specified service or default service
+    const service = serviceName 
+      ? serviceManager.getService(serviceName)
+      : serviceManager.getDefaultService();
+    
+    if (!service) {
+      return res.status(400).json({ error: 'No available service found' });
+    }
+    
+    // Route to appropriate service based on type
+    let response;
+    switch (service.type) {
+      case 'openwebui':
+        response = await openWebUIBridge.enhancedChat(message, personaId, conversationHistory);
+        break;
+      case 'ollama':
+        // TODO: Implement Ollama bridge
+        response = { message: 'Ollama integration coming soon', service: service.name };
+        break;
+      case 'openai':
+        // TODO: Implement OpenAI bridge
+        response = { message: 'OpenAI integration coming soon', service: service.name };
+        break;
+      default:
+        response = { message: 'Service type not yet implemented', service: service.name };
+    }
+    
     return res.json(response);
     
   } catch (error) {
@@ -217,6 +379,88 @@ app.post('/api/openwebui/chat', async (req, res) => {
   } catch (error) {
     console.error('Error sending chat message:', error);
     return res.status(500).json({ error: 'Failed to send chat message' });
+  }
+});
+
+// Sync endpoints
+app.post('/api/sync', async (req, res) => {
+  try {
+    const message: SyncMessage = req.body;
+    
+    // Store the sync message
+    await storeSyncMessage(message);
+    
+    // Broadcast to other connected devices
+    io.emit('sync-message', message);
+    
+    res.json({ success: true, message: 'Sync message processed' });
+  } catch (error) {
+    console.error('Error processing sync message:', error);
+    res.status(500).json({ error: 'Failed to process sync message' });
+  }
+});
+
+app.get('/api/sync/updates', async (req, res) => {
+  try {
+    const deviceId = req.query.deviceId as string;
+    const lastSync = req.query.lastSync as string;
+    
+    // Get updates since last sync
+    const updates = await getSyncUpdates(deviceId, lastSync);
+    
+    res.json(updates);
+  } catch (error) {
+    console.error('Error getting sync updates:', error);
+    res.status(500).json({ error: 'Failed to get sync updates' });
+  }
+});
+
+app.get('/api/sessions', async (_req, res) => {
+  try {
+    const sessions = syncManager.getSessions();
+    res.json(sessions);
+  } catch (error) {
+    console.error('Error getting sessions:', error);
+    res.status(500).json({ error: 'Failed to get sessions' });
+  }
+});
+
+app.post('/api/sessions', async (req, res) => {
+  try {
+    const { type, title, data } = req.body;
+    const sessionId = await syncManager.createSession(type, title, data);
+    
+    res.json({ sessionId, success: true });
+  } catch (error) {
+    console.error('Error creating session:', error);
+    res.status(500).json({ error: 'Failed to create session' });
+  }
+});
+
+app.put('/api/sessions/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { data } = req.body;
+    
+    await syncManager.updateSession(sessionId, data);
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating session:', error);
+    res.status(500).json({ error: 'Failed to update session' });
+  }
+});
+
+app.delete('/api/sessions/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    await syncManager.deleteSession(sessionId);
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting session:', error);
+    res.status(500).json({ error: 'Failed to delete session' });
   }
 });
 
@@ -256,6 +500,44 @@ io.on('connection', (socket) => {
     }
   });
   
+  socket.on('sync-message', async (message: SyncMessage) => {
+    try {
+      // Process sync message
+      await storeSyncMessage(message);
+      
+      // Broadcast to other clients
+      socket.broadcast.emit('sync-message', message);
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to process sync message' });
+    }
+  });
+  
+  socket.on('join-session', async (sessionId: string) => {
+    try {
+      const session = syncManager.getSession(sessionId);
+      if (session) {
+        socket.join(`session_${sessionId}`);
+        socket.emit('session-joined', session);
+        
+        // Notify other participants
+        socket.to(`session_${sessionId}`).emit('participant-joined', {
+          deviceId: socket.id,
+          sessionId
+        });
+      }
+    } catch (error) {
+      socket.emit('error', { message: 'Failed to join session' });
+    }
+  });
+  
+  socket.on('leave-session', (sessionId: string) => {
+    socket.leave(`session_${sessionId}`);
+    socket.to(`session_${sessionId}`).emit('participant-left', {
+      deviceId: socket.id,
+      sessionId
+    });
+  });
+  
   socket.on('disconnect', () => {
     console.log('🔌 Client disconnected:', socket.id);
   });
@@ -292,3 +574,41 @@ process.on('SIGINT', async () => {
 
 // Start the server
 startServer();
+
+// Helper functions for sync storage
+async function storeSyncMessage(message: SyncMessage): Promise<void> {
+  // Store in local database (implement with your preferred database)
+  console.log('Storing sync message:', message);
+  // This would be implemented with actual database storage
+}
+
+async function getSyncUpdates(deviceId: string, lastSync?: string): Promise<SyncMessage[]> {
+  // Get updates since last sync (implement with your preferred database)
+  console.log('Getting sync updates for device:', deviceId, 'since:', lastSync);
+  // This would be implemented with actual database queries
+  return [];
+}
+
+// Serve static files from the dist directory (for extension assets)
+app.use(express.static(path.join(__dirname, "../../dist")));
+
+// API-only server - don't serve index.html for Chrome extension
+app.get("*", (req, res) => {
+    // Only handle non-API requests that are looking for extension files
+    if (!req.path.startsWith("/api")) {
+        // For Chrome extension, we don't serve index.html
+        // Instead, return a helpful message
+        res.status(404).json({
+            error: "Not Found",
+            message: "This is an API server for the OWU+ Chrome Extension. Use the extension popup or tab interface.",
+            availableEndpoints: [
+                "/health",
+                "/api/chat",
+                "/api/personas/query",
+                "/api/personas/select",
+                "/api/chat/enhanced",
+                "/api/openwebui/chat"
+            ]
+        });
+    }
+});

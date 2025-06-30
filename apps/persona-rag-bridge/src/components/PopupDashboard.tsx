@@ -1,24 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { 
   servicesStateAtom, 
-  activeServicesAtom,
   switchToTabAtom
 } from '../modules/state/atoms';
 import { ServicesTab } from './tabs/ServicesTab';
 import { Button } from './ui';
 import { 
-  ExternalLink, 
   PanelLeftClose,
+  PanelLeftOpen,
   Settings,
-  HelpCircle
+  Server,
+  Wrench,
+  FileText
 } from 'lucide-react';
 import { ServiceInitializer } from '../services/service-initializer-browser';
 
 export const PopupDashboard: React.FC = () => {
   const [servicesState, setServicesState] = useAtom(servicesStateAtom);
-  const [activeServices] = useAtom(activeServicesAtom);
   const [, switchToTab] = useAtom(switchToTabAtom);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   // Initialize services on mount
   useEffect(() => {
@@ -43,71 +44,100 @@ export const PopupDashboard: React.FC = () => {
     };
   }, []);
 
-  const handleOpenInTab = () => {
-    switchToTab({ serviceId: undefined, view: 'services' });
+  const handleOpenInTab = (view: 'services' | 'settings' | 'chat' | 'artefacts' | 'recipes' | 'agents' | 'vault' = 'services') => {
+    switchToTab({ serviceId: undefined, view });
     window.close();
   };
 
-  const handleOpenInPanel = () => {
-    // For panel, we need a serviceId, so we'll use a default one or skip this for now
-    // switchToPanel({ serviceId: 'default', view: 'services' });
-    // For now, just open in tab since panel requires a specific service
-    switchToTab({ serviceId: undefined, view: 'services' });
-    window.close();
+  const togglePanel = async () => {
+    try {
+      const currentTab = (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
+      if (currentTab?.id) {
+        if (isPanelOpen) {
+          // Close the panel
+          await chrome.sidePanel.setOptions({
+            tabId: currentTab.id,
+            enabled: false,
+          });
+          setIsPanelOpen(false);
+        } else {
+          // Open the panel
+          await chrome.sidePanel.setOptions({
+            tabId: currentTab.id,
+            path: 'sidepanel.html',
+            enabled: true,
+          });
+          await chrome.sidePanel.open({ tabId: currentTab.id });
+          setIsPanelOpen(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle panel:', error);
+      // Fallback to tab if panel is not available
+      handleOpenInTab('services');
+    }
   };
 
   return (
-    <div className="w-[640px] h-[600px] bg-background-primary text-text-primary flex flex-col">
+    <div className="w-[640px] h-[800px] bg-background-primary text-text-primary flex flex-col">
       {/* Header - matching kai-cd style */}
-      <div className="flex items-center justify-between p-4 border-b border-border-primary bg-background-secondary">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-interactive-primary/20 rounded-lg flex items-center justify-center">
-            <Settings className="w-4 h-4 text-interactive-primary" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-text-primary">OWU+ Services</h1>
-            <p className="text-xs text-text-secondary">
-              {activeServices} active • {servicesState.status}
-            </p>
-          </div>
+      <header className="flex items-center justify-between bg-background-secondary px-3 py-2 border-b border-border-primary">
+        <div className="flex items-center gap-2">
+          <Server className="h-5 w-5 text-interactive-primary" />
+          <span className="font-semibold text-text-primary">OWU+ Bridge</span>
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
-            className="text-text-secondary hover:text-text-primary"
-            onClick={handleOpenInTab}
+            className="flex items-center gap-1 px-2 py-1 hover:bg-background-tertiary rounded text-text-secondary hover:text-text-primary"
+            onClick={togglePanel}
+            title={isPanelOpen ? 'Hide Panel' : 'Show Panel'}
           >
-            <ExternalLink className="w-4 h-4 mr-1" />
-            Tab
+            {isPanelOpen ? (
+              <PanelLeftClose className="h-4 w-4" />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" />
+            )}
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="text-text-secondary hover:text-text-primary"
-            onClick={handleOpenInPanel}
+            className="flex items-center gap-1 px-2 py-1 hover:bg-background-tertiary rounded text-text-secondary hover:text-text-primary"
+            onClick={() => handleOpenInTab('services')}
+            title="Service Manager"
           >
-            <PanelLeftClose className="w-4 h-4 mr-1" />
-            Panel
+            <Wrench className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-1 px-2 py-1 hover:bg-background-tertiary rounded text-text-secondary hover:text-text-primary"
+            onClick={() => handleOpenInTab('settings')}
+            title="Settings"
           >
-            <HelpCircle className="w-4 h-4" />
+            <Settings className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-1 px-2 py-1 hover:bg-background-tertiary rounded text-text-secondary hover:text-text-primary"
+            onClick={() => handleOpenInTab('chat')}
+            title="Chat"
+          >
+            <FileText className="h-4 w-4" />
           </Button>
         </div>
-      </div>
+      </header>
 
       {/* Services Content */}
-      <div className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-y-auto p-4">
         <ServicesTab />
-      </div>
+      </main>
 
       {/* Footer - matching kai-cd style */}
-      <div className="border-t border-border-primary p-3 bg-background-secondary">
+      <footer className="border-t border-border-primary p-3 bg-background-secondary">
         <div className="flex justify-between items-center text-xs text-text-secondary">
           <div className="flex items-center space-x-4">
             <span>Status: {servicesState.status}</span>
@@ -124,7 +154,7 @@ export const PopupDashboard: React.FC = () => {
             <span>OWU+ Bridge</span>
           </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 };

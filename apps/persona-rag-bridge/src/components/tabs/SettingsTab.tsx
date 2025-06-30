@@ -189,26 +189,67 @@ export const SettingsTab: React.FC = () => {
             <div className="text-xs text-muted-foreground mb-2">
               Config Source: <span className="font-medium">{configSource}</span>
             </div>
+            
+            {/* OpenWebUI Server Selection */}
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">OpenWebUI Server</label>
+              <label className="text-xs text-muted-foreground mb-2 block">OpenWebUI Server</label>
+              <div className="flex space-x-2 mb-2">
+                <Button 
+                  variant={connectionConfig.openwebuiUrl.includes('localhost') || connectionConfig.openwebuiUrl.includes('127.0.0.1') ? "primary" : "outline"}
+                  size="sm" 
+                  onClick={() => handleConnectionChange('openwebuiUrl', 'http://localhost:3000')}
+                  className="flex-1"
+                >
+                  Local (localhost:3000)
+                </Button>
+                <Button 
+                  variant={connectionConfig.openwebuiUrl.includes('192.168.1.180') ? "primary" : "outline"}
+                  size="sm" 
+                  onClick={() => handleConnectionChange('openwebuiUrl', 'http://192.168.1.180:3000')}
+                  className="flex-1"
+                >
+                  Remote (.180)
+                </Button>
+              </div>
               <input 
                 type="text" 
                 className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground"
                 value={connectionConfig.openwebuiUrl}
                 onChange={(e) => handleConnectionChange('openwebuiUrl', e.target.value)}
-                placeholder="http://192.168.1.180:3000"
+                placeholder="http://localhost:3000"
               />
             </div>
+
+            {/* RAG Service Selection */}
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">RAG Service</label>
+              <label className="text-xs text-muted-foreground mb-2 block">RAG Service</label>
+              <div className="flex space-x-2 mb-2">
+                <Button 
+                  variant={connectionConfig.ragServiceUrl.includes('localhost') || connectionConfig.ragServiceUrl.includes('127.0.0.1') ? "primary" : "outline"}
+                  size="sm" 
+                  onClick={() => handleConnectionChange('ragServiceUrl', 'http://localhost:30436')}
+                  className="flex-1"
+                >
+                  Local (localhost:30436)
+                </Button>
+                <Button 
+                  variant={connectionConfig.ragServiceUrl.includes('192.168.1.180') ? "primary" : "outline"}
+                  size="sm" 
+                  onClick={() => handleConnectionChange('ragServiceUrl', 'http://192.168.1.180:30436')}
+                  className="flex-1"
+                >
+                  Remote (.180)
+                </Button>
+              </div>
               <input 
                 type="text" 
                 className="w-full px-3 py-2 text-sm border border-border rounded bg-background text-foreground"
                 value={connectionConfig.ragServiceUrl}
                 onChange={(e) => handleConnectionChange('ragServiceUrl', e.target.value)}
-                placeholder="http://localhost:3001"
+                placeholder="http://localhost:30436"
               />
             </div>
+
             <div className="flex items-center justify-between">
               <span className="text-sm">Use Local RAG</span>
               <input 

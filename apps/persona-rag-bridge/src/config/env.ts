@@ -2,24 +2,55 @@
  * Application Configuration
  * 
  * This file contains the configuration for the PersonaRAG Bridge extension.
- * Network settings are configured for development with 192.168.1.180 as the default.
+ * Flexible configuration that allows any service connections while maintaining local RAG/vector/db storage.
  */
 
 export const config = {
   // --- Networking ---
   networking: {
-    localIp: 'localhost',
-    remoteIp: '192.168.1.180', // Default dev IP
-    defaultTimeoutMs: 15000
+    // Allow any IP/hostname for service connections
+    allowedHosts: ['localhost', '127.0.0.1', '192.168.1.180', '0.0.0.0'],
+    defaultTimeoutMs: 15000,
+    // Allow dynamic service discovery
+    enableServiceDiscovery: true
   },
 
-  // --- Service Defaults ---
+  // --- Service Configuration ---
   services: {
-    defaultOllamaModel: 'llama3.2:3b',
-    defaultOpenAiModel: 'gpt-4o',
-    defaultOpenWebUIModel: 'llama3.2:3b',
-    defaultPersonaRAGModel: 'llama3.2:3b',
-    defaultVectorStoreModel: 'sentence-transformers/all-MiniLM-L6-v2'
+    // Default models but allow any model to be used
+    defaultModels: {
+      ollama: 'llama3.2:3b',
+      openai: 'gpt-4o',
+      openwebui: 'llama3.2:3b',
+      anthropic: 'claude-3-sonnet',
+      local: 'llama3.2:3b'
+    },
+    // Allow any service type
+    supportedTypes: ['ollama', 'openai', 'openwebui', 'anthropic', 'local', 'custom'],
+    // Local storage always used for RAG/vector/db
+    localStorage: {
+      vectorStore: 'local',
+      database: 'local',
+      embeddings: 'local'
+    }
+  },
+
+  // --- RAG & Vector Configuration ---
+  rag: {
+    // Always use local vector store and database
+    vectorStore: {
+      type: 'local',
+      path: './data/vectors',
+      model: 'sentence-transformers/all-MiniLM-L6-v2'
+    },
+    database: {
+      type: 'local',
+      path: './data/database'
+    },
+    embeddings: {
+      type: 'local',
+      model: 'sentence-transformers/all-MiniLM-L6-v2'
+    }
   },
 
   // --- UI/UX Settings ---
@@ -27,7 +58,9 @@ export const config = {
     defaultTheme: 'dark',
     showCategoryHeaders: true,
     popupWidth: 640,
-    popupHeight: 600
+    popupHeight: 600,
+    // Allow dynamic service configuration
+    enableServiceConfig: true
   },
 
   // --- Developer & Debugging ---
@@ -36,7 +69,9 @@ export const config = {
     loadDefaultServices: true,
     featureFlags: {
       enableServiceDiscovery: true,
-      enableHealthChecks: true
+      enableHealthChecks: true,
+      allowAnyServiceConnection: true,
+      flexibleModelSelection: true
     }
   },
 

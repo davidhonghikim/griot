@@ -1,0 +1,1413 @@
+const { useState, useEffect } = React;
+
+// Simple toast notification system
+const toast = (message, type = "success") => {
+  const toastDiv = document.createElement("div");
+  toastDiv.className = `toast toast-${type} slide-in`;
+  toastDiv.textContent = message;
+  document.body.appendChild(toastDiv);
+  setTimeout(() => {
+    toastDiv.remove();
+  }, 5000);
+};
+
+// API Client
+const api = {
+  baseURL: '/api/vault',
+  
+  async getSecrets() {
+    const response = await axios.get(`${this.baseURL}/secrets`);
+    return response.data;
+  },
+  
+  async setSecret(key, value, encrypted = true) {
+    const response = await axios.post(`${this.baseURL}/secrets`, { key, value, encrypted });
+    return response.data;
+  },
+  
+  async deleteSecret(key) {
+    const response = await axios.delete(`${this.baseURL}/secrets/${key}`);
+    return response.data;
+  },
+  
+  async importEnv(envContent) {
+    const response = await axios.post(`${this.baseURL}/import`, { envContent });
+    return response.data;
+  },
+  
+  async exportEnv() {
+    const response = await axios.get(`${this.baseURL}/export`, { responseType: 'blob' });
+    return response.data;
+  },
+  
+  async getStatus() {
+    const response = await axios.get(`${this.baseURL}/status`);
+    return response.data;
+  }
+};
+
+// Toast notification system
+const Toast = ({ message, type = 'success', onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 5000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className={`toast toast-${type} slide-in`}>
+      {message}
+    </div>
+  );
+};
+
+// Icon Button Component (reused from kai-cd)
+const IconButton = ({ icon: Icon, onClick, title, variant = 'ghost', size = 'md', disabled = false, className = '' }) => {
+  const sizeClasses = {
+    sm: 'p-1.5',
+    md: 'p-2',
+    lg: 'p-3'
+  };
+
+  const iconSizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-5 w-5',
+    lg: 'h-6 w-6'
+  };
+
+  const variantClasses = {
+    primary: 'text-cyan-400 hover:bg-cyan-700 hover:text-white focus:ring-cyan-500',
+    secondary: 'text-slate-400 hover:bg-slate-700 hover:text-white focus:ring-slate-500',
+    danger: 'text-red-500 hover:bg-red-700 hover:text-white focus:ring-red-500',
+    warning: 'text-amber-500 hover:bg-amber-700 hover:text-white focus:ring-amber-500',
+    success: 'text-green-500 hover:bg-green-700 hover:text-white focus:ring-green-500',
+    ghost: 'text-slate-400 hover:bg-slate-800 hover:text-white focus:ring-slate-500'
+  };
+
+  const baseClasses = 'rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900';
+  const disabledClasses = 'opacity-50 cursor-not-allowed hover:bg-transparent';
+
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      disabled={disabled}
+      className={`
+        ${baseClasses}
+        ${sizeClasses[size]}
+        ${disabled ? disabledClasses : variantClasses[variant]}
+        ${className}
+      `.trim()}
+    >
+      <Icon className={iconSizeClasses[size]} />
+    </button>
+  );
+};
+
+// Secret Card Component
+const SecretCard = ({ secret, onEdit, onDelete, onCopy }) => {
+  const [showValue, setShowValue] = useState(false);
+  
+  return (
+    <div className="card p-6 hover-lift">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-100">{secret.key}</h3>
+          <p className="text-sm text-slate-400">Last updated: {new Date().toLocaleDateString()}</p>
+        </div>
+        <div className="flex space-x-2">
+          <IconButton
+            icon={showValue ? EyeSlashIcon : EyeIcon}
+            onClick={() => setShowValue(!showValue)}
+            title={showValue ? 'Hide value' : 'Show value'}
+            variant="secondary"
+            size="sm"
+          />
+          <IconButton
+            icon={ClipboardIcon}
+            onClick={() => onCopy(secret.value, secret.key)}
+            title="Copy to clipboard"
+            variant="secondary"
+            size="sm"
+          />
+          <IconButton
+            icon={PencilIcon}
+            onClick={() => onEdit(secret)}
+            title="Edit secret"
+            variant="primary"
+            size="sm"
+          />
+          <IconButton
+            icon={TrashIcon}
+            onClick={() => onDelete(secret.key)}
+            title="Delete secret"
+            variant="danger"
+            size="sm"
+          />
+        </div>
+      </div>
+      
+      <div className="bg-slate-800 rounded-lg p-3 font-mono text-sm">
+        {showValue ? secret.value : secret.masked}
+      </div>
+    </div>
+  );
+};
+
+// Add/Edit Secret Form
+const SecretForm = ({ secret, onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    key: secret?.key || '',
+    value: secret?.value || '',
+    encrypted: secret?.encrypted !== false
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <div className="card p-6 mb-6">
+      <h3 className="text-lg font-semibold text-slate-100 mb-4">
+        {secret ? 'Edit Secret' : 'Add New Secret'}
+      </h3>
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Secret Key
+          </label>
+          <input
+            type="text"
+            value={formData.key}
+            onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+            className="input"
+            placeholder="e.g., OPENWEBUI_API_KEY"
+            required
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Secret Value
+          </label>
+          <input
+            type="password"
+            value={formData.value}
+            onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+            className="input"
+            placeholder="Enter your secret value"
+            required
+          />
+        </div>
+        
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="encrypted"
+            checked={formData.encrypted}
+            onChange={(e) => setFormData({ ...formData, encrypted: e.target.checked })}
+            className="mr-2"
+          />
+          <label htmlFor="encrypted" className="text-sm text-slate-300">
+            Encrypt this secret (recommended)
+          </label>
+        </div>
+        
+        <div className="flex space-x-3">
+          <button type="submit" className="btn btn-primary">
+            {secret ? 'Update Secret' : 'Add Secret'}
+          </button>
+          <button type="button" onClick={onCancel} className="btn btn-secondary">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+// Import/Export Component
+const ImportExport = ({ onImport, onExport }) => {
+  const [envContent, setEnvContent] = useState('');
+
+  const handleImport = () => {
+    if (envContent.trim()) {
+      onImport(envContent);
+      setEnvContent('');
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await onExport();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'persona-rag.env';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
+  };
+
+  return (
+    <div className="card p-6">
+      <h3 className="text-lg font-semibold text-slate-100 mb-4">Import/Export</h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Import from .env file
+          </label>
+          <textarea
+            value={envContent}
+            onChange={(e) => setEnvContent(e.target.value)}
+            className="input h-32 resize-none"
+            placeholder="# Paste your .env file content here&#10;OPENWEBUI_API_KEY=your_key_here&#10;OPENAI_API_KEY=your_openai_key_here"
+          />
+          <button onClick={handleImport} className="btn btn-primary mt-3">
+            Import Secrets
+          </button>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Export to .env file
+          </label>
+          <p className="text-sm text-slate-400 mb-3">
+            Download all secrets as a .env file for backup or migration.
+          </p>
+          <button onClick={handleExport} className="btn btn-secondary">
+            Download .env
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Status Bar Component
+const StatusBar = ({ status }) => {
+  if (!status) return null;
+
+  return (
+    <div className="card p-4 mb-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <div className={`status-indicator ${status.securityValid ? 'status-success' : 'status-warning'}`}></div>
+          <span className="text-sm font-medium">
+            {status.securityValid ? 'Vault Secure' : 'Security Issues'}
+          </span>
+          <span className="text-sm text-slate-400">
+            {status.secretCount} secrets
+          </span>
+        </div>
+        
+        <div className="text-sm text-slate-400">
+          Vault: {status.vaultPath}
+        </div>
+      </div>
+      
+      {!status.securityValid && status.issues && status.issues.length > 0 && (
+        <div className="mt-3 p-3 bg-amber-900/20 border border-amber-500/30 rounded-lg">
+          <p className="text-sm text-amber-200 font-medium mb-2">Security Issues:</p>
+          <ul className="text-sm text-amber-300 space-y-1">
+            {status.issues.map((issue, index) => (
+              <li key={index}>• {issue}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Service Status Component
+const ServiceStatus = ({ services, onRefresh }) => {
+  const [statuses, setStatuses] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const checkServiceStatus = async (service) => {
+    try {
+      const response = await axios.get(service.healthUrl, { timeout: 5000 });
+      return { status: 'online', response: response.data };
+    } catch (error) {
+      return { status: 'offline', error: error.message };
+    }
+  };
+
+  const refreshAllStatuses = async () => {
+    setLoading(true);
+    const newStatuses = {};
+    
+    for (const service of services) {
+      newStatuses[service.name] = await checkServiceStatus(service);
+    }
+    
+    setStatuses(newStatuses);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    refreshAllStatuses();
+    const interval = setInterval(refreshAllStatuses, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'online': return 'text-green-400';
+      case 'offline': return 'text-red-400';
+      default: return 'text-yellow-400';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'online': return '🟢';
+      case 'offline': return '🔴';
+      default: return '🟡';
+    }
+  };
+
+  return (
+    <div className="bg-slate-800 rounded-lg p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Service Status</h2>
+        <button 
+          onClick={refreshAllStatuses}
+          disabled={loading}
+          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm disabled:opacity-50"
+        >
+          {loading ? '🔄' : '🔄 Refresh'}
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {services.map(service => {
+          const status = statuses[service.name];
+          return (
+            <div key={service.name} className="bg-slate-700 rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">{service.name}</h3>
+                <span className={`text-sm ${getStatusColor(status?.status)}`}>
+                  {getStatusIcon(status?.status)} {status?.status || 'checking...'}
+                </span>
+              </div>
+              <p className="text-slate-400 text-sm mb-2">{service.url}</p>
+              {status?.response && (
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-blue-400">Response Details</summary>
+                  <pre className="mt-2 bg-slate-600 p-2 rounded overflow-auto">
+                    {JSON.stringify(status.response, null, 2)}
+                  </pre>
+                </details>
+              )}
+              {status?.error && (
+                <p className="text-red-400 text-xs">{status.error}</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// API Test Component
+const ApiTester = () => {
+  const [endpoints, setEndpoints] = useState([
+    { name: 'Health Check', method: 'GET', url: '/health', body: null },
+    { name: 'Vault Status', method: 'GET', url: '/vault/status', body: null },
+    { name: 'Query Personas', method: 'POST', url: '/api/personas/query', body: { query: 'test query', limit: 5 } },
+    { name: 'Select Persona', method: 'POST', url: '/api/personas/select', body: { personaId: 'test-id', context: 'test context' } },
+    { name: 'Enhanced Chat', method: 'POST', url: '/api/chat/enhanced', body: { message: 'Hello', personaId: 'test-id' } },
+    { name: 'OpenWebUI Chat', method: 'POST', url: '/api/openwebui/chat', body: { message: 'Hello', model: 'llama3.1' } }
+  ]);
+  
+  const [results, setResults] = useState({});
+  const [loading, setLoading] = useState({});
+
+  const testEndpoint = async (endpoint) => {
+    setLoading(prev => ({ ...prev, [endpoint.name]: true }));
+    
+    try {
+      const config = {
+        method: endpoint.method,
+        url: `http://localhost:5000${endpoint.url}`,
+        headers: { 'Content-Type': 'application/json' }
+      };
+      
+      if (endpoint.body && endpoint.method !== 'GET') {
+        config.data = endpoint.body;
+      }
+      
+      const response = await axios(config);
+      setResults(prev => ({
+        ...prev,
+        [endpoint.name]: { success: true, data: response.data, status: response.status }
+      }));
+      toast.success(`${endpoint.name} test passed!`);
+    } catch (error) {
+      setResults(prev => ({
+        ...prev,
+        [endpoint.name]: { 
+          success: false, 
+          error: error.response?.data || error.message,
+          status: error.response?.status
+        }
+      }));
+      toast.error(`${endpoint.name} test failed!`);
+    } finally {
+      setLoading(prev => ({ ...prev, [endpoint.name]: false }));
+    }
+  };
+
+  return (
+    <div className="bg-slate-800 rounded-lg p-6">
+      <h2 className="text-xl font-semibold mb-4">API Testing</h2>
+      <div className="space-y-4">
+        {endpoints.map(endpoint => (
+          <div key={endpoint.name} className="bg-slate-700 rounded p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h3 className="font-medium">{endpoint.name}</h3>
+                <p className="text-slate-400 text-sm">
+                  {endpoint.method} {endpoint.url}
+                </p>
+              </div>
+              <button
+                onClick={() => testEndpoint(endpoint)}
+                disabled={loading[endpoint.name]}
+                className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm disabled:opacity-50"
+              >
+                {loading[endpoint.name] ? 'Testing...' : 'Test'}
+              </button>
+            </div>
+            
+            {results[endpoint.name] && (
+              <div className="mt-3">
+                <div className={`text-sm mb-2 ${results[endpoint.name].success ? 'text-green-400' : 'text-red-400'}`}>
+                  Status: {results[endpoint.name].status} - {results[endpoint.name].success ? 'Success' : 'Failed'}
+                </div>
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-blue-400">Response</summary>
+                  <pre className="mt-2 bg-slate-600 p-2 rounded overflow-auto max-h-40">
+                    {JSON.stringify(results[endpoint.name].data || results[endpoint.name].error, null, 2)}
+                  </pre>
+                </details>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Enhanced Vault Management Component
+const VaultManager = () => {
+  const [secrets, setSecrets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingSecret, setEditingSecret] = useState(null);
+  const [newSecret, setNewSecret] = useState({ key: '', value: '', description: '' });
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const loadSecrets = async () => {
+    try {
+      const response = await axios.get('/api/vault/secrets');
+      setSecrets(response.data);
+    } catch (error) {
+      toast.error('Failed to load secrets');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSecrets();
+  }, []);
+
+  const addSecret = async () => {
+    try {
+      await axios.post('/api/vault/secrets', newSecret);
+      setNewSecret({ key: '', value: '', description: '' });
+      setShowAddForm(false);
+      loadSecrets();
+      toast.success('Secret added successfully');
+    } catch (error) {
+      toast.error('Failed to add secret');
+    }
+  };
+
+  const updateSecret = async (id, updates) => {
+    try {
+      await axios.put(`/api/vault/secrets/${id}`, updates);
+      setEditingSecret(null);
+      loadSecrets();
+      toast.success('Secret updated successfully');
+    } catch (error) {
+      toast.error('Failed to update secret');
+    }
+  };
+
+  const deleteSecret = async (id) => {
+    if (!confirm('Are you sure you want to delete this secret?')) return;
+    
+    try {
+      await axios.delete(`/api/vault/secrets/${id}`);
+      loadSecrets();
+      toast.success('Secret deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete secret');
+    }
+  };
+
+  const exportSecrets = () => {
+    const dataStr = JSON.stringify(secrets, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'vault-secrets.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importSecrets = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const secrets = JSON.parse(e.target.result);
+        await axios.post('/api/vault/secrets/bulk', { secrets });
+        loadSecrets();
+        toast.success('Secrets imported successfully');
+      } catch (error) {
+        toast.error('Failed to import secrets');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  if (loading) return <div className="text-center py-8">Loading secrets...</div>;
+
+  return (
+    <div className="bg-slate-800 rounded-lg p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Vault Management</h2>
+        <div className="space-x-2">
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+          >
+            ➕ Add Secret
+          </button>
+          <button
+            onClick={exportSecrets}
+            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm"
+          >
+            📤 Export
+          </button>
+          <label className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm cursor-pointer">
+            📥 Import
+            <input
+              type="file"
+              accept=".json"
+              onChange={importSecrets}
+              className="hidden"
+            />
+          </label>
+        </div>
+      </div>
+
+      {showAddForm && (
+        <div className="bg-slate-700 rounded p-4 mb-4">
+          <h3 className="font-medium mb-3">Add New Secret</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+            <input
+              type="text"
+              placeholder="Key"
+              value={newSecret.key}
+              onChange={(e) => setNewSecret(prev => ({ ...prev, key: e.target.value }))}
+              className="bg-slate-600 px-3 py-2 rounded text-sm"
+            />
+            <input
+              type="password"
+              placeholder="Value"
+              value={newSecret.value}
+              onChange={(e) => setNewSecret(prev => ({ ...prev, value: e.target.value }))}
+              className="bg-slate-600 px-3 py-2 rounded text-sm"
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={newSecret.description}
+              onChange={(e) => setNewSecret(prev => ({ ...prev, description: e.target.value }))}
+              className="bg-slate-600 px-3 py-2 rounded text-sm"
+            />
+          </div>
+          <div className="flex space-x-2">
+            <button
+              onClick={addSecret}
+              className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setShowAddForm(false)}
+              className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        {secrets.map(secret => (
+          <div key={secret.id} className="bg-slate-700 rounded p-4">
+            {editingSecret?.id === secret.id ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                <input
+                  type="text"
+                  value={editingSecret.key}
+                  onChange={(e) => setEditingSecret(prev => ({ ...prev, key: e.target.value }))}
+                  className="bg-slate-600 px-3 py-2 rounded text-sm"
+                />
+                <input
+                  type="password"
+                  value={editingSecret.value}
+                  onChange={(e) => setEditingSecret(prev => ({ ...prev, value: e.target.value }))}
+                  className="bg-slate-600 px-3 py-2 rounded text-sm"
+                />
+                <input
+                  type="text"
+                  value={editingSecret.description}
+                  onChange={(e) => setEditingSecret(prev => ({ ...prev, description: e.target.value }))}
+                  className="bg-slate-600 px-3 py-2 rounded text-sm"
+                />
+              </div>
+            ) : (
+              <div className="flex justify-between items-center">
+                <div>
+                  <div className="font-medium">{secret.key}</div>
+                  <div className="text-slate-400 text-sm">{secret.description}</div>
+                  <div className="text-slate-500 text-xs">••••••••</div>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setEditingSecret(secret)}
+                    className="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => deleteSecret(secret.id)}
+                    className="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {editingSecret?.id === secret.id && (
+              <div className="flex space-x-2 mt-3">
+                <button
+                  onClick={() => updateSecret(secret.id, editingSecret)}
+                  className="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-xs"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setEditingSecret(null)}
+                  className="px-2 py-1 bg-gray-600 hover:bg-gray-700 rounded text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Service Configuration Component
+const ServiceConfig = () => {
+  const [config, setConfig] = useState({
+    openWebUI: { url: 'http://192.168.1.180:3000', apiKey: '' },
+    personaRAG: { url: 'http://localhost:5000' },
+    vectorStore: { url: 'http://localhost:8080' },
+    embeddingService: { model: 'text-embedding-ada-002', dimensions: 1536 }
+  });
+  const [loading, setLoading] = useState(false);
+
+  const saveConfig = async () => {
+    setLoading(true);
+    try {
+      await axios.post('/api/config', config);
+      toast.success('Configuration saved successfully');
+    } catch (error) {
+      toast.error('Failed to save configuration');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testConnection = async (serviceName) => {
+    try {
+      const service = config[serviceName];
+      await axios.get(`${service.url}/health`, { timeout: 5000 });
+      toast.success(`${serviceName} connection successful`);
+    } catch (error) {
+      toast.error(`${serviceName} connection failed: ${error.message}`);
+    }
+  };
+
+  return (
+    <div className="bg-slate-800 rounded-lg p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Service Configuration</h2>
+        <button
+          onClick={saveConfig}
+          disabled={loading}
+          className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm disabled:opacity-50"
+        >
+          {loading ? 'Saving...' : '💾 Save Config'}
+        </button>
+      </div>
+
+      <div className="space-y-6">
+        {Object.entries(config).map(([serviceName, serviceConfig]) => (
+          <div key={serviceName} className="bg-slate-700 rounded p-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-medium capitalize">{serviceName}</h3>
+              <button
+                onClick={() => testConnection(serviceName)}
+                className="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
+              >
+                🔗 Test Connection
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Object.entries(serviceConfig).map(([key, value]) => (
+                <div key={key}>
+                  <label className="block text-sm text-slate-400 mb-1 capitalize">
+                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                  </label>
+                  <input
+                    type={key.includes('Key') ? 'password' : 'text'}
+                    value={value}
+                    onChange={(e) => setConfig(prev => ({
+                      ...prev,
+                      [serviceName]: { ...prev[serviceName], [key]: e.target.value }
+                    }))}
+                    className="w-full bg-slate-600 px-3 py-2 rounded text-sm"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Main App Component
+const App = () => {
+  const [activeTab, setActiveTab] = useState('status');
+  
+  const services = [
+    { name: 'PersonaRAG Bridge', url: 'http://localhost:5000', healthUrl: 'http://localhost:5000/health' },
+    { name: 'Vector Store (Weaviate)', url: 'http://localhost:8080', healthUrl: 'http://localhost:8080/v1/.well-known/ready' },
+    { name: 'OpenWebUI', url: 'http://192.168.1.180:3000', healthUrl: 'http://192.168.1.180:3000/api/v1/health' },
+    { name: 'PostgreSQL', url: 'localhost:5432', healthUrl: 'http://localhost:5432' },
+    { name: 'MongoDB', url: 'localhost:27017', healthUrl: 'http://localhost:27017' },
+    { name: 'Redis', url: 'localhost:6379', healthUrl: 'http://localhost:6379' }
+  ];
+
+  const tabs = [
+    { id: 'status', name: 'Service Status', icon: '📊' },
+    { id: 'api', name: 'API Testing', icon: '🔧' },
+    { id: 'vault', name: 'Vault Management', icon: '🔐' },
+    { id: 'config', name: 'Configuration', icon: '⚙️' }
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'status':
+        return <ServiceStatus services={services} />;
+      case 'api':
+        return <ApiTester />;
+      case 'vault':
+        return <VaultManager />;
+      case 'config':
+        return <ServiceConfig />;
+      default:
+        return <ServiceStatus services={services} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-center mb-2">PersonaRAG Bridge Dashboard</h1>
+          <p className="text-slate-400 text-center">Comprehensive service management and monitoring</p>
+        </div>
+
+        <div className="bg-slate-800 rounded-lg p-1 mb-6">
+          <div className="flex space-x-1">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 px-4 py-2 rounded text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-blue-600 text-white'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                }`}
+              >
+                {tab.icon} {tab.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {renderTabContent()}
+      </div>
+    </div>
+  );
+};
+
+// Render the app
+ReactDOM.render(<App />, document.getElementById('root'));
+
+// Vault Web UI - Enhanced with Service Management
+class VaultWebUI {
+  constructor() {
+    this.currentView = 'vault';
+    this.services = [];
+    this.config = {
+      localIp: '192.168.1.180',
+      remoteIp: 'localhost',
+      defaultPorts: {
+        weaviate: 8080,
+        postgresql: 5432,
+        mongodb: 27017,
+        redis: 6379,
+        neo4j: 7687,
+        openwebui: 3000,
+        chromadb: 8000,
+        qdrant: 6333
+      }
+    };
+    this.init();
+  }
+
+  async init() {
+    this.setupEventListeners();
+    await this.loadConfig();
+    await this.loadServices();
+    this.render();
+  }
+
+  setupEventListeners() {
+    // Navigation
+    document.getElementById('nav-vault')?.addEventListener('click', () => this.switchView('vault'));
+    document.getElementById('nav-services')?.addEventListener('click', () => this.switchView('services'));
+    document.getElementById('nav-config')?.addEventListener('click', () => this.switchView('config'));
+
+    // Vault operations
+    document.getElementById('add-secret-btn')?.addEventListener('click', () => this.showAddSecretForm());
+    document.getElementById('import-env-btn')?.addEventListener('click', () => this.showImportForm());
+    document.getElementById('export-env-btn')?.addEventListener('click', () => this.exportEnv());
+    document.getElementById('check-all-btn')?.addEventListener('click', () => this.checkAllServices());
+
+    // Form submissions
+    document.getElementById('add-secret-form')?.addEventListener('submit', (e) => this.handleAddSecret(e));
+    document.getElementById('import-form')?.addEventListener('submit', (e) => this.handleImport(e));
+  }
+
+  async loadConfig() {
+    try {
+      const response = await fetch('/api/config');
+      if (response.ok) {
+        const config = await response.json();
+        this.config = { ...this.config, ...config };
+      }
+    } catch (error) {
+      console.warn('Failed to load config:', error);
+    }
+  }
+
+  async loadServices() {
+    try {
+      const response = await fetch('/api/services');
+      if (response.ok) {
+        this.services = await response.json();
+      }
+    } catch (error) {
+      console.warn('Failed to load services:', error);
+    }
+  }
+
+  switchView(view) {
+    this.currentView = view;
+    this.render();
+  }
+
+  async render() {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+
+    switch (this.currentView) {
+      case 'vault':
+        mainContent.innerHTML = this.renderVaultView();
+        this.setupVaultEventListeners();
+        break;
+      case 'services':
+        mainContent.innerHTML = this.renderServicesView();
+        this.setupServicesEventListeners();
+        break;
+      case 'config':
+        mainContent.innerHTML = this.renderConfigView();
+        this.setupConfigEventListeners();
+        break;
+    }
+
+    this.updateNavigation();
+  }
+
+  updateNavigation() {
+    // Update active nav item
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    document.getElementById(`nav-${this.currentView}`)?.classList.add('active');
+  }
+
+  // Vault View
+  renderVaultView() {
+    return `
+      <div class="vault-view">
+        <div class="header">
+          <h1>🔐 Secure Vault</h1>
+          <div class="actions">
+            <button id="add-secret-btn" class="btn btn-primary">Add Secret</button>
+            <button id="import-env-btn" class="btn btn-secondary">Import .env</button>
+            <button id="export-env-btn" class="btn btn-secondary">Export .env</button>
+          </div>
+        </div>
+        
+        <div class="status-panel">
+          <div class="status-item">
+            <span class="label">Vault Status:</span>
+            <span id="vault-status" class="status">Loading...</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Secrets Count:</span>
+            <span id="secrets-count" class="count">-</span>
+          </div>
+        </div>
+
+        <div id="secrets-list" class="secrets-list">
+          <div class="loading">Loading secrets...</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Services View
+  renderServicesView() {
+    return `
+      <div class="services-view">
+        <div class="header">
+          <h1>🔧 Service Management</h1>
+          <div class="actions">
+            <button id="add-service-btn" class="btn btn-primary">Add Service</button>
+            <button id="check-all-btn" class="btn btn-secondary">Check All</button>
+          </div>
+        </div>
+
+        <div class="services-overview">
+          <div class="overview-card">
+            <h3>Total Services</h3>
+            <span class="count">${this.services.length}</span>
+          </div>
+          <div class="overview-card">
+            <h3>Online</h3>
+            <span class="count online">${this.services.filter(s => s.status === 'online').length}</span>
+          </div>
+          <div class="overview-card">
+            <h3>Offline</h3>
+            <span class="count offline">${this.services.filter(s => s.status === 'offline').length}</span>
+          </div>
+          <div class="overview-card">
+            <h3>Errors</h3>
+            <span class="count error">${this.services.filter(s => s.status === 'error').length}</span>
+          </div>
+        </div>
+
+        <div id="services-list" class="services-list">
+          ${this.renderServicesList()}
+        </div>
+      </div>
+    `;
+  }
+
+  renderServicesList() {
+    if (this.services.length === 0) {
+      return `
+        <div class="empty-state">
+          <p>No services configured</p>
+          <p class="subtitle">Click "Add Service" to get started</p>
+        </div>
+      `;
+    }
+
+    return this.services.map(service => `
+      <div class="service-card" data-service-id="${service.id}">
+        <div class="service-header">
+          <div class="service-info">
+            <span class="service-icon">${this.getServiceIcon(service.type)}</span>
+            <div>
+              <h3>${service.name}</h3>
+              <p class="service-url">${service.url}</p>
+              <p class="service-meta">${service.type} • Port ${service.port}</p>
+            </div>
+          </div>
+          <div class="service-actions">
+            <span class="status-badge ${service.status}">${service.status}</span>
+            <button class="btn btn-sm" onclick="vaultUI.checkServiceStatus('${service.id}')">Check</button>
+            <button class="btn btn-sm" onclick="vaultUI.editService('${service.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="vaultUI.deleteService('${service.id}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Config View
+  renderConfigView() {
+    return `
+      <div class="config-view">
+        <div class="header">
+          <h1>⚙️ Configuration</h1>
+        </div>
+        
+        <div class="config-section">
+          <h3>Network Configuration</h3>
+          <div class="config-grid">
+            <div class="config-item">
+              <label>Local IP:</label>
+              <input type="text" id="local-ip" value="${this.config.localIp}" />
+            </div>
+            <div class="config-item">
+              <label>Remote IP:</label>
+              <input type="text" id="remote-ip" value="${this.config.remoteIp}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <h3>Default Ports</h3>
+          <div class="ports-grid">
+            ${Object.entries(this.config.defaultPorts).map(([service, port]) => `
+              <div class="port-item">
+                <label>${service}:</label>
+                <input type="number" id="port-${service}" value="${port}" min="1" max="65535" />
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="config-actions">
+          <button id="save-config-btn" class="btn btn-primary">Save Configuration</button>
+          <button id="reset-config-btn" class="btn btn-secondary">Reset to Defaults</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Service Management Methods
+  async addService(serviceData) {
+    try {
+      const response = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(serviceData)
+      });
+
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('Service added successfully', 'success');
+      } else {
+        throw new Error('Failed to add service');
+      }
+    } catch (error) {
+      this.showNotification('Failed to add service: ' + error.message, 'error');
+    }
+  }
+
+  async updateService(id, serviceData) {
+    try {
+      const response = await fetch(`/api/services/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(serviceData)
+      });
+
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('Service updated successfully', 'success');
+      } else {
+        throw new Error('Failed to update service');
+      }
+    } catch (error) {
+      this.showNotification('Failed to update service: ' + error.message, 'error');
+    }
+  }
+
+  async deleteService(id) {
+    if (!confirm('Are you sure you want to delete this service?')) return;
+
+    try {
+      const response = await fetch(`/api/services/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('Service deleted successfully', 'success');
+      } else {
+        throw new Error('Failed to delete service');
+      }
+    } catch (error) {
+      this.showNotification('Failed to delete service: ' + error.message, 'error');
+    }
+  }
+
+  async checkServiceStatus(id) {
+    try {
+      const response = await fetch(`/api/services/${id}/status`);
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+      }
+    } catch (error) {
+      this.showNotification('Failed to check service status: ' + error.message, 'error');
+    }
+  }
+
+  async checkAllServices() {
+    try {
+      const response = await fetch('/api/services/check-all', { method: 'POST' });
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('All services checked', 'success');
+      }
+    } catch (error) {
+      this.showNotification('Failed to check all services: ' + error.message, 'error');
+    }
+  }
+
+  // Utility Methods
+  getServiceIcon(type) {
+    const icons = {
+      database: '🗄️',
+      ai_model: '🤖',
+      storage: '💾',
+      network: '🌐',
+      custom: '⚙️'
+    };
+    return icons[type] || '🔧';
+  }
+
+  showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+
+  setupVaultEventListeners() {
+    // Vault-specific event listeners
+    this.loadVaultStatus();
+    this.loadSecrets();
+  }
+
+  setupServicesEventListeners() {
+    // Services-specific event listeners
+    document.getElementById('add-service-btn')?.addEventListener('click', () => {
+      this.showAddServiceForm();
+    });
+  }
+
+  setupConfigEventListeners() {
+    // Config-specific event listeners
+    document.getElementById('save-config-btn')?.addEventListener('click', () => {
+      this.saveConfig();
+    });
+  }
+
+  async loadVaultStatus() {
+    try {
+      const response = await fetch('/api/vault/status');
+      if (response.ok) {
+        const status = await response.json();
+        document.getElementById('vault-status').textContent = status.initialized ? 'Initialized' : 'Not Initialized';
+        document.getElementById('secrets-count').textContent = status.secretCount;
+      }
+    } catch (error) {
+      console.error('Failed to load vault status:', error);
+    }
+  }
+
+  async loadSecrets() {
+    try {
+      const response = await fetch('/api/vault/secrets');
+      if (response.ok) {
+        const secrets = await response.json();
+        this.renderSecretsList(secrets);
+      }
+    } catch (error) {
+      console.error('Failed to load secrets:', error);
+    }
+  }
+
+  renderSecretsList(secrets) {
+    const container = document.getElementById('secrets-list');
+    if (!container) return;
+
+    if (secrets.length === 0) {
+      container.innerHTML = '<div class="empty-state">No secrets found</div>';
+      return;
+    }
+
+    container.innerHTML = secrets.map(secret => `
+      <div class="secret-item">
+        <div class="secret-key">${secret.key}</div>
+        <div class="secret-value">${this.maskValue(secret.value)}</div>
+        <div class="secret-actions">
+          <button onclick="vaultUI.editSecret('${secret.key}')" class="btn btn-sm">Edit</button>
+          <button onclick="vaultUI.deleteSecret('${secret.key}')" class="btn btn-sm btn-danger">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  maskValue(value) {
+    if (!value || value.length <= 8) return value;
+    return value.substring(0, 4) + '*'.repeat(value.length - 8) + value.substring(value.length - 4);
+  }
+
+  showAddSecretForm() {
+    // Implementation for adding secrets
+    const key = prompt('Enter secret key:');
+    if (!key) return;
+    
+    const value = prompt('Enter secret value:');
+    if (!value) return;
+
+    this.addSecret(key, value);
+  }
+
+  async addSecret(key, value) {
+    try {
+      const response = await fetch('/api/vault/secrets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value, encrypted: true })
+      });
+
+      if (response.ok) {
+        this.loadSecrets();
+        this.showNotification('Secret added successfully', 'success');
+      } else {
+        throw new Error('Failed to add secret');
+      }
+    } catch (error) {
+      this.showNotification('Failed to add secret: ' + error.message, 'error');
+    }
+  }
+
+  showAddServiceForm() {
+    // Simple form for adding services
+    const name = prompt('Service name:');
+    if (!name) return;
+    
+    const type = prompt('Service type (database/ai_model/storage/network/custom):');
+    if (!type) return;
+    
+    const url = prompt('Service URL:');
+    if (!url) return;
+    
+    const port = parseInt(prompt('Port:') || '8080');
+    
+    this.addService({
+      name,
+      type,
+      url,
+      port,
+      enabled: true,
+      credentials: { type: 'none' }
+    });
+  }
+
+  async saveConfig() {
+    const localIp = document.getElementById('local-ip')?.value;
+    const remoteIp = document.getElementById('remote-ip')?.value;
+    
+    const defaultPorts = {};
+    Object.keys(this.config.defaultPorts).forEach(service => {
+      const port = document.getElementById(`port-${service}`)?.value;
+      if (port) defaultPorts[service] = parseInt(port);
+    });
+
+    try {
+      const response = await fetch('/api/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          localIp,
+          remoteIp,
+          defaultPorts
+        })
+      });
+
+      if (response.ok) {
+        this.config = { localIp, remoteIp, defaultPorts };
+        this.showNotification('Configuration saved successfully', 'success');
+      } else {
+        throw new Error('Failed to save configuration');
+      }
+    } catch (error) {
+      this.showNotification('Failed to save configuration: ' + error.message, 'error');
+    }
+  }
+}
+
+// Initialize the UI when the page loads
+let vaultUI;
+document.addEventListener('DOMContentLoaded', () => {
+  vaultUI = new VaultWebUI();
+}); 

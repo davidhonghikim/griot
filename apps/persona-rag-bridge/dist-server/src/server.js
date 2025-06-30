@@ -1,0 +1,269 @@
+#!/usr/bin/env tsx
+"use strict";
+/**
+ * PersonaRAG Bridge Server
+ *
+ * Connects PersonaRAG engine to OpenWebUI for persona-aware AI interactions
+ * Provides REST API and WebSocket endpoints for real-time persona selection
+ */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const path_1 = __importDefault(require("path"));
+const cors_1 = __importDefault(require("cors"));
+const http_1 = require("http");
+const socket_io_1 = require("socket.io");
+const openwebui_bridge_service_js_1 = require("./services/openwebui-bridge.service.js");
+const secure_vault_js_1 = require("./vault/secure-vault.js");
+const dotenv_1 = __importDefault(require("dotenv"));
+const persona_rag_service_1 = require("@griot/data/rag/persona_rag_service");
+const vector_store_1 = require("@griot/data/rag/vector_store");
+const embedding_service_1 = require("@griot/data/rag/embedding_service");
+const persona_vectorization_service_1 = require("@griot/data/rag/persona_vectorization_service");
+const persona_loader_1 = require("@griot/data/persona_loader");
+// Load environment variables
+dotenv_1.default.config();
+const app = (0, express_1.default)();
+const server = (0, http_1.createServer)(app);
+const io = new socket_io_1.Server(server, {
+    cors: {
+        origin: ["http://localhost:3000", "http://localhost:3000", "http://127.0.0.1:3000"],
+        methods: ["GET", "POST"]
+    }
+});
+// Middleware
+app.use((0, cors_1.default)({
+    origin: ["http://localhost:3000", "http://localhost:3000", "http://127.0.0.1:3000"],
+    credentials: true
+}));
+app.use(express_1.default.json({ limit: '10mb' }));
+app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
+// Initialize services
+let personaRAGService;
+let openWebUIBridge;
+// Initialize vault and services
+async function initializeServices() {
+    try {
+        console.log('🔐 Initializing secure vault...');
+        const vault = (0, secure_vault_js_1.getVault)();
+        await vault.initialize();
+        // Validate vault security
+        const validation = await vault.validateSecurity();
+        if (!validation.valid) {
+            console.warn('⚠️ Vault security issues detected:');
+            validation.issues.forEach(issue => console.warn(`  • ${issue}`));
+            console.warn('💡 Run "npm run vault:validate" to see recommendations');
+        }
+        // Get OpenWebUI configuration from vault
+        const openWebUIUrl = await vault.getSecret('OPENWEBUI_URL') || 'http://localhost:3000';
+        const openWebUIApiKey = await vault.getSecret('OPENWEBUI_API_KEY');
+        console.log(`🌐 OpenWebUI URL: ${openWebUIUrl}`);
+        if (!openWebUIApiKey) {
+            console.warn('⚠️ OpenWebUI API key not configured');
+            console.warn('💡 Run "npm run vault:set OPENWEBUI_API_KEY" to configure');
+        }
+        // Get OpenAI API key from vault and set as environment variable
+        const openaiApiKey = await vault.getSecret('OPENAI_API_KEY');
+        if (!openaiApiKey) {
+            console.warn('⚠️ OpenAI API key not configured');
+            console.warn('💡 Run "npm run vault:set OPENAI_API_KEY" to configure');
+            console.warn('💡 Using mock embedding service for testing');
+            // Set a mock key for testing
+            process.env.OPENAI_API_KEY = openaiApiKey || 'sk-dae28e6035904cecb2737fbc54768d16';
+        }
+        else {
+            process.env.OPENAI_API_KEY = openaiApiKey;
+            console.log('✅ OpenAI API key loaded from vault');
+        }
+        // Initialize core RAG services
+        const vectorStore = new vector_store_1.VectorStore();
+        const embeddingService = new embedding_service_1.EmbeddingService();
+        const personaLoader = new persona_loader_1.PersonaLoader();
+        const personaVectorization = new persona_vectorization_service_1.PersonaVectorizationService({
+            vectorStore,
+            embeddingService,
+            personaLoader
+        });
+        // Initialize PersonaRAG service
+        personaRAGService = new persona_rag_service_1.PersonaRAGService(vectorStore, embeddingService, personaVectorization);
+        await personaRAGService.initialize();
+        // Initialize OpenWebUI bridge
+        openWebUIBridge = new openwebui_bridge_service_js_1.OpenWebUIBridge({
+            url: 'http://localhost:3000',
+            apiKey: 'sk-dae28e6035904cecb2737fbc54768d16'
+        }, personaRAGService);
+        console.log('✅ Services initialized successfully');
+    }
+    catch (error) {
+        console.error('❌ Failed to initialize services:', error);
+        process.exit(1);
+    }
+}
+// Health check endpoint
+app.get('/health', (_req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date() });
+});
+// Vault status endpoint (protected)
+app.get('/vault/status', async (_req, res) => {
+    try {
+        const vault = (0, secure_vault_js_1.getVault)();
+        const secrets = await vault.listSecrets();
+        const validation = await vault.validateSecurity();
+        res.json({
+            totalSecrets: secrets.length,
+            securityStatus: validation.valid ? 'secure' : 'issues_found',
+            issues: validation.issues
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to get vault status' });
+    }
+});
+// Persona query endpoint
+app.post('/api/personas/query', async (req, res) => {
+    try {
+        const { query, limit = 5, threshold = 0.6 } = req.body;
+        if (!query) {
+            return res.status(400).json({ error: 'Query is required' });
+        }
+        const request = {
+            query,
+            limit,
+            similarityThreshold: threshold
+        };
+        const response = await personaRAGService.query(request);
+        return res.json(response);
+    }
+    catch (error) {
+        console.error('Error querying personas:', error);
+        return res.status(500).json({ error: 'Failed to query personas' });
+    }
+});
+// Persona selection endpoint
+app.post('/api/personas/select', async (req, res) => {
+    try {
+        const { personaId, context } = req.body;
+        if (!personaId) {
+            return res.status(400).json({ error: 'Persona ID is required' });
+        }
+        const request = {
+            query: context || 'general context',
+            personaId,
+            limit: 1
+        };
+        const response = await personaRAGService.query(request);
+        return res.json(response);
+    }
+    catch (error) {
+        console.error('Error selecting persona:', error);
+        return res.status(500).json({ error: 'Failed to select persona' });
+    }
+});
+// Enhanced chat endpoint
+app.post('/api/chat/enhanced', async (req, res) => {
+    try {
+        const { message, personaId, conversationHistory = [] } = req.body;
+        if (!message) {
+            return res.status(400).json({ error: 'Message is required' });
+        }
+        const response = await openWebUIBridge.enhancedChat(message, personaId, conversationHistory);
+        return res.json(response);
+    }
+    catch (error) {
+        console.error('Error in enhanced chat:', error);
+        return res.status(500).json({ error: 'Failed to process enhanced chat' });
+    }
+});
+// OpenWebUI integration endpoints
+app.post('/api/openwebui/chat', async (req, res) => {
+    try {
+        const { message, personaId, model = 'llama3.1' } = req.body;
+        if (!message) {
+            return res.status(400).json({ error: 'Message is required' });
+        }
+        const response = await openWebUIBridge.sendChatMessage(message, personaId, model);
+        return res.json(response);
+    }
+    catch (error) {
+        console.error('Error sending chat message:', error);
+        return res.status(500).json({ error: 'Failed to send chat message' });
+    }
+});
+// WebSocket connection for real-time communication
+io.on('connection', (socket) => {
+    console.log('🔌 Client connected:', socket.id);
+    socket.on('query-personas', async (data) => {
+        try {
+            const { query, limit = 5, threshold = 0.6 } = data;
+            const request = { query, limit, similarityThreshold: threshold };
+            const response = await personaRAGService.query(request);
+            socket.emit('personas-result', response);
+        }
+        catch (error) {
+            socket.emit('error', { message: 'Failed to query personas' });
+        }
+    });
+    socket.on('select-persona', async (data) => {
+        try {
+            const { personaId, context } = data;
+            const request = { query: context || 'general context', personaId, limit: 1 };
+            const response = await personaRAGService.query(request);
+            socket.emit('persona-selected', response);
+        }
+        catch (error) {
+            socket.emit('error', { message: 'Failed to select persona' });
+        }
+    });
+    socket.on('enhanced-chat', async (data) => {
+        try {
+            const { message, personaId, conversationHistory = [] } = data;
+            const response = await openWebUIBridge.enhancedChat(message, personaId, conversationHistory);
+            socket.emit('chat-response', response);
+        }
+        catch (error) {
+            socket.emit('error', { message: 'Failed to process enhanced chat' });
+        }
+    });
+    socket.on('disconnect', () => {
+        console.log('🔌 Client disconnected:', socket.id);
+    });
+});
+// Start server
+async function startServer() {
+    try {
+        await initializeServices();
+        // Serve static files from the dist directory
+        app.use(express_1.default.static(path_1.default.join(__dirname, "../../dist")));
+        // Fallback: serve index.html for any non-API route (for SPA routing)
+        app.get("*", (req, res) => {
+            // Only handle non-API requests
+            if (!req.path.startsWith("/api")) {
+                res.sendFile(path_1.default.join(__dirname, "../../dist/index.html"));
+            }
+        });
+        const port = process.env.PORT || 30436;
+        server.listen(port, () => {
+            console.log(`🚀 PersonaRAG Bridge Server running on port ${port}`);
+            console.log(`📡 WebSocket server ready for real-time communication`);
+            console.log(`🔐 Secure vault system operational`);
+            console.log(`🤖 PersonaRAG service initialized`);
+            console.log(`🌐 OpenWebUI bridge ready`);
+        });
+    }
+    catch (error) {
+        console.error('❌ Failed to start server:', error);
+        process.exit(1);
+    }
+}
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    console.log('\n🛑 Shutting down gracefully...');
+    if (personaRAGService) {
+        await personaRAGService.cleanup();
+    }
+    process.exit(0);
+});
+// Start the server
+startServer();
