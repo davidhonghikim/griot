@@ -1,0 +1,273 @@
+import React, { useState, useEffect } from 'react';
+
+export interface ServiceFormData {
+  name: string;
+  type: 'database' | 'ai_model' | 'storage' | 'network' | 'custom';
+  url: string;
+  port: number;
+  enabled: boolean;
+  credentials?: {
+    type: 'none' | 'api_key' | 'jwt' | 'login';
+    key?: string;
+    value?: string;
+  };
+}
+
+interface ServiceFormProps {
+  service?: ServiceFormData & { id: string };
+  onClose: () => void;
+  onSubmit: (data: ServiceFormData) => void;
+  config: {
+    localIp: string;
+    remoteIp: string;
+    defaultPorts: Record<string, number>;
+  };
+}
+
+const SERVICE_TYPES = [
+  { value: 'database', label: 'Database', ports: ['weaviate', 'postgresql', 'mongodb', 'redis', 'neo4j'] },
+  { value: 'ai_model', label: 'AI Model', ports: ['openwebui', 'chromadb', 'qdrant'] },
+  { value: 'storage', label: 'Storage', ports: ['dropbox', 's3'] },
+  { value: 'network', label: 'Network', ports: ['custom'] },
+  { value: 'custom', label: 'Custom', ports: ['custom'] }
+];
+
+const CREDENTIAL_TYPES = [
+  { value: 'none', label: 'No Authentication' },
+  { value: 'api_key', label: 'API Key' },
+  { value: 'jwt', label: 'JWT Token' },
+  { value: 'login', label: 'Username/Password' }
+];
+
+export const ServiceForm: React.FC<ServiceFormProps> = ({ 
+  service, 
+  onClose, 
+  onSubmit, 
+  config 
+}) => {
+  const [formData, setFormData] = useState<ServiceFormData>({
+    name: service?.name || '',
+    type: service?.type || 'database',
+    url: service?.url || '',
+    port: service?.port || 8080,
+    enabled: service?.enabled ?? true,
+    credentials: service?.credentials || { type: 'none' }
+  });
+
+  const [ipType, setIpType] = useState<'local' | 'remote' | 'custom'>('local');
+
+  // Update URL when IP type or port changes
+  useEffect(() => {
+    if (ipType === 'local') {
+      setFormData(prev => ({
+        ...prev,
+        url: `http://${config.localIp}:${prev.port}`
+      }));
+    } else if (ipType === 'remote') {
+      setFormData(prev => ({
+        ...prev,
+        url: `http://${config.remoteIp}:${prev.port}`
+      }));
+    }
+  }, [ipType, config.localIp, config.remoteIp]);
+
+  // Update port when service type changes
+  useEffect(() => {
+    const serviceType = SERVICE_TYPES.find(t => t.value === formData.type);
+    if (serviceType && serviceType.ports.length > 0) {
+      const defaultPort = config.defaultPorts[serviceType.ports[0]] || 8080;
+      setFormData(prev => ({
+        ...prev,
+        port: defaultPort
+      }));
+    }
+  }, [formData.type, config.defaultPorts]);
+
+  const handleChange = (field: keyof ServiceFormData, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleCredentialChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      credentials: {
+        type: 'none' as const,
+        ...prev.credentials,
+        [field]: value
+      }
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.url) {
+      alert('Service name and URL are required');
+      return;
+    }
+
+    onSubmit(formData);
+  };
+
+  const isUrlDisabled = ipType === 'local' || ipType === 'remote';
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-slate-800 rounded-lg">
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium text-slate-300">
+          Service Name
+        </label>
+        <input
+          type="text"
+          id="name"
+          value={formData.name}
+          onChange={(e) => handleChange('name', e.target.value)}
+          className="mt-1 block w-full bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="type" className="block text-sm font-medium text-slate-300">
+          Service Type
+        </label>
+        <select
+          id="type"
+          value={formData.type}
+          onChange={(e) => handleChange('type', e.target.value)}
+          className="mt-1 block w-full bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+        >
+          {SERVICE_TYPES.map(type => (
+            <option key={type.value} value={type.value}>
+              {type.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="url" className="block text-sm font-medium text-slate-300">
+          Service URL
+        </label>
+        <div className="mt-1 flex flex-col sm:flex-row gap-2">
+          <select
+            value={ipType}
+            onChange={(e) => setIpType(e.target.value as any)}
+            className="sm:flex-none block bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+          >
+            <option value="local">Local ({config.localIp})</option>
+            <option value="remote">Remote ({config.remoteIp})</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input
+            type="text"
+            id="url"
+            value={formData.url}
+            onChange={(e) => handleChange('url', e.target.value)}
+            disabled={isUrlDisabled}
+            className="flex-grow block w-full bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+            placeholder="http://..."
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="port" className="block text-sm font-medium text-slate-300">
+          Port
+        </label>
+        <input
+          type="number"
+          id="port"
+          value={formData.port}
+          onChange={(e) => handleChange('port', parseInt(e.target.value))}
+          className="mt-1 block w-full bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+          min="1"
+          max="65535"
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="credentialType" className="block text-sm font-medium text-slate-300">
+          Authentication
+        </label>
+        <select
+          id="credentialType"
+          value={formData.credentials?.type || 'none'}
+          onChange={(e) => handleCredentialChange('type', e.target.value)}
+          className="mt-1 block w-full bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+        >
+          {CREDENTIAL_TYPES.map(type => (
+            <option key={type.value} value={type.value}>
+              {type.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {formData.credentials?.type !== 'none' && (
+        <div className="space-y-2">
+          <div>
+            <label htmlFor="credentialKey" className="block text-sm font-medium text-slate-300">
+              Credential Key
+            </label>
+            <input
+              type="text"
+              id="credentialKey"
+              value={formData.credentials?.key || ''}
+              onChange={(e) => handleCredentialChange('key', e.target.value)}
+              className="mt-1 block w-full bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+              placeholder="API_KEY, username, etc."
+            />
+          </div>
+          <div>
+            <label htmlFor="credentialValue" className="block text-sm font-medium text-slate-300">
+              Credential Value
+            </label>
+            <input
+              type="password"
+              id="credentialValue"
+              value={formData.credentials?.value || ''}
+              onChange={(e) => handleCredentialChange('value', e.target.value)}
+              className="mt-1 block w-full bg-slate-900 border-slate-700 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white"
+              placeholder="Enter credential value"
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center">
+        <input
+          id="enabled"
+          type="checkbox"
+          checked={formData.enabled}
+          onChange={(e) => handleChange('enabled', e.target.checked)}
+          className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-cyan-600 focus:ring-cyan-500"
+        />
+        <label htmlFor="enabled" className="ml-2 block text-sm text-slate-300">
+          Enabled
+        </label>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 text-sm font-medium text-white bg-cyan-600 border border-transparent rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        >
+          {service ? 'Update Service' : 'Add Service'}
+        </button>
+      </div>
+    </form>
+  );
+}; 

@@ -13,7 +13,7 @@ import {
   Settings,
   HelpCircle
 } from 'lucide-react';
-import { ServiceInitializer } from '../services/service-initializer-browser';
+import { ServiceInitializer } from '../services/service-initializer';
 
 export const PopupDashboard: React.FC = () => {
   const [servicesState, setServicesState] = useAtom(servicesStateAtom);

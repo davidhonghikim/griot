@@ -880,4 +880,524 @@ const App = () => {
 };
 
 // Render the app
-ReactDOM.render(<App />, document.getElementById('root')); 
+ReactDOM.render(<App />, document.getElementById('root'));
+
+// Vault Web UI - Enhanced with Service Management
+class VaultWebUI {
+  constructor() {
+    this.currentView = 'vault';
+    this.services = [];
+    this.config = {
+      localIp: '192.168.1.180',
+      remoteIp: 'localhost',
+      defaultPorts: {
+        weaviate: 8080,
+        postgresql: 5432,
+        mongodb: 27017,
+        redis: 6379,
+        neo4j: 7687,
+        openwebui: 3000,
+        chromadb: 8000,
+        qdrant: 6333
+      }
+    };
+    this.init();
+  }
+
+  async init() {
+    this.setupEventListeners();
+    await this.loadConfig();
+    await this.loadServices();
+    this.render();
+  }
+
+  setupEventListeners() {
+    // Navigation
+    document.getElementById('nav-vault')?.addEventListener('click', () => this.switchView('vault'));
+    document.getElementById('nav-services')?.addEventListener('click', () => this.switchView('services'));
+    document.getElementById('nav-config')?.addEventListener('click', () => this.switchView('config'));
+
+    // Vault operations
+    document.getElementById('add-secret-btn')?.addEventListener('click', () => this.showAddSecretForm());
+    document.getElementById('import-env-btn')?.addEventListener('click', () => this.showImportForm());
+    document.getElementById('export-env-btn')?.addEventListener('click', () => this.exportEnv());
+    document.getElementById('check-all-btn')?.addEventListener('click', () => this.checkAllServices());
+
+    // Form submissions
+    document.getElementById('add-secret-form')?.addEventListener('submit', (e) => this.handleAddSecret(e));
+    document.getElementById('import-form')?.addEventListener('submit', (e) => this.handleImport(e));
+  }
+
+  async loadConfig() {
+    try {
+      const response = await fetch('/api/config');
+      if (response.ok) {
+        const config = await response.json();
+        this.config = { ...this.config, ...config };
+      }
+    } catch (error) {
+      console.warn('Failed to load config:', error);
+    }
+  }
+
+  async loadServices() {
+    try {
+      const response = await fetch('/api/services');
+      if (response.ok) {
+        this.services = await response.json();
+      }
+    } catch (error) {
+      console.warn('Failed to load services:', error);
+    }
+  }
+
+  switchView(view) {
+    this.currentView = view;
+    this.render();
+  }
+
+  async render() {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+
+    switch (this.currentView) {
+      case 'vault':
+        mainContent.innerHTML = this.renderVaultView();
+        this.setupVaultEventListeners();
+        break;
+      case 'services':
+        mainContent.innerHTML = this.renderServicesView();
+        this.setupServicesEventListeners();
+        break;
+      case 'config':
+        mainContent.innerHTML = this.renderConfigView();
+        this.setupConfigEventListeners();
+        break;
+    }
+
+    this.updateNavigation();
+  }
+
+  updateNavigation() {
+    // Update active nav item
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    document.getElementById(`nav-${this.currentView}`)?.classList.add('active');
+  }
+
+  // Vault View
+  renderVaultView() {
+    return `
+      <div class="vault-view">
+        <div class="header">
+          <h1>🔐 Secure Vault</h1>
+          <div class="actions">
+            <button id="add-secret-btn" class="btn btn-primary">Add Secret</button>
+            <button id="import-env-btn" class="btn btn-secondary">Import .env</button>
+            <button id="export-env-btn" class="btn btn-secondary">Export .env</button>
+          </div>
+        </div>
+        
+        <div class="status-panel">
+          <div class="status-item">
+            <span class="label">Vault Status:</span>
+            <span id="vault-status" class="status">Loading...</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Secrets Count:</span>
+            <span id="secrets-count" class="count">-</span>
+          </div>
+        </div>
+
+        <div id="secrets-list" class="secrets-list">
+          <div class="loading">Loading secrets...</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Services View
+  renderServicesView() {
+    return `
+      <div class="services-view">
+        <div class="header">
+          <h1>🔧 Service Management</h1>
+          <div class="actions">
+            <button id="add-service-btn" class="btn btn-primary">Add Service</button>
+            <button id="check-all-btn" class="btn btn-secondary">Check All</button>
+          </div>
+        </div>
+
+        <div class="services-overview">
+          <div class="overview-card">
+            <h3>Total Services</h3>
+            <span class="count">${this.services.length}</span>
+          </div>
+          <div class="overview-card">
+            <h3>Online</h3>
+            <span class="count online">${this.services.filter(s => s.status === 'online').length}</span>
+          </div>
+          <div class="overview-card">
+            <h3>Offline</h3>
+            <span class="count offline">${this.services.filter(s => s.status === 'offline').length}</span>
+          </div>
+          <div class="overview-card">
+            <h3>Errors</h3>
+            <span class="count error">${this.services.filter(s => s.status === 'error').length}</span>
+          </div>
+        </div>
+
+        <div id="services-list" class="services-list">
+          ${this.renderServicesList()}
+        </div>
+      </div>
+    `;
+  }
+
+  renderServicesList() {
+    if (this.services.length === 0) {
+      return `
+        <div class="empty-state">
+          <p>No services configured</p>
+          <p class="subtitle">Click "Add Service" to get started</p>
+        </div>
+      `;
+    }
+
+    return this.services.map(service => `
+      <div class="service-card" data-service-id="${service.id}">
+        <div class="service-header">
+          <div class="service-info">
+            <span class="service-icon">${this.getServiceIcon(service.type)}</span>
+            <div>
+              <h3>${service.name}</h3>
+              <p class="service-url">${service.url}</p>
+              <p class="service-meta">${service.type} • Port ${service.port}</p>
+            </div>
+          </div>
+          <div class="service-actions">
+            <span class="status-badge ${service.status}">${service.status}</span>
+            <button class="btn btn-sm" onclick="vaultUI.checkServiceStatus('${service.id}')">Check</button>
+            <button class="btn btn-sm" onclick="vaultUI.editService('${service.id}')">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="vaultUI.deleteService('${service.id}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Config View
+  renderConfigView() {
+    return `
+      <div class="config-view">
+        <div class="header">
+          <h1>⚙️ Configuration</h1>
+        </div>
+        
+        <div class="config-section">
+          <h3>Network Configuration</h3>
+          <div class="config-grid">
+            <div class="config-item">
+              <label>Local IP:</label>
+              <input type="text" id="local-ip" value="${this.config.localIp}" />
+            </div>
+            <div class="config-item">
+              <label>Remote IP:</label>
+              <input type="text" id="remote-ip" value="${this.config.remoteIp}" />
+            </div>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <h3>Default Ports</h3>
+          <div class="ports-grid">
+            ${Object.entries(this.config.defaultPorts).map(([service, port]) => `
+              <div class="port-item">
+                <label>${service}:</label>
+                <input type="number" id="port-${service}" value="${port}" min="1" max="65535" />
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="config-actions">
+          <button id="save-config-btn" class="btn btn-primary">Save Configuration</button>
+          <button id="reset-config-btn" class="btn btn-secondary">Reset to Defaults</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Service Management Methods
+  async addService(serviceData) {
+    try {
+      const response = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(serviceData)
+      });
+
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('Service added successfully', 'success');
+      } else {
+        throw new Error('Failed to add service');
+      }
+    } catch (error) {
+      this.showNotification('Failed to add service: ' + error.message, 'error');
+    }
+  }
+
+  async updateService(id, serviceData) {
+    try {
+      const response = await fetch(`/api/services/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(serviceData)
+      });
+
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('Service updated successfully', 'success');
+      } else {
+        throw new Error('Failed to update service');
+      }
+    } catch (error) {
+      this.showNotification('Failed to update service: ' + error.message, 'error');
+    }
+  }
+
+  async deleteService(id) {
+    if (!confirm('Are you sure you want to delete this service?')) return;
+
+    try {
+      const response = await fetch(`/api/services/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('Service deleted successfully', 'success');
+      } else {
+        throw new Error('Failed to delete service');
+      }
+    } catch (error) {
+      this.showNotification('Failed to delete service: ' + error.message, 'error');
+    }
+  }
+
+  async checkServiceStatus(id) {
+    try {
+      const response = await fetch(`/api/services/${id}/status`);
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+      }
+    } catch (error) {
+      this.showNotification('Failed to check service status: ' + error.message, 'error');
+    }
+  }
+
+  async checkAllServices() {
+    try {
+      const response = await fetch('/api/services/check-all', { method: 'POST' });
+      if (response.ok) {
+        await this.loadServices();
+        this.render();
+        this.showNotification('All services checked', 'success');
+      }
+    } catch (error) {
+      this.showNotification('Failed to check all services: ' + error.message, 'error');
+    }
+  }
+
+  // Utility Methods
+  getServiceIcon(type) {
+    const icons = {
+      database: '🗄️',
+      ai_model: '🤖',
+      storage: '💾',
+      network: '🌐',
+      custom: '⚙️'
+    };
+    return icons[type] || '🔧';
+  }
+
+  showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+
+  setupVaultEventListeners() {
+    // Vault-specific event listeners
+    this.loadVaultStatus();
+    this.loadSecrets();
+  }
+
+  setupServicesEventListeners() {
+    // Services-specific event listeners
+    document.getElementById('add-service-btn')?.addEventListener('click', () => {
+      this.showAddServiceForm();
+    });
+  }
+
+  setupConfigEventListeners() {
+    // Config-specific event listeners
+    document.getElementById('save-config-btn')?.addEventListener('click', () => {
+      this.saveConfig();
+    });
+  }
+
+  async loadVaultStatus() {
+    try {
+      const response = await fetch('/api/vault/status');
+      if (response.ok) {
+        const status = await response.json();
+        document.getElementById('vault-status').textContent = status.initialized ? 'Initialized' : 'Not Initialized';
+        document.getElementById('secrets-count').textContent = status.secretCount;
+      }
+    } catch (error) {
+      console.error('Failed to load vault status:', error);
+    }
+  }
+
+  async loadSecrets() {
+    try {
+      const response = await fetch('/api/vault/secrets');
+      if (response.ok) {
+        const secrets = await response.json();
+        this.renderSecretsList(secrets);
+      }
+    } catch (error) {
+      console.error('Failed to load secrets:', error);
+    }
+  }
+
+  renderSecretsList(secrets) {
+    const container = document.getElementById('secrets-list');
+    if (!container) return;
+
+    if (secrets.length === 0) {
+      container.innerHTML = '<div class="empty-state">No secrets found</div>';
+      return;
+    }
+
+    container.innerHTML = secrets.map(secret => `
+      <div class="secret-item">
+        <div class="secret-key">${secret.key}</div>
+        <div class="secret-value">${this.maskValue(secret.value)}</div>
+        <div class="secret-actions">
+          <button onclick="vaultUI.editSecret('${secret.key}')" class="btn btn-sm">Edit</button>
+          <button onclick="vaultUI.deleteSecret('${secret.key}')" class="btn btn-sm btn-danger">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  maskValue(value) {
+    if (!value || value.length <= 8) return value;
+    return value.substring(0, 4) + '*'.repeat(value.length - 8) + value.substring(value.length - 4);
+  }
+
+  showAddSecretForm() {
+    // Implementation for adding secrets
+    const key = prompt('Enter secret key:');
+    if (!key) return;
+    
+    const value = prompt('Enter secret value:');
+    if (!value) return;
+
+    this.addSecret(key, value);
+  }
+
+  async addSecret(key, value) {
+    try {
+      const response = await fetch('/api/vault/secrets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value, encrypted: true })
+      });
+
+      if (response.ok) {
+        this.loadSecrets();
+        this.showNotification('Secret added successfully', 'success');
+      } else {
+        throw new Error('Failed to add secret');
+      }
+    } catch (error) {
+      this.showNotification('Failed to add secret: ' + error.message, 'error');
+    }
+  }
+
+  showAddServiceForm() {
+    // Simple form for adding services
+    const name = prompt('Service name:');
+    if (!name) return;
+    
+    const type = prompt('Service type (database/ai_model/storage/network/custom):');
+    if (!type) return;
+    
+    const url = prompt('Service URL:');
+    if (!url) return;
+    
+    const port = parseInt(prompt('Port:') || '8080');
+    
+    this.addService({
+      name,
+      type,
+      url,
+      port,
+      enabled: true,
+      credentials: { type: 'none' }
+    });
+  }
+
+  async saveConfig() {
+    const localIp = document.getElementById('local-ip')?.value;
+    const remoteIp = document.getElementById('remote-ip')?.value;
+    
+    const defaultPorts = {};
+    Object.keys(this.config.defaultPorts).forEach(service => {
+      const port = document.getElementById(`port-${service}`)?.value;
+      if (port) defaultPorts[service] = parseInt(port);
+    });
+
+    try {
+      const response = await fetch('/api/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          localIp,
+          remoteIp,
+          defaultPorts
+        })
+      });
+
+      if (response.ok) {
+        this.config = { localIp, remoteIp, defaultPorts };
+        this.showNotification('Configuration saved successfully', 'success');
+      } else {
+        throw new Error('Failed to save configuration');
+      }
+    } catch (error) {
+      this.showNotification('Failed to save configuration: ' + error.message, 'error');
+    }
+  }
+}
+
+// Initialize the UI when the page loads
+let vaultUI;
+document.addEventListener('DOMContentLoaded', () => {
+  vaultUI = new VaultWebUI();
+}); 

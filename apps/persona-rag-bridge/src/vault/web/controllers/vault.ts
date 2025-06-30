@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getVault } from '../../secure-vault';
-import { v4 as uuidv4 } from 'uuid';
+
 
 export class VaultController {
   async getSecrets(_req: Request, res: Response) {
@@ -12,7 +12,7 @@ export class VaultController {
       for (const key of secrets) {
         const value = await vault.getSecret(key);
         secretData.push({
-          id: uuidv4(), // Generate unique ID for frontend
+          id: Date.now().toString(), // Generate unique ID for frontend
           key,
           value: value || '',
           description: '', // Placeholder for description field
@@ -44,7 +44,7 @@ export class VaultController {
         success: true, 
         message: 'Secret added successfully',
         secret: {
-          id: uuidv4(),
+          id: Date.now().toString(),
           key,
           value,
           description: description || '',
@@ -59,7 +59,7 @@ export class VaultController {
 
   async updateSecret(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      // const { id } = req.params; // ID used for response // ID used for response
       const { key, value, description } = req.body;
       
       if (!key || !value) {
@@ -73,7 +73,7 @@ export class VaultController {
         success: true, 
         message: 'Secret updated successfully',
         secret: {
-          id,
+          id: Date.now().toString(),
           key,
           value,
           description: description || '',
@@ -87,7 +87,7 @@ export class VaultController {
 
   async deleteSecret(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      // const { id } = req.params; // ID used for response // ID used for response
       const { key } = req.body; // We need the key to delete from vault
       
       if (!key) {

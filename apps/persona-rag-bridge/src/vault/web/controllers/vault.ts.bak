@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getVault } from '../../secure-vault';
-import { v4 as uuidv4 } from 'uuid';
+
 
 export class VaultController {
   async getSecrets(_req: Request, res: Response) {
@@ -59,7 +59,7 @@ export class VaultController {
 
   async updateSecret(req: Request, res: Response) {
     try {
-      const { id } = req.params; // ID used for response
+      // const { id } = req.params; // ID used for response // ID used for response
       const { key, value, description } = req.body;
       
       if (!key || !value) {
@@ -87,7 +87,7 @@ export class VaultController {
 
   async deleteSecret(req: Request, res: Response) {
     try {
-      const { id } = req.params; // ID used for response
+      // const { id } = req.params; // ID used for response // ID used for response
       const { key } = req.body; // We need the key to delete from vault
       
       if (!key) {

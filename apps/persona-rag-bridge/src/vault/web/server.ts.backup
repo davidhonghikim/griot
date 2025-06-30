@@ -2,8 +2,6 @@ import express from 'express';
 import path from 'path';
 import { vaultRoutes } from './routes/vault';
 import { configRoutes } from './routes/config';
-import { serviceRoutes } from './routes/services';
-import { getVaultServiceManager } from '../vault-service-manager';
 
 const app = express();
 const PORT = process.env.VAULT_WEB_PORT || 3001;
@@ -15,21 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialize vault service manager
-const initializeVaultServices = async () => {
-  try {
-    const manager = getVaultServiceManager();
-    await manager.initialize();
-    console.log('✅ Vault Service Manager initialized');
-  } catch (error) {
-    console.error('❌ Failed to initialize Vault Service Manager:', error);
-  }
-};
-
 // API Routes
 app.use('/api/vault', vaultRoutes);
 app.use('/api/config', configRoutes);
-app.use('/api', serviceRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -42,14 +28,10 @@ app.get('/', (_req, res) => {
 });
 
 // Start server
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.log(`🔐 Vault Web GUI: http://localhost:${PORT}`);
   console.log(`📋 API: http://localhost:${PORT}/api/vault`);
-  console.log(`🔧 Services API: http://localhost:${PORT}/api/services`);
   console.log(`🌐 Web Interface: http://localhost:${PORT}`);
-  
-  // Initialize vault services after server starts
-  await initializeVaultServices();
 });
 
 export { app }; 
